@@ -1,0 +1,290 @@
+                [.taxation]
+            }
+        }
+        """,
+    )
+
+
+def android_library(namespace: str, dependencies: str = "") -> str:
+    return f"""
+    plugins {{
+        id("com.android.library")
+        id("org.jetbrains.kotlin.android")
+    }}
+
+    android {{
+        namespace = "{namespace}"
+        compileSdk = 34
+
+        defaultConfig {{
+            minSdk = 24
+        }}
+
+        sourceSets["main"].java.srcDirs(".")
+    }}
+
+    dependencies {{
+    {dependencies.rstrip()}
+    }}
+    """
+
+
+def ensure_android_modules() -> None:
+    write_text(
+        "mobile-client/android/settings.gradle.kts",
+        """
+        pluginManagement {
+            repositories {
+                google()
+                mavenCentral()
+                gradlePluginPortal()
+            }
+        }
+
+        dependencyResolutionManagement {
+            repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+            repositories {
+                google()
+                mavenCentral()
+            }
+        }
+
+        rootProject.name = "Mobiling"
+
+        include(
+            ":app",
+            ":client-contract",
+            ":client-data",
+            ":client-usecase",
+            ":client-navigation",
+            ":client-ui",
+            ":core:config",
+            ":core:entitlement",
+            ":core:billing",
+            ":core:analytic",
+            ":core:push",
+            ":core:security",
+        )
+
+        project(":client-contract").projectDir = file("Contract")
+        project(":client-data").projectDir = file("Data")
+        project(":client-usecase").projectDir = file("UseCase")
+        project(":client-navigation").projectDir = file("Navigation")
+        project(":client-ui").projectDir = file("UI")
+        """,
+    )
+    write_text(
+        "mobile-client/android/build.gradle.kts",
+        """
+        plugins {
+            id("com.android.application") version "8.2.2" apply false
+            id("com.android.library") version "8.2.2" apply false
+            id("org.jetbrains.kotlin.android") version "1.9.10" apply false
+            id("org.jetbrains.kotlin.kapt") version "1.9.10" apply false
+        }
+        """,
+    )
+    write_text("mobile-client/android/Contract/build.gradle.kts", android_library("com.smartresponsor.mobile.client.contract"))
+    write_text(
+        "mobile-client/android/Data/build.gradle.kts",
+        android_library(
+            "com.smartresponsor.mobile.client.data",
+            """
+            implementation(project(":client-contract"))
+            implementation("androidx.core:core-ktx:1.12.0")
+            implementation("androidx.datastore:datastore-preferences:1.0.0")
+            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+            implementation("com.squareup.okhttp3:okhttp:4.12.0")
+            """,
+        ),
+    )
+    write_text(
+        "mobile-client/android/UseCase/build.gradle.kts",
+        android_library(
+            "com.smartresponsor.mobile.client.usecase",
+            """
+            implementation(project(":client-contract"))
+            implementation(project(":client-data"))
+            implementation("com.squareup.okhttp3:okhttp:4.12.0")
+            """,
+        ),
+    )
+    write_text("mobile-client/android/Navigation/build.gradle.kts", android_library("com.smartresponsor.mobile.client.navigation"))
+    write_text(
+        "mobile-client/android/UI/build.gradle.kts",
+        android_library(
+            "com.smartresponsor.mobile.client.ui",
+            """
+            implementation(project(":client-contract"))
+            """,
+        ),
+    )
+    write_text(
+        "mobile-client/android/app/build.gradle.kts",
+        """
+        plugins {
+            id("com.android.application")
+            id("org.jetbrains.kotlin.android")
+            id("org.jetbrains.kotlin.kapt")
+        }
+
+        android {
+            namespace = "com.smartresponsor.mobile"
+            compileSdk = 34
+
+            defaultConfig {
+                applicationId = "com.smartresponsor.mobile"
+                minSdk = 24
+                targetSdk = 34
+                versionCode = 1
+                versionName = "0.1.0-materialized"
+            }
+
+            buildTypes {
+                getByName("release") {
+                    isMinifyEnabled = true
+                    proguardFiles(
+                        getDefaultProguardFile("proguard-android-optimize.txt"),
+                        "proguard-rules.pro",
+                    )
+                }
+                getByName("debug") {
+                    isMinifyEnabled = false
+                }
+            }
+
+            buildFeatures {
+                compose = true
+            }
+
+            composeOptions {
+                kotlinCompilerExtensionVersion = "1.5.3"
+            }
+        }
+
+        dependencies {
+            implementation(project(":client-contract"))
+            implementation(project(":client-data"))
+            implementation(project(":client-usecase"))
+            implementation(project(":client-navigation"))
+            implementation(project(":client-ui"))
+            implementation(project(":core:config"))
+            implementation(project(":core:entitlement"))
+            implementation(project(":core:billing"))
+            implementation(project(":core:analytic"))
+            implementation(project(":core:push"))
+            implementation(project(":core:security"))
+            implementation("androidx.core:core-ktx:1.12.0")
+            implementation("androidx.activity:activity-compose:1.8.2")
+            implementation("androidx.compose.ui:ui:1.6.0")
+            implementation("androidx.compose.material3:material3:1.1.2")
+            implementation("androidx.work:work-runtime-ktx:2.9.0")
+        }
+        """,
+    )
+
+    canonical_dependencies = """
+
+    dependencies {
+        implementation(project(":client-contract"))
+        implementation(project(":client-data"))
+        implementation(project(":client-usecase"))
+    }
+    """
+    for module in ("config", "entitlement", "billing", "analytic", "push", "security"):
+        path = ROOT / f"mobile-client/android/core/{module}/build.gradle.kts"
+        if not path.exists():
+            continue
+        text = path.read_text(encoding="utf-8")
+        if 'project(":client-contract")' not in text:
+            path.write_text(text.rstrip() + dedent(canonical_dependencies) + "\n", encoding="utf-8")
+
+    write_text(
+        "mobile-client/android/app/src/main/java/com/smartresponsor/mobile/MainActivity.kt",
+        """
+        package com.smartresponsor.mobile
+
+        import android.os.Bundle
+        import androidx.activity.ComponentActivity
+        import androidx.activity.compose.setContent
+        import androidx.compose.foundation.layout.Arrangement
+        import androidx.compose.foundation.layout.Column
+        import androidx.compose.foundation.layout.fillMaxSize
+        import androidx.compose.foundation.layout.padding
+        import androidx.compose.material3.MaterialTheme
+        import androidx.compose.material3.Surface
+        import androidx.compose.material3.Text
+        import androidx.compose.runtime.Composable
+        import androidx.compose.ui.Modifier
+        import androidx.compose.ui.unit.dp
+        import com.smartresponsor.mobile.app.dashboard.DashboardRouteMap
+        import com.smartresponsor.mobile.app.order.OrderOwnedRouteMap
+        import com.smartresponsor.mobile.app.vendor.VendorOwnedRouteMap
+
+        class MainActivity : ComponentActivity() {
+            override fun onCreate(savedInstanceState: Bundle?) {
+                super.onCreate(savedInstanceState)
+                setContent {
+                    MaterialTheme {
+                        Surface(modifier = Modifier.fillMaxSize()) {
+                            MaterializationScreen()
+                        }
+                    }
+                }
+            }
+        }
+
+        @Composable
+        private fun MaterializationScreen() {
+            val dashboard = DashboardRouteMap()
+            val vendor = VendorOwnedRouteMap()
+            val order = OrderOwnedRouteMap()
+
+            Column(
+                modifier = Modifier.padding(24.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                Text("SmartResponsor Mobiling", style = MaterialTheme.typography.headlineSmall)
+                Text("Repository materialization baseline")
+                Text("Dashboard: ${dashboard.primarySections().joinToString()}")
+                Text("Entry flow: ${dashboard.entryFlows().joinToString()}")
+                Text("Vendor owns: ${vendor.ownedFlows().joinToString()}")
+                Text("Order owns: ${order.ownedFlows().joinToString()}")
+                Text("Order embeds: ${order.embeddedCapabilities().joinToString()}")
+            }
+        }
+        """,
+    )
+
+    remote_config = ROOT / "mobile-client/android/Data/System/Config/RemoteConfigStore.kt"
+    if remote_config.exists():
+        text = remote_config.read_text(encoding="utf-8")
+        text = text.replace(
+            '"{"ttlSec":1800,"flag":{"analyticEnabled":true,"billing.graceDay":3,"security.signingEnabled":true}}"',
+            '"""{"ttlSec":1800,"flag":{"analyticEnabled":true,"billing.graceDay":3,"security.signingEnabled":true}}"""',
+        )
+        remote_config.write_text(text, encoding="utf-8")
+
+    remove("mobile-client/android/core/billing/src/main/java/com/smartresponsor/core/billing/Shell.kt")
+
+
+def ensure_ios_modules() -> None:
+    mobile_client_sources = [
+        "Contract",
+        "Data",
+        "UseCase",
+        "Navigation",
+        "UI",
+        "App/Auth",
+        "App/Catalog",
+        "App/Dashboard",
+        "App/Message",
+        "App/Order",
+        "App/Product",
+        "App/Profile",
+        "App/Project",
+        "App/Shipment",
+        "App/Taxation",
+        "App/Vendor",
+    ]
+    source_lines = ",\n                ".join(f'"{item}"' for item in mobile_client_sources)
