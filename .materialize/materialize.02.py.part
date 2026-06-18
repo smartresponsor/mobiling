@@ -1,0 +1,266 @@
+    write_text(
+        "mobile-client/ios/Package.swift",
+        f"""
+        // swift-tools-version: 5.9
+        import PackageDescription
+
+        let package = Package(
+            name: "Mobiling",
+            platforms: [.iOS(.v15)],
+            products: [
+                .library(name: "MobileClient", targets: ["MobileClient"]),
+                .library(name: "CoreConfig", targets: ["CoreConfig"]),
+                .library(name: "CoreEntitlement", targets: ["CoreEntitlement"]),
+                .library(name: "CoreBilling", targets: ["CoreBilling"]),
+                .library(name: "CoreAnalytic", targets: ["CoreAnalytic"]),
+                .library(name: "CorePush", targets: ["CorePush"]),
+                .library(name: "CoreSecurity", targets: ["CoreSecurity"]),
+            ],
+            targets: [
+                .target(
+                    name: "MobileClient",
+                    path: ".",
+                    exclude: ["Sources", "App/ContentView.swift", "App/MobileApp.swift", "App/Info.plist", "project.yml"],
+                    sources: [
+                        {source_lines}
+                    ]
+                ),
+                .target(name: "CoreConfig", dependencies: ["MobileClient"], path: "Sources/CoreConfig"),
+                .target(name: "CoreEntitlement", dependencies: ["MobileClient"], path: "Sources/CoreEntitlement"),
+                .target(name: "CoreBilling", dependencies: ["MobileClient"], path: "Sources/CoreBilling"),
+                .target(name: "CoreAnalytic", dependencies: ["MobileClient"], path: "Sources/CoreAnalytic"),
+                .target(name: "CorePush", dependencies: ["MobileClient"], path: "Sources/CorePush"),
+                .target(name: "CoreSecurity", dependencies: ["MobileClient"], path: "Sources/CoreSecurity"),
+            ]
+        )
+        """,
+    )
+
+    project_sources = "\n".join(f"      - path: {item}" for item in mobile_client_sources)
+    project_yml = f"""name: Mobiling
+options:
+  bundleIdPrefix: com.smartresponsor
+  deploymentTarget:
+    iOS: "15.0"
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+targets:
+  MobileClient:
+    type: framework
+    platform: iOS
+    sources:
+{project_sources}
+  CoreConfig:
+"""
+    project_yml += """    type: framework
+    platform: iOS
+    sources: [Sources/CoreConfig]
+    dependencies: [{ target: MobileClient }]
+  CoreEntitlement:
+    type: framework
+    platform: iOS
+    sources: [Sources/CoreEntitlement]
+    dependencies: [{ target: MobileClient }]
+  CoreBilling:
+    type: framework
+    platform: iOS
+    sources: [Sources/CoreBilling]
+    dependencies: [{ target: MobileClient }]
+  CoreAnalytic:
+    type: framework
+    platform: iOS
+    sources: [Sources/CoreAnalytic]
+    dependencies: [{ target: MobileClient }]
+  CorePush:
+    type: framework
+    platform: iOS
+    sources: [Sources/CorePush]
+    dependencies: [{ target: MobileClient }]
+  CoreSecurity:
+    type: framework
+    platform: iOS
+    sources: [Sources/CoreSecurity]
+    dependencies: [{ target: MobileClient }]
+  Mobiling:
+    type: application
+    platform: iOS
+    sources:
+      - path: App/ContentView.swift
+      - path: App/MobileApp.swift
+    info:
+      path: App/Info.plist
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.smartresponsor.mobile
+    dependencies:
+      - target: MobileClient
+      - target: CoreConfig
+      - target: CoreEntitlement
+      - target: CoreBilling
+      - target: CoreAnalytic
+      - target: CorePush
+      - target: CoreSecurity
+schemes:
+  Mobiling:
+    build:
+      targets:
+        Mobiling: all
+    run:
+      config: Debug
+"""
+    write_text(
+        "mobile-client/ios/project.yml",
+        project_yml,
+    )
+
+    for path in (ROOT / "mobile-client/ios/Sources").rglob("*.swift"):
+        text = path.read_text(encoding="utf-8")
+        if "import MobileClient" not in text:
+            lines = text.splitlines()
+            insertion = 0
+            while insertion < len(lines) and (lines[insertion].startswith("//") or not lines[insertion].strip()):
+                insertion += 1
+            lines.insert(insertion, "import MobileClient")
+            path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+    write_text(
+        "mobile-client/ios/App/ContentView.swift",
+        """
+        import SwiftUI
+        import MobileClient
+
+        struct ContentView: View {
+            private let dashboard = DashboardRouteMap()
+            private let vendor = VendorOwnedRouteMap()
+            private let order = OrderOwnedRouteMap()
+
+            var body: some View {
+                List {
+                    Section("SmartResponsor Mobiling") {
+                        Text("Repository materialization baseline")
+                    }
+                    Section("Dashboard") {
+                        Text(dashboard.primarySections().map(\.rawValue).joined(separator: ", "))
+                        Text("Entry: " + dashboard.entryFlows().map(\.rawValue).joined(separator: ", "))
+                    }
+                    Section("Vendor ownership") {
+                        Text(vendor.ownedFlows().map(\.rawValue).joined(separator: ", "))
+                    }
+                    Section("Order ownership") {
+                        Text(order.ownedFlows().map(\.rawValue).joined(separator: ", "))
+                        Text("Embedded: " + order.embeddedCapabilities().map(\.rawValue).joined(separator: ", "))
+                    }
+                }
+            }
+        }
+        """,
+    )
+    write_text(
+        "mobile-client/ios/App/MobileApp.swift",
+        """
+        import SwiftUI
+
+        @main
+        struct MobilingApp: App {
+            var body: some Scene {
+                WindowGroup {
+                    ContentView()
+                }
+            }
+        }
+        """,
+    )
+
+
+def ensure_edge_runtime() -> None:
+    write_text(
+        "mobile-edge/package.json",
+        """
+        {
+          "name": "mobile-edge",
+          "private": true,
+          "type": "module",
+          "scripts": {
+            "dev": "tsx src/app.ts",
+            "build": "tsc -p tsconfig.json",
+            "typecheck": "tsc -p tsconfig.json --noEmit",
+            "start": "node dist/app.js"
+          },
+          "dependencies": {
+            "@aws-sdk/client-s3": "^3.600.0",
+            "@fastify/cors": "^9.0.1",
+            "@fastify/helmet": "^12.2.0",
+            "@fastify/rate-limit": "^8.0.0",
+            "@fastify/static": "^7.0.4",
+            "better-sqlite3": "^11.3.0",
+            "fastify": "^4.28.1",
+            "fastify-raw-body": "^4.3.0",
+            "jose": "^5.9.6",
+            "pg": "^8.13.0",
+            "pino": "^9.4.0",
+            "prom-client": "^15.1.3"
+          },
+          "devDependencies": {
+            "@types/better-sqlite3": "^7.6.11",
+            "@types/node": "^22.7.4",
+            "@types/pg": "^8.11.10",
+            "tsx": "^4.19.1",
+            "typescript": "^5.6.3"
+          }
+        }
+        """,
+    )
+    write_text(
+        "mobile-edge/src/env.ts",
+        """
+        const integer = (name: string, fallback: number): number =>
+          Number.parseInt(process.env[name] || String(fallback), 10);
+
+        const boolean = (name: string, fallback: boolean): boolean =>
+          (process.env[name] || String(fallback)).toLowerCase() === "true";
+
+        const list = (name: string, fallback = ""): string[] =>
+          (process.env[name] || fallback).split(",").map((value) => value.trim()).filter(Boolean);
+
+        export const ENV = {
+          NODE_ENV: process.env.NODE_ENV || "development",
+          PORT: integer("PORT", 8080),
+          ADMIN_TOKEN: process.env.ADMIN_TOKEN || "dev",
+          ADMIN_ALLOW_IPS: list("ADMIN_ALLOW_IPS"),
+          CSRF_REQUIRED: boolean("CSRF_REQUIRED", false),
+          JWT_SECRET: process.env.JWT_SECRET || "devsecret",
+          JWT_PREV_SECRET: process.env.JWT_PREV_SECRET || "",
+          JWT_PREV_EXP_TS: integer("JWT_PREV_EXP_TS", 0),
+          JWT_TTL_SEC: integer("JWT_TTL_SEC", 3600),
+          DEV_BEARER: process.env.DEV_BEARER || "Bearer dev",
+          METRICS_ENABLED: boolean("METRICS_ENABLED", false),
+          ALLOW_ORIGINS: list("ALLOW_ORIGINS", "*"),
+          TRACE_RESPONSE_HEADER: process.env.TRACE_RESPONSE_HEADER || "Trace-Id",
+          ZIPKIN_URL: process.env.ZIPKIN_URL || "",
+          LOG_SHIP_URL: process.env.LOG_SHIP_URL || "",
+          CONFIG_VERSION: process.env.CONFIG_VERSION || "1",
+          CONFIG_SECRET_V1: process.env.CONFIG_SECRET_V1 || "changeme",
+          CONFIG_ED25519_PRIVATE: process.env.CONFIG_ED25519_PRIVATE || "",
+          CONFIG_KEY_ID: process.env.CONFIG_KEY_ID || "k1",
+          ANALYTIC_SECRET: process.env.ANALYTIC_SECRET || "dev-analytic",
+          RATE_MOBILE_RPM: integer("RATE_MOBILE_RPM", 120),
+          CORE_COMMERCE_URL: process.env.CORE_COMMERCE_URL || "http://localhost:9000",
+          CORE_AUTH: process.env.CORE_AUTH || "",
+          CORE_TIMEOUT_MS: integer("CORE_TIMEOUT_MS", 3000),
+          CB_FAILS_OPEN: integer("CB_FAILS_OPEN", 5),
+          CB_COOLDOWN_MS: integer("CB_COOLDOWN_MS", 20000),
+          STORE: (process.env.STORE || "sqlite").toLowerCase(),
+          DB_PATH: process.env.DB_PATH || "data/mobile-edge.sqlite",
+          DB_URL: process.env.DB_URL || "postgres://postgres:postgres@localhost:5432/mobile_edge",
+          WEBHOOK_URL_REQUEUE: process.env.WEBHOOK_URL_REQUEUE || "",
+          WEBHOOK_URL_PURGE: process.env.WEBHOOK_URL_PURGE || "",
+          WEBHOOK_SECRET: process.env.WEBHOOK_SECRET || "dev-webhook",
+          S3_BUCKET: process.env.S3_BUCKET || "",
+          S3_REGION: process.env.S3_REGION || "",
+          REQUEUE_ENABLED: boolean("REQUEUE_ENABLED", false),
+          REQUEUE_BASE_MS: integer("REQUEUE_BASE_MS", 1000),
+          REQUEUE_CAP_MS: integer("REQUEUE_CAP_MS", 600000),
+          REQUEUE_RPM: integer("REQUEUE_RPM", 60),
+          REQUEUE_DAILY: integer("REQUEUE_DAILY", 10000),
+          REQUEUE_CONCURRENCY: integer("REQUEUE_CONCURRENCY", 4),
