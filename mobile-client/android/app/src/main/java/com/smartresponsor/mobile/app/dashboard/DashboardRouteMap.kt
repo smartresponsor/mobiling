@@ -1,25 +1,14 @@
 package com.smartresponsor.mobile.app.dashboard
 
-/**
- * Marketing America Corp. Oleksandr Tishchenko
- *
- * Canonical dashboard route map.
- *
- * It reflects the working spec where Dashboard is the only root section,
- * with primary sections and secondary flows owned by Catalog / Vendor /
- * Order chains rather than exposed as a flat surface.
- */
+/** Canonical Dashboard ownership and navigation map. */
 class DashboardRouteMap {
-    fun primarySections(): List<DashboardPrimarySection> = listOf(
-        DashboardPrimarySection.CATALOG,
-        DashboardPrimarySection.MESSAGE,
-        DashboardPrimarySection.VENDOR,
-        DashboardPrimarySection.AUTH,
+    fun primarySections(): List<DashboardNavigationSection> = listOf(
+        DashboardNavigationSection.CATALOG,
+        DashboardNavigationSection.MESSAGE,
+        DashboardNavigationSection.VENDOR,
     )
 
-    fun secondaryFlows(): List<DashboardSecondaryFlow> = listOf(
-        DashboardSecondaryFlow.PRODUCT,
-    )
+    fun entryFlows(): List<DashboardEntryFlow> = listOf(DashboardEntryFlow.AUTH)
 
     fun navigationOwners(): Map<String, String> = mapOf(
         "catalog" to "catalog/navigation",
