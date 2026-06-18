@@ -1,11 +1,6 @@
 package com.smartresponsor.mobile.app.order
 
-/**
- * Marketing America Corp. Oleksandr Tishchenko
- *
- * Order-owned secondary flows.
- */
+/** Navigable secondary flows owned by Order. */
 enum class OrderOwnedFlow {
     SHIPMENT,
-    TAXATION,
 }
