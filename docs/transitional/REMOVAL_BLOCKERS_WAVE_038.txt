@@ -1,0 +1,7 @@
+Mobile Wave 038 - Removal blockers
+
+1. Flat ProductFeatureBridge and OrderFeatureBridge still exist as compatibility-facing entry points.
+2. Catalog navigation was still pointing directly at ProductFeatureBridge before this wave.
+3. VendorBusinessBridge had flat bridge storage before this wave.
+4. ShipmentFeatureBridge and TaxationFeatureBridge remain required for compatibility construction of order-owned wrappers.
+5. Actual physical removal should only happen after call sites are migrated to wrapper-first constructors and navigation owners.

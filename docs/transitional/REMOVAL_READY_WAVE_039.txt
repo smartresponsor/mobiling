@@ -1,0 +1,6 @@
+Mobile Wave 039 - Removal readiness
+
+1. ShipmentFeatureBridge is no longer required by active order-owned runtime logic.
+2. TaxationFeatureBridge is no longer required by active order-owned runtime logic.
+3. Both flat bridges remain only as compatibility shims for transitional call sites.
+4. Next safe removal candidate pass can target direct flat shipment/taxation usages before physical archive/removal.

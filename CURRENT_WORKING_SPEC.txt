@@ -1,0 +1,9 @@
+Dashboard is the only root section.
+Auth is an entry flow under Dashboard, not a regular business section.
+Catalog, Message, Vendor, and Auth are Dashboard-owned primary sections.
+Vendor is the main business-side owner.
+Product, Order, Project, and Profile are Vendor-owned flows.
+Shipment is Order-owned.
+Taxation is embedded in Order.
+Identity is internal-only.
+Use singular names everywhere.

@@ -1,0 +1,3 @@
+-keep class com.smartresponsor.** { *; }
+-dontnote javax.annotation.**
+-dontwarn androidx.**

@@ -1,0 +1,30 @@
+Working structural canon for the reconstructed mobile workspace:
+
+mobile-client/
+  android/
+  ios/
+  contract/
+  docs/
+
+mobile-edge/
+  src/
+    routes/
+    middleware/
+    auth/
+    service/
+    adapter/
+    schema/
+    store/
+    util/
+    worker/
+  public/
+  clients/
+  openapi/
+
+Architectural direction for future waves:
+- layer-first at top level;
+- domain folders at second level;
+- flow/subfeature folders at third level when justified;
+- use `UseCase` instead of `Domain`;
+- use `Contract` instead of `Shared`;
+- use `routes` for internal edge route entry points.

@@ -1,0 +1,13 @@
+Wave 003 introduces target domain scaffolds inside mobile-edge/src.
+
+Canonical target pattern:
+- routes/[domain]/
+- usecase/[domain]/
+- contract/[domain]/
+
+Cross-cutting layers remain:
+- service/
+- repository/
+- middleware/
+- infrastructure/ (pending dedicated move if needed)
+- config/

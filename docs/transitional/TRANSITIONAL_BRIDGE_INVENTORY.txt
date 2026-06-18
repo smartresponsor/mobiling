@@ -1,0 +1,53 @@
+Marketing America Corp. Oleksandr Tishchenko
+
+Wave 042 transitional bridge inventory.
+
+Canonical root/app entry bridges:
+- DashboardBridge
+- DashboardNavigationBridge
+- AuthFeatureBridge
+- CatalogFeatureBridge
+- CatalogNavigationBridge
+- MessageFeatureBridge
+- VendorFeatureBridge
+- VendorBusinessBridge
+- VendorNavigationBridge
+- OrderBusinessBridge
+
+Vendor-owned wrappers preferred over direct flat bridges:
+- VendorProductBridge -> preferred over ProductFeatureBridge
+- VendorOrderBridge -> preferred over OrderFeatureBridge
+- VendorProjectBridge -> preferred over ProjectFeatureBridge
+- VendorProfileBridge -> preferred over ProfileFeatureBridge
+
+Order-owned wrappers preferred over direct flat bridges:
+- OrderShipmentBridge -> preferred over ShipmentFeatureBridge
+- OrderTaxationBridge -> preferred over TaxationFeatureBridge
+
+Legacy compatibility boundaries:
+- LegacyVendorBusinessBridgeFactory -> wrapper-first vendor compatibility boundary
+- LegacyOrderBusinessBridgeFactory -> wrapper-first order compatibility boundary
+
+Flat compatibility shims isolated behind boundaries:
+- LegacyVendorFlatCompatibility -> vendor-level flat compatibility shim
+- LegacyOrderFlatCompatibility -> order-level flat compatibility shim
+
+Compatibility-only flat bridges retained for now:
+- ProductFeatureBridge
+- OrderFeatureBridge
+- ProjectFeatureBridge
+- ProfileFeatureBridge
+- ShipmentFeatureBridge
+- TaxationFeatureBridge
+
+Flat bridges that remain canonical for now:
+- CatalogFeatureBridge
+- MessageFeatureBridge
+- VendorFeatureBridge
+- AuthFeatureBridge
+
+Wave 042 shift:
+- Wrapper-first construction stays in *BusinessBridgeFactory files.
+- Flat compatibility moved into dedicated *FlatCompatibility files.
+- Deprecated fromFlatFeatures entry points now forward into isolated shims.
+- Removal/archive can target shim call sites without touching wrapper-first boundaries.

@@ -1,0 +1,14 @@
+{
+  "hosts": [
+    {
+      "host": "api.smartresponsor.dev",
+      "pins": [
+        "sha256/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="
+      ]
+    },
+    {
+      "host": "localhost",
+      "pins": []
+    }
+  ]
+}

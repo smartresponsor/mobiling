@@ -1,0 +1,7 @@
+Wave 002 canon moves applied
+- src/schema -> src/contract
+- src/store -> src/repository
+- imports updated accordingly
+- src/routes remains canonical inbound route root
+- src/service remains technical/application service layer
+- deeper infrastructure folders remain pending for later waves

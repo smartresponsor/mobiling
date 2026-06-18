@@ -1,0 +1,6 @@
+Mobile Wave 040 - Removal readiness
+
+1. Active VendorBusinessBridge no longer imports or constructs from flat ShipmentFeatureBridge / TaxationFeatureBridge.
+2. Legacy flat compatibility has been isolated to dedicated LegacyVendorBusinessBridgeFactory files.
+3. Active OrderBusinessBridge is wrapper-first only.
+4. Next safe removal candidate pass can target direct compatibility construction sites instead of active business bridges.

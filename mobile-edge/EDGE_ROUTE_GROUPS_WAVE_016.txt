@@ -1,0 +1,9 @@
+Wave 016 adds lightweight grouped route manifests.
+
+Purpose:
+- make the new canonical account-side and commerce-side routes discoverable;
+- prepare later app-level registration without forcing framework rewrites in this wave.
+
+Groups:
+- src/routes/account/index.ts
+- src/routes/commerce/index.ts

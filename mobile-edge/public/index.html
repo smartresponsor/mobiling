@@ -1,0 +1,9 @@
+<!doctype html>
+<meta charset='utf-8'/>
+<title>Mobile Edge Admin</title>
+<h1>Admin</h1>
+<button id='m'>/metrics</button>
+<pre id='out'></pre>
+<script>
+m.onclick=async()=>{ const r=await fetch('/metrics'); out.textContent=await r.text(); };
+</script>

@@ -1,0 +1,6 @@
+Mobile Wave 041 - Removal readiness
+
+1. Vendor-level compatibility no longer constructs OrderShipmentBridge / OrderTaxationBridge directly.
+2. LegacyVendorBusinessBridgeFactory now depends on OrderBusinessBridge as the transitional order boundary.
+3. Shipment/Taxation compatibility has been pushed fully into LegacyOrderBusinessBridgeFactory.
+4. Next safe pass can target actual legacy call-site migration to OrderBusinessBridge factory entry points.

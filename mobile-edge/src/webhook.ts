@@ -1,0 +1,1 @@
+import { getStore } from './repository/index.js'; export async function publish(event:string,payload:any){ const s=await getStore(); const subs=await s.whFindByEvent(event); for(const sub of subs){ await s.whEnqueue(sub.id,event,payload); } }

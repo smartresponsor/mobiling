@@ -1,0 +1,6 @@
+Mobile Wave 042 - Removal readiness
+
+1. Wrapper-first business factories are now separated from flat compatibility shims.
+2. Flat compatibility construction lives only in LegacyVendorFlatCompatibility / LegacyOrderFlatCompatibility.
+3. Deprecated fromFlatFeatures entry points remain as forwarding facades for compatibility only.
+4. Next safe pass can migrate or archive shim call sites without destabilizing active wrapper-first business boundaries.
