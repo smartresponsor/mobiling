@@ -1,7 +1,7 @@
 package com.smartresponsor.mobile.client.usecase.system.entitlement
 
-import com.smartresponsor.mobile.client.contract.system.entitlement.entitlementsnapshot
-import com.smartresponsor.mobile.client.data.system.entitlement.entitlementsnapshotgateway
+import com.smartresponsor.mobile.client.contract.system.entitlement.EntitlementSnapshot
+import com.smartresponsor.mobile.client.data.system.entitlement.EntitlementSnapshotGateway
 
 /**
  * Canonical use case for refreshing entitlement state.

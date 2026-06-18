@@ -1,9 +1,9 @@
 package com.smartresponsor.core.config
 
 import android.content.Context
-import com.smartresponsor.mobile.client.contract.system.config.remoteconfigpayload
-import com.smartresponsor.mobile.client.data.system.config.remoteconfigstore
-import com.smartresponsor.mobile.client.usecase.system.config.refreshremoteconfigusecase
+import com.smartresponsor.mobile.client.contract.system.config.RemoteConfigPayload
+import com.smartresponsor.mobile.client.data.system.config.RemoteConfigStore
+import com.smartresponsor.mobile.client.usecase.system.config.RefreshRemoteConfigUseCase
 
 /**
  * Legacy-compatible Android entry point bridged to canonical system/config slices.

@@ -1,6 +1,6 @@
 package com.smartresponsor.mobile.client.ui.product.listing
 
-import com.smartresponsor.mobile.client.contract.product.listing.productcardsummary
+import com.smartresponsor.mobile.client.contract.product.listing.ProductCardSummary
 
 /**
  * Marketing America Corp. Oleksandr Tishchenko

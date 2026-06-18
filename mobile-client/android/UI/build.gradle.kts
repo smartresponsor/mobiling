@@ -7,4 +7,8 @@ android {
     namespace = "com.smartresponsor.mobile.client.ui"
     compileSdk = 34
     defaultConfig { minSdk = 24 }
+    sourceSets["main"].java.srcDirs(".")
 }
+
+
+        dependencies { implementation(project(":client-contract")) }

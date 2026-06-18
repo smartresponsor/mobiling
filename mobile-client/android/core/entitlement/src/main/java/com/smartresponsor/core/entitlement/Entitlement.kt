@@ -1,8 +1,8 @@
 package com.smartresponsor.core.entitlement
 
-import com.smartresponsor.mobile.client.contract.system.entitlement.entitlementsnapshot
-import com.smartresponsor.mobile.client.data.system.entitlement.entitlementsnapshotgateway
-import com.smartresponsor.mobile.client.usecase.system.entitlement.refreshentitlementsnapshotusecase
+import com.smartresponsor.mobile.client.contract.system.entitlement.EntitlementSnapshot
+import com.smartresponsor.mobile.client.data.system.entitlement.EntitlementSnapshotGateway
+import com.smartresponsor.mobile.client.usecase.system.entitlement.RefreshEntitlementSnapshotUseCase
 
 /**
  * Legacy-compatible Android entry point bridged to canonical system/entitlement slices.

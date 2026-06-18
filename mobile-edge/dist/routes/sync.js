@@ -1,0 +1,3 @@
+export default async function route(app) {
+    app.post("/mobile/sync/event", { config: { rateLimit: { max: 120, timeWindow: "1 minute" } } }, async (_req, res) => res.status(204).send());
+}

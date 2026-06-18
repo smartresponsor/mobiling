@@ -1,27 +1,47 @@
-
-import { ENV } from "./env.js";
 import type { FastifyInstance } from "fastify";
-let client:any, register:any; let counters:any={}, hist:any={};
-async function ensure(){
-  if(!ENV.METRICS_ENABLED) return false;
-  if(!client){
-    const mod = await import("prom-client");
-    client = mod; register = client.register; client.collectDefaultMetrics();
-    counters.req = new client.Counter({ name:"http_requests_total", help:"Requests", labelNames:["route","code"] });
-    hist.lat = new client.Histogram({ name:"http_duration_ms", help:"Handler time (ms)", buckets:[25,50,100,250,500,1000,2000] });
-    counters.cb = new client.Counter({ name:"circuit_state_total", help:"Circuit state changes", labelNames:["state"] });
+import { ENV } from "./env.js";
+
+let client: any;
+let register: any;
+let requestCounter: any;
+let durationHistogram: any;
+let circuitCounter: any;
+let eventCounter: any;
+
+async function ensure(): Promise<boolean> {
+  if (!ENV.METRICS_ENABLED) return false;
+  if (!client) {
+    client = await import("prom-client");
+    register = client.register;
+    client.collectDefaultMetrics();
+    requestCounter = new client.Counter({ name: "http_requests_total", help: "HTTP request count", labelNames: ["route", "code"] });
+    durationHistogram = new client.Histogram({ name: "http_duration_ms", help: "HTTP handler duration", buckets: [25, 50, 100, 250, 500, 1000, 2000] });
+    circuitCounter = new client.Counter({ name: "circuit_state_total", help: "Circuit state transitions", labelNames: ["state"] });
+    eventCounter = new client.Counter({ name: "mobile_edge_event_total", help: "Mobile edge event count", labelNames: ["name", "label"] });
   }
   return true;
 }
+
 export const M = {
-  async route(app: FastifyInstance){
-    if(!ENV.METRICS_ENABLED) return; await ensure();
-    app.get("/metrics", async (_req, res)=>{ res.header("Content-Type", register.contentType); return await register.metrics(); });
+  async route(app: FastifyInstance): Promise<void> {
+    if (!(await ensure())) return;
+    app.get("/metrics", async (_request, reply) => {
+      reply.header("Content-Type", register.contentType);
+      return register.metrics();
+    });
   },
-  async observe(route:string, code:number, ms:number){
-    if(!ENV.METRICS_ENABLED) return; await ensure(); counters.req.inc({route, code:String(code)}); hist.lat.observe(ms);
+  async observe(route: string, code: number, durationMs: number): Promise<void> {
+    if (!(await ensure())) return;
+    requestCounter.inc({ route, code: String(code) });
+    durationHistogram.observe(durationMs);
   },
-  async circuit(state:"open"|"half_open"|"closed"){
-    if(!ENV.METRICS_ENABLED) return; await ensure(); counters.cb.inc({state});
-  }
+  async circuit(state: "open" | "half_open" | "closed"): Promise<void> {
+    if (!(await ensure())) return;
+    circuitCounter.inc({ state });
+  },
+  async inc(name: string, label: Record<string, unknown> = {}): Promise<void> {
+    if (!(await ensure())) return;
+    const serialized = Object.entries(label).sort(([left], [right]) => left.localeCompare(right)).map(([key, value]) => `${key}=${String(value)}`).join(",");
+    eventCounter.inc({ name, label: serialized });
+  },
 };

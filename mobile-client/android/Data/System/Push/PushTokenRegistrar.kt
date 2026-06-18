@@ -1,6 +1,6 @@
 package com.smartresponsor.mobile.client.data.system.push
 
-import com.smartresponsor.mobile.client.contract.system.push.pushregistrationpayload
+import com.smartresponsor.mobile.client.contract.system.push.PushRegistrationPayload
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request

@@ -1,6 +1,6 @@
 package com.smartresponsor.mobile.client.usecase.system.config
 
-import com.smartresponsor.mobile.client.data.system.config.remoteconfigstore
+import com.smartresponsor.mobile.client.data.system.config.RemoteConfigStore
 
 class RefreshRemoteConfigUseCase(private val remoteConfigStore: RemoteConfigStore) {
     suspend operator fun invoke(

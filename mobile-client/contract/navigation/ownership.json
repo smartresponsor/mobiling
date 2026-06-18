@@ -2,12 +2,31 @@
   "$schema": "https://smartresponsor.dev/schema/mobile-ownership-v1.json",
   "schema": "smartresponsor.mobile.ownership.v1",
   "root": "dashboard",
-  "entry_flow": ["auth"],
-  "primary_section": ["catalog", "message", "vendor"],
+  "entry_flow": [
+    "auth"
+  ],
+  "primary_section": [
+    "catalog",
+    "message",
+    "vendor"
+  ],
   "owner": {
-    "vendor": ["product", "order", "project", "profile"],
-    "order": ["shipment"]
+    "vendor": [
+      "product",
+      "order",
+      "project",
+      "profile"
+    ],
+    "order": [
+      "shipment"
+    ]
   },
-  "embedded": {"order": ["taxation"]},
-  "internal": ["identity"]
+  "embedded": {
+    "order": [
+      "taxation"
+    ]
+  },
+  "internal": [
+    "identity"
+  ]
 }

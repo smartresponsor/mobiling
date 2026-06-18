@@ -1,6 +1,6 @@
 package com.smartresponsor.mobile.client.data.system.security
 
-import com.smartresponsor.mobile.client.contract.system.security.signatureheaders
+import com.smartresponsor.mobile.client.contract.system.security.SignatureHeaders
 import okhttp3.Request
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec

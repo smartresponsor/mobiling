@@ -1,10 +1,12 @@
-
 import { FastifyInstance } from "fastify";
 import { coreCall } from "../adapter/http/core.js";
-import * as CB from "../service/circuit.js";
-export default async function route(app: FastifyInstance){
-  app.post("/mobile/core/test", async (req:any)=>{
-    return await coreCall("/test", req.body||{});
+import { adminGuard } from "../middleware/admin.js";
+import * as circuit from "../service/circuit.js";
+
+export default async function route(app: FastifyInstance): Promise<void> {
+  app.post("/mobile/core/test", async (request: any) => coreCall("/test", request.body || {}));
+  app.get("/admin/circuit", async (request: any) => {
+    adminGuard(request);
+    return circuit.status();
   });
-  app.get("/admin/circuit", async ()=> CB.status());
 }

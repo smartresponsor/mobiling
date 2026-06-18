@@ -1,8 +1,8 @@
 package com.smartresponsor.mobile.client.usecase.product.listing
 
-import com.smartresponsor.mobile.client.contract.product.listing.productcardsummary
-import com.smartresponsor.mobile.client.contract.product.listing.productlistquery
-import com.smartresponsor.mobile.client.data.product.listing.productlistinggateway
+import com.smartresponsor.mobile.client.contract.product.listing.ProductCardSummary
+import com.smartresponsor.mobile.client.contract.product.listing.ProductListQuery
+import com.smartresponsor.mobile.client.data.product.listing.ProductListingGateway
 
 /**
  * Marketing America Corp. Oleksandr Tishchenko

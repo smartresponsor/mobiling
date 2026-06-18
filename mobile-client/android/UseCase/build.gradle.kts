@@ -10,8 +10,9 @@ android {
     sourceSets["main"].java.srcDirs(".")
 }
 
-dependencies {
-    implementation(project(":client-contract"))
-    implementation(project(":client-data"))
-    implementation("com.squareup.okhttp3:okhttp:4.12.0")
-}
+
+        dependencies {
+            implementation(project(":client-contract"))
+            implementation(project(":client-data"))
+            implementation("com.squareup.okhttp3:okhttp:4.12.0")
+        }

@@ -1,9 +1,9 @@
 package com.smartresponsor.core.billing
 
-import com.smartresponsor.mobile.client.contract.system.billing.receiptverificationresult
-import com.smartresponsor.mobile.client.data.system.billing.billingreceiptgateway
-import com.smartresponsor.mobile.client.usecase.system.billing.uploadreceiptusecase
-import com.smartresponsor.mobile.client.usecase.system.billing.verifyreceiptusecase
+import com.smartresponsor.mobile.client.contract.system.billing.ReceiptVerificationResult
+import com.smartresponsor.mobile.client.data.system.billing.BillingReceiptGateway
+import com.smartresponsor.mobile.client.usecase.system.billing.UploadReceiptUseCase
+import com.smartresponsor.mobile.client.usecase.system.billing.VerifyReceiptUseCase
 
 /**
  * Legacy-compatible Android entry point bridged to canonical system/billing slices.

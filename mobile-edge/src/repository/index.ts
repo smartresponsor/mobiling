@@ -1,13 +1,7 @@
-
-import { ENV } from "../env.js";
+import { RuntimeStore } from "./runtime.js";
 import { Storage } from "./storage.js";
-import { SqliteStore } from "./sqlite.js";
-// PG реализацию можно подключить по ENV.STORE === 'pg'
-let store: Storage;
+let store: Storage | undefined;
 export async function getStore(): Promise<Storage> {
-  if (!store){
-    store = new SqliteStore();
-    await (store as any).init();
-  }
+  if (!store) { store = new RuntimeStore(); await store.init(); }
   return store;
 }

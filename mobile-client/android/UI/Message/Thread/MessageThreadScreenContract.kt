@@ -1,7 +1,7 @@
 package com.smartresponsor.mobile.client.ui.message.thread
 
-import com.smartresponsor.mobile.client.contract.message.thread.messageitempayload
-import com.smartresponsor.mobile.client.contract.message.thread.messagethreadsummary
+import com.smartresponsor.mobile.client.contract.message.thread.MessageItemPayload
+import com.smartresponsor.mobile.client.contract.message.thread.MessageThreadSummary
 
 /**
  * Marketing America Corp. Oleksandr Tishchenko

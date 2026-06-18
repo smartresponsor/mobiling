@@ -1,8 +1,8 @@
 package com.smartresponsor.core.security
 
-import com.smartresponsor.mobile.client.contract.system.security.signatureheaders
-import com.smartresponsor.mobile.client.data.system.security.requestsignatureapplier
-import com.smartresponsor.mobile.client.usecase.system.security.applyrequestsignatureusecase
+import com.smartresponsor.mobile.client.contract.system.security.SignatureHeaders
+import com.smartresponsor.mobile.client.data.system.security.RequestSignatureApplier
+import com.smartresponsor.mobile.client.usecase.system.security.ApplyRequestSignatureUseCase
 import okhttp3.Request
 
 /**

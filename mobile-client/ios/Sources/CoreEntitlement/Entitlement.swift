@@ -1,3 +1,4 @@
+import MobileClient
 import Foundation
 
 public actor Entitlement {

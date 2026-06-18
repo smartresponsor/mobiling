@@ -1,0 +1,12 @@
+export { productDetailRoute } from '../product/detail';
+export { productListingRoute } from '../product/listing';
+export { catalogBrowseRoute } from '../catalog/browse';
+export { catalogDetailRoute } from '../catalog/detail';
+export { vendorListingRoute } from '../vendor/listing';
+export { vendorDetailRoute } from '../vendor/detail';
+export { orderListingRoute } from '../order/listing';
+export { orderDetailRoute } from '../order/detail';
+export { shipmentTrackingRoute } from '../shipment/tracking';
+export { shipmentDetailRoute } from '../shipment/detail';
+export { taxSummaryRoute } from '../taxation/summary';
+export { taxDetailRoute } from '../taxation/detail';

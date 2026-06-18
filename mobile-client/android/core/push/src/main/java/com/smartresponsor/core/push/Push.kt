@@ -1,7 +1,7 @@
 package com.smartresponsor.core.push
 
-import com.smartresponsor.mobile.client.data.system.push.pushtokenregistrar
-import com.smartresponsor.mobile.client.usecase.system.push.registerpushtokenusecase
+import com.smartresponsor.mobile.client.data.system.push.PushTokenRegistrar
+import com.smartresponsor.mobile.client.usecase.system.push.RegisterPushTokenUseCase
 
 /**
  * Legacy-compatible Android entry point bridged to canonical system/push slices.

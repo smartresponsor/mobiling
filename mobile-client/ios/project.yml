@@ -1,0 +1,85 @@
+name: Mobiling
+options:
+  bundleIdPrefix: com.smartresponsor
+  deploymentTarget:
+    iOS: "15.0"
+settings:
+  base:
+    SWIFT_VERSION: "5.9"
+targets:
+  MobileClient:
+    type: framework
+    platform: iOS
+    sources:
+      - path: Contract
+      - path: Data
+      - path: UseCase
+      - path: Navigation
+      - path: UI
+      - path: App/Auth
+      - path: App/Catalog
+      - path: App/Dashboard
+      - path: App/Message
+      - path: App/Order
+      - path: App/Product
+      - path: App/Profile
+      - path: App/Project
+      - path: App/Shipment
+      - path: App/Taxation
+      - path: App/Vendor
+  CoreConfig:
+    type: framework
+    platform: iOS
+    sources: [Sources/CoreConfig]
+    dependencies: [{ target: MobileClient }]
+  CoreEntitlement:
+    type: framework
+    platform: iOS
+    sources: [Sources/CoreEntitlement]
+    dependencies: [{ target: MobileClient }]
+  CoreBilling:
+    type: framework
+    platform: iOS
+    sources: [Sources/CoreBilling]
+    dependencies: [{ target: MobileClient }]
+  CoreAnalytic:
+    type: framework
+    platform: iOS
+    sources: [Sources/CoreAnalytic]
+    dependencies: [{ target: MobileClient }]
+  CorePush:
+    type: framework
+    platform: iOS
+    sources: [Sources/CorePush]
+    dependencies: [{ target: MobileClient }]
+  CoreSecurity:
+    type: framework
+    platform: iOS
+    sources: [Sources/CoreSecurity]
+    dependencies: [{ target: MobileClient }]
+  Mobiling:
+    type: application
+    platform: iOS
+    sources:
+      - path: App/ContentView.swift
+      - path: App/MobileApp.swift
+    info:
+      path: App/Info.plist
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.smartresponsor.mobile
+    dependencies:
+      - target: MobileClient
+      - target: CoreConfig
+      - target: CoreEntitlement
+      - target: CoreBilling
+      - target: CoreAnalytic
+      - target: CorePush
+      - target: CoreSecurity
+schemes:
+  Mobiling:
+    build:
+      targets:
+        Mobiling: all
+    run:
+      config: Debug

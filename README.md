@@ -1,17 +1,18 @@
-# Mobile 001 Initial Curated Slice
+# SmartResponsor Mobiling
 
-This workspace is the first curated repository slice reconstructed from the uploaded Mobile archive set.
+Canonical mobile workspace for Android, iOS, cross-platform contracts, and Mobile Edge.
 
-It intentionally excludes archive warehouses, release bundles, dated snapshot folders, IDE/temp folders,
-embedded private signing material, and shadow duplicate roots.
+## Active roots
 
-Canonical working roots in this slice:
-- `mobile-client/`
-- `mobile-edge/`
+- `mobile-client/android` — Android application and canonical client layers.
+- `mobile-client/ios` — iOS application, `MobileClient` framework, and mirrored core frameworks.
+- `mobile-client/contract` — cross-platform contracts and ownership metadata.
+- `mobile-edge` — Fastify mobile boundary and runtime services.
 
-Main donor tree: `Mobile/mobile-src`
+## Ownership
 
-Important constraints:
-- donor Git history was not preserved as canonical product history;
-- `mobile/mobile/edge` was excluded as a shadow duplicate root;
-- `Mobile/signatures/mobile-key-signing-private.pem` was excluded and should be treated as compromised.
+`Dashboard` is the only application root. `Auth` is an entry flow. Persistent sections are `Catalog`, `Message`, and `Vendor`. `Vendor` owns `Product`, `Order`, `Project`, and `Profile`. `Order` owns `Shipment` and embeds `Taxation`. `Identity` is internal.
+
+Machine-readable ownership is stored in `mobile-client/contract/navigation/ownership.json`.
+
+This baseline materializes build and runtime structure only. Product visual direction remains intentionally undecided.

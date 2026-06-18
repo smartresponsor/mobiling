@@ -1,7 +1,7 @@
 package com.smartresponsor.mobile.client.ui.vendor.listing
 
-import com.smartresponsor.mobile.client.contract.vendor.listing.listvendorsquery
-import com.smartresponsor.mobile.client.contract.vendor.listing.vendorcardsummary
+import com.smartresponsor.mobile.client.contract.vendor.listing.ListVendorsQuery
+import com.smartresponsor.mobile.client.contract.vendor.listing.VendorCardSummary
 
 /**
  * Marketing America Corp. Oleksandr Tishchenko
