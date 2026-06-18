@@ -11,7 +11,8 @@ android {
   composeOptions { kotlinCompilerExtensionVersion = "1.5.3" }
 }
 dependencies {
-  implementation(project(":client-contract"));
+  implementation(project(":client-contract")); implementation(project(":client-data")); implementation(project(":client-usecase"));
+  implementation(project(":client-navigation")); implementation(project(":client-ui"));
   implementation(project(":core:config")); implementation(project(":core:entitlement")); implementation(project(":core:billing"));
   implementation(project(":core:analytic")); implementation(project(":core:push")); implementation(project(":core:security"));
   implementation("androidx.core:core-ktx:1.12.0"); implementation("androidx.activity:activity-compose:1.8.2");
