@@ -1,0 +1,22 @@
+# Mobile Edge 0.4.1 Accessing API Client Milestone
+
+- Purpose: switch mobile-edge from contract-only behavior to calling the Accessing-owned backend API surface.
+- Backend routes used:
+  - `POST /api/access/signin`
+  - `POST /api/access/register`
+  - `POST /api/access/logout`
+  - `GET /api/access/session`
+- Explicit decision: no backend `/mobile/` token is used; mobile-edge proxies to Accessing `/api/access/*` only.
+- Compatibility note: `accountId` remains a nullable mobile-edge compatibility field and is not sourced from Accessing in this milestone.
+- Relationship:
+  - follows Accessing commit `617a356` (`accessing: materialize api access json surface`)
+  - follows mobile-edge contract milestone commit `629316b` (`mobile-edge: materialize auth contract`)
+- Limitation:
+  - mobile-edge does not invent access tokens, refresh tokens, authenticated users, or a mobile session
+  - `session_transport_pending` from backend sign-in is passed through honestly
+  - mobile-edge remains a BFF/client only; Accessing owns the auth/access business logic
+- Verification:
+  - `npm run typecheck` passed
+  - `npm run build` passed
+- Next recommended milestone:
+  - `mobile-session-transport-decision`

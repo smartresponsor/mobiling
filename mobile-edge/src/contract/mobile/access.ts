@@ -16,9 +16,9 @@ export const mobileAccessRegisterRequest = {
   body: {
     type: "object",
     additionalProperties: false,
-    required: ["companyName", "email", "password"],
+    required: ["displayName", "email", "password"],
     properties: {
-      companyName: stringField(1),
+      displayName: stringField(1),
       email: stringField(3),
       password: stringField(8),
     },
@@ -28,12 +28,14 @@ export const mobileAccessRegisterRequest = {
 export const mobileAccessIdentityPayload = {
   type: "object",
   additionalProperties: false,
-  required: ["userId", "accountId", "displayName", "email"],
+  required: ["userId", "accountId", "displayName", "email", "emailVerified", "secondFactorEnabled"],
   properties: {
     userId: stringField(1),
-    accountId: stringField(1),
+    accountId: { anyOf: [stringField(1), { type: "null" }] },
     displayName: stringField(1),
     email: stringField(3),
+    emailVerified: { type: "boolean" },
+    secondFactorEnabled: { type: "boolean" },
   },
 } as const;
 

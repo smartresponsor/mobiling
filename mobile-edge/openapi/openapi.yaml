@@ -28,7 +28,7 @@ paths:
       responses: { '200': { description: Grants, content: { application/json: { schema: { type: object } } } } }
   /mobile/access/signin:
     post:
-      summary: Mobile access sign in contract
+      summary: Proxy mobile access sign in to Accessing
       requestBody:
         required: true
         content:
@@ -36,15 +36,39 @@ paths:
             schema:
               $ref: '#/components/schemas/MobileAccessSignInRequest'
       responses:
-        '501':
-          description: Contract materialized, Accessing not connected
+        '202':
+          description: Accessing accepted the sign in and session transport is pending
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MobileAccessSessionPayload'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MobileAccessErrorPayload'
+        '423':
+          description: Account locked
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MobileAccessErrorPayload'
+        '429':
+          description: Rate limited
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MobileAccessErrorPayload'
+        '503':
+          description: Accessing API unavailable
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/MobileAccessErrorPayload'
   /mobile/access/register:
     post:
-      summary: Mobile access registration contract
+      summary: Proxy mobile access registration to Accessing
       requestBody:
         required: true
         content:
@@ -52,32 +76,56 @@ paths:
             schema:
               $ref: '#/components/schemas/MobileAccessRegisterRequest'
       responses:
-        '501':
-          description: Contract materialized, Accessing not connected
+        '201':
+          description: Accessing accepted the registration request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MobileAccessSessionPayload'
+        '409':
+          description: Registration conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MobileAccessErrorPayload'
+        '503':
+          description: Accessing API unavailable
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/MobileAccessErrorPayload'
   /mobile/access/logout:
     post:
-      summary: Mobile access logout contract
+      summary: Proxy mobile access logout to Accessing
       responses:
-        '501':
-          description: Contract materialized, Accessing not connected
+        '200':
+          description: Accessing returned the current session state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MobileAccessSessionPayload'
+        '503':
+          description: Accessing API unavailable
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/MobileAccessErrorPayload'
   /mobile/access/session:
     get:
-      summary: Mobile access session contract
+      summary: Proxy mobile access session to Accessing
       responses:
         '200':
-          description: Unauthenticated mobile access session
+          description: Accessing returned the current mobile access session state
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/MobileAccessSessionPayload'
+        '503':
+          description: Accessing API unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MobileAccessErrorPayload'
   /mobile/push/register:
     post:
       summary: Register push token
@@ -187,21 +235,29 @@ components:
         password: { type: string, minLength: 8 }
     MobileAccessRegisterRequest:
       type: object
-      required: [companyName, email, password]
+      required: [displayName, email, password]
       properties:
-        companyName: { type: string, minLength: 1 }
+        displayName: { type: string, minLength: 1 }
         email: { type: string, minLength: 3 }
         password: { type: string, minLength: 8 }
     MobileAccessIdentityPayload:
       type: object
-      required: [userId, accountId, displayName, email]
+      additionalProperties: false
+      description: accountId is a nullable compatibility field and is not sourced from Accessing in this milestone.
+      required: [userId, accountId, displayName, email, emailVerified, secondFactorEnabled]
       properties:
         userId: { type: string }
-        accountId: { type: string }
+        accountId:
+          anyOf:
+            - { type: string }
+            - { type: 'null' }
         displayName: { type: string }
         email: { type: string }
+        emailVerified: { type: boolean }
+        secondFactorEnabled: { type: boolean }
     MobileAccessSessionPayload:
       type: object
+      additionalProperties: false
       required: [status, identity, accessToken, refreshToken, expiresAt, requiresVerification, requiresSecondFactor]
       properties:
         status: { type: string }
