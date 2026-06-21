@@ -1,4 +1,4 @@
-plugins { id("com.android.application"); id("org.jetbrains.kotlin.android"); id("org.jetbrains.kotlin.kapt") }
+﻿plugins { id("com.android.application"); id("org.jetbrains.kotlin.android"); id("org.jetbrains.kotlin.kapt") }
 android {
     namespace = "com.smartresponsor.mobile"
     compileSdk = 34
@@ -9,6 +9,15 @@ android {
     }
     buildFeatures { compose = true }
     composeOptions { kotlinCompilerExtensionVersion = "1.5.3" }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = "17"
+    }
 }
 dependencies {
     implementation(project(":client-contract")); implementation(project(":client-data")); implementation(project(":client-usecase")); implementation(project(":client-navigation")); implementation(project(":client-ui"))
@@ -17,3 +26,6 @@ dependencies {
     implementation("androidx.compose.ui:ui:1.6.0"); implementation("androidx.compose.material3:material3:1.1.2")
     implementation("androidx.work:work-runtime-ktx:2.9.0")
 }
+
+
+

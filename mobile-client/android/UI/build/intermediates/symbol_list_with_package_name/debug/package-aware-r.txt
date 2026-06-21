@@ -1,0 +1,1 @@
+com.smartresponsor.mobile.client.ui
