@@ -26,6 +26,58 @@ paths:
       summary: Entitlement grants
       security: [ { bearerAuth: [] } ]
       responses: { '200': { description: Grants, content: { application/json: { schema: { type: object } } } } }
+  /mobile/access/signin:
+    post:
+      summary: Mobile access sign in contract
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MobileAccessSignInRequest'
+      responses:
+        '501':
+          description: Contract materialized, Accessing not connected
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MobileAccessErrorPayload'
+  /mobile/access/register:
+    post:
+      summary: Mobile access registration contract
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MobileAccessRegisterRequest'
+      responses:
+        '501':
+          description: Contract materialized, Accessing not connected
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MobileAccessErrorPayload'
+  /mobile/access/logout:
+    post:
+      summary: Mobile access logout contract
+      responses:
+        '501':
+          description: Contract materialized, Accessing not connected
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MobileAccessErrorPayload'
+  /mobile/access/session:
+    get:
+      summary: Mobile access session contract
+      responses:
+        '200':
+          description: Unauthenticated mobile access session
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MobileAccessSessionPayload'
   /mobile/push/register:
     post:
       summary: Register push token
@@ -127,6 +179,63 @@ components:
         deviceId: { type: string }
         token: { type: string }
         platform: { type: string, enum: [android, ios, web] }
+    MobileAccessSignInRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email: { type: string, minLength: 3 }
+        password: { type: string, minLength: 8 }
+    MobileAccessRegisterRequest:
+      type: object
+      required: [companyName, email, password]
+      properties:
+        companyName: { type: string, minLength: 1 }
+        email: { type: string, minLength: 3 }
+        password: { type: string, minLength: 8 }
+    MobileAccessIdentityPayload:
+      type: object
+      required: [userId, accountId, displayName, email]
+      properties:
+        userId: { type: string }
+        accountId: { type: string }
+        displayName: { type: string }
+        email: { type: string }
+    MobileAccessSessionPayload:
+      type: object
+      required: [status, identity, accessToken, refreshToken, expiresAt, requiresVerification, requiresSecondFactor]
+      properties:
+        status: { type: string }
+        identity:
+          anyOf:
+            - { $ref: '#/components/schemas/MobileAccessIdentityPayload' }
+            - { type: 'null' }
+        accessToken:
+          anyOf:
+            - { type: string }
+            - { type: 'null' }
+        refreshToken:
+          anyOf:
+            - { type: string }
+            - { type: 'null' }
+        expiresAt:
+          anyOf:
+            - { type: string }
+            - { type: 'null' }
+        requiresVerification: { type: boolean }
+        requiresSecondFactor: { type: boolean }
+    MobileAccessErrorPayload:
+      type: object
+      required: [code, message]
+      properties:
+        code: { type: string }
+        message: { type: string }
+        fieldErrors:
+          anyOf:
+            - type: object
+              additionalProperties:
+                type: array
+                items: { type: string }
+            - { type: 'null' }
     ReceiptVerifyV1:
       type: object
       required: [transactionId, productId, platform, receipt]

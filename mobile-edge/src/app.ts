@@ -15,6 +15,7 @@ import routeCore from "./routes/core.js";
 import routeEntitlement from "./routes/entitlement.js";
 import routeFlag from "./routes/flag.js";
 import routeHealth from "./routes/health.js";
+import routeMobileAccess from "./routes/mobile/access.js";
 import routeMetrics from "./routes/metrics.js";
 import routePush from "./routes/push.js";
 import routeReceipt from "./routes/receipt.js";
@@ -57,6 +58,7 @@ app.setErrorHandler((error: any, _request, reply) => {
 });
 
 await routeHealth(app);
+await routeMobileAccess(app);
 await routeSession(app);
 await routeFlag(app);
 await routeConfig(app);
