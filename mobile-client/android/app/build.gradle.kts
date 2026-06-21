@@ -2,7 +2,7 @@
 android {
     namespace = "com.smartresponsor.mobile"
     compileSdk = 34
-    defaultConfig { applicationId = "com.smartresponsor.mobile"; minSdk = 24; targetSdk = 34; versionCode = 1; versionName = "0.1.0-materialized" }
+    defaultConfig { applicationId = "com.smartresponsor.mobile"; minSdk = 24; targetSdk = 34; versionCode = 1; versionName = "0.2.0-access-entry-materialized" }
     buildTypes {
         getByName("release") { isMinifyEnabled = true; proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro") }
         getByName("debug") { isMinifyEnabled = false }
