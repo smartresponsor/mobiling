@@ -19,6 +19,7 @@ let package = Package(
         "UseCase",
         "Navigation",
         "UI",
+        "App/Access",
         "App/Auth",
         "App/Catalog",
         "App/Dashboard",
