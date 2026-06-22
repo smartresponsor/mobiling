@@ -1,6 +1,7 @@
 export interface AuthSessionPayload {
-  accessToken: string;
-  refreshToken?: string;
-  expiresAt: string;
-  sessionId: string;
+  status: string;
+  sessionId: string | null;
+  authenticated: boolean;
+  requiresVerification: boolean;
+  requiresSecondFactor: boolean;
 }
