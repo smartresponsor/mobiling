@@ -23,6 +23,16 @@ public struct MobilingAppShell: View {
                     onBack: { currentScreen = .welcome },
                     onSignIn: { currentScreen = .signIn }
                 )
+            case .verificationRequired:
+                VerificationRequiredView(
+                    onBack: { currentScreen = .signIn },
+                    onUseDifferentAccess: { currentScreen = .welcome }
+                )
+            case .secondFactorRequired:
+                SecondFactorRequiredView(
+                    onBack: { currentScreen = .signIn },
+                    onUseDifferentAccess: { currentScreen = .welcome }
+                )
             }
         }
     }

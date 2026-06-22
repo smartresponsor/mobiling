@@ -4,4 +4,6 @@ enum class AccessScreen {
     Welcome,
     SignIn,
     Register,
+    VerificationRequired,
+    SecondFactorRequired,
 }

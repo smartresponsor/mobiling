@@ -29,6 +29,16 @@ fun MobilingAppShell() {
                 onBack = { currentScreen = AccessScreen.Welcome },
                 onSignIn = { currentScreen = AccessScreen.SignIn },
             )
+
+            AccessScreen.VerificationRequired -> VerificationRequiredScreen(
+                onBack = { currentScreen = AccessScreen.SignIn },
+                onUseDifferentAccess = { currentScreen = AccessScreen.Welcome },
+            )
+
+            AccessScreen.SecondFactorRequired -> SecondFactorRequiredScreen(
+                onBack = { currentScreen = AccessScreen.SignIn },
+                onUseDifferentAccess = { currentScreen = AccessScreen.Welcome },
+            )
         }
     }
 }

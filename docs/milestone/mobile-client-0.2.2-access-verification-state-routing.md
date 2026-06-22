@@ -1,0 +1,21 @@
+# Mobile Client 0.2.2 Access Verification State Routing Milestone
+
+- Purpose: prepare mobile UI state routing for backend-owned verification and second-factor requirements.
+- Boundary decision: Mobiling does not implement authentication, verification, or second-factor business logic.
+- Backend-owned signals already represented by mobile-edge session payload:
+  - `requiresVerification`
+  - `requiresSecondFactor`
+  - `emailVerified`
+  - `secondFactorEnabled`
+- Android state routing added:
+  - `AccessScreen.VerificationRequired`
+  - `AccessScreen.SecondFactorRequired`
+  - passive informational screens for both states
+- iOS state routing added:
+  - `AccessScreen.verificationRequired`
+  - `AccessScreen.secondFactorRequired`
+  - passive informational views for both states
+- Not included:
+  - verification code validation
+  - second-factor code validation
+  - token generation or session authority
