@@ -2,8 +2,11 @@ import SwiftUI
 
 public struct MobilingAppShell: View {
     @State private var currentScreen: AccessScreen = .welcome
+    private let authFeatureBridge: AuthFeatureBridge?
 
-    public init() {}
+    public init(authFeatureBridge: AuthFeatureBridge? = nil) {
+        self.authFeatureBridge = authFeatureBridge
+    }
 
     public var body: some View {
         Group {
@@ -16,7 +19,14 @@ public struct MobilingAppShell: View {
             case .signIn:
                 SignInView(
                     onBack: { currentScreen = .welcome },
-                    onCreateAccess: { currentScreen = .register }
+                    onCreateAccess: { currentScreen = .register },
+                    onStartAccess: { request in
+                        guard let authFeatureBridge else {
+                            return nil
+                        }
+                        return try await authFeatureBridge.start(request: request)
+                    },
+                    onAccessSession: { payload in currentScreen = payload.toAccessScreen() }
                 )
             case .register:
                 RegisterAccessView(

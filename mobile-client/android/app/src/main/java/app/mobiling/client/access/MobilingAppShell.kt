@@ -8,9 +8,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import app.mobiling.client.auth.AuthFeatureBridge
 
 @Composable
-fun MobilingAppShell() {
+fun MobilingAppShell(
+    authFeatureBridge: AuthFeatureBridge? = null,
+) {
     var currentScreen by rememberSaveable { mutableStateOf(AccessScreen.Welcome) }
 
     Surface(Modifier.fillMaxSize()) {
@@ -23,6 +26,8 @@ fun MobilingAppShell() {
             AccessScreen.SignIn -> SignInScreen(
                 onBack = { currentScreen = AccessScreen.Welcome },
                 onCreateAccess = { currentScreen = AccessScreen.Register },
+                onStartAccess = { request -> authFeatureBridge?.start(request) },
+                onAccessSession = { payload -> currentScreen = payload.toAccessScreen() },
             )
 
             AccessScreen.Register -> RegisterAccessScreen(
