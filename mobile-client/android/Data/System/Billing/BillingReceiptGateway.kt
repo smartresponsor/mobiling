@@ -1,7 +1,7 @@
-package com.smartresponsor.mobile.client.data.system.billing
+package app.mobiling.client.client.data.system.billing
 
-import com.smartresponsor.mobile.client.contract.system.billing.ReceiptUploadPayload
-import com.smartresponsor.mobile.client.contract.system.billing.ReceiptVerificationResult
+import app.mobiling.client.client.contract.system.billing.ReceiptUploadPayload
+import app.mobiling.client.client.contract.system.billing.ReceiptVerificationResult
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request

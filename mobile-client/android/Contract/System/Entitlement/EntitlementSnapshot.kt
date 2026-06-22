@@ -1,4 +1,4 @@
-package com.smartresponsor.mobile.client.contract.system.entitlement
+package app.mobiling.client.client.contract.system.entitlement
 
 /**
  * Canonical contract snapshot for client entitlement state.

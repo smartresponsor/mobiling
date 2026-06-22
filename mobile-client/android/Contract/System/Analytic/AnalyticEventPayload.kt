@@ -1,4 +1,4 @@
-package com.smartresponsor.mobile.client.contract.system.analytic
+package app.mobiling.client.client.contract.system.analytic
 
 /**
  * Canonical contract payload for analytics event emission.

@@ -1,7 +1,7 @@
-package com.smartresponsor.mobile.client.usecase.identity.session
+package app.mobiling.client.client.usecase.identity.session
 
-import com.smartresponsor.mobile.client.contract.identity.session.SessionIdentityPayload
-import com.smartresponsor.mobile.client.data.identity.session.SessionIdentityGateway
+import app.mobiling.client.client.contract.identity.session.SessionIdentityPayload
+import app.mobiling.client.client.data.identity.session.SessionIdentityGateway
 
 class LoadSessionIdentityUseCase(
     private val gateway: SessionIdentityGateway,

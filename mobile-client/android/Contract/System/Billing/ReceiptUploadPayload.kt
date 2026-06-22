@@ -1,4 +1,4 @@
-package com.smartresponsor.mobile.client.contract.system.billing
+package app.mobiling.client.client.contract.system.billing
 
 data class ReceiptUploadPayload(
     val token: String,

@@ -1,7 +1,7 @@
-package com.smartresponsor.mobile.client.usecase.system.analytic
+package app.mobiling.client.client.usecase.system.analytic
 
-import com.smartresponsor.mobile.client.contract.system.analytic.AnalyticEventPayload
-import com.smartresponsor.mobile.client.data.system.analytic.AnalyticEventRecorder
+import app.mobiling.client.client.contract.system.analytic.AnalyticEventPayload
+import app.mobiling.client.client.data.system.analytic.AnalyticEventRecorder
 
 /**
  * Canonical use case for analytics event emission.

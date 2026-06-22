@@ -1,6 +1,6 @@
-package com.smartresponsor.mobile.client.data.taxation.detail
+package app.mobiling.client.client.data.taxation.detail
 
-import com.smartresponsor.mobile.client.contract.taxation.detail.TaxDetailPayload
+import app.mobiling.client.client.contract.taxation.detail.TaxDetailPayload
 
 /**
  * Marketing America Corp. Oleksandr Tishchenko

@@ -1,6 +1,6 @@
-package com.smartresponsor.mobile.client.data.system.analytic
+package app.mobiling.client.client.data.system.analytic
 
-import com.smartresponsor.mobile.client.contract.system.analytic.AnalyticEventPayload
+import app.mobiling.client.client.contract.system.analytic.AnalyticEventPayload
 
 /**
  * Canonical data adapter responsible for recording analytics events.

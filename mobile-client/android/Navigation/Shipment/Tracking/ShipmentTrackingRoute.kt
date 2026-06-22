@@ -1,4 +1,4 @@
-package com.smartresponsor.mobile.client.navigation.shipment.tracking
+package app.mobiling.client.client.navigation.shipment.tracking
 
 /**
  * Marketing America Corp. Oleksandr Tishchenko

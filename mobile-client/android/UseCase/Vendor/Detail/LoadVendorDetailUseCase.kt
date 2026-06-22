@@ -1,6 +1,6 @@
-package com.smartresponsor.mobile.client.usecase.vendor.detail
+package app.mobiling.client.client.usecase.vendor.detail
 
-import com.smartresponsor.mobile.client.data.vendor.detail.VendorDetailGateway
+import app.mobiling.client.client.data.vendor.detail.VendorDetailGateway
 
 /**
  * Marketing America Corp. Oleksandr Tishchenko

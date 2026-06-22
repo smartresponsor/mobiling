@@ -1,7 +1,7 @@
-package com.smartresponsor.mobile.client.data.order.listing
+package app.mobiling.client.client.data.order.listing
 
-import com.smartresponsor.mobile.client.contract.order.listing.ListOrdersQuery
-import com.smartresponsor.mobile.client.contract.order.listing.OrderSummary
+import app.mobiling.client.client.contract.order.listing.ListOrdersQuery
+import app.mobiling.client.client.contract.order.listing.OrderSummary
 
 /**
  * Marketing America Corp. Oleksandr Tishchenko

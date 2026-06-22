@@ -1,0 +1,27 @@
+package app.mobiling.client.catalog
+
+import app.mobiling.client.vendor.VendorNavigationBridge
+import app.mobiling.client.vendor.VendorProductBridge
+
+/**
+ * Marketing America Corp. Oleksandr Tishchenko
+ *
+ * Catalog-level navigation owner.
+ *
+ * Catalog remains a primary Dashboard section while routing commercial
+ * discovery into Vendor-owned commerce flows.
+ */
+class CatalogNavigationBridge(
+    private val feature: CatalogFeatureBridge,
+    private val routeMap: CatalogCommerceRouteMap,
+    private val vendor: VendorNavigationBridge,
+    private val product: VendorProductBridge,
+) {
+    fun feature(): CatalogFeatureBridge = feature
+
+    fun routeMap(): CatalogCommerceRouteMap = routeMap
+
+    fun vendor(): VendorNavigationBridge = vendor
+
+    fun product(): VendorProductBridge = product
+}

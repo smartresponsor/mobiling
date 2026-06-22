@@ -1,8 +1,8 @@
-package com.smartresponsor.mobile.client.usecase.project.listing
+package app.mobiling.client.client.usecase.project.listing
 
-import com.smartresponsor.mobile.client.contract.project.listing.ListProjectsQuery
-import com.smartresponsor.mobile.client.contract.project.listing.ProjectSummary
-import com.smartresponsor.mobile.client.data.project.listing.ProjectListingGateway
+import app.mobiling.client.client.contract.project.listing.ListProjectsQuery
+import app.mobiling.client.client.contract.project.listing.ProjectSummary
+import app.mobiling.client.client.data.project.listing.ProjectListingGateway
 
 /**
  * Marketing America Corp. Oleksandr Tishchenko

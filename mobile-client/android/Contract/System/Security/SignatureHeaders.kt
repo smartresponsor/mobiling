@@ -1,4 +1,4 @@
-package com.smartresponsor.mobile.client.contract.system.security
+package app.mobiling.client.client.contract.system.security
 
 data class SignatureHeaders(
     val signatureHeaderName: String = "X-SR-Signature",

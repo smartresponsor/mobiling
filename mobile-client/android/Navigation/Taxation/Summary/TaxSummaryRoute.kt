@@ -1,4 +1,4 @@
-package com.smartresponsor.mobile.client.navigation.taxation.summary
+package app.mobiling.client.client.navigation.taxation.summary
 
 /**
  * Marketing America Corp. Oleksandr Tishchenko

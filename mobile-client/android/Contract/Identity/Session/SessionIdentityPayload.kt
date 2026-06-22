@@ -1,4 +1,4 @@
-package com.smartresponsor.mobile.client.contract.identity.session
+package app.mobiling.client.client.contract.identity.session
 
 data class SessionIdentityPayload(
     val userId: String,

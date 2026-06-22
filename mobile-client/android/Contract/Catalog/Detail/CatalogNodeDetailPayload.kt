@@ -1,6 +1,6 @@
-package com.smartresponsor.mobile.client.contract.catalog.detail
+package app.mobiling.client.client.contract.catalog.detail
 
-import com.smartresponsor.mobile.client.contract.catalog.browse.CatalogNodeSummary
+import app.mobiling.client.client.contract.catalog.browse.CatalogNodeSummary
 
 /**
  * Marketing America Corp. Oleksandr Tishchenko

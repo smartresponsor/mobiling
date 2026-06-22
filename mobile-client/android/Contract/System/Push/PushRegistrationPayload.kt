@@ -1,4 +1,4 @@
-package com.smartresponsor.mobile.client.contract.system.push
+package app.mobiling.client.client.contract.system.push
 
 data class PushRegistrationPayload(
     val token: String,

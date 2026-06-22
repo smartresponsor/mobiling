@@ -1,4 +1,4 @@
-package com.smartresponsor.mobile.client.contract.system.config
+package app.mobiling.client.client.contract.system.config
 
 data class RemoteConfigPayload(
     val ttlSec: Int,

@@ -1,5 +1,5 @@
-﻿plugins { id("com.android.library"); id("org.jetbrains.kotlin.android") }
-android { namespace = "com.smartresponsor.core.push"; compileSdk = 34; defaultConfig { minSdk = 24 }
+plugins { id("com.android.library"); id("org.jetbrains.kotlin.android") }
+android { namespace = "app.mobiling.core.push"; compileSdk = 34; defaultConfig { minSdk = 24 }
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17

@@ -1,7 +1,7 @@
-package com.smartresponsor.mobile.client.usecase.profile.detail
+package app.mobiling.client.client.usecase.profile.detail
 
-import com.smartresponsor.mobile.client.contract.profile.detail.ProfileDetailPayload
-import com.smartresponsor.mobile.client.data.profile.detail.ProfileDetailGateway
+import app.mobiling.client.client.contract.profile.detail.ProfileDetailPayload
+import app.mobiling.client.client.data.profile.detail.ProfileDetailGateway
 
 class LoadProfileDetailUseCase(
     private val gateway: ProfileDetailGateway,

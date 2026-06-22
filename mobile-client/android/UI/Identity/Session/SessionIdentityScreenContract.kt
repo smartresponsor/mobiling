@@ -1,4 +1,4 @@
-package com.smartresponsor.mobile.client.ui.identity.session
+package app.mobiling.client.client.ui.identity.session
 
 interface SessionIdentityScreenContract {
     val routePath: String

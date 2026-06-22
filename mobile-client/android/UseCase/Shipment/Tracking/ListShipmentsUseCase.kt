@@ -1,8 +1,8 @@
-package com.smartresponsor.mobile.client.usecase.shipment.tracking
+package app.mobiling.client.client.usecase.shipment.tracking
 
-import com.smartresponsor.mobile.client.contract.shipment.tracking.ListShipmentsQuery
-import com.smartresponsor.mobile.client.contract.shipment.tracking.ShipmentTrackingSummary
-import com.smartresponsor.mobile.client.data.shipment.tracking.ShipmentTrackingGateway
+import app.mobiling.client.client.contract.shipment.tracking.ListShipmentsQuery
+import app.mobiling.client.client.contract.shipment.tracking.ShipmentTrackingSummary
+import app.mobiling.client.client.data.shipment.tracking.ShipmentTrackingGateway
 
 /**
  * Marketing America Corp. Oleksandr Tishchenko

@@ -1,10 +1,10 @@
-﻿plugins {
+plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
 }
 
 android {
-    namespace = "com.smartresponsor.mobile.client.ui"
+    namespace = "app.mobiling.client.client.ui"
     compileSdk = 34
     defaultConfig { minSdk = 24 }
 

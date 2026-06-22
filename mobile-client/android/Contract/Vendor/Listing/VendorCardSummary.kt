@@ -1,4 +1,4 @@
-package com.smartresponsor.mobile.client.contract.vendor.listing
+package app.mobiling.client.client.contract.vendor.listing
 
 /**
  * Marketing America Corp. Oleksandr Tishchenko

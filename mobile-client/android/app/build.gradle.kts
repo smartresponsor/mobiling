@@ -1,8 +1,8 @@
-﻿plugins { id("com.android.application"); id("org.jetbrains.kotlin.android"); id("org.jetbrains.kotlin.kapt") }
+plugins { id("com.android.application"); id("org.jetbrains.kotlin.android"); id("org.jetbrains.kotlin.kapt") }
 android {
-    namespace = "com.smartresponsor.mobile"
+    namespace = "app.mobiling.client"
     compileSdk = 34
-    defaultConfig { applicationId = "com.smartresponsor.mobile"; minSdk = 24; targetSdk = 34; versionCode = 1; versionName = "0.2.0-access-entry-materialized" }
+    defaultConfig { applicationId = "app.mobiling.client"; minSdk = 24; targetSdk = 34; versionCode = 1; versionName = "0.2.0-access-entry-materialized" }
     buildTypes {
         getByName("release") { isMinifyEnabled = true; proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro") }
         getByName("debug") { isMinifyEnabled = false }

@@ -1,11 +1,11 @@
-package com.smartresponsor.mobile.client.data.system.config
+package app.mobiling.client.client.data.system.config
 
 import android.content.Context
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import com.smartresponsor.mobile.client.contract.system.config.RemoteConfigPayload
+import app.mobiling.client.client.contract.system.config.RemoteConfigPayload
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import okhttp3.OkHttpClient
