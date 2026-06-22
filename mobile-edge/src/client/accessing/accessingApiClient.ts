@@ -25,9 +25,6 @@ export interface AccessingApiIdentityPayload {
 export interface AccessingApiSessionPayload {
   status: string;
   identity: AccessingApiIdentityPayload | null;
-  accessToken: string | null;
-  refreshToken: string | null;
-  expiresAt: string | null;
   requiresVerification: boolean;
   requiresSecondFactor: boolean;
 }

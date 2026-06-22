@@ -97,9 +97,6 @@ function normalizeSessionPayload(body: unknown): AccessingApiSessionPayload {
     return {
       status: "unauthenticated",
       identity: null,
-      accessToken: null,
-      refreshToken: null,
-      expiresAt: null,
       requiresVerification: false,
       requiresSecondFactor: false,
     };
@@ -108,9 +105,6 @@ function normalizeSessionPayload(body: unknown): AccessingApiSessionPayload {
   return {
     status: "string" === typeof body.status && "" !== body.status.trim() ? body.status.trim() : "unauthenticated",
     identity: normalizeIdentity(body.identity),
-    accessToken: "string" === typeof body.accessToken && "" !== body.accessToken.trim() ? body.accessToken.trim() : null,
-    refreshToken: "string" === typeof body.refreshToken && "" !== body.refreshToken.trim() ? body.refreshToken.trim() : null,
-    expiresAt: "string" === typeof body.expiresAt && "" !== body.expiresAt.trim() ? body.expiresAt.trim() : null,
     requiresVerification: Boolean(body.requiresVerification),
     requiresSecondFactor: Boolean(body.requiresSecondFactor),
   };

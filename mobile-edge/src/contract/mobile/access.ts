@@ -45,18 +45,12 @@ export const mobileAccessSessionPayload = {
   required: [
     "status",
     "identity",
-    "accessToken",
-    "refreshToken",
-    "expiresAt",
     "requiresVerification",
     "requiresSecondFactor",
   ],
   properties: {
     status: stringField(1),
     identity: { ...mobileAccessIdentityPayload, nullable: true },
-    accessToken: { type: "string", minLength: 1, nullable: true },
-    refreshToken: { type: "string", minLength: 1, nullable: true },
-    expiresAt: { type: "string", minLength: 1, nullable: true },
     requiresVerification: { type: "boolean" },
     requiresSecondFactor: { type: "boolean" },
   },

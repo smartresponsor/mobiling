@@ -266,24 +266,12 @@ components:
     MobileAccessSessionPayload:
       type: object
       additionalProperties: false
-      required: [status, identity, accessToken, refreshToken, expiresAt, requiresVerification, requiresSecondFactor]
+      required: [status, identity, requiresVerification, requiresSecondFactor]
       properties:
         status: { type: string }
         identity:
           anyOf:
             - { $ref: '#/components/schemas/MobileAccessIdentityPayload' }
-            - { type: 'null' }
-        accessToken:
-          anyOf:
-            - { type: string }
-            - { type: 'null' }
-        refreshToken:
-          anyOf:
-            - { type: string }
-            - { type: 'null' }
-        expiresAt:
-          anyOf:
-            - { type: string }
             - { type: 'null' }
         requiresVerification: { type: boolean }
         requiresSecondFactor: { type: boolean }
