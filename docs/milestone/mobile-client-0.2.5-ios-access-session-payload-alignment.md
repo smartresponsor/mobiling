@@ -1,0 +1,21 @@
+# Mobile Client 0.2.5 iOS Access Session Payload Alignment Milestone
+
+- Purpose: align iOS access/session contracts with Android and Accessing-owned session state.
+- Boundary decision: Mobiling does not mint tokens or own authentication business logic.
+- iOS auth session payload no longer models local mobile token ownership.
+- iOS auth session payload now carries backend-owned routing flags:
+  - `status`
+  - `authenticated`
+  - `requiresVerification`
+  - `requiresSecondFactor`
+  - nullable `sessionId`
+- iOS session identity payload now supports partially available identity state:
+  - nullable `userId`
+  - nullable `accountId`
+  - `emailVerified`
+  - `secondFactorEnabled`
+- Added `AuthSessionPayload.toAccessScreen()` for passive UI routing parity.
+- `requiresVerification` routes to `verificationRequired`.
+- `requiresSecondFactor` routes to `secondFactorRequired`.
+- Temporary authenticated route remains `welcome` until authenticated workspace shell is materialized.
+- Not included: password validation, verification code validation, second-factor validation, token generation, or session authority.
