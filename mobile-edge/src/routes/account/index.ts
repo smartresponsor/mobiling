@@ -1,2 +1,3 @@
-export { default as registerIdentitySessionRoute } from '../identity/session';
-export { default as registerProfileDetailRoute } from '../profile/detail';
+/**
+ * Account route manifest intentionally does not export legacy Express route islands.
+ */

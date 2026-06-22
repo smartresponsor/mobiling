@@ -18,6 +18,3 @@ export { productListingRoute } from '../product/listing';
 export { productDetailRoute } from '../product/detail';
 export { orderListingRoute } from '../order/listing';
 export { orderDetailRoute } from '../order/detail';
-export { projectListingRouter } from '../project/listing';
-export { projectDetailRouter } from '../project/detail';
-export { default as profileDetailRouter } from '../profile/detail';
