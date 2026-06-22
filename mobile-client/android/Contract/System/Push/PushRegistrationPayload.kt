@@ -1,4 +1,4 @@
-package app.mobiling.client.client.contract.system.push
+package app.mobiling.client.contract.system.push
 
 data class PushRegistrationPayload(
     val token: String,

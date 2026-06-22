@@ -1,7 +1,7 @@
-package app.mobiling.client.client.ui.message.thread
+package app.mobiling.client.ui.message.thread
 
-import app.mobiling.client.client.contract.message.thread.MessageItemPayload
-import app.mobiling.client.client.contract.message.thread.MessageThreadSummary
+import app.mobiling.client.contract.message.thread.MessageItemPayload
+import app.mobiling.client.contract.message.thread.MessageThreadSummary
 
 /**
  * Marketing America Corp. Oleksandr Tishchenko

@@ -1,9 +1,9 @@
 package app.mobiling.core.config
 
 import android.content.Context
-import app.mobiling.client.client.contract.system.config.RemoteConfigPayload
-import app.mobiling.client.client.data.system.config.RemoteConfigStore
-import app.mobiling.client.client.usecase.system.config.RefreshRemoteConfigUseCase
+import app.mobiling.client.contract.system.config.RemoteConfigPayload
+import app.mobiling.client.data.system.config.RemoteConfigStore
+import app.mobiling.client.usecase.system.config.RefreshRemoteConfigUseCase
 
 /**
  * Legacy-compatible Android entry point bridged to canonical system/config slices.

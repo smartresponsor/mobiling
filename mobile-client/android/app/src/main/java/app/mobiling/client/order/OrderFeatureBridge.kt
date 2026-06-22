@@ -1,12 +1,12 @@
 package app.mobiling.client.order
 
-import app.mobiling.client.client.contract.order.detail.OrderDetailPayload
-import app.mobiling.client.client.contract.order.listing.ListOrdersQuery
-import app.mobiling.client.client.contract.order.listing.OrderSummary
-import app.mobiling.client.client.data.order.detail.OrderDetailGateway
-import app.mobiling.client.client.data.order.listing.OrderListingGateway
-import app.mobiling.client.client.usecase.order.detail.LoadOrderDetailUseCase
-import app.mobiling.client.client.usecase.order.listing.ListOrdersUseCase
+import app.mobiling.client.contract.order.detail.OrderDetailPayload
+import app.mobiling.client.contract.order.listing.ListOrdersQuery
+import app.mobiling.client.contract.order.listing.OrderSummary
+import app.mobiling.client.data.order.detail.OrderDetailGateway
+import app.mobiling.client.data.order.listing.OrderListingGateway
+import app.mobiling.client.usecase.order.detail.LoadOrderDetailUseCase
+import app.mobiling.client.usecase.order.listing.ListOrdersUseCase
 
 /**
  * Marketing America Corp. Oleksandr Tishchenko

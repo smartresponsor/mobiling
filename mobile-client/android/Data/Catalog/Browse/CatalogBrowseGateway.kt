@@ -1,7 +1,7 @@
-package app.mobiling.client.client.data.catalog.browse
+package app.mobiling.client.data.catalog.browse
 
-import app.mobiling.client.client.contract.catalog.browse.CatalogNodeSummary
-import app.mobiling.client.client.contract.catalog.browse.ListCatalogNodesQuery
+import app.mobiling.client.contract.catalog.browse.CatalogNodeSummary
+import app.mobiling.client.contract.catalog.browse.ListCatalogNodesQuery
 
 /**
  * Marketing America Corp. Oleksandr Tishchenko

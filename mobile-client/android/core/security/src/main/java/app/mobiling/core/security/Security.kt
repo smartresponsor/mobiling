@@ -1,8 +1,8 @@
 package app.mobiling.core.security
 
-import app.mobiling.client.client.contract.system.security.SignatureHeaders
-import app.mobiling.client.client.data.system.security.RequestSignatureApplier
-import app.mobiling.client.client.usecase.system.security.ApplyRequestSignatureUseCase
+import app.mobiling.client.contract.system.security.SignatureHeaders
+import app.mobiling.client.data.system.security.RequestSignatureApplier
+import app.mobiling.client.usecase.system.security.ApplyRequestSignatureUseCase
 import okhttp3.Request
 
 /**

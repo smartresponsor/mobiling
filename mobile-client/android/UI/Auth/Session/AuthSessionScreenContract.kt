@@ -1,4 +1,4 @@
-package app.mobiling.client.client.ui.auth.session
+package app.mobiling.client.ui.auth.session
 
 interface AuthSessionScreenContract {
     val routePath: String

@@ -1,8 +1,8 @@
-package app.mobiling.client.client.data.shipment.tracking
+package app.mobiling.client.data.shipment.tracking
 
-import app.mobiling.client.client.contract.shipment.detail.ShipmentDetailPayload
-import app.mobiling.client.client.contract.shipment.tracking.ListShipmentsQuery
-import app.mobiling.client.client.contract.shipment.tracking.ShipmentTrackingSummary
+import app.mobiling.client.contract.shipment.detail.ShipmentDetailPayload
+import app.mobiling.client.contract.shipment.tracking.ListShipmentsQuery
+import app.mobiling.client.contract.shipment.tracking.ShipmentTrackingSummary
 
 /**
  * Marketing America Corp. Oleksandr Tishchenko

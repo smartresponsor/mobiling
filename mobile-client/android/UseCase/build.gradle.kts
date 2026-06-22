@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "app.mobiling.client.client.usecase"
+    namespace = "app.mobiling.client.usecase"
     compileSdk = 34
     defaultConfig { minSdk = 24 }
 

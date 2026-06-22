@@ -1,4 +1,4 @@
-package app.mobiling.client.client.contract.identity.session
+package app.mobiling.client.contract.identity.session
 
 data class SessionIdentityPayload(
     val userId: String,

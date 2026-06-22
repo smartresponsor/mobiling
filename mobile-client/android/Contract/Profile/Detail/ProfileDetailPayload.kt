@@ -1,4 +1,4 @@
-package app.mobiling.client.client.contract.profile.detail
+package app.mobiling.client.contract.profile.detail
 
 data class ProfileDetailPayload(
     val profileId: String,

@@ -1,4 +1,4 @@
-package app.mobiling.client.client.contract.product.listing
+package app.mobiling.client.contract.product.listing
 
 /**
  * Marketing America Corp. Oleksandr Tishchenko

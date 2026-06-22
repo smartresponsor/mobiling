@@ -1,7 +1,7 @@
-package app.mobiling.client.client.usecase.message.thread
+package app.mobiling.client.usecase.message.thread
 
-import app.mobiling.client.client.contract.message.thread.MessageThreadSummary
-import app.mobiling.client.client.data.message.thread.MessageThreadGateway
+import app.mobiling.client.contract.message.thread.MessageThreadSummary
+import app.mobiling.client.data.message.thread.MessageThreadGateway
 
 /**
  * Marketing America Corp. Oleksandr Tishchenko

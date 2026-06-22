@@ -1,8 +1,8 @@
 package app.mobiling.core.analytic
 
-import app.mobiling.client.client.contract.system.analytic.AnalyticEventPayload
-import app.mobiling.client.client.data.system.analytic.AnalyticEventRecorder
-import app.mobiling.client.client.usecase.system.analytic.RecordAnalyticEventUseCase
+import app.mobiling.client.contract.system.analytic.AnalyticEventPayload
+import app.mobiling.client.data.system.analytic.AnalyticEventRecorder
+import app.mobiling.client.usecase.system.analytic.RecordAnalyticEventUseCase
 
 /**
  * Legacy-compatible Android entry point bridged to canonical system/analytic slices.

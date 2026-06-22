@@ -1,6 +1,6 @@
-package app.mobiling.client.client.data.taxation.detail
+package app.mobiling.client.data.taxation.detail
 
-import app.mobiling.client.client.contract.taxation.detail.TaxDetailPayload
+import app.mobiling.client.contract.taxation.detail.TaxDetailPayload
 
 /**
  * Marketing America Corp. Oleksandr Tishchenko

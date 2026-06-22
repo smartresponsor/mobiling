@@ -1,6 +1,6 @@
-package app.mobiling.client.client.data.system.analytic
+package app.mobiling.client.data.system.analytic
 
-import app.mobiling.client.client.contract.system.analytic.AnalyticEventPayload
+import app.mobiling.client.contract.system.analytic.AnalyticEventPayload
 
 /**
  * Canonical data adapter responsible for recording analytics events.

@@ -1,4 +1,4 @@
-package app.mobiling.client.client.contract.system.billing
+package app.mobiling.client.contract.system.billing
 
 data class ReceiptUploadPayload(
     val token: String,

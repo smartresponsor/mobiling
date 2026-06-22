@@ -1,12 +1,12 @@
 package app.mobiling.client.message
 
-import app.mobiling.client.client.contract.message.thread.MessageItemPayload
-import app.mobiling.client.client.contract.message.thread.MessageThreadSummary
-import app.mobiling.client.client.contract.message.thread.SendMessageRequest
-import app.mobiling.client.client.data.message.thread.MessageThreadGateway
-import app.mobiling.client.client.usecase.message.thread.ListMessageItemsUseCase
-import app.mobiling.client.client.usecase.message.thread.ListMessageThreadsUseCase
-import app.mobiling.client.client.usecase.message.thread.SendMessageUseCase
+import app.mobiling.client.contract.message.thread.MessageItemPayload
+import app.mobiling.client.contract.message.thread.MessageThreadSummary
+import app.mobiling.client.contract.message.thread.SendMessageRequest
+import app.mobiling.client.data.message.thread.MessageThreadGateway
+import app.mobiling.client.usecase.message.thread.ListMessageItemsUseCase
+import app.mobiling.client.usecase.message.thread.ListMessageThreadsUseCase
+import app.mobiling.client.usecase.message.thread.SendMessageUseCase
 
 /**
  * Marketing America Corp. Oleksandr Tishchenko

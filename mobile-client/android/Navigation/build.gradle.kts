@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "app.mobiling.client.client.navigation"
+    namespace = "app.mobiling.client.navigation"
     compileSdk = 34
     defaultConfig { minSdk = 24 }
 

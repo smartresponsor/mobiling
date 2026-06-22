@@ -1,4 +1,4 @@
-package app.mobiling.client.client.navigation.taxation.detail
+package app.mobiling.client.navigation.taxation.detail
 
 /**
  * Marketing America Corp. Oleksandr Tishchenko

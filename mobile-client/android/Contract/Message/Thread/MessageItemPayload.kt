@@ -1,4 +1,4 @@
-package app.mobiling.client.client.contract.message.thread
+package app.mobiling.client.contract.message.thread
 
 /**
  * Marketing America Corp. Oleksandr Tishchenko

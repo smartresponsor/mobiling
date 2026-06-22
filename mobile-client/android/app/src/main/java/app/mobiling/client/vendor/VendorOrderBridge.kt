@@ -3,9 +3,9 @@ package app.mobiling.client.vendor
 import app.mobiling.client.order.OrderBusinessBridge
 import app.mobiling.client.order.OrderOwnedFlow
 import app.mobiling.client.order.OrderOwnedRouteMap
-import app.mobiling.client.client.contract.order.detail.OrderDetailPayload
-import app.mobiling.client.client.contract.order.listing.ListOrdersQuery
-import app.mobiling.client.client.contract.order.listing.OrderSummary
+import app.mobiling.client.contract.order.detail.OrderDetailPayload
+import app.mobiling.client.contract.order.listing.ListOrdersQuery
+import app.mobiling.client.contract.order.listing.OrderSummary
 
 /**
  * Marketing America Corp. Oleksandr Tishchenko

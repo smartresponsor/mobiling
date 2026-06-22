@@ -1,7 +1,7 @@
 package app.mobiling.core.push
 
-import app.mobiling.client.client.data.system.push.PushTokenRegistrar
-import app.mobiling.client.client.usecase.system.push.RegisterPushTokenUseCase
+import app.mobiling.client.data.system.push.PushTokenRegistrar
+import app.mobiling.client.usecase.system.push.RegisterPushTokenUseCase
 
 /**
  * Legacy-compatible Android entry point bridged to canonical system/push slices.

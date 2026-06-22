@@ -1,6 +1,6 @@
-package app.mobiling.client.client.data.order.detail
+package app.mobiling.client.data.order.detail
 
-import app.mobiling.client.client.contract.order.detail.OrderDetailPayload
+import app.mobiling.client.contract.order.detail.OrderDetailPayload
 
 /**
  * Marketing America Corp. Oleksandr Tishchenko

@@ -1,12 +1,12 @@
 package app.mobiling.client.taxation
 
-import app.mobiling.client.client.contract.taxation.detail.TaxDetailPayload
-import app.mobiling.client.client.contract.taxation.summary.LoadTaxSummaryQuery
-import app.mobiling.client.client.contract.taxation.summary.TaxSummary
-import app.mobiling.client.client.data.taxation.detail.TaxDetailGateway
-import app.mobiling.client.client.data.taxation.summary.TaxSummaryGateway
-import app.mobiling.client.client.usecase.taxation.detail.LoadTaxDetailUseCase
-import app.mobiling.client.client.usecase.taxation.summary.LoadTaxSummaryUseCase
+import app.mobiling.client.contract.taxation.detail.TaxDetailPayload
+import app.mobiling.client.contract.taxation.summary.LoadTaxSummaryQuery
+import app.mobiling.client.contract.taxation.summary.TaxSummary
+import app.mobiling.client.data.taxation.detail.TaxDetailGateway
+import app.mobiling.client.data.taxation.summary.TaxSummaryGateway
+import app.mobiling.client.usecase.taxation.detail.LoadTaxDetailUseCase
+import app.mobiling.client.usecase.taxation.summary.LoadTaxSummaryUseCase
 
 /**
  * Marketing America Corp. Oleksandr Tishchenko

@@ -1,6 +1,6 @@
-package app.mobiling.client.client.ui.product.listing
+package app.mobiling.client.ui.product.listing
 
-import app.mobiling.client.client.contract.product.listing.ProductCardSummary
+import app.mobiling.client.contract.product.listing.ProductCardSummary
 
 /**
  * Marketing America Corp. Oleksandr Tishchenko

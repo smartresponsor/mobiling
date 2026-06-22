@@ -1,6 +1,6 @@
-package app.mobiling.client.client.usecase.system.config
+package app.mobiling.client.usecase.system.config
 
-import app.mobiling.client.client.data.system.config.RemoteConfigStore
+import app.mobiling.client.data.system.config.RemoteConfigStore
 
 class RefreshRemoteConfigUseCase(private val remoteConfigStore: RemoteConfigStore) {
     suspend operator fun invoke(

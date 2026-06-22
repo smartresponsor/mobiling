@@ -1,6 +1,6 @@
-package app.mobiling.client.client.ui.project.detail
+package app.mobiling.client.ui.project.detail
 
-import app.mobiling.client.client.contract.project.detail.ProjectDetailPayload
+import app.mobiling.client.contract.project.detail.ProjectDetailPayload
 
 /**
  * Marketing America Corp. Oleksandr Tishchenko

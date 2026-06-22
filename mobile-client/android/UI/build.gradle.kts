@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "app.mobiling.client.client.ui"
+    namespace = "app.mobiling.client.ui"
     compileSdk = 34
     defaultConfig { minSdk = 24 }
 

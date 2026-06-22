@@ -1,6 +1,6 @@
-package app.mobiling.client.client.data.system.entitlement
+package app.mobiling.client.data.system.entitlement
 
-import app.mobiling.client.client.contract.system.entitlement.EntitlementSnapshot
+import app.mobiling.client.contract.system.entitlement.EntitlementSnapshot
 
 /**
  * Canonical data adapter responsible for loading entitlement state.

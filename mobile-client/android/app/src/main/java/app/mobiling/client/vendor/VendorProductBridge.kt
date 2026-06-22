@@ -1,9 +1,9 @@
 package app.mobiling.client.vendor
 
 import app.mobiling.client.product.ProductFeatureBridge
-import app.mobiling.client.client.contract.product.detail.ProductDetailPayload
-import app.mobiling.client.client.contract.product.listing.ProductCardSummary
-import app.mobiling.client.client.contract.product.listing.ProductListQuery
+import app.mobiling.client.contract.product.detail.ProductDetailPayload
+import app.mobiling.client.contract.product.listing.ProductCardSummary
+import app.mobiling.client.contract.product.listing.ProductListQuery
 
 /**
  * Marketing America Corp. Oleksandr Tishchenko

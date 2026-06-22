@@ -1,9 +1,9 @@
 package app.mobiling.core.billing
 
-import app.mobiling.client.client.contract.system.billing.ReceiptVerificationResult
-import app.mobiling.client.client.data.system.billing.BillingReceiptGateway
-import app.mobiling.client.client.usecase.system.billing.UploadReceiptUseCase
-import app.mobiling.client.client.usecase.system.billing.VerifyReceiptUseCase
+import app.mobiling.client.contract.system.billing.ReceiptVerificationResult
+import app.mobiling.client.data.system.billing.BillingReceiptGateway
+import app.mobiling.client.usecase.system.billing.UploadReceiptUseCase
+import app.mobiling.client.usecase.system.billing.VerifyReceiptUseCase
 
 /**
  * Legacy-compatible Android entry point bridged to canonical system/billing slices.

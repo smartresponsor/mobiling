@@ -1,9 +1,9 @@
 package app.mobiling.client.auth
 
-import app.mobiling.client.client.contract.auth.session.AuthSessionPayload
-import app.mobiling.client.client.contract.auth.session.StartAuthRequest
-import app.mobiling.client.client.data.auth.session.AuthSessionGateway
-import app.mobiling.client.client.usecase.auth.session.StartAuthUseCase
+import app.mobiling.client.contract.auth.session.AuthSessionPayload
+import app.mobiling.client.contract.auth.session.StartAuthRequest
+import app.mobiling.client.data.auth.session.AuthSessionGateway
+import app.mobiling.client.usecase.auth.session.StartAuthUseCase
 
 /**
  * Marketing America Corp. Oleksandr Tishchenko

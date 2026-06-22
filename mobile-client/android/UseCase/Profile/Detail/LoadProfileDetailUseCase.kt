@@ -1,7 +1,7 @@
-package app.mobiling.client.client.usecase.profile.detail
+package app.mobiling.client.usecase.profile.detail
 
-import app.mobiling.client.client.contract.profile.detail.ProfileDetailPayload
-import app.mobiling.client.client.data.profile.detail.ProfileDetailGateway
+import app.mobiling.client.contract.profile.detail.ProfileDetailPayload
+import app.mobiling.client.data.profile.detail.ProfileDetailGateway
 
 class LoadProfileDetailUseCase(
     private val gateway: ProfileDetailGateway,

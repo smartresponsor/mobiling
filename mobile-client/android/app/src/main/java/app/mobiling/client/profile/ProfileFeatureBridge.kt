@@ -1,8 +1,8 @@
 package app.mobiling.client.profile
 
-import app.mobiling.client.client.contract.profile.detail.ProfileDetailPayload
-import app.mobiling.client.client.data.profile.detail.ProfileDetailGateway
-import app.mobiling.client.client.usecase.profile.detail.LoadProfileDetailUseCase
+import app.mobiling.client.contract.profile.detail.ProfileDetailPayload
+import app.mobiling.client.data.profile.detail.ProfileDetailGateway
+import app.mobiling.client.usecase.profile.detail.LoadProfileDetailUseCase
 
 /**
  * Marketing America Corp. Oleksandr Tishchenko

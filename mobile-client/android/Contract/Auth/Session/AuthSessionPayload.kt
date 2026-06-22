@@ -1,4 +1,4 @@
-package app.mobiling.client.client.contract.auth.session
+package app.mobiling.client.contract.auth.session
 
 data class AuthSessionPayload(
     val accessToken: String,

@@ -1,7 +1,7 @@
-package app.mobiling.client.client.data.vendor.listing
+package app.mobiling.client.data.vendor.listing
 
-import app.mobiling.client.client.contract.vendor.listing.ListVendorsQuery
-import app.mobiling.client.client.contract.vendor.listing.VendorCardSummary
+import app.mobiling.client.contract.vendor.listing.ListVendorsQuery
+import app.mobiling.client.contract.vendor.listing.VendorCardSummary
 
 /**
  * Marketing America Corp. Oleksandr Tishchenko

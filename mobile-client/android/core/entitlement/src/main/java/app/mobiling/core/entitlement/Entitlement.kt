@@ -1,8 +1,8 @@
 package app.mobiling.core.entitlement
 
-import app.mobiling.client.client.contract.system.entitlement.EntitlementSnapshot
-import app.mobiling.client.client.data.system.entitlement.EntitlementSnapshotGateway
-import app.mobiling.client.client.usecase.system.entitlement.RefreshEntitlementSnapshotUseCase
+import app.mobiling.client.contract.system.entitlement.EntitlementSnapshot
+import app.mobiling.client.data.system.entitlement.EntitlementSnapshotGateway
+import app.mobiling.client.usecase.system.entitlement.RefreshEntitlementSnapshotUseCase
 
 /**
  * Legacy-compatible Android entry point bridged to canonical system/entitlement slices.

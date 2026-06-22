@@ -1,6 +1,6 @@
-package app.mobiling.client.client.data.system.push
+package app.mobiling.client.data.system.push
 
-import app.mobiling.client.client.contract.system.push.PushRegistrationPayload
+import app.mobiling.client.contract.system.push.PushRegistrationPayload
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request

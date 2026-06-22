@@ -1,6 +1,6 @@
-package app.mobiling.client.client.data.system.security
+package app.mobiling.client.data.system.security
 
-import app.mobiling.client.client.contract.system.security.SignatureHeaders
+import app.mobiling.client.contract.system.security.SignatureHeaders
 import okhttp3.Request
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
