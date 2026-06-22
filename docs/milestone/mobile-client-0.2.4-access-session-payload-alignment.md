@@ -1,0 +1,22 @@
+# Mobile Client 0.2.4 Access Session Payload Alignment Milestone
+
+- Purpose: align Android access/session contracts with Accessing-owned session state.
+- Boundary decision: Mobiling does not mint tokens or own authentication business logic.
+- Android auth session payload no longer models local mobile token ownership.
+- Android auth session payload now carries backend-owned routing flags:
+  - `status`
+  - `authenticated`
+  - `requiresVerification`
+  - `requiresSecondFactor`
+  - nullable `sessionId`
+- Android session identity payload now supports partially available identity state:
+  - nullable `userId`
+  - nullable `accountId`
+  - `emailVerified`
+  - `secondFactorEnabled`
+- Added `AuthSessionPayload.toAccessScreen()` for passive UI routing.
+- Routing behavior:
+  - `requiresVerification` routes to `VerificationRequired`.
+  - `requiresSecondFactor` routes to `SecondFactorRequired`.
+  - unauthenticated state routes to `SignIn`.
+- Temporary authenticated route remains `Welcome` until authenticated workspace shell is materialized.
