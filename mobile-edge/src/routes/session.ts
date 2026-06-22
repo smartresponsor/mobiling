@@ -1,18 +1,6 @@
+import type { FastifyInstance } from "fastify";
 
-import { FastifyInstance } from "fastify";
-import { signJwt, verifyJwt } from "../auth/jwt.js";
-export default async function route(app: FastifyInstance){
-  app.post("/mobile/session", async (_req, _res) => {
-    const token = await signJwt({ sub: "user:dev", scope: ["mobile"] });
-    const now = Math.floor(Date.now()/1000);
-    return { token, token_type: "Bearer", expires_at: now + 3600 };
-  });
-  app.post("/mobile/session/refresh", async (req:any, res)=>{
-    const h = String(req.headers["authorization"]||"");
-    if (!h.toLowerCase().startsWith("bearer ")) return res.status(401).send({error:"unauthorized"});
-    try { await verifyJwt(h.slice(7)); } catch { return res.status(401).send({error:"unauthorized"}); }
-    const token = await signJwt({ sub:"user:dev", scope:["mobile"] });
-    const now = Math.floor(Date.now()/1000);
-    return { token, token_type:"Bearer", expires_at: now + 3600 };
-  });
+export default async function route(_app: FastifyInstance): Promise<void> {
+  // Legacy local mobile session token minting is intentionally disabled.
+  // Mobile authentication now uses Accessing-owned `/mobile/access/*` session transport.
 }

@@ -29,6 +29,7 @@ paths:
   /mobile/access/signin:
     post:
       summary: Proxy mobile access sign in to Accessing
+      description: Accessing owns authentication and session transport; mobile-edge forwards request credentials and passes Accessing response cookies back to the mobile client without minting mobile tokens.
       requestBody:
         required: true
         content:
@@ -69,6 +70,7 @@ paths:
   /mobile/access/register:
     post:
       summary: Proxy mobile access registration to Accessing
+      description: Accessing owns registration-side session transport; mobile-edge passes Accessing response cookies back to the mobile client without minting mobile tokens.
       requestBody:
         required: true
         content:
@@ -97,6 +99,7 @@ paths:
   /mobile/access/logout:
     post:
       summary: Proxy mobile access logout to Accessing
+      description: Accessing owns logout and session clearing; mobile-edge passes Accessing response cookies back to the mobile client.
       responses:
         '200':
           description: Accessing returned the current session state
@@ -113,6 +116,7 @@ paths:
   /mobile/access/session:
     get:
       summary: Proxy mobile access session to Accessing
+      description: Accessing owns session lookup and transport; mobile-edge forwards client session credentials and passes Accessing response cookies back to the mobile client.
       responses:
         '200':
           description: Accessing returned the current mobile access session state
@@ -183,10 +187,14 @@ paths:
   /mobile/session:
     post:
       summary: Dev token
+      deprecated: true
+      description: Retired legacy local token route; mobile authentication uses Accessing-owned /mobile/access/* session transport.
       responses: { '200': { description: OK } }
   /oauth/token:
     post:
       summary: Dev OAuth token
+      deprecated: true
+      description: Retired legacy OAuth token route; mobile authentication uses Accessing-owned /mobile/access/* session transport.
       responses: { '200': { description: OK } }
   /admin/stats:
     get:

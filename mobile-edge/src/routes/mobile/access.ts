@@ -1,4 +1,4 @@
-import type { FastifyInstance } from "fastify";
+import type { FastifyInstance, FastifyReply } from "fastify";
 import {
   mobileAccessErrorPayload,
   mobileAccessRegisterRequest,
@@ -141,6 +141,14 @@ function proxyPayload(status: number, body: unknown): AccessingApiSessionPayload
   return normalizeErrorPayload(body);
 }
 
+function applySessionTransport(reply: FastifyReply, responseCookie: string[]): void {
+  if (responseCookie.length < 1) {
+    return;
+  }
+
+  reply.header("set-cookie", responseCookie);
+}
+
 function mobileAccessRequestSchemas() {
   return {
     signin: {
@@ -185,6 +193,7 @@ export default async function route(app: FastifyInstance): Promise<void> {
 
   app.post("/mobile/access/signin", { schema: schemas.signin }, async (request, reply) => {
     const result = await accessingApiClient.signIn(request.body as { email: string; password: string }, forwardedHeaders(request as { headers: Record<string, unknown> }));
+    applySessionTransport(reply, result.responseCookie);
     return reply.code(result.status).send(proxyPayload(result.status, result.body));
   });
 
@@ -199,16 +208,19 @@ export default async function route(app: FastifyInstance): Promise<void> {
       forwardedHeaders(request as { headers: Record<string, unknown> }),
     );
 
+    applySessionTransport(reply, result.responseCookie);
     return reply.code(result.status).send(proxyPayload(result.status, result.body));
   });
 
   app.post("/mobile/access/logout", { schema: schemas.logout }, async (request, reply) => {
     const result = await accessingApiClient.logout(forwardedHeaders(request as { headers: Record<string, unknown> }));
+    applySessionTransport(reply, result.responseCookie);
     return reply.code(result.status).send(proxyPayload(result.status, result.body));
   });
 
   app.get("/mobile/access/session", { schema: schemas.session }, async (request, reply) => {
     const result = await accessingApiClient.session(forwardedHeaders(request as { headers: Record<string, unknown> }));
+    applySessionTransport(reply, result.responseCookie);
     return reply.code(result.status).send(proxyPayload(result.status, result.body));
   });
 }

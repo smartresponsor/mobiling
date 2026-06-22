@@ -13,7 +13,7 @@
   - follows mobile-edge contract milestone commit `629316b` (`mobile-edge: materialize auth contract`)
 - Limitation:
   - mobile-edge does not invent access tokens, refresh tokens, authenticated users, or a mobile session
-  - `session_transport_pending` from backend sign-in is passed through honestly
+  - `session_transport_pending` from backend signin is passed through honestly
   - mobile-edge remains a BFF/client only; Accessing owns the auth/access business logic
 - Verification:
   - `npm run typecheck` passed

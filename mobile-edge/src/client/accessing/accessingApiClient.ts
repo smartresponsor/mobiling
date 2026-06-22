@@ -41,6 +41,7 @@ export interface AccessingApiErrorPayload {
 export interface AccessingApiResponse {
   status: number;
   body: unknown;
+  responseCookie: string[];
 }
 
 const ACCESSING_API_UNAVAILABLE_PAYLOAD: AccessingApiErrorPayload = {
@@ -109,9 +110,11 @@ export class AccessingApiClient {
           response.on("data", (chunk: Buffer) => chunks.push(chunk));
           response.on("end", () => {
             const text = Buffer.concat(chunks).toString("utf8");
+            const responseCookie = response.headers["set-cookie"] || [];
             resolve({
               status: response.statusCode || 502,
               body: this.parseResponseBody(text),
+              responseCookie: Array.isArray(responseCookie) ? responseCookie : [responseCookie],
             });
           });
         },
@@ -139,6 +142,7 @@ export class AccessingApiClient {
     return {
       status: 503,
       body: ACCESSING_API_UNAVAILABLE_PAYLOAD,
+      responseCookie: [],
     };
   }
 
