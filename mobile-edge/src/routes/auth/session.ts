@@ -1,12 +1,8 @@
-import { Router } from 'express';
+import type { RouteHandlerRequest, RouteHandlerResponse } from '../routeHandlerContext';
 
-const router = Router();
-
-router.post('/session', async (_req, res) => {
+export async function authSessionRetiredRoute(_req: RouteHandlerRequest, res: RouteHandlerResponse): Promise<void> {
   res.status(410).json({
     code: 'legacy_auth_session_retired',
     message: 'Use /mobile/access/* session transport.',
   });
-});
-
-export default router;
+}

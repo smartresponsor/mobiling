@@ -1,10 +1,6 @@
-import { Router } from 'express';
+import type { RouteHandlerRequest, RouteHandlerResponse } from '../routeHandlerContext';
 import { loadSessionIdentity } from '../../usecase/identity/session/loadSessionIdentity';
 
-const router = Router();
-
-router.get('/session', async (_req, res) => {
+export async function identitySessionRoute(_req: RouteHandlerRequest, res: RouteHandlerResponse): Promise<void> {
   res.json(await loadSessionIdentity());
-});
-
-export default router;
+}
