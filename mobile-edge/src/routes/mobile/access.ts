@@ -74,16 +74,16 @@ function normalizeIdentity(identity: unknown): AccessingApiSessionPayload["ident
     return null;
   }
 
-  const userId = stringValue(identity.userId);
+  const vendorId = stringValue(identity.vendorId);
   const displayName = stringValue(identity.displayName);
   const email = stringValue(identity.email);
 
-  if (null === userId || null === displayName || null === email) {
+  if (null === vendorId || null === displayName || null === email) {
     return null;
   }
 
   return {
-    userId,
+    vendorId,
     accountId: null,
     displayName,
     email,

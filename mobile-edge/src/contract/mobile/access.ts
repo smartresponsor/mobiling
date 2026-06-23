@@ -28,9 +28,9 @@ export const mobileAccessRegisterRequest = {
 export const mobileAccessIdentityPayload = {
   type: "object",
   additionalProperties: false,
-  required: ["userId", "accountId", "displayName", "email", "emailVerified", "secondFactorEnabled"],
+  required: ["vendorId", "accountId", "displayName", "email", "emailVerified", "secondFactorEnabled"],
   properties: {
-    userId: stringField(1),
+    vendorId: stringField(1),
     accountId: { anyOf: [stringField(1), { type: "null" }] },
     displayName: stringField(1),
     email: stringField(3),

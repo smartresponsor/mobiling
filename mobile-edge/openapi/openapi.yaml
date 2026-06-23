@@ -240,9 +240,9 @@ components:
       type: object
       additionalProperties: false
       description: accountId is a nullable compatibility field and is not sourced from Accessing in this milestone.
-      required: [userId, accountId, displayName, email, emailVerified, secondFactorEnabled]
+      required: [vendorId, accountId, displayName, email, emailVerified, secondFactorEnabled]
       properties:
-        userId: { type: string }
+        vendorId: { type: string }
         accountId:
           anyOf:
             - { type: string }

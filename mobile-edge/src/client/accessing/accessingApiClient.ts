@@ -14,7 +14,7 @@ export interface AccessingApiRegisterRequest {
 }
 
 export interface AccessingApiIdentityPayload {
-  userId: string | number;
+  vendorId: string | number;
   accountId?: string | null;
   displayName: string;
   email: string;
