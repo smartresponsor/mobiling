@@ -1,10 +1,8 @@
 // Marketing America Corp. Oleksandr Tishchenko
-import { Router } from 'express';
+import type { RouteHandlerRequest, RouteHandlerResponse } from '../routeHandlerContext';
 import { loadProjectDetail } from '../../usecase/project/detail/loadProjectDetail';
 
-export const projectDetailRouter = Router();
-
-projectDetailRouter.get('/:projectId', async (req, res) => {
-  const payload = await loadProjectDetail(req.params.projectId);
+export async function projectDetailRoute(req: RouteHandlerRequest, res: RouteHandlerResponse): Promise<void> {
+  const payload = await loadProjectDetail(String(req.params.projectId ?? ''));
   res.json(payload);
-});
+}

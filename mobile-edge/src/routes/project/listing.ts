@@ -1,10 +1,8 @@
 // Marketing America Corp. Oleksandr Tishchenko
-import { Router } from 'express';
+import type { RouteHandlerRequest, RouteHandlerResponse } from '../routeHandlerContext';
 import { listProjects } from '../../usecase/project/listing/listProjects';
 
-export const projectListingRouter = Router();
-
-projectListingRouter.get('/', async (req, res) => {
+export async function projectListingRoute(req: RouteHandlerRequest, res: RouteHandlerResponse): Promise<void> {
   const payload = await listProjects({
     searchTerm: typeof req.query.searchTerm === 'string' ? req.query.searchTerm : undefined,
     stateCode: typeof req.query.stateCode === 'string' ? req.query.stateCode : undefined,
@@ -13,4 +11,4 @@ projectListingRouter.get('/', async (req, res) => {
   });
 
   res.json(payload);
-});
+}
