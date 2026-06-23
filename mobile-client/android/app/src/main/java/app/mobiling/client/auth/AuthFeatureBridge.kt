@@ -1,8 +1,10 @@
 package app.mobiling.client.auth
 
 import app.mobiling.client.contract.auth.session.AuthSessionPayload
+import app.mobiling.client.contract.auth.session.RegisterAuthRequest
 import app.mobiling.client.contract.auth.session.StartAuthRequest
 import app.mobiling.client.data.auth.session.AuthSessionGateway
+import app.mobiling.client.usecase.auth.session.RegisterAuthUseCase
 import app.mobiling.client.usecase.auth.session.StartAuthUseCase
 
 /**
@@ -18,4 +20,7 @@ class AuthFeatureBridge(
 ) {
     suspend fun start(request: StartAuthRequest): AuthSessionPayload =
         StartAuthUseCase(gateway).invoke(request)
+
+    suspend fun register(request: RegisterAuthRequest): AuthSessionPayload =
+        RegisterAuthUseCase(gateway).invoke(request)
 }

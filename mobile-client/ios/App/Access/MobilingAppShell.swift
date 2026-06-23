@@ -31,7 +31,14 @@ public struct MobilingAppShell: View {
             case .register:
                 RegisterAccessView(
                     onBack: { currentScreen = .welcome },
-                    onSignIn: { currentScreen = .signIn }
+                    onSignIn: { currentScreen = .signIn },
+                    onRegisterAccess: { request in
+                        guard let authFeatureBridge else {
+                            return nil
+                        }
+                        return try await authFeatureBridge.register(request: request)
+                    },
+                    onAccessSession: { payload in currentScreen = payload.toAccessScreen() }
                 )
             case .verificationRequired:
                 VerificationRequiredView(

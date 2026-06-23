@@ -33,6 +33,8 @@ fun MobilingAppShell(
             AccessScreen.Register -> RegisterAccessScreen(
                 onBack = { currentScreen = AccessScreen.Welcome },
                 onSignIn = { currentScreen = AccessScreen.SignIn },
+                onRegisterAccess = { request -> authFeatureBridge?.register(request) },
+                onAccessSession = { payload -> currentScreen = payload.toAccessScreen() },
             )
 
             AccessScreen.VerificationRequired -> VerificationRequiredScreen(
