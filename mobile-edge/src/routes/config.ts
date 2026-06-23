@@ -8,7 +8,7 @@ const SNAP: Record<string, any> = {
 };
 function etagOf(s:string){ return '"'+hmacHex("etag", s).slice(0,16)+'"'; }
 export default async function route(app: FastifyInstance){
-  app.get("/mobile/config", async (req:any, res)=>{
+  app.get("/config", async (req:any, res)=>{
     const v = (req.query?.v || ENV.CONFIG_VERSION).toString();
     const body = JSON.stringify(SNAP[v] || SNAP["1"]);
     const tag = etagOf(body);

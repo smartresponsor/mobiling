@@ -22,15 +22,15 @@ public final class EdgeClient {
             done(.success(data ?? Data()))
         }.resume()
     }
-    public func config(done:@escaping (Result<Data,Error>)->Void){ req(path:"/mobile/config", done: done) }
-    public func entitlement(done:@escaping (Result<Data,Error>)->Void){ req(path:"/mobile/entitlement", done: done) }
+    public func config(done:@escaping (Result<Data,Error>)->Void){ req(path:"/config", done: done) }
+    public func entitlement(done:@escaping (Result<Data,Error>)->Void){ req(path:"/entitlement", done: done) }
     public func pushRegister(deviceId:String, token:String, platform:String?=nil, done:@escaping (Result<Void,Error>)->Void){
         let body = try! JSONSerialization.data(withJSONObject: ["deviceId":deviceId,"token":token,"platform":platform as Any])
-        req(path:"/mobile/push/register", method:"POST", body: body){ r in switch r{ case .success: done(.success(())); case .failure(let e): done(.failure(e)) } }
+        req(path:"/push/register", method:"POST", body: body){ r in switch r{ case .success: done(.success(())); case .failure(let e): done(.failure(e)) } }
     }
     public func receiptVerify(idem:String, payload:[String:Any], done:@escaping (Result<Data,Error>)->Void){
         var h = [String:String](); h["Idempotency-Key"] = idem
         let body = try! JSONSerialization.data(withJSONObject: payload)
-        req(path:"/mobile/receipt/verify", method:"POST", body: body, headers:h, done: done)
+        req(path:"/receipt/verify", method:"POST", body: body, headers:h, done: done)
     }
 }

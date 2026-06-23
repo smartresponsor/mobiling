@@ -5,7 +5,7 @@ import { registry } from "../contract/registry.js";
 import { getStore } from "../repository/index.js";
 
 export default async function route(app: FastifyInstance){
-  app.post("/mobile/push/register", {
+  app.post("/push/register", {
     schema: registry.get("push.register", registry.latest("push.register")!),
     config: { rateLimit: { max: 20, timeWindow: "1 minute" } }
   }, async (req: any, res) => {

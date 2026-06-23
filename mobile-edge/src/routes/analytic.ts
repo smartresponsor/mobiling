@@ -6,7 +6,7 @@ import { parseNdjson } from "../util/ndjson.js";
 import { getStore } from "../repository/index.js";
 
 export default async function route(app: FastifyInstance){
-  app.post("/mobile/analytic/batch", {
+  app.post("/analytic/batch", {
     schema: registry.get("analytic.batch.json", registry.latest("analytic.batch.json")!),
     config: { rateLimit: { max: 60, timeWindow: "1 minute" } }
   }, async (req: any, res) => {
@@ -17,7 +17,7 @@ export default async function route(app: FastifyInstance){
     for (const ev of events){ if (typeof ev?.type === "string") await store.metricIncr("analytic_"+ev.type, 1); }
     return res.status(202).send({ accepted: true, mode: "json", events: events.length });
   });
-  app.post("/mobile/analytic/batch-ndjson", {
+  app.post("/analytic/batch-ndjson", {
     config: { rawBody: true, rateLimit: { max: 60, timeWindow: "1 minute" } }
   }, async (req: any, res) => {
     const raw: Buffer = req.rawBody || Buffer.from("");

@@ -3,6 +3,6 @@ import type { RouteHandlerRequest, RouteHandlerResponse } from '../routeHandlerC
 export async function authSessionRetiredRoute(_req: RouteHandlerRequest, res: RouteHandlerResponse): Promise<void> {
   res.status(410).json({
     code: 'legacy_auth_session_retired',
-    message: 'Use /mobile/access/* session transport.',
+    message: 'Use /access/* session transport.',
   });
 }

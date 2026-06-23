@@ -9,7 +9,7 @@ paths:
     get:
       summary: Health
       responses: { '200': { description: OK } }
-  /mobile/config:
+  /config:
     get:
       summary: Config flags
       responses:
@@ -21,12 +21,12 @@ paths:
           content:
             application/json:
               schema: { type: object }
-  /mobile/entitlement:
+  /entitlement:
     get:
       summary: Entitlement grants
       security: [ { bearerAuth: [] } ]
       responses: { '200': { description: Grants, content: { application/json: { schema: { type: object } } } } }
-  /mobile/access/signin:
+  /access/signin:
     post:
       summary: Proxy mobile access sign in to Accessing
       description: Accessing owns authentication and session transport; mobile-edge forwards request credentials and passes Accessing response cookies back to the mobile client without minting mobile tokens.
@@ -67,7 +67,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MobileAccessErrorPayload'
-  /mobile/access/register:
+  /access/register:
     post:
       summary: Proxy mobile access registration to Accessing
       description: Accessing owns registration-side session transport; mobile-edge passes Accessing response cookies back to the mobile client without minting mobile tokens.
@@ -96,7 +96,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MobileAccessErrorPayload'
-  /mobile/access/logout:
+  /access/logout:
     post:
       summary: Proxy mobile access logout to Accessing
       description: Accessing owns logout and session clearing; mobile-edge passes Accessing response cookies back to the mobile client.
@@ -113,7 +113,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MobileAccessErrorPayload'
-  /mobile/access/session:
+  /access/session:
     get:
       summary: Proxy mobile access session to Accessing
       description: Accessing owns session lookup and transport; mobile-edge forwards client session credentials and passes Accessing response cookies back to the mobile client.
@@ -130,7 +130,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MobileAccessErrorPayload'
-  /mobile/push/register:
+  /push/register:
     post:
       summary: Register push token
       security: [ { bearerAuth: [] } ]
@@ -141,7 +141,7 @@ paths:
             schema:
               $ref: '#/components/schemas/PushRegisterV1'
       responses: { '204': { description: No Content } }
-  /mobile/receipt/verify:
+  /receipt/verify:
     post:
       summary: Verify purchase receipt
       security: [ { bearerAuth: [] } ]
@@ -157,7 +157,7 @@ paths:
             schema:
               $ref: '#/components/schemas/ReceiptVerifyV1'
       responses: { '200': { description: OK } }
-  /mobile/analytic/batch:
+  /analytic/batch:
     post:
       summary: Analytics JSON batch
       parameters:
@@ -171,7 +171,7 @@ paths:
           application/json:
             schema: { $ref: '#/components/schemas/AnalyticBatchJsonV1' }
       responses: { '202': { description: Accepted } }
-  /mobile/analytic/batch-ndjson:
+  /analytic/batch-ndjson:
     post:
       summary: Analytics NDJSON
       parameters:
@@ -180,7 +180,7 @@ paths:
           required: true
           schema: { type: string }
       responses: { '202': { description: Accepted } }
-  /mobile/sync/event:
+  /sync/event:
     post:
       summary: Client sync event
       responses: { '204': { description: No Content } }

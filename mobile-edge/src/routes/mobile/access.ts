@@ -185,13 +185,13 @@ function mobileAccessRequestSchemas() {
 export default async function route(app: FastifyInstance): Promise<void> {
   const schemas = mobileAccessRequestSchemas();
 
-  app.post("/mobile/access/signin", { schema: schemas.signin }, async (request, reply) => {
+  app.post("/access/signin", { schema: schemas.signin }, async (request, reply) => {
     const result = await accessingApiClient.signIn(request.body as { email: string; password: string }, forwardedHeaders(request as { headers: Record<string, unknown> }));
     applySessionTransport(reply, result.responseCookie);
     return reply.code(result.status).send(proxyPayload(result.status, result.body));
   });
 
-  app.post("/mobile/access/register", { schema: schemas.register }, async (request, reply) => {
+  app.post("/access/register", { schema: schemas.register }, async (request, reply) => {
     const body = request.body as { displayName: string; email: string; password: string };
     const result = await accessingApiClient.register(
       {
@@ -206,13 +206,13 @@ export default async function route(app: FastifyInstance): Promise<void> {
     return reply.code(result.status).send(proxyPayload(result.status, result.body));
   });
 
-  app.post("/mobile/access/logout", { schema: schemas.logout }, async (request, reply) => {
+  app.post("/access/logout", { schema: schemas.logout }, async (request, reply) => {
     const result = await accessingApiClient.logout(forwardedHeaders(request as { headers: Record<string, unknown> }));
     applySessionTransport(reply, result.responseCookie);
     return reply.code(result.status).send(proxyPayload(result.status, result.body));
   });
 
-  app.get("/mobile/access/session", { schema: schemas.session }, async (request, reply) => {
+  app.get("/access/session", { schema: schemas.session }, async (request, reply) => {
     const result = await accessingApiClient.session(forwardedHeaders(request as { headers: Record<string, unknown> }));
     applySessionTransport(reply, result.responseCookie);
     return reply.code(result.status).send(proxyPayload(result.status, result.body));

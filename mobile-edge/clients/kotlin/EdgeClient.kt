@@ -21,14 +21,14 @@ class EdgeClient(private val base:String, private val bearer:String? = null){
         c.disconnect()
         return code to txt
     }
-    fun config(): Pair<Int,String> = req("/mobile/config")
-    fun entitlement(): Pair<Int,String> = req("/mobile/entitlement")
+    fun config(): Pair<Int,String> = req("/config")
+    fun entitlement(): Pair<Int,String> = req("/entitlement")
     fun pushRegister(deviceId:String, token:String, platform:String?=null): Pair<Int,String> {
         val b = "{"deviceId":"$deviceId","token":"$token","platform":"${platform ?: ""}"}"
-        return req("/mobile/push/register", "POST", b)
+        return req("/push/register", "POST", b)
     }
     fun receiptVerify(idem:String, transactionId:String, productId:String, platform:String, receipt:String): Pair<Int,String> {
         val b = "{"transactionId":"$transactionId","productId":"$productId","platform":"$platform","receipt":"$receipt"}"
-        return req("/mobile/receipt/verify", "POST", b, headers = mapOf("Idempotency-Key" to idem))
+        return req("/receipt/verify", "POST", b, headers = mapOf("Idempotency-Key" to idem))
     }
 }

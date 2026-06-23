@@ -10,16 +10,16 @@ export class EdgeClient {
     const txt = await r.text();
     try { return JSON.parse(txt); } catch { return txt; }
   }
-  config(){ return this.req("/mobile/config"); }
-  entitlement(){ return this.req("/mobile/entitlement"); }
+  config(){ return this.req("/config"); }
+  entitlement(){ return this.req("/entitlement"); }
   pushRegister(deviceId:string, token:string, platform?:string){
-    return this.req("/mobile/push/register", { method:"POST", body: JSON.stringify({ deviceId, token, platform }) });
+    return this.req("/push/register", { method:"POST", body: JSON.stringify({ deviceId, token, platform }) });
   }
   receiptVerify(idemKey:string, body:{transactionId:string,productId:string,platform:"android"|"ios",receipt:string}){
-    return this.req("/mobile/receipt/verify", { method:"POST", body: JSON.stringify(body), headers: {"Idempotency-Key": idemKey } });
+    return this.req("/receipt/verify", { method:"POST", body: JSON.stringify(body), headers: {"Idempotency-Key": idemKey } });
   }
   analyticBatch(signature:string, events:any[]){
     const body = JSON.stringify({ events });
-    return this.req("/mobile/analytic/batch", { method:"POST", body, headers: {"X-SR-Analytic-Signature": signature} });
+    return this.req("/analytic/batch", { method:"POST", body, headers: {"X-SR-Analytic-Signature": signature} });
   }
 }

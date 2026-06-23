@@ -6,7 +6,7 @@ const SNAP: Snapshot = { flags: {
   "wifi_only": { key:"wifi_only" }
 }};
 export default async function route(app: FastifyInstance){
-  app.post("/mobile/flag/eval/:key", async (req:any, res)=>{
+  app.post("/flag/eval/:key", async (req:any, res)=>{
     const key = req.params.key; const ctx = req.body || {};
     const on = evalFlag(SNAP, key, ctx);
     return { key, on };
