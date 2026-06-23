@@ -1,7 +1,7 @@
 package app.mobiling.client.contract.identity.session
 
 data class SessionIdentityPayload(
-    val userId: String?,
+    val vendorId: String?,
     val accountId: String?,
     val displayName: String?,
     val activeRole: String?,

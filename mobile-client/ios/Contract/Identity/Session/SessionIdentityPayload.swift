@@ -1,5 +1,5 @@
 public struct SessionIdentityPayload {
-    public let userId: String?
+    public let vendorId: String?
     public let accountId: String?
     public let displayName: String?
     public let activeRole: String?
@@ -7,8 +7,8 @@ public struct SessionIdentityPayload {
     public let emailVerified: Bool
     public let secondFactorEnabled: Bool
 
-    public init(userId: String?, accountId: String?, displayName: String?, activeRole: String?, authenticated: Bool, emailVerified: Bool, secondFactorEnabled: Bool) {
-        self.userId = userId
+    public init(vendorId: String?, accountId: String?, displayName: String?, activeRole: String?, authenticated: Bool, emailVerified: Bool, secondFactorEnabled: Bool) {
+        self.vendorId = vendorId
         self.accountId = accountId
         self.displayName = displayName
         self.activeRole = activeRole
