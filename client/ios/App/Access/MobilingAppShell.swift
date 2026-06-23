@@ -43,12 +43,12 @@ public struct MobilingAppShell: View {
             case .verificationRequired:
                 VerificationRequiredView(
                     onBack: { currentScreen = .signIn },
-                    onUseDifferentAccess: { currentScreen = .welcome }
+                    onUseDifferentAccess: { clearAccessSession() }
                 )
             case .secondFactorRequired:
                 SecondFactorRequiredView(
                     onBack: { currentScreen = .signIn },
-                    onUseDifferentAccess: { currentScreen = .welcome }
+                    onUseDifferentAccess: { clearAccessSession() }
                 )
             }
         }
@@ -61,6 +61,17 @@ public struct MobilingAppShell: View {
                 currentScreen = try await authFeatureBridge.restore().toAccessScreen()
             } catch {
             }
+        }
+    }
+
+    private func clearAccessSession() {
+        Task {
+            do {
+                try await authFeatureBridge?.logout()
+            } catch {
+            }
+
+            currentScreen = .welcome
         }
     }
 }

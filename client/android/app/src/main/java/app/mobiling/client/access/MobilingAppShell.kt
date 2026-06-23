@@ -6,16 +6,30 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import app.mobiling.client.auth.AuthFeatureBridge
+import kotlinx.coroutines.launch
 
 @Composable
 fun MobilingAppShell(
     authFeatureBridge: AuthFeatureBridge? = null,
 ) {
     var currentScreen by rememberSaveable { mutableStateOf(AccessScreen.Welcome) }
+    val coroutineScope = rememberCoroutineScope()
+
+    fun clearAccessSession() {
+        coroutineScope.launch {
+            try {
+                authFeatureBridge?.logout()
+            } catch (_: Exception) {
+            }
+
+            currentScreen = AccessScreen.Welcome
+        }
+    }
 
     LaunchedEffect(authFeatureBridge) {
         val payload = try {
@@ -52,12 +66,12 @@ fun MobilingAppShell(
 
             AccessScreen.VerificationRequired -> VerificationRequiredScreen(
                 onBack = { currentScreen = AccessScreen.SignIn },
-                onUseDifferentAccess = { currentScreen = AccessScreen.Welcome },
+                onUseDifferentAccess = { clearAccessSession() },
             )
 
             AccessScreen.SecondFactorRequired -> SecondFactorRequiredScreen(
                 onBack = { currentScreen = AccessScreen.SignIn },
-                onUseDifferentAccess = { currentScreen = AccessScreen.Welcome },
+                onUseDifferentAccess = { clearAccessSession() },
             )
         }
     }

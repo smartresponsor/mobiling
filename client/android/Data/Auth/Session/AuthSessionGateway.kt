@@ -8,4 +8,5 @@ interface AuthSessionGateway {
     suspend fun startAuth(request: StartAuthRequest): AuthSessionPayload
     suspend fun registerAuth(request: RegisterAuthRequest): AuthSessionPayload
     suspend fun restoreAuth(): AuthSessionPayload
+    suspend fun logoutAuth()
 }

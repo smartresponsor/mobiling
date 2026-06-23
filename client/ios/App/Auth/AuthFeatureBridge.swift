@@ -20,4 +20,8 @@ public struct AuthFeatureBridge: Sendable {
     public func restore() async throws -> AuthSessionPayload {
         try await RestoreAuthUseCase(gateway: gateway)()
     }
+
+    public func logout() async throws {
+        try await LogoutAuthUseCase(gateway: gateway)()
+    }
 }
