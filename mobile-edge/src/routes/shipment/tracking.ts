@@ -1,8 +1,8 @@
 // Marketing America Corp. Oleksandr Tishchenko
-import type { Request, Response } from 'express';
+import type { RouteHandlerRequest, RouteHandlerResponse } from '../routeHandlerContext';
 import { listShipments } from '../../usecase/shipment/tracking/listShipments';
 
-export async function shipmentTrackingRoute(req: Request, res: Response): Promise<void> {
+export async function shipmentTrackingRoute(req: RouteHandlerRequest, res: RouteHandlerResponse): Promise<void> {
   const payload = await listShipments({
     orderId: typeof req.query.orderId === 'string' ? req.query.orderId : undefined,
     statusCode: typeof req.query.statusCode === 'string' ? req.query.statusCode : undefined,
