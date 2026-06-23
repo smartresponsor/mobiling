@@ -3,6 +3,7 @@ package app.mobiling.client.access
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -15,6 +16,18 @@ fun MobilingAppShell(
     authFeatureBridge: AuthFeatureBridge? = null,
 ) {
     var currentScreen by rememberSaveable { mutableStateOf(AccessScreen.Welcome) }
+
+    LaunchedEffect(authFeatureBridge) {
+        val payload = try {
+            authFeatureBridge?.restore()
+        } catch (_: Exception) {
+            null
+        }
+
+        if (payload != null) {
+            currentScreen = payload.toAccessScreen()
+        }
+    }
 
     Surface(Modifier.fillMaxSize()) {
         when (currentScreen) {

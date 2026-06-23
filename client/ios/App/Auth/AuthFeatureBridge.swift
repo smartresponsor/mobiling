@@ -16,4 +16,8 @@ public struct AuthFeatureBridge: Sendable {
     public func register(request: RegisterAuthRequest) async throws -> AuthSessionPayload {
         try await RegisterAuthUseCase(gateway: gateway)(request: request)
     }
+
+    public func restore() async throws -> AuthSessionPayload {
+        try await RestoreAuthUseCase(gateway: gateway)()
+    }
 }

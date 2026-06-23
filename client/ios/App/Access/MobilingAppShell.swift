@@ -52,5 +52,15 @@ public struct MobilingAppShell: View {
                 )
             }
         }
+        .task {
+            guard let authFeatureBridge else {
+                return
+            }
+
+            do {
+                currentScreen = try await authFeatureBridge.restore().toAccessScreen()
+            } catch {
+            }
+        }
     }
 }
