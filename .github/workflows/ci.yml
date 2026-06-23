@@ -25,7 +25,7 @@ jobs:
       - run: npm run build
   android:
     runs-on: ubuntu-latest
-    defaults: { run: { working-directory: mobile-client/android } }
+    defaults: { run: { working-directory: client/android } }
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
@@ -35,7 +35,7 @@ jobs:
       - run: gradle :app:compileDebugKotlin --stacktrace
   ios-structure:
     runs-on: macos-latest
-    defaults: { run: { working-directory: mobile-client/ios } }
+    defaults: { run: { working-directory: client/ios } }
     steps:
       - uses: actions/checkout@v4
       - run: swift package dump-package

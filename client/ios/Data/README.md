@@ -1,9 +1,9 @@
-# UseCase
+# Data
 
-Canonical scaffold layer for iOS mobile-client.
+Canonical scaffold layer for iOS client.
 
 Pattern:
-- UseCase/[Domain]/[Flow]
+- Data/[Domain]/[Flow]
 - singular domain names only
 - do not mix responsibilities across layers
 

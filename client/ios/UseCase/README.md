@@ -1,9 +1,9 @@
-# Navigation
+# UseCase
 
-Canonical scaffold layer for iOS mobile-client.
+Canonical scaffold layer for iOS client.
 
 Pattern:
-- Navigation/[Domain]/[Flow]
+- UseCase/[Domain]/[Flow]
 - singular domain names only
 - do not mix responsibilities across layers
 

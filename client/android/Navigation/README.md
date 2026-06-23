@@ -1,9 +1,9 @@
-# UI
+# Navigation
 
-Canonical scaffold layer for Android mobile-client.
+Canonical scaffold layer for Android client.
 
 Pattern:
-- UI/[Domain]/[Flow]
+- Navigation/[Domain]/[Flow]
 - singular domain names only
 - do not mix responsibilities across layers
 

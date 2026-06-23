@@ -1,6 +1,6 @@
 Working structural canon for the reconstructed mobile workspace:
 
-mobile-client/
+client/
   android/
   ios/
   contract/

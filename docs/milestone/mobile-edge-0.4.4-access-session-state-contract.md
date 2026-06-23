@@ -1,6 +1,6 @@
 # Mobile Edge 0.4.4 Access Session State Contract Milestone
 
-- Purpose: align mobile-edge access session payload with mobile-client Android/iOS session-state contracts.
+- Purpose: align mobile-edge access session payload with client Android/iOS session-state contracts.
 - Boundary decision: Accessing owns authentication and session transport.
 - Removed token-owned response fields from mobile-edge access session payload:
   - `accessToken`
@@ -13,5 +13,5 @@
   - `requiresSecondFactor`
 - Cookie/session transport remains forwarded from Accessing via `set-cookie` passthrough.
 - Normalizer no longer derives or emits local mobile token fields.
-- OpenAPI schema now matches mobile-client access session payload shape.
+- OpenAPI schema now matches client access session payload shape.
 - Not included: token generation, password validation, verification code validation, second-factor validation, or session authority.

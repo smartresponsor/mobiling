@@ -1,4 +1,4 @@
-# mobile-client contract canon
+# client contract canon
 
 Top-level contract folder contains cross-platform contract slices only.
 

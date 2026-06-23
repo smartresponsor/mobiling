@@ -15,20 +15,20 @@ expected = {
     "embedded": {"order": ["taxation"]},
     "internal": ["identity"],
 }
-ownership = json.loads((root / "mobile-client/contract/navigation/ownership.json").read_text(encoding="utf-8"))
+ownership = json.loads((root / "client/contract/navigation/ownership.json").read_text(encoding="utf-8"))
 for key, value in expected.items():
     if ownership.get(key) != value: error.append(f"ownership mismatch: {key}")
 for relative in [
-    "mobile-client/android/Contract/build.gradle.kts", "mobile-client/android/Data/build.gradle.kts",
-    "mobile-client/android/UseCase/build.gradle.kts", "mobile-client/android/Navigation/build.gradle.kts",
-    "mobile-client/android/UI/build.gradle.kts", "mobile-client/ios/Package.swift",
-    "mobile-client/ios/project.yml", "mobile-edge/src/app.ts", "mobile-edge/src/repository/runtime.ts",
+    "client/android/Contract/build.gradle.kts", "client/android/Data/build.gradle.kts",
+    "client/android/UseCase/build.gradle.kts", "client/android/Navigation/build.gradle.kts",
+    "client/android/UI/build.gradle.kts", "client/ios/Package.swift",
+    "client/ios/project.yml", "mobile-edge/src/app.ts", "mobile-edge/src/repository/runtime.ts",
 ]:
     if not (root / relative).exists(): error.append(f"missing materialized surface: {relative}")
 declaration = re.compile(r"\b(?:data\s+class|sealed\s+class|enum\s+class|class|interface|object|typealias)\s+([A-Za-z_][A-Za-z0-9_]*)")
 package = re.compile(r"(?m)^\s*package\s+([A-Za-z0-9_.]+)\s*$")
 symbols: dict[tuple[str, str], str] = {}
-android = root / "mobile-client/android"
+android = root / "client/android"
 for path in android.rglob("*.kt"):
     text = path.read_text(encoding="utf-8"); match = package.search(text)
     if match:

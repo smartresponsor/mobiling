@@ -9,7 +9,7 @@ This baseline converts the curated donor slice into explicit build and runtime s
 - iOS exposes a `MobileClient` framework boundary, mirrored core frameworks, Swift Package metadata, and an XcodeGen application definition.
 - Mobile Edge registers implemented public, system, and protected admin routes from one entry point.
 - Mobile Edge uses one complete process-local storage contract for the baseline; durable storage selection is deferred until runtime requirements are fixed.
-- Ownership is machine-readable in `mobile-client/contract/navigation/ownership.json`.
+- Ownership is machine-readable in `client/contract/navigation/ownership.json`.
 
 ## Deliberately deferred
 

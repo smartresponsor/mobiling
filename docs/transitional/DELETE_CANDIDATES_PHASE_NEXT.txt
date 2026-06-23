@@ -1,21 +1,21 @@
 Next delete/archive candidates after Wave 042
 
 Keep active canonical surfaces:
-- mobile-client/android/app/src/main/java/com/smartresponsor/mobile/app/vendor/VendorBusinessBridge.kt
-- mobile-client/ios/App/Vendor/VendorBusinessBridge.swift
-- mobile-client/android/app/src/main/java/com/smartresponsor/mobile/app/order/OrderBusinessBridge.kt
-- mobile-client/ios/App/Order/OrderBusinessBridge.swift
-- mobile-client/android/app/src/main/java/com/smartresponsor/mobile/app/vendor/legacy/LegacyVendorBusinessBridgeFactory.kt
-- mobile-client/ios/App/Vendor/LegacyVendorBusinessBridgeFactory.swift
-- mobile-client/android/app/src/main/java/com/smartresponsor/mobile/app/order/legacy/LegacyOrderBusinessBridgeFactory.kt
-- mobile-client/ios/App/Order/LegacyOrderBusinessBridgeFactory.swift
+- client/android/app/src/main/java/com/smartresponsor/mobile/app/vendor/VendorBusinessBridge.kt
+- client/ios/App/Vendor/VendorBusinessBridge.swift
+- client/android/app/src/main/java/com/smartresponsor/mobile/app/order/OrderBusinessBridge.kt
+- client/ios/App/Order/OrderBusinessBridge.swift
+- client/android/app/src/main/java/com/smartresponsor/mobile/app/vendor/legacy/LegacyVendorBusinessBridgeFactory.kt
+- client/ios/App/Vendor/LegacyVendorBusinessBridgeFactory.swift
+- client/android/app/src/main/java/com/smartresponsor/mobile/app/order/legacy/LegacyOrderBusinessBridgeFactory.kt
+- client/ios/App/Order/LegacyOrderBusinessBridgeFactory.swift
 
 Archive/remove once shim call sites are gone:
-- mobile-client/android/app/src/main/java/com/smartresponsor/mobile/app/vendor/legacy/LegacyVendorFlatCompatibility.kt
-- mobile-client/ios/App/Vendor/LegacyVendorFlatCompatibility.swift
-- mobile-client/android/app/src/main/java/com/smartresponsor/mobile/app/order/legacy/LegacyOrderFlatCompatibility.kt
-- mobile-client/ios/App/Order/LegacyOrderFlatCompatibility.swift
-- mobile-client/android/app/src/main/java/com/smartresponsor/mobile/app/shipment/ShipmentFeatureBridge.kt
-- mobile-client/android/app/src/main/java/com/smartresponsor/mobile/app/taxation/TaxationFeatureBridge.kt
-- mobile-client/ios/App/Shipment/ShipmentFeatureBridge.swift
-- mobile-client/ios/App/Taxation/TaxationFeatureBridge.swift
+- client/android/app/src/main/java/com/smartresponsor/mobile/app/vendor/legacy/LegacyVendorFlatCompatibility.kt
+- client/ios/App/Vendor/LegacyVendorFlatCompatibility.swift
+- client/android/app/src/main/java/com/smartresponsor/mobile/app/order/legacy/LegacyOrderFlatCompatibility.kt
+- client/ios/App/Order/LegacyOrderFlatCompatibility.swift
+- client/android/app/src/main/java/com/smartresponsor/mobile/app/shipment/ShipmentFeatureBridge.kt
+- client/android/app/src/main/java/com/smartresponsor/mobile/app/taxation/TaxationFeatureBridge.kt
+- client/ios/App/Shipment/ShipmentFeatureBridge.swift
+- client/ios/App/Taxation/TaxationFeatureBridge.swift

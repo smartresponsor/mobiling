@@ -1,6 +1,6 @@
 # Data
 
-Canonical scaffold layer for iOS mobile-client.
+Canonical scaffold layer for Android client.
 
 Pattern:
 - Data/[Domain]/[Flow]

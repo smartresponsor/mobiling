@@ -1,9 +1,9 @@
-# Data
+# UI
 
-Canonical scaffold layer for Android mobile-client.
+Canonical scaffold layer for iOS client.
 
 Pattern:
-- Data/[Domain]/[Flow]
+- UI/[Domain]/[Flow]
 - singular domain names only
 - do not mix responsibilities across layers
 

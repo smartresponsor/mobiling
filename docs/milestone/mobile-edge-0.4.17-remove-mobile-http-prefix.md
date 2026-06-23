@@ -9,4 +9,4 @@
 - Analytic routes moved from `/mobile/analytic/*` to `/analytic/*`.
 - Sync route moved from `/mobile/sync/event` to `/sync/event`.
 - Internal source organization under `routes/mobile` and `contract/mobile` is unchanged.
-- Not included: auth logic changes, Accessing behavior changes, or mobile-client UI changes.
+- Not included: auth logic changes, Accessing behavior changes, or client UI changes.

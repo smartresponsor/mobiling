@@ -1,9 +1,9 @@
-# Contract
+# Navigation
 
-Canonical scaffold layer for iOS mobile-client.
+Canonical scaffold layer for iOS client.
 
 Pattern:
-- Contract/[Domain]/[Flow]
+- Navigation/[Domain]/[Flow]
 - singular domain names only
 - do not mix responsibilities across layers
 

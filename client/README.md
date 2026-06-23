@@ -1,4 +1,4 @@
-# mobile-client
+# client
 
 Initial curated client repository slice.
 

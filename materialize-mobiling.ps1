@@ -60,7 +60,7 @@ if (-not $SkipBuild) {
         Pop-Location
     }
 
-    Push-Location mobile-client/android
+    Push-Location client/android
     try {
         if (Test-Path .\gradlew.bat) {
             Invoke-Step 'Compile Android' { .\gradlew.bat :app:compileDebugKotlin --stacktrace }

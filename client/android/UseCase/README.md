@@ -1,6 +1,6 @@
 # UseCase
 
-Canonical scaffold layer for Android mobile-client.
+Canonical scaffold layer for Android client.
 
 Pattern:
 - UseCase/[Domain]/[Flow]

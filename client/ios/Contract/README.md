@@ -1,6 +1,6 @@
 # Contract
 
-Canonical scaffold layer for Android mobile-client.
+Canonical scaffold layer for iOS client.
 
 Pattern:
 - Contract/[Domain]/[Flow]
