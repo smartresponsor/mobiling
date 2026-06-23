@@ -184,18 +184,6 @@ paths:
     post:
       summary: Client sync event
       responses: { '204': { description: No Content } }
-  /mobile/session:
-    post:
-      summary: Dev token
-      deprecated: true
-      description: Retired legacy local token route; mobile authentication uses Accessing-owned /mobile/access/* session transport.
-      responses: { '200': { description: OK } }
-  /oauth/token:
-    post:
-      summary: Dev OAuth token
-      deprecated: true
-      description: Retired legacy OAuth token route; mobile authentication uses Accessing-owned /mobile/access/* session transport.
-      responses: { '200': { description: OK } }
   /admin/stats:
     get:
       summary: Admin stats
