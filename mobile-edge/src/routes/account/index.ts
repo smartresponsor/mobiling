@@ -1,3 +1,3 @@
 /**
- * Account route manifest intentionally does not export legacy Express route islands.
+ * Account route manifest intentionally does not export legacy route islands.
  */
