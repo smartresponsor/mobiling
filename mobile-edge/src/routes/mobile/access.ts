@@ -2,8 +2,10 @@ import type { FastifyInstance, FastifyReply } from "fastify";
 import {
   mobileAccessErrorPayload,
   mobileAccessRegisterRequest,
+  mobileAccessSecondFactorVerifyRequest,
   mobileAccessSessionPayload,
   mobileAccessSignInRequest,
+  mobileAccessVerificationConfirmRequest,
 } from "../../contract/mobile/access.js";
 import {
   AccessingApiClient,
@@ -179,6 +181,58 @@ function mobileAccessRequestSchemas() {
         503: mobileAccessErrorPayload,
       },
     },
+    verificationResend: {
+      response: {
+        202: mobileAccessSessionPayload,
+        400: mobileAccessErrorPayload,
+        401: mobileAccessErrorPayload,
+        404: mobileAccessErrorPayload,
+        409: mobileAccessErrorPayload,
+        429: mobileAccessErrorPayload,
+        500: mobileAccessErrorPayload,
+        503: mobileAccessErrorPayload,
+      },
+    },
+    verificationConfirm: {
+      body: mobileAccessVerificationConfirmRequest.body,
+      response: {
+        202: mobileAccessSessionPayload,
+        400: mobileAccessErrorPayload,
+        401: mobileAccessErrorPayload,
+        404: mobileAccessErrorPayload,
+        409: mobileAccessErrorPayload,
+        422: mobileAccessErrorPayload,
+        429: mobileAccessErrorPayload,
+        500: mobileAccessErrorPayload,
+        503: mobileAccessErrorPayload,
+      },
+    },
+    secondFactorChallenge: {
+      response: {
+        202: mobileAccessSessionPayload,
+        400: mobileAccessErrorPayload,
+        401: mobileAccessErrorPayload,
+        404: mobileAccessErrorPayload,
+        409: mobileAccessErrorPayload,
+        429: mobileAccessErrorPayload,
+        500: mobileAccessErrorPayload,
+        503: mobileAccessErrorPayload,
+      },
+    },
+    secondFactorVerify: {
+      body: mobileAccessSecondFactorVerifyRequest.body,
+      response: {
+        202: mobileAccessSessionPayload,
+        400: mobileAccessErrorPayload,
+        401: mobileAccessErrorPayload,
+        404: mobileAccessErrorPayload,
+        409: mobileAccessErrorPayload,
+        422: mobileAccessErrorPayload,
+        429: mobileAccessErrorPayload,
+        500: mobileAccessErrorPayload,
+        503: mobileAccessErrorPayload,
+      },
+    },
   } as const;
 }
 
@@ -214,6 +268,40 @@ export default async function route(app: FastifyInstance): Promise<void> {
 
   app.get("/access/session", { schema: schemas.session }, async (request, reply) => {
     const result = await accessingApiClient.session(forwardedHeaders(request as { headers: Record<string, unknown> }));
+    applySessionTransport(reply, result.responseCookie);
+    return reply.code(result.status).send(proxyPayload(result.status, result.body));
+  });
+
+  app.post("/access/verification/resend", { schema: schemas.verificationResend }, async (request, reply) => {
+    const result = await accessingApiClient.resendVerification(forwardedHeaders(request as { headers: Record<string, unknown> }));
+    applySessionTransport(reply, result.responseCookie);
+    return reply.code(result.status).send(proxyPayload(result.status, result.body));
+  });
+
+  app.post("/access/verification/confirm", { schema: schemas.verificationConfirm }, async (request, reply) => {
+    const body = request.body as { code: string };
+    const result = await accessingApiClient.confirmVerification(
+      { code: body.code },
+      forwardedHeaders(request as { headers: Record<string, unknown> }),
+    );
+
+    applySessionTransport(reply, result.responseCookie);
+    return reply.code(result.status).send(proxyPayload(result.status, result.body));
+  });
+
+  app.post("/access/second-factor/challenge", { schema: schemas.secondFactorChallenge }, async (request, reply) => {
+    const result = await accessingApiClient.challengeSecondFactor(forwardedHeaders(request as { headers: Record<string, unknown> }));
+    applySessionTransport(reply, result.responseCookie);
+    return reply.code(result.status).send(proxyPayload(result.status, result.body));
+  });
+
+  app.post("/access/second-factor/verify", { schema: schemas.secondFactorVerify }, async (request, reply) => {
+    const body = request.body as { code: string };
+    const result = await accessingApiClient.verifySecondFactor(
+      { code: body.code },
+      forwardedHeaders(request as { headers: Record<string, unknown> }),
+    );
+
     applySessionTransport(reply, result.responseCookie);
     return reply.code(result.status).send(proxyPayload(result.status, result.body));
   });

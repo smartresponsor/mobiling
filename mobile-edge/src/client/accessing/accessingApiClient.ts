@@ -13,6 +13,14 @@ export interface AccessingApiRegisterRequest {
   password: string;
 }
 
+export interface AccessingApiVerificationConfirmRequest {
+  code: string;
+}
+
+export interface AccessingApiSecondFactorVerifyRequest {
+  code: string;
+}
+
 export interface AccessingApiIdentityPayload {
   vendorId: string | number;
   accountId?: string | null;
@@ -67,6 +75,22 @@ export class AccessingApiClient {
 
   session(forwardedHeaders: Record<string, string> = {}): Promise<AccessingApiResponse> {
     return this.request("GET", "/api/access/session", null, forwardedHeaders);
+  }
+
+  resendVerification(forwardedHeaders: Record<string, string> = {}): Promise<AccessingApiResponse> {
+    return this.request("POST", "/api/access/verification/resend", null, forwardedHeaders);
+  }
+
+  confirmVerification(request: AccessingApiVerificationConfirmRequest, forwardedHeaders: Record<string, string> = {}): Promise<AccessingApiResponse> {
+    return this.request("POST", "/api/access/verification/confirm", request, forwardedHeaders);
+  }
+
+  challengeSecondFactor(forwardedHeaders: Record<string, string> = {}): Promise<AccessingApiResponse> {
+    return this.request("POST", "/api/access/second-factor/challenge", null, forwardedHeaders);
+  }
+
+  verifySecondFactor(request: AccessingApiSecondFactorVerifyRequest, forwardedHeaders: Record<string, string> = {}): Promise<AccessingApiResponse> {
+    return this.request("POST", "/api/access/second-factor/verify", request, forwardedHeaders);
   }
 
   private async request(method: string, path: string, body: unknown, forwardedHeaders: Record<string, string>): Promise<AccessingApiResponse> {

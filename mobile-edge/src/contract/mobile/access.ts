@@ -25,6 +25,28 @@ export const mobileAccessRegisterRequest = {
   },
 } as const;
 
+export const mobileAccessVerificationConfirmRequest = {
+  body: {
+    type: "object",
+    additionalProperties: false,
+    required: ["code"],
+    properties: {
+      code: stringField(1),
+    },
+  },
+} as const;
+
+export const mobileAccessSecondFactorVerifyRequest = {
+  body: {
+    type: "object",
+    additionalProperties: false,
+    required: ["code"],
+    properties: {
+      code: stringField(1),
+    },
+  },
+} as const;
+
 export const mobileAccessIdentityPayload = {
   type: "object",
   additionalProperties: false,
