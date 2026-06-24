@@ -1,6 +1,8 @@
 import type { FastifyInstance, FastifyReply } from "fastify";
 import {
   mobileAccessErrorPayload,
+  mobileAccessRecoveryRequest,
+  mobileAccessRecoveryResetRequest,
   mobileAccessRegisterRequest,
   mobileAccessSecondFactorVerifyRequest,
   mobileAccessSessionPayload,
@@ -221,6 +223,32 @@ function mobileAccessRequestSchemas() {
     },
     secondFactorVerify: {
       body: mobileAccessSecondFactorVerifyRequest.body,
+      response: {
+        202: mobileAccessSessionPayload,
+        400: mobileAccessErrorPayload,
+        401: mobileAccessErrorPayload,
+        404: mobileAccessErrorPayload,
+        409: mobileAccessErrorPayload,
+        422: mobileAccessErrorPayload,
+        429: mobileAccessErrorPayload,
+        500: mobileAccessErrorPayload,
+        503: mobileAccessErrorPayload,
+      },
+    },
+    recoveryRequest: {
+      body: mobileAccessRecoveryRequest.body,
+      response: {
+        202: mobileAccessSessionPayload,
+        400: mobileAccessErrorPayload,
+        404: mobileAccessErrorPayload,
+        409: mobileAccessErrorPayload,
+        429: mobileAccessErrorPayload,
+        500: mobileAccessErrorPayload,
+        503: mobileAccessErrorPayload,
+      },
+    },
+    recoveryReset: {
+      body: mobileAccessRecoveryResetRequest.body,
       response: {
         202: mobileAccessSessionPayload,
         400: mobileAccessErrorPayload,

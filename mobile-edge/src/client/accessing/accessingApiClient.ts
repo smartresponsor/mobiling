@@ -21,6 +21,15 @@ export interface AccessingApiSecondFactorVerifyRequest {
   code: string;
 }
 
+export interface AccessingApiRecoveryRequest {
+  email: string;
+}
+
+export interface AccessingApiRecoveryResetRequest {
+  code: string;
+  password: string;
+}
+
 export interface AccessingApiIdentityPayload {
   vendorId: string | number;
   accountId?: string | null;
@@ -91,6 +100,14 @@ export class AccessingApiClient {
 
   verifySecondFactor(request: AccessingApiSecondFactorVerifyRequest, forwardedHeaders: Record<string, string> = {}): Promise<AccessingApiResponse> {
     return this.request("POST", "/api/access/second-factor/verify", request, forwardedHeaders);
+  }
+
+  requestRecovery(request: AccessingApiRecoveryRequest, forwardedHeaders: Record<string, string> = {}): Promise<AccessingApiResponse> {
+    return this.request("POST", "/api/access/recovery/request", request, forwardedHeaders);
+  }
+
+  resetRecovery(request: AccessingApiRecoveryResetRequest, forwardedHeaders: Record<string, string> = {}): Promise<AccessingApiResponse> {
+    return this.request("POST", "/api/access/recovery/reset", request, forwardedHeaders);
   }
 
   private async request(method: string, path: string, body: unknown, forwardedHeaders: Record<string, string>): Promise<AccessingApiResponse> {

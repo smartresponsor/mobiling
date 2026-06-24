@@ -47,6 +47,29 @@ export const mobileAccessSecondFactorVerifyRequest = {
   },
 } as const;
 
+export const mobileAccessRecoveryRequest = {
+  body: {
+    type: "object",
+    additionalProperties: false,
+    required: ["email"],
+    properties: {
+      email: stringField(3),
+    },
+  },
+} as const;
+
+export const mobileAccessRecoveryResetRequest = {
+  body: {
+    type: "object",
+    additionalProperties: false,
+    required: ["code", "password"],
+    properties: {
+      code: stringField(1),
+      password: stringField(8),
+    },
+  },
+} as const;
+
 export const mobileAccessIdentityPayload = {
   type: "object",
   additionalProperties: false,
