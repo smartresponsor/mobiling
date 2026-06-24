@@ -3,6 +3,8 @@ package app.mobiling.client.data.auth.session
 import app.mobiling.client.contract.auth.session.AuthSessionPayload
 import app.mobiling.client.contract.auth.session.ConfirmVerificationRequest
 import app.mobiling.client.contract.auth.session.RegisterAuthRequest
+import app.mobiling.client.contract.auth.session.RequestRecoveryRequest
+import app.mobiling.client.contract.auth.session.ResetRecoveryRequest
 import app.mobiling.client.contract.auth.session.StartAuthRequest
 import app.mobiling.client.contract.auth.session.VerifySecondFactorRequest
 
@@ -15,4 +17,6 @@ interface AuthSessionGateway {
     suspend fun confirmVerification(request: ConfirmVerificationRequest): AuthSessionPayload
     suspend fun challengeSecondFactor(): AuthSessionPayload
     suspend fun verifySecondFactor(request: VerifySecondFactorRequest): AuthSessionPayload
+    suspend fun requestRecovery(request: RequestRecoveryRequest): AuthSessionPayload
+    suspend fun resetRecovery(request: ResetRecoveryRequest): AuthSessionPayload
 }
