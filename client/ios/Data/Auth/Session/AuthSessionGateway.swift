@@ -3,4 +3,8 @@ public protocol AuthSessionGateway {
     func registerAuth(request: RegisterAuthRequest) async throws -> AuthSessionPayload
     func restoreAuth() async throws -> AuthSessionPayload
     func logoutAuth() async throws
+    func resendVerification() async throws -> AuthSessionPayload
+    func confirmVerification(request: ConfirmVerificationRequest) async throws -> AuthSessionPayload
+    func challengeSecondFactor() async throws -> AuthSessionPayload
+    func verifySecondFactor(request: VerifySecondFactorRequest) async throws -> AuthSessionPayload
 }

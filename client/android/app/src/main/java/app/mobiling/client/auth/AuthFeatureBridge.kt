@@ -4,13 +4,16 @@ import app.mobiling.client.contract.auth.session.AuthSessionPayload
 import app.mobiling.client.contract.auth.session.ConfirmVerificationRequest
 import app.mobiling.client.contract.auth.session.RegisterAuthRequest
 import app.mobiling.client.contract.auth.session.StartAuthRequest
+import app.mobiling.client.contract.auth.session.VerifySecondFactorRequest
 import app.mobiling.client.data.auth.session.AuthSessionGateway
+import app.mobiling.client.usecase.auth.session.ChallengeSecondFactorUseCase
 import app.mobiling.client.usecase.auth.session.ConfirmVerificationUseCase
 import app.mobiling.client.usecase.auth.session.LogoutAuthUseCase
 import app.mobiling.client.usecase.auth.session.RegisterAuthUseCase
 import app.mobiling.client.usecase.auth.session.ResendVerificationUseCase
 import app.mobiling.client.usecase.auth.session.RestoreAuthUseCase
 import app.mobiling.client.usecase.auth.session.StartAuthUseCase
+import app.mobiling.client.usecase.auth.session.VerifySecondFactorUseCase
 
 /**
  * Marketing America Corp. Oleksandr Tishchenko
@@ -40,4 +43,10 @@ class AuthFeatureBridge(
 
     suspend fun confirmVerification(request: ConfirmVerificationRequest): AuthSessionPayload =
         ConfirmVerificationUseCase(gateway).invoke(request)
+
+    suspend fun challengeSecondFactor(): AuthSessionPayload =
+        ChallengeSecondFactorUseCase(gateway).invoke()
+
+    suspend fun verifySecondFactor(request: VerifySecondFactorRequest): AuthSessionPayload =
+        VerifySecondFactorUseCase(gateway).invoke(request)
 }

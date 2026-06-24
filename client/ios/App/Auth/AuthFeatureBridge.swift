@@ -24,4 +24,20 @@ public struct AuthFeatureBridge: Sendable {
     public func logout() async throws {
         try await LogoutAuthUseCase(gateway: gateway)()
     }
+
+    public func resendVerification() async throws -> AuthSessionPayload {
+        try await ResendVerificationUseCase(gateway: gateway)()
+    }
+
+    public func confirmVerification(request: ConfirmVerificationRequest) async throws -> AuthSessionPayload {
+        try await ConfirmVerificationUseCase(gateway: gateway)(request: request)
+    }
+
+    public func challengeSecondFactor() async throws -> AuthSessionPayload {
+        try await ChallengeSecondFactorUseCase(gateway: gateway)()
+    }
+
+    public func verifySecondFactor(request: VerifySecondFactorRequest) async throws -> AuthSessionPayload {
+        try await VerifySecondFactorUseCase(gateway: gateway)(request: request)
+    }
 }
