@@ -1,3 +1,3 @@
 import Foundation
 
-let accessUnavailableMessage = "Mobile access API is not connected in this milestone."
+let accessUnavailableMessage = "Access service is temporarily unavailable. Please try again later."
