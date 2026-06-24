@@ -1,11 +1,14 @@
 package app.mobiling.client.auth
 
 import app.mobiling.client.contract.auth.session.AuthSessionPayload
+import app.mobiling.client.contract.auth.session.ConfirmVerificationRequest
 import app.mobiling.client.contract.auth.session.RegisterAuthRequest
 import app.mobiling.client.contract.auth.session.StartAuthRequest
 import app.mobiling.client.data.auth.session.AuthSessionGateway
+import app.mobiling.client.usecase.auth.session.ConfirmVerificationUseCase
 import app.mobiling.client.usecase.auth.session.LogoutAuthUseCase
 import app.mobiling.client.usecase.auth.session.RegisterAuthUseCase
+import app.mobiling.client.usecase.auth.session.ResendVerificationUseCase
 import app.mobiling.client.usecase.auth.session.RestoreAuthUseCase
 import app.mobiling.client.usecase.auth.session.StartAuthUseCase
 
@@ -31,4 +34,10 @@ class AuthFeatureBridge(
 
     suspend fun logout() =
         LogoutAuthUseCase(gateway).invoke()
+
+    suspend fun resendVerification(): AuthSessionPayload =
+        ResendVerificationUseCase(gateway).invoke()
+
+    suspend fun confirmVerification(request: ConfirmVerificationRequest): AuthSessionPayload =
+        ConfirmVerificationUseCase(gateway).invoke(request)
 }
