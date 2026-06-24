@@ -333,4 +333,26 @@ export default async function route(app: FastifyInstance): Promise<void> {
     applySessionTransport(reply, result.responseCookie);
     return reply.code(result.status).send(proxyPayload(result.status, result.body));
   });
+
+  app.post("/access/recovery/request", { schema: schemas.recoveryRequest }, async (request, reply) => {
+    const body = request.body as { email: string };
+    const result = await accessingApiClient.requestRecovery(
+      { email: body.email },
+      forwardedHeaders(request as { headers: Record<string, unknown> }),
+    );
+
+    applySessionTransport(reply, result.responseCookie);
+    return reply.code(result.status).send(proxyPayload(result.status, result.body));
+  });
+
+  app.post("/access/recovery/reset", { schema: schemas.recoveryReset }, async (request, reply) => {
+    const body = request.body as { code: string; password: string };
+    const result = await accessingApiClient.resetRecovery(
+      { code: body.code, password: body.password },
+      forwardedHeaders(request as { headers: Record<string, unknown> }),
+    );
+
+    applySessionTransport(reply, result.responseCookie);
+    return reply.code(result.status).send(proxyPayload(result.status, result.body));
+  });
 }
