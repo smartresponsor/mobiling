@@ -1,43 +1,35 @@
 import SwiftUI
 
-struct SignInView: View {
+struct RecoveryRequestView: View {
     let onBack: () -> Void
-    let onCreateAccess: () -> Void
-    let onRecoverAccess: () -> Void
-    let onStartAccess: (StartAuthRequest) async throws -> AuthSessionPayload?
+    let onHaveRecoveryCode: () -> Void
+    let onRequestRecovery: (RequestRecoveryRequest) async throws -> AuthSessionPayload?
     let onAccessSession: (AuthSessionPayload) -> Void
     @State private var email = ""
-    @State private var password = ""
     @State private var statusMessage: String?
 
     var body: some View {
         AccessEntryFormView(
-            title: "Sign in",
-            subtitle: "Use your SmartResponsor access to enter the business workspace.",
-            primaryActionTitle: "Sign in",
-            secondaryActionTitle: "Recover access",
+            title: "Recover access",
+            subtitle: "Request a recovery code for your SmartResponsor access.",
+            primaryActionTitle: "Send recovery code",
+            secondaryActionTitle: "I have a recovery code",
             onPrimaryAction: {
                 Task {
                     statusMessage = nil
                     do {
-                        let payload = try await onStartAccess(
-                            StartAuthRequest(
-                                login: email,
-                                password: password,
-                                deviceLabel: "iOS"
-                            )
-                        )
+                        let payload = try await onRequestRecovery(RequestRecoveryRequest(email: email))
                         if let payload {
                             onAccessSession(payload)
                         } else {
                             statusMessage = accessUnavailableMessage
                         }
                     } catch {
-                        statusMessage = "Access session could not be started."
+                        statusMessage = "Recovery request could not be started."
                     }
                 }
             },
-            onSecondaryAction: onRecoverAccess,
+            onSecondaryAction: onHaveRecoveryCode,
             onBack: onBack,
             statusMessage: statusMessage
         ) {
@@ -45,8 +37,6 @@ struct SignInView: View {
                 TextField("Email", text: $email)
                     .textInputAutocapitalization(.never)
                     .keyboardType(.emailAddress)
-                    .textFieldStyle(.roundedBorder)
-                SecureField("Password", text: $password)
                     .textFieldStyle(.roundedBorder)
             }
         }

@@ -6,4 +6,6 @@ enum AccessScreen {
     case register
     case verificationRequired
     case secondFactorRequired
+    case recoveryRequest
+    case recoveryReset
 }

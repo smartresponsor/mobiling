@@ -53,6 +53,7 @@ fun MobilingAppShell(
             AccessScreen.SignIn -> SignInScreen(
                 onBack = { currentScreen = AccessScreen.Welcome },
                 onCreateAccess = { currentScreen = AccessScreen.Register },
+                onRecoverAccess = { currentScreen = AccessScreen.RecoveryRequest },
                 onStartAccess = { request -> authFeatureBridge?.start(request) },
                 onAccessSession = { payload -> currentScreen = payload.toAccessScreen() },
             )
@@ -72,6 +73,20 @@ fun MobilingAppShell(
             AccessScreen.SecondFactorRequired -> SecondFactorRequiredScreen(
                 onBack = { currentScreen = AccessScreen.SignIn },
                 onUseDifferentAccess = { clearAccessSession() },
+            )
+
+            AccessScreen.RecoveryRequest -> RecoveryRequestScreen(
+                onBack = { currentScreen = AccessScreen.SignIn },
+                onHaveRecoveryCode = { currentScreen = AccessScreen.RecoveryReset },
+                onRequestRecovery = { request -> authFeatureBridge?.requestRecovery(request) },
+                onAccessSession = { payload -> currentScreen = payload.toAccessScreen() },
+            )
+
+            AccessScreen.RecoveryReset -> RecoveryResetScreen(
+                onBack = { currentScreen = AccessScreen.RecoveryRequest },
+                onRequestRecovery = { currentScreen = AccessScreen.RecoveryRequest },
+                onResetRecovery = { request -> authFeatureBridge?.resetRecovery(request) },
+                onAccessSession = { payload -> currentScreen = payload.toAccessScreen() },
             )
         }
     }

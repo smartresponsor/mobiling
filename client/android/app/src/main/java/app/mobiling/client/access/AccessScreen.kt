@@ -6,4 +6,6 @@ enum class AccessScreen {
     Register,
     VerificationRequired,
     SecondFactorRequired,
+    RecoveryRequest,
+    RecoveryReset,
 }

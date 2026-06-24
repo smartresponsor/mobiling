@@ -1,30 +1,28 @@
 import SwiftUI
 
-struct SignInView: View {
+struct RecoveryResetView: View {
     let onBack: () -> Void
-    let onCreateAccess: () -> Void
-    let onRecoverAccess: () -> Void
-    let onStartAccess: (StartAuthRequest) async throws -> AuthSessionPayload?
+    let onRequestRecovery: () -> Void
+    let onResetRecovery: (ResetRecoveryRequest) async throws -> AuthSessionPayload?
     let onAccessSession: (AuthSessionPayload) -> Void
-    @State private var email = ""
+    @State private var code = ""
     @State private var password = ""
     @State private var statusMessage: String?
 
     var body: some View {
         AccessEntryFormView(
-            title: "Sign in",
-            subtitle: "Use your SmartResponsor access to enter the business workspace.",
-            primaryActionTitle: "Sign in",
-            secondaryActionTitle: "Recover access",
+            title: "Reset access",
+            subtitle: "Use your recovery code and choose a new password.",
+            primaryActionTitle: "Reset access",
+            secondaryActionTitle: "Request code",
             onPrimaryAction: {
                 Task {
                     statusMessage = nil
                     do {
-                        let payload = try await onStartAccess(
-                            StartAuthRequest(
-                                login: email,
-                                password: password,
-                                deviceLabel: "iOS"
+                        let payload = try await onResetRecovery(
+                            ResetRecoveryRequest(
+                                code: code,
+                                password: password
                             )
                         )
                         if let payload {
@@ -33,20 +31,19 @@ struct SignInView: View {
                             statusMessage = accessUnavailableMessage
                         }
                     } catch {
-                        statusMessage = "Access session could not be started."
+                        statusMessage = "Recovery reset could not be completed."
                     }
                 }
             },
-            onSecondaryAction: onRecoverAccess,
+            onSecondaryAction: onRequestRecovery,
             onBack: onBack,
             statusMessage: statusMessage
         ) {
             VStack(alignment: .leading, spacing: 12) {
-                TextField("Email", text: $email)
+                TextField("Recovery code", text: $code)
                     .textInputAutocapitalization(.never)
-                    .keyboardType(.emailAddress)
                     .textFieldStyle(.roundedBorder)
-                SecureField("Password", text: $password)
+                SecureField("New password", text: $password)
                     .textFieldStyle(.roundedBorder)
             }
         }

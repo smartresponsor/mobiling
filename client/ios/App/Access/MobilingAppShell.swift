@@ -20,6 +20,7 @@ public struct MobilingAppShell: View {
                 SignInView(
                     onBack: { currentScreen = .welcome },
                     onCreateAccess: { currentScreen = .register },
+                    onRecoverAccess: { currentScreen = .recoveryRequest },
                     onStartAccess: { request in
                         guard let authFeatureBridge else {
                             return nil
@@ -49,6 +50,30 @@ public struct MobilingAppShell: View {
                 SecondFactorRequiredView(
                     onBack: { currentScreen = .signIn },
                     onUseDifferentAccess: { clearAccessSession() }
+                )
+            case .recoveryRequest:
+                RecoveryRequestView(
+                    onBack: { currentScreen = .signIn },
+                    onHaveRecoveryCode: { currentScreen = .recoveryReset },
+                    onRequestRecovery: { request in
+                        guard let authFeatureBridge else {
+                            return nil
+                        }
+                        return try await authFeatureBridge.requestRecovery(request: request)
+                    },
+                    onAccessSession: { payload in currentScreen = payload.toAccessScreen() }
+                )
+            case .recoveryReset:
+                RecoveryResetView(
+                    onBack: { currentScreen = .recoveryRequest },
+                    onRequestRecovery: { currentScreen = .recoveryRequest },
+                    onResetRecovery: { request in
+                        guard let authFeatureBridge else {
+                            return nil
+                        }
+                        return try await authFeatureBridge.resetRecovery(request: request)
+                    },
+                    onAccessSession: { payload in currentScreen = payload.toAccessScreen() }
                 )
             }
         }

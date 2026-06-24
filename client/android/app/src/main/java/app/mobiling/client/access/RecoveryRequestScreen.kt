@@ -12,49 +12,41 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import app.mobiling.client.contract.auth.session.AuthSessionPayload
-import app.mobiling.client.contract.auth.session.StartAuthRequest
+import app.mobiling.client.contract.auth.session.RequestRecoveryRequest
 import kotlinx.coroutines.launch
 
 @Composable
-fun SignInScreen(
+fun RecoveryRequestScreen(
     onBack: () -> Unit,
-    onCreateAccess: () -> Unit,
-    onRecoverAccess: () -> Unit,
-    onStartAccess: suspend (StartAuthRequest) -> AuthSessionPayload? = { null },
+    onHaveRecoveryCode: () -> Unit,
+    onRequestRecovery: suspend (RequestRecoveryRequest) -> AuthSessionPayload? = { null },
     onAccessSession: (AuthSessionPayload) -> Unit = {},
 ) {
     var email by rememberSaveable { mutableStateOf("") }
-    var password by rememberSaveable { mutableStateOf("") }
     var status by remember { mutableStateOf<String?>(null) }
     val coroutineScope = rememberCoroutineScope()
 
     AccessEntryFormScaffold(
-        title = "Sign in",
-        subtitle = "Use your SmartResponsor access to enter the business workspace.",
-        primaryActionLabel = "Sign in",
-        secondaryActionLabel = "Recover access",
+        title = "Recover access",
+        subtitle = "Request a recovery code for your SmartResponsor access.",
+        primaryActionLabel = "Send recovery code",
+        secondaryActionLabel = "I have a recovery code",
         onPrimaryAction = {
             coroutineScope.launch {
                 status = null
                 try {
-                    val payload = onStartAccess(
-                        StartAuthRequest(
-                            login = email,
-                            password = password,
-                            deviceLabel = "Android",
-                        ),
-                    )
+                    val payload = onRequestRecovery(RequestRecoveryRequest(email = email))
                     if (payload == null) {
                         status = AccessUnavailableMessage
                     } else {
                         onAccessSession(payload)
                     }
                 } catch (_: Exception) {
-                    status = "Access session could not be started."
+                    status = "Recovery request could not be started."
                 }
             }
         },
-        onSecondaryAction = onRecoverAccess,
+        onSecondaryAction = onHaveRecoveryCode,
         onBack = onBack,
         status = status,
     ) {
@@ -65,12 +57,3 @@ fun SignInScreen(
             label = { Text("Email") },
             singleLine = true,
         )
-        OutlinedTextField(
-            value = password,
-            onValueChange = { password = it },
-            modifier = Modifier.fillMaxWidth(),
-            label = { Text("Password") },
-            singleLine = true,
-        )
-    }
-}

@@ -12,36 +12,34 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import app.mobiling.client.contract.auth.session.AuthSessionPayload
-import app.mobiling.client.contract.auth.session.StartAuthRequest
+import app.mobiling.client.contract.auth.session.ResetRecoveryRequest
 import kotlinx.coroutines.launch
 
 @Composable
-fun SignInScreen(
+fun RecoveryResetScreen(
     onBack: () -> Unit,
-    onCreateAccess: () -> Unit,
-    onRecoverAccess: () -> Unit,
-    onStartAccess: suspend (StartAuthRequest) -> AuthSessionPayload? = { null },
+    onRequestRecovery: () -> Unit,
+    onResetRecovery: suspend (ResetRecoveryRequest) -> AuthSessionPayload? = { null },
     onAccessSession: (AuthSessionPayload) -> Unit = {},
 ) {
-    var email by rememberSaveable { mutableStateOf("") }
+    var code by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
     var status by remember { mutableStateOf<String?>(null) }
     val coroutineScope = rememberCoroutineScope()
 
     AccessEntryFormScaffold(
-        title = "Sign in",
-        subtitle = "Use your SmartResponsor access to enter the business workspace.",
-        primaryActionLabel = "Sign in",
-        secondaryActionLabel = "Recover access",
+        title = "Reset access",
+        subtitle = "Use your recovery code and choose a new password.",
+        primaryActionLabel = "Reset access",
+        secondaryActionLabel = "Request code",
         onPrimaryAction = {
             coroutineScope.launch {
                 status = null
                 try {
-                    val payload = onStartAccess(
-                        StartAuthRequest(
-                            login = email,
+                    val payload = onResetRecovery(
+                        ResetRecoveryRequest(
+                            code = code,
                             password = password,
-                            deviceLabel = "Android",
                         ),
                     )
                     if (payload == null) {
@@ -50,27 +48,21 @@ fun SignInScreen(
                         onAccessSession(payload)
                     }
                 } catch (_: Exception) {
-                    status = "Access session could not be started."
+                    status = "Recovery reset could not be completed."
                 }
             }
         },
-        onSecondaryAction = onRecoverAccess,
+        onSecondaryAction = onRequestRecovery,
         onBack = onBack,
         status = status,
     ) {
         OutlinedTextField(
-            value = email,
-            onValueChange = { email = it },
+            value = code,
+            onValueChange = { code = it },
             modifier = Modifier.fillMaxWidth(),
-            label = { Text("Email") },
+            label = { Text("Recovery code") },
             singleLine = true,
         )
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
-            modifier = Modifier.fillMaxWidth(),
-            label = { Text("Password") },
-            singleLine = true,
-        )
-    }
-}
