@@ -40,4 +40,12 @@ public struct AuthFeatureBridge: Sendable {
     public func verifySecondFactor(request: VerifySecondFactorRequest) async throws -> AuthSessionPayload {
         try await VerifySecondFactorUseCase(gateway: gateway)(request: request)
     }
+
+    public func requestRecovery(request: RequestRecoveryRequest) async throws -> AuthSessionPayload {
+        try await RequestRecoveryUseCase(gateway: gateway)(request: request)
+    }
+
+    public func resetRecovery(request: ResetRecoveryRequest) async throws -> AuthSessionPayload {
+        try await ResetRecoveryUseCase(gateway: gateway)(request: request)
+    }
 }

@@ -3,7 +3,10 @@
 
   <uses-permission android:name="android.permission.INTERNET"/>
 
-  <application android:label="Mobile" android:supportsRtl="true">
+  <application
+      android:label="Mobile"
+      android:supportsRtl="true"
+      android:usesCleartextTraffic="true">
     <service
         android:name="androidx.work.impl.background.systemjob.SystemJobService"
         android:permission="android.permission.BIND_JOB_SERVICE"

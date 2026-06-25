@@ -3,6 +3,8 @@ package app.mobiling.client.auth
 import app.mobiling.client.contract.auth.session.AuthSessionPayload
 import app.mobiling.client.contract.auth.session.ConfirmVerificationRequest
 import app.mobiling.client.contract.auth.session.RegisterAuthRequest
+import app.mobiling.client.contract.auth.session.RequestRecoveryRequest
+import app.mobiling.client.contract.auth.session.ResetRecoveryRequest
 import app.mobiling.client.contract.auth.session.StartAuthRequest
 import app.mobiling.client.contract.auth.session.VerifySecondFactorRequest
 import app.mobiling.client.data.auth.session.AuthSessionGateway
@@ -10,7 +12,9 @@ import app.mobiling.client.usecase.auth.session.ChallengeSecondFactorUseCase
 import app.mobiling.client.usecase.auth.session.ConfirmVerificationUseCase
 import app.mobiling.client.usecase.auth.session.LogoutAuthUseCase
 import app.mobiling.client.usecase.auth.session.RegisterAuthUseCase
+import app.mobiling.client.usecase.auth.session.RequestRecoveryUseCase
 import app.mobiling.client.usecase.auth.session.ResendVerificationUseCase
+import app.mobiling.client.usecase.auth.session.ResetRecoveryUseCase
 import app.mobiling.client.usecase.auth.session.RestoreAuthUseCase
 import app.mobiling.client.usecase.auth.session.StartAuthUseCase
 import app.mobiling.client.usecase.auth.session.VerifySecondFactorUseCase
@@ -49,4 +53,10 @@ class AuthFeatureBridge(
 
     suspend fun verifySecondFactor(request: VerifySecondFactorRequest): AuthSessionPayload =
         VerifySecondFactorUseCase(gateway).invoke(request)
+
+    suspend fun requestRecovery(request: RequestRecoveryRequest): AuthSessionPayload =
+        RequestRecoveryUseCase(gateway).invoke(request)
+
+    suspend fun resetRecovery(request: ResetRecoveryRequest): AuthSessionPayload =
+        ResetRecoveryUseCase(gateway).invoke(request)
 }

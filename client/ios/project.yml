@@ -64,6 +64,7 @@ targets:
     sources:
       - path: App/ContentView.swift
       - path: App/MobileApp.swift
+      - path: App/MobileClientRuntimeConfig.swift
     info:
       path: App/Info.plist
     settings:

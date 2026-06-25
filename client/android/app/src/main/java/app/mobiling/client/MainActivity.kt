@@ -7,13 +7,18 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import app.mobiling.client.access.MobilingAppShell
+import app.mobiling.client.auth.AuthFeatureBridge
+import app.mobiling.client.data.auth.session.HttpAuthSessionGateway
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val authFeatureBridge = AuthFeatureBridge(
+            HttpAuthSessionGateway(baseUrl = MobileClientRuntimeConfig.mobileEdgeBaseUrl),
+        )
         setContent {
             MaterialTheme {
                 Surface(Modifier.fillMaxSize()) {
-                    MobilingAppShell()
+                    MobilingAppShell(authFeatureBridge = authFeatureBridge)
                 }
             }
         }
