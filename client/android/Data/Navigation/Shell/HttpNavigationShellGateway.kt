@@ -91,3 +91,10 @@ class HttpNavigationShellGateway(
             val code = json.optString("code", "mobile_navigation_error")
             val message = json.optString("message", "Mobile navigation shell request failed.")
             "$code: $message"
+        } catch (_: Exception) {
+            "Mobile navigation shell request failed with HTTP $statusCode."
+        }
+    }
+
+    private fun normalizedBaseUrl(): String = baseUrl.trimEnd('/')
+}
