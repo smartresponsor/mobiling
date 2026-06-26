@@ -62,8 +62,9 @@ export const mobileAccessRecoveryResetRequest = {
   body: {
     type: "object",
     additionalProperties: false,
-    required: ["code", "password"],
+    required: ["email", "code", "password"],
     properties: {
+      email: stringField(3),
       code: stringField(1),
       password: stringField(8),
     },

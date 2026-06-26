@@ -2,10 +2,8 @@ import type { SessionIdentityPayload } from '../../contract/identity/session/Ses
 
 export async function loadSessionIdentity(): Promise<SessionIdentityPayload> {
   return {
-    userId: 'stub-user',
-    accountId: 'stub-account',
-    displayName: 'Stub User',
-    activeRole: 'operator',
-    authenticated: true,
+    vendorId: null,
+    accountId: null,
+    authenticated: false,
   };
 }

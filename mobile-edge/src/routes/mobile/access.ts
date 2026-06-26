@@ -78,7 +78,7 @@ function normalizeIdentity(identity: unknown): AccessingApiSessionPayload["ident
     return null;
   }
 
-  const vendorId = stringValue(identity.vendorId);
+  const vendorId = stringValue(identity.vendorId ?? identity.userId);
   const displayName = stringValue(identity.displayName);
   const email = stringValue(identity.email);
 
@@ -346,9 +346,9 @@ export default async function route(app: FastifyInstance): Promise<void> {
   });
 
   app.post("/access/recovery/reset", { schema: schemas.recoveryReset }, async (request, reply) => {
-    const body = request.body as { code: string; password: string };
+    const body = request.body as { email: string; code: string; password: string };
     const result = await accessingApiClient.resetRecovery(
-      { code: body.code, password: body.password },
+      body,
       forwardedHeaders(request as { headers: Record<string, unknown> }),
     );
 

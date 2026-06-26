@@ -22,6 +22,7 @@ fun RecoveryResetScreen(
     onResetRecovery: suspend (ResetRecoveryRequest) -> AuthSessionPayload? = { null },
     onAccessSession: (AuthSessionPayload) -> Unit = {},
 ) {
+    var email by rememberSaveable { mutableStateOf("") }
     var code by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
     var status by remember { mutableStateOf<String?>(null) }
@@ -38,6 +39,7 @@ fun RecoveryResetScreen(
                 try {
                     val payload = onResetRecovery(
                         ResetRecoveryRequest(
+                            email = email,
                             code = code,
                             password = password,
                         ),
@@ -56,6 +58,13 @@ fun RecoveryResetScreen(
         onBack = onBack,
         status = status,
     ) {
+        OutlinedTextField(
+            value = email,
+            onValueChange = { email = it },
+            modifier = Modifier.fillMaxWidth(),
+            label = { Text("Email") },
+            singleLine = true,
+        )
         OutlinedTextField(
             value = code,
             onValueChange = { code = it },

@@ -1,4 +1,5 @@
 public struct ResetRecoveryRequest {
+    public var email: String = ""
     public let code: String
     public let password: String
 

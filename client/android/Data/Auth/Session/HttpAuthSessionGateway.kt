@@ -84,6 +84,7 @@ class HttpAuthSessionGateway(
         method = "POST",
         path = "/access/recovery/reset",
         body = JSONObject()
+            .put("email", request.email)
             .put("code", request.code)
             .put("password", request.password),
     )

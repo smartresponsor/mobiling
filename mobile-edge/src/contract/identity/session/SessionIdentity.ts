@@ -1,6 +1,6 @@
 export interface SessionIdentityPayload {
-  userId: string;
-  accountId: string;
+  vendorId: string | null;
+  accountId: string | null;
   displayName?: string;
   activeRole?: string;
   authenticated: boolean;

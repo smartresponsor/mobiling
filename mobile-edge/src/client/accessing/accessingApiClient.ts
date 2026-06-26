@@ -26,6 +26,7 @@ export interface AccessingApiRecoveryRequest {
 }
 
 export interface AccessingApiRecoveryResetRequest {
+  email: string;
   code: string;
   password: string;
 }

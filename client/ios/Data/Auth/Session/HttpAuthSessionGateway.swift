@@ -77,6 +77,7 @@ public struct HttpAuthSessionGateway: AuthRecoverySessionGateway {
             method: "POST",
             path: "/access/recovery/reset",
             body: [
+                "email": request.email,
                 "code": request.code,
                 "password": request.password,
             ]

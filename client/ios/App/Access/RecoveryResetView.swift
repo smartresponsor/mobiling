@@ -5,6 +5,7 @@ struct RecoveryResetView: View {
     let onRequestRecovery: () -> Void
     let onResetRecovery: (ResetRecoveryRequest) async throws -> AuthSessionPayload?
     let onAccessSession: (AuthSessionPayload) -> Void
+    @State private var email = ""
     @State private var code = ""
     @State private var password = ""
     @State private var statusMessage: String?
@@ -19,12 +20,14 @@ struct RecoveryResetView: View {
                 Task {
                     statusMessage = nil
                     do {
-                        let payload = try await onResetRecovery(
-                            ResetRecoveryRequest(
-                                code: code,
-                                password: password
-                            )
+                        var request = ResetRecoveryRequest(
+                            code: code,
+                            password: password
                         )
+                        request.email = email
+
+                        let payload = try await onResetRecovery(request)
+
                         if let payload {
                             onAccessSession(payload)
                         } else {
@@ -40,6 +43,9 @@ struct RecoveryResetView: View {
             statusMessage: statusMessage
         ) {
             VStack(alignment: .leading, spacing: 12) {
+                TextField("Email", text: $email)
+                    .textInputAutocapitalization(.never)
+                    .textFieldStyle(.roundedBorder)
                 TextField("Recovery code", text: $code)
                     .textInputAutocapitalization(.never)
                     .textFieldStyle(.roundedBorder)

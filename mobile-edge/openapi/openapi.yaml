@@ -130,6 +130,64 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MobileAccessErrorPayload'
+  /access/recovery/request:
+    post:
+      summary: Proxy mobile access recovery request to Accessing
+      description: Accessing owns recovery challenge issuing; mobile-edge forwards the email request and passes the normalized session response back to the mobile client.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MobileAccessRecoveryRequest'
+      responses:
+        '202':
+          description: Accessing accepted the recovery request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MobileAccessSessionPayload'
+        '422':
+          description: Invalid recovery request payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MobileAccessErrorPayload'
+        '503':
+          description: Accessing API unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MobileAccessErrorPayload'
+  /access/recovery/reset:
+    post:
+      summary: Proxy mobile access recovery reset to Accessing
+      description: Accessing owns recovery completion; mobile-edge forwards the request and returns the normalized session response.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MobileAccessRecoveryResetRequest'
+      responses:
+        '202':
+          description: Accessing accepted the recovery reset request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MobileAccessSessionPayload'
+        '422':
+          description: Invalid recovery reset payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MobileAccessErrorPayload'
+        '503':
+          description: Accessing API unavailable
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MobileAccessErrorPayload'
   /push/register:
     post:
       summary: Register push token
@@ -235,6 +293,20 @@ components:
       properties:
         displayName: { type: string, minLength: 1 }
         email: { type: string, minLength: 3 }
+        password: { type: string, minLength: 8 }
+    MobileAccessRecoveryRequest:
+      type: object
+      additionalProperties: false
+      required: [email]
+      properties:
+        email: { type: string, minLength: 3 }
+    MobileAccessRecoveryResetRequest:
+      type: object
+      additionalProperties: false
+      required: [email, code, password]
+      properties:
+        email: { type: string, minLength: 3 }
+        code: { type: string, minLength: 1 }
         password: { type: string, minLength: 8 }
     MobileAccessIdentityPayload:
       type: object
