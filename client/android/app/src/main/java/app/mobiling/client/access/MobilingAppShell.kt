@@ -11,11 +11,14 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import app.mobiling.client.auth.AuthFeatureBridge
+import app.mobiling.client.dashboard.MobileDashboardShell
+import app.mobiling.client.data.navigation.shell.NavigationShellGateway
 import kotlinx.coroutines.launch
 
 @Composable
 fun MobilingAppShell(
     authFeatureBridge: AuthFeatureBridge? = null,
+    navigationShellGateway: NavigationShellGateway? = null,
 ) {
     var currentScreen by rememberSaveable { mutableStateOf(AccessScreen.Welcome) }
     val coroutineScope = rememberCoroutineScope()
@@ -45,6 +48,11 @@ fun MobilingAppShell(
 
     Surface(Modifier.fillMaxSize()) {
         when (currentScreen) {
+            AccessScreen.Dashboard -> MobileDashboardShell(
+                navigationShellGateway = navigationShellGateway,
+                onSignOut = { clearAccessSession() },
+            )
+
             AccessScreen.Welcome -> AccessWelcomeScreen(
                 onSignIn = { currentScreen = AccessScreen.SignIn },
                 onCreateAccess = { currentScreen = AccessScreen.Register },

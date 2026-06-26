@@ -5,7 +5,8 @@ struct ContentView: View {
         MobilingAppShell(
             authFeatureBridge: AuthFeatureBridge(
                 gateway: HttpAuthSessionGateway(baseUrl: MobileClientRuntimeConfig.mobileEdgeBaseUrl)
-            )
+            ),
+            navigationShellGateway: HttpNavigationShellGateway(baseUrl: MobileClientRuntimeConfig.mobileEdgeBaseUrl)
         )
     }
 }

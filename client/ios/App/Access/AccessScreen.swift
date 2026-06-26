@@ -2,6 +2,7 @@ import Foundation
 
 enum AccessScreen {
     case welcome
+    case dashboard
     case signIn
     case register
     case verificationRequired

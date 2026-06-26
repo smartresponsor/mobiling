@@ -16,6 +16,8 @@ import routeEntitlement from "./routes/entitlement.js";
 import routeFlag from "./routes/flag.js";
 import routeHealth from "./routes/health.js";
 import routeMobileAccess from "./routes/mobile/access.js";
+import routeMobileNavigationShell from "./routes/mobile/navigationShell.js";
+import routeMobileVendorProfile from "./routes/mobile/vendorProfile.js";
 import routeMetrics from "./routes/metrics.js";
 import routePush from "./routes/push.js";
 import routeReceipt from "./routes/receipt.js";
@@ -59,6 +61,8 @@ app.setErrorHandler((error: any, _request, reply) => {
 
 await routeHealth(app);
 await routeMobileAccess(app);
+await routeMobileNavigationShell(app);
+await routeMobileVendorProfile(app);
 await routeSession(app);
 await routeFlag(app);
 await routeConfig(app);

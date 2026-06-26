@@ -6,6 +6,6 @@ fun AuthSessionPayload.toAccessScreen(): AccessScreen =
     when {
         requiresVerification -> AccessScreen.VerificationRequired
         requiresSecondFactor -> AccessScreen.SecondFactorRequired
-        authenticated -> AccessScreen.Welcome
+        authenticated -> AccessScreen.Dashboard
         else -> AccessScreen.SignIn
     }

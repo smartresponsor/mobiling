@@ -8,6 +8,6 @@ extension AuthSessionPayload {
         if requiresSecondFactor {
             return .secondFactorRequired
         }
-        return authenticated ? .welcome : .signIn
+        return authenticated ? .dashboard : .signIn
     }
 }

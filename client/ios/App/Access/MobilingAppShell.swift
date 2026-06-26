@@ -3,14 +3,21 @@ import SwiftUI
 public struct MobilingAppShell: View {
     @State private var currentScreen: AccessScreen = .welcome
     private let authFeatureBridge: AuthFeatureBridge?
+    private let navigationShellGateway: NavigationShellGateway?
 
-    public init(authFeatureBridge: AuthFeatureBridge? = nil) {
+    public init(authFeatureBridge: AuthFeatureBridge? = nil, navigationShellGateway: NavigationShellGateway? = nil) {
         self.authFeatureBridge = authFeatureBridge
+        self.navigationShellGateway = navigationShellGateway
     }
 
     public var body: some View {
         Group {
             switch currentScreen {
+            case .dashboard:
+                MobileDashboardShellView(
+                    navigationShellGateway: navigationShellGateway,
+                    onSignOut: { clearAccessSession() }
+                )
             case .welcome:
                 AccessWelcomeView(
                     onSignIn: { currentScreen = .signIn },
