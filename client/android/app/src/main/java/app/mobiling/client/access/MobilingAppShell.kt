@@ -10,18 +10,27 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import app.mobiling.client.contract.auth.session.AuthSessionPayload
 import app.mobiling.client.auth.AuthFeatureBridge
 import app.mobiling.client.dashboard.MobileDashboardShell
 import app.mobiling.client.data.navigation.shell.NavigationShellGateway
+import app.mobiling.client.data.vendor.profile.VendorProfileGateway
 import kotlinx.coroutines.launch
 
 @Composable
 fun MobilingAppShell(
     authFeatureBridge: AuthFeatureBridge? = null,
     navigationShellGateway: NavigationShellGateway? = null,
+    vendorProfileGateway: VendorProfileGateway? = null,
 ) {
     var currentScreen by rememberSaveable { mutableStateOf(AccessScreen.Welcome) }
+    var activeVendorId by rememberSaveable { mutableStateOf<String?>(null) }
     val coroutineScope = rememberCoroutineScope()
+
+    fun applyAccessSession(payload: AuthSessionPayload) {
+        activeVendorId = payload.vendorId
+        currentScreen = payload.toAccessScreen()
+    }
 
     fun clearAccessSession() {
         coroutineScope.launch {
@@ -30,6 +39,7 @@ fun MobilingAppShell(
             } catch (_: Exception) {
             }
 
+            activeVendorId = null
             currentScreen = AccessScreen.Welcome
         }
     }
@@ -42,7 +52,7 @@ fun MobilingAppShell(
         }
 
         if (payload != null) {
-            currentScreen = payload.toAccessScreen()
+            applyAccessSession(payload)
         }
     }
 
@@ -50,6 +60,8 @@ fun MobilingAppShell(
         when (currentScreen) {
             AccessScreen.Dashboard -> MobileDashboardShell(
                 navigationShellGateway = navigationShellGateway,
+                vendorId = activeVendorId,
+                vendorProfileGateway = vendorProfileGateway,
                 onSignOut = { clearAccessSession() },
             )
 
@@ -63,14 +75,14 @@ fun MobilingAppShell(
                 onCreateAccess = { currentScreen = AccessScreen.Register },
                 onRecoverAccess = { currentScreen = AccessScreen.RecoveryRequest },
                 onStartAccess = { request -> authFeatureBridge?.start(request) },
-                onAccessSession = { payload -> currentScreen = payload.toAccessScreen() },
+                onAccessSession = { payload -> applyAccessSession(payload) },
             )
 
             AccessScreen.Register -> RegisterAccessScreen(
                 onBack = { currentScreen = AccessScreen.Welcome },
                 onSignIn = { currentScreen = AccessScreen.SignIn },
                 onRegisterAccess = { request -> authFeatureBridge?.register(request) },
-                onAccessSession = { payload -> currentScreen = payload.toAccessScreen() },
+                onAccessSession = { payload -> applyAccessSession(payload) },
             )
 
             AccessScreen.VerificationRequired -> VerificationRequiredScreen(
@@ -87,14 +99,14 @@ fun MobilingAppShell(
                 onBack = { currentScreen = AccessScreen.SignIn },
                 onHaveRecoveryCode = { currentScreen = AccessScreen.RecoveryReset },
                 onRequestRecovery = { request -> authFeatureBridge?.requestRecovery(request) },
-                onAccessSession = { payload -> currentScreen = payload.toAccessScreen() },
+                onAccessSession = { payload -> applyAccessSession(payload) },
             )
 
             AccessScreen.RecoveryReset -> RecoveryResetScreen(
                 onBack = { currentScreen = AccessScreen.RecoveryRequest },
                 onRequestRecovery = { currentScreen = AccessScreen.RecoveryRequest },
                 onResetRecovery = { request -> authFeatureBridge?.resetRecovery(request) },
-                onAccessSession = { payload -> currentScreen = payload.toAccessScreen() },
+                onAccessSession = { payload -> applyAccessSession(payload) },
             )
         }
     }

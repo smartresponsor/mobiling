@@ -1,5 +1,6 @@
 package app.mobiling.client.dashboard
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -30,13 +31,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import app.mobiling.client.contract.navigation.shell.MobileNavigationItemPayload
 import app.mobiling.client.data.navigation.shell.NavigationShellGateway
+import app.mobiling.client.data.vendor.profile.VendorProfileGateway
 import app.mobiling.client.ui.navigation.shell.MobileNavigationShellScreenContract
 import app.mobiling.client.usecase.navigation.shell.LoadNavigationShellUseCase
+import app.mobiling.client.vendor.MobileVendorProfileScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MobileDashboardShell(
     navigationShellGateway: NavigationShellGateway?,
+    vendorId: String? = null,
+    vendorProfileGateway: VendorProfileGateway? = null,
     onSignOut: () -> Unit,
 ) {
     var selectedRoute by remember { mutableStateOf("dashboard") }
@@ -90,6 +95,9 @@ fun MobileDashboardShell(
         DashboardContent(
             selectedRoute = selectedRoute,
             shell = shell,
+            vendorId = vendorId,
+            vendorProfileGateway = vendorProfileGateway,
+            onRouteSelected = { route -> selectedRoute = route },
             padding = padding,
         )
     }
@@ -115,6 +123,9 @@ fun MobileDashboardShell(
 private fun DashboardContent(
     selectedRoute: String,
     shell: MobileNavigationShellScreenContract,
+    vendorId: String?,
+    vendorProfileGateway: VendorProfileGateway?,
+    onRouteSelected: (String) -> Unit,
     padding: PaddingValues,
 ) {
     LazyColumn(
@@ -128,6 +139,7 @@ private fun DashboardContent(
             Text(
                 text = when (selectedRoute) {
                     "vendor" -> "Vendor"
+                    "vendor/profile" -> "My Profile"
                     "more" -> "More"
                     else -> "Dashboard"
                 },
@@ -141,10 +153,17 @@ private fun DashboardContent(
 
         when (selectedRoute) {
             "vendor" -> item {
-                ShellSection(title = "Vendor", items = shell.vendorContext)
+                ShellSection(title = "Vendor", items = shell.vendorContext, onItemClick = { item ->
+                    item.route?.let(onRouteSelected)
+                })
+            }
+            "vendor/profile" -> item {
+                MobileVendorProfileScreen(vendorId = vendorId, vendorProfileGateway = vendorProfileGateway)
             }
             "more" -> item {
-                ShellSection(title = "More", items = shell.moreDrawer)
+                ShellSection(title = "More", items = shell.moreDrawer, onItemClick = { item ->
+                    item.route?.let(onRouteSelected)
+                })
             }
             else -> item {
                 ShellSection(title = "Primary", items = shell.bottomPrimary)
@@ -170,3 +189,81 @@ private fun ShellSection(
                 supportingContent = { Text(item.badge ?: item.route ?: item.key) },
                 leadingContent = { Text(iconLabel(item)) },
                 trailingContent = {
+                    if (!item.enabled) {
+                        AssistChip(
+                            onClick = {},
+                            label = { Text(item.badge ?: "Coming soon") },
+                        )
+                    }
+                },
+                modifier = Modifier.clickable(enabled = item.enabled) {
+                    onItemClick(item)
+                },
+            )
+        }
+    }
+}
+
+private fun iconLabel(item: MobileNavigationItemPayload): String =
+    when (item.icon) {
+        "store" -> "🏬"
+        "person" -> "👤"
+        "attachment" -> "📎"
+        "message" -> "💬"
+        "catalog" -> "🛍"
+        "key" -> "🔑"
+        "logout" -> "↩"
+        "menu" -> "☰"
+        else -> "⌂"
+    }
+
+private fun fallbackShell(): MobileNavigationShellScreenContract = MobileNavigationShellScreenContract(
+    bottomPrimary = listOf(
+        item("dashboard", "Dashboard", "dashboard", true, "dashboard"),
+        item("vendor", "Vendor", "store", true, "vendor"),
+        item("more", "More", "menu", true, "more"),
+    ),
+    accountQuick = listOf(
+        item("vendor_profile", "My Profile", "person", true, "vendor/profile"),
+        item("access_change_password", "Change Password", "key", false, "access/change-password"),
+        item("access_verification", "Verification", "key", false, "access/verification"),
+        item("vendor_attachment", "My Attachments", "attachment", false, "attachment"),
+        item("access_sign_out", "Sign Out", "logout", true, "access/sign-out", action = "access.sign_out"),
+    ),
+    moreDrawer = listOf(
+        item("dashboard", "Dashboard", "dashboard", true, "dashboard"),
+        item("vendor", "Vendor", "store", true, "vendor"),
+        item("catalog", "Catalog", "catalog", false, "catalog"),
+        item("message", "Message", "message", false, "message"),
+        item("attachment", "Attachments", "attachment", false, "attachment"),
+    ),
+    vendorContext = listOf(
+        item("vendor_overview", "My Vendor", "store", true, "vendor"),
+        item("vendor_profile", "My Profile", "person", true, "vendor/profile"),
+        item("vendor_attachment", "My Attachments", "attachment", false, "attachment"),
+    ),
+)
+
+private fun item(
+    key: String,
+    label: String,
+    icon: String,
+    enabled: Boolean,
+    route: String,
+    action: String? = null,
+): MobileNavigationItemPayload = MobileNavigationItemPayload(
+    key = key,
+    label = label,
+    icon = icon,
+    badge = if (enabled) null else "Coming soon",
+    enabled = enabled,
+    visible = true,
+    status = if (enabled) "active" else "coming_soon",
+    disabledReason = if (enabled) null else "component_disabled",
+    requiredComponent = null,
+    location = "mobile",
+    group = "fallback",
+    groupLabel = "Fallback",
+    action = action,
+    route = route,
+)

@@ -2,14 +2,19 @@ import SwiftUI
 
 public struct MobileDashboardShellView: View {
     private let navigationShellGateway: NavigationShellGateway?
+    private let vendorId: String?
+    private let vendorProfileGateway: VendorProfileGateway?
     private let onSignOut: () -> Void
 
     @State private var selectedRoute: String = "dashboard"
+    @State private var vendorContentRoute: String = "vendor"
     @State private var accountOpen: Bool = false
     @State private var shell: MobileNavigationShellScreenContract = MobileDashboardShellView.fallbackShell()
 
-    public init(navigationShellGateway: NavigationShellGateway? = nil, onSignOut: @escaping () -> Void) {
+    public init(navigationShellGateway: NavigationShellGateway? = nil, vendorId: String? = nil, vendorProfileGateway: VendorProfileGateway? = nil, onSignOut: @escaping () -> Void) {
         self.navigationShellGateway = navigationShellGateway
+        self.vendorId = vendorId
+        self.vendorProfileGateway = vendorProfileGateway
         self.onSignOut = onSignOut
     }
 
@@ -23,8 +28,13 @@ public struct MobileDashboardShellView: View {
             .tag("dashboard")
 
             NavigationView {
-                content(title: "Vendor", items: shell.vendorContext)
-                    .toolbar { accountToolbar }
+                if vendorContentRoute == "vendor/profile" {
+                    MobileVendorProfileView(vendorId: vendorId, vendorProfileGateway: vendorProfileGateway)
+                        .toolbar { accountToolbar }
+                } else {
+                    content(title: "Vendor", items: shell.vendorContext)
+                        .toolbar { accountToolbar }
+                }
             }
             .tabItem { Label("Vendor", systemImage: "storefront") }
             .tag("vendor")
@@ -84,6 +94,7 @@ public struct MobileDashboardShellView: View {
             Section(title) {
                 ForEach(items.filter { $0.visible }) { item in
                     row(item)
+                        .onTapGesture { handle(item) }
                 }
             }
         }
@@ -123,9 +134,23 @@ public struct MobileDashboardShellView: View {
             return
         }
 
-        if item.enabled, let route = item.route {
-            selectedRoute = route
+        guard item.enabled, let route = item.route else {
+            return
         }
+
+        if route == "vendor/profile" {
+            vendorContentRoute = route
+            selectedRoute = "vendor"
+            accountOpen = false
+            return
+        }
+
+        if route == "vendor" {
+            vendorContentRoute = "vendor"
+        }
+
+        selectedRoute = route
+        accountOpen = false
     }
 
     private func systemImage(for item: MobileNavigationItemPayload) -> String {

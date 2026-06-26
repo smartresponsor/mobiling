@@ -2,12 +2,15 @@ import SwiftUI
 
 public struct MobilingAppShell: View {
     @State private var currentScreen: AccessScreen = .welcome
+    @State private var activeVendorId: String?
     private let authFeatureBridge: AuthFeatureBridge?
     private let navigationShellGateway: NavigationShellGateway?
+    private let vendorProfileGateway: VendorProfileGateway?
 
-    public init(authFeatureBridge: AuthFeatureBridge? = nil, navigationShellGateway: NavigationShellGateway? = nil) {
+    public init(authFeatureBridge: AuthFeatureBridge? = nil, navigationShellGateway: NavigationShellGateway? = nil, vendorProfileGateway: VendorProfileGateway? = nil) {
         self.authFeatureBridge = authFeatureBridge
         self.navigationShellGateway = navigationShellGateway
+        self.vendorProfileGateway = vendorProfileGateway
     }
 
     public var body: some View {
@@ -16,6 +19,8 @@ public struct MobilingAppShell: View {
             case .dashboard:
                 MobileDashboardShellView(
                     navigationShellGateway: navigationShellGateway,
+                    vendorId: activeVendorId,
+                    vendorProfileGateway: vendorProfileGateway,
                     onSignOut: { clearAccessSession() }
                 )
             case .welcome:
@@ -34,7 +39,7 @@ public struct MobilingAppShell: View {
                         }
                         return try await authFeatureBridge.start(request: request)
                     },
-                    onAccessSession: { payload in currentScreen = payload.toAccessScreen() }
+                    onAccessSession: { payload in applyAccessSession(payload) }
                 )
             case .register:
                 RegisterAccessView(
@@ -46,7 +51,7 @@ public struct MobilingAppShell: View {
                         }
                         return try await authFeatureBridge.register(request: request)
                     },
-                    onAccessSession: { payload in currentScreen = payload.toAccessScreen() }
+                    onAccessSession: { payload in applyAccessSession(payload) }
                 )
             case .verificationRequired:
                 VerificationRequiredView(
@@ -68,7 +73,7 @@ public struct MobilingAppShell: View {
                         }
                         return try await authFeatureBridge.requestRecovery(request: request)
                     },
-                    onAccessSession: { payload in currentScreen = payload.toAccessScreen() }
+                    onAccessSession: { payload in applyAccessSession(payload) }
                 )
             case .recoveryReset:
                 RecoveryResetView(
@@ -80,7 +85,7 @@ public struct MobilingAppShell: View {
                         }
                         return try await authFeatureBridge.resetRecovery(request: request)
                     },
-                    onAccessSession: { payload in currentScreen = payload.toAccessScreen() }
+                    onAccessSession: { payload in applyAccessSession(payload) }
                 )
             }
         }
@@ -90,10 +95,15 @@ public struct MobilingAppShell: View {
             }
 
             do {
-                currentScreen = try await authFeatureBridge.restore().toAccessScreen()
+                applyAccessSession(try await authFeatureBridge.restore())
             } catch {
             }
         }
+    }
+
+    private func applyAccessSession(_ payload: AuthSessionPayload) {
+        activeVendorId = payload.vendorId
+        currentScreen = payload.toAccessScreen()
     }
 
     private func clearAccessSession() {
@@ -103,6 +113,7 @@ public struct MobilingAppShell: View {
             } catch {
             }
 
+            activeVendorId = nil
             currentScreen = .welcome
         }
     }

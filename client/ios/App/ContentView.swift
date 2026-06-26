@@ -6,7 +6,8 @@ struct ContentView: View {
             authFeatureBridge: AuthFeatureBridge(
                 gateway: HttpAuthSessionGateway(baseUrl: MobileClientRuntimeConfig.mobileEdgeBaseUrl)
             ),
-            navigationShellGateway: HttpNavigationShellGateway(baseUrl: MobileClientRuntimeConfig.mobileEdgeBaseUrl)
+            navigationShellGateway: HttpNavigationShellGateway(baseUrl: MobileClientRuntimeConfig.mobileEdgeBaseUrl),
+            vendorProfileGateway: HttpVendorProfileGateway(baseUrl: MobileClientRuntimeConfig.mobileEdgeBaseUrl)
         )
     }
 }

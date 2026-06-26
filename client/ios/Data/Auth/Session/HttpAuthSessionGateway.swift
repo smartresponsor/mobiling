@@ -117,6 +117,7 @@ public struct HttpAuthSessionGateway: AuthRecoverySessionGateway {
             return AuthSessionPayload(
                 status: "unauthenticated",
                 sessionId: nil,
+                vendorId: nil,
                 authenticated: false,
                 requiresVerification: false,
                 requiresSecondFactor: false
@@ -130,10 +131,12 @@ public struct HttpAuthSessionGateway: AuthRecoverySessionGateway {
 
         let identity = object["identity"] as? [String: Any]
         let authenticated = identity != nil
+        let vendorId = (identity?["vendorId"] as? String)?.trimmingCharacters(in: .whitespacesAndNewlines)
 
         return AuthSessionPayload(
             status: object["status"] as? String ?? (authenticated ? "authenticated" : "unauthenticated"),
             sessionId: nil,
+            vendorId: vendorId?.isEmpty == false ? vendorId : nil,
             authenticated: authenticated,
             requiresVerification: object["requiresVerification"] as? Bool ?? false,
             requiresSecondFactor: object["requiresSecondFactor"] as? Bool ?? false

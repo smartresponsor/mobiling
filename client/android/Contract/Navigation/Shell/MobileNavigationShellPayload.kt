@@ -23,3 +23,4 @@ data class MobileNavigationItemPayload(
     val group: String,
     val groupLabel: String,
     val action: String?,
+    val route: String?,

@@ -25,3 +25,5 @@ public struct MobileNavigationItemPayload: Identifiable, Sendable {
     public let location: String
     public let group: String
     public let groupLabel: String
+    public let action: String?
+    public let route: String?

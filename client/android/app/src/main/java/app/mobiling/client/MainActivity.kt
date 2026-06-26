@@ -11,6 +11,7 @@ import app.mobiling.client.access.MobilingAppShell
 import app.mobiling.client.auth.AuthFeatureBridge
 import app.mobiling.client.data.auth.session.HttpAuthSessionGateway
 import app.mobiling.client.data.navigation.shell.HttpNavigationShellGateway
+import app.mobiling.client.data.vendor.profile.HttpVendorProfileGateway
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,6 +26,7 @@ class MainActivity : ComponentActivity() {
                     MobilingAppShell(
                         authFeatureBridge = authFeatureBridge,
                         navigationShellGateway = HttpNavigationShellGateway(baseUrl = MobileClientRuntimeConfig.mobileEdgeBaseUrl),
+                        vendorProfileGateway = HttpVendorProfileGateway(baseUrl = MobileClientRuntimeConfig.mobileEdgeBaseUrl),
                     )
                 }
             }
