@@ -96,5 +96,5 @@ class HttpNavigationShellGateway(
         }
     }
 
-    private fun normalizedBaseUrl(): String = baseUrl.trimEnd('/')
+    private fun normalizedBaseUrl(): String = baseUrl.trim().trimEnd('/')
 }

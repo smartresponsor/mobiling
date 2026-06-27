@@ -91,7 +91,9 @@ public struct HttpNavigationShellGateway: NavigationShellGateway {
     }
 
     private func normalizedBaseUrl() -> String {
-        String(baseUrl.drop(while: { $0 == " " }).reversed().drop(while: { $0 == "/" }).reversed())
+        let trimmed = baseUrl.trimmingCharacters(in: .whitespacesAndNewlines)
+
+        return String(trimmed.reversed().drop(while: { $0 == "/" }).reversed())
     }
 }
 
