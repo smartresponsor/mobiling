@@ -226,7 +226,7 @@ private fun fallbackShell(): MobileNavigationShellScreenContract = MobileNavigat
     ),
     accountQuick = listOf(
         item("vendor_profile", "My Profile", "person", true, "vendor/profile"),
-        item("access_change_password", "Change Password", "key", false, "access/change-password"),
+        item("access_password", "Change Password", "key", false, "access/password"),
         item("access_verification", "Verification", "key", false, "access/verification"),
         item("vendor_attachment", "My Attachments", "attachment", false, "attachment"),
         item("access_sign_out", "Sign Out", "logout", true, "access/sign-out", action = "access.sign_out"),

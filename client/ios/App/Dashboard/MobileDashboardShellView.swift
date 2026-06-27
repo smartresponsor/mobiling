@@ -104,7 +104,7 @@ public struct MobileDashboardShellView: View {
     private func row(_ item: MobileNavigationItemPayload) -> some View {
         HStack(spacing: 12) {
             Image(systemName: systemImage(for: item))
-                .foregroundStyle(item.enabled ? .blue : .secondary)
+                .foregroundColor(item.enabled ? .blue : .secondary)
                 .frame(width: 24)
 
             VStack(alignment: .leading, spacing: 2) {
@@ -184,13 +184,17 @@ public struct MobileDashboardShellView: View {
             ],
             accountQuick: [
                 item("vendor_profile", "My Profile", "person", true, "vendor/profile"),
+                item("access_password", "Change Password", "key", false, "access/password"),
+                item("access_verification", "Verification", "key", false, "access/verification"),
                 item("vendor_attachment", "My Attachments", "attachment", false, "attachment"),
                 item("access_sign_out", "Sign Out", "logout", true, "access/sign-out", action: "access.sign_out"),
             ],
             moreDrawer: [
+                item("dashboard", "Dashboard", "dashboard", true, "dashboard"),
                 item("vendor", "Vendor", "store", true, "vendor"),
                 item("catalog", "Catalog", "catalog", false, "catalog"),
                 item("message", "Message", "message", false, "message"),
+                item("attachment", "Attachments", "attachment", false, "attachment"),
             ],
             vendorContext: [
                 item("vendor_overview", "My Vendor", "store", true, "vendor"),
