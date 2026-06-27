@@ -101,6 +101,29 @@ for needle in [
 for route in ["Config", "Entitlement", "Push", "Receipt", "Analytic", "Sync", "ApiKey", "Admin", "Webhook"]:
     if f"route{route}(app)" not in edge: error.append(f"unregistered mobile-edge route: {route}")
 if (root / ".materialize").exists(): error.append("bootstrap payload remains")
+for active_item in [
+    'item("dashboard", "Dashboard", "dashboard", true, "dashboard")',
+    'item("vendor", "Vendor", "store", true, "vendor")',
+    'item("more", "More", "menu", true, "more")',
+    'item("vendor_profile", "My Profile", "person", true, "vendor/profile")',
+    'item("vendor_overview", "My Vendor", "store", true, "vendor")',
+]:
+    require_shell_contains("Android active fallback item", android_shell, active_item)
+    require_shell_contains("iOS active fallback item", ios_shell, active_item)
+
+for disabled_item in [
+    'item("access_password", "Change Password", "key", false, "access/password")',
+    'item("access_verification", "Verification", "key", false, "access/verification")',
+    'item("vendor_attachment", "My Attachments", "attachment", false, "attachment")',
+    'item("catalog", "Catalog", "catalog", false, "catalog")',
+    'item("message", "Message", "message", false, "message")',
+    'item("attachment", "Attachments", "attachment", false, "attachment")',
+]:
+    require_shell_contains("Android disabled fallback item", android_shell, disabled_item)
+    require_shell_contains("iOS disabled fallback item", ios_shell, disabled_item)
+
+require_shell_contains("Android sign out fallback item", android_shell, 'item("access_sign_out", "Sign Out", "logout", true, "access/sign-out", action = "access.sign_out")')
+require_shell_contains("iOS sign out fallback item", ios_shell, 'item("access_sign_out", "Sign Out", "logout", true, "access/sign-out", action: "access.sign_out")')
 if error:
     print("Repository validation failed:")
     for item in error: print(f"- {item}")
