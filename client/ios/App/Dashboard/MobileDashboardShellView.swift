@@ -138,6 +138,10 @@ public struct MobileDashboardShellView: View {
             return
         }
 
+        guard isHandledRoute(route) else {
+            return
+        }
+
         if route == "vendor/profile" {
             vendorContentRoute = route
             selectedRoute = "vendor"
@@ -165,6 +169,10 @@ public struct MobileDashboardShellView: View {
         case "menu": return "line.3.horizontal"
         default: return "house"
         }
+    }
+
+    private func isHandledRoute(_ route: String) -> Bool {
+        ["dashboard", "vendor", "vendor/profile", "more"].contains(route)
     }
 
     private static func fallbackShell() -> MobileNavigationShellScreenContract {

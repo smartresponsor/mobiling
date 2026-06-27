@@ -80,7 +80,7 @@ fun MobileDashboardShell(
                     NavigationBarItem(
                         selected = selectedRoute == item.route,
                         onClick = {
-                            if (item.enabled) {
+                            if (item.enabled && isHandledRoute(item.route)) {
                                 selectedRoute = item.route ?: item.key
                             }
                         },
@@ -97,7 +97,7 @@ fun MobileDashboardShell(
             shell = shell,
             vendorId = vendorId,
             vendorProfileGateway = vendorProfileGateway,
-            onRouteSelected = { route -> selectedRoute = route },
+            onRouteSelected = { route -> if (isHandledRoute(route)) selectedRoute = route },
             padding = padding,
         )
     }
@@ -110,7 +110,8 @@ fun MobileDashboardShell(
                 onItemClick = { item ->
                     when {
                         item.action == "access.sign_out" -> onSignOut()
-                        item.enabled -> selectedRoute = item.route ?: item.key
+                        item.enabled && isHandledRoute(item.route) -> selectedRoute = item.route ?: item.key
+                        else -> Unit
                     }
                     accountOpen = false
                 },
@@ -267,3 +268,6 @@ private fun item(
     action = action,
     route = route,
 )
+
+private fun isHandledRoute(route: String?): Boolean =
+    setOf("dashboard", "vendor", "vendor/profile", "more").contains(route)
