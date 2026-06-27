@@ -137,6 +137,8 @@ for needle in [
     "normalizeProfile(vendorId, result.body)",
 ]:
     require_shell_contains("mobile-edge vendor profile route", edge_vendor_profile_route, needle)
+edge_vendor_profile_client = (root / "mobile-edge/src/client/vendoring/vendoringApiClient.ts").read_text(encoding="utf-8")
+require_shell_contains("mobile-edge vendoring profile show endpoint", edge_vendor_profile_client, "/api/vendor/profile/show/")
 
 if error:
     print("Repository validation failed:")

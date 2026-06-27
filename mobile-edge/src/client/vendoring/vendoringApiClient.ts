@@ -26,7 +26,7 @@ export class VendoringApiClient {
   }
 
   getProfile(vendorId: string, forwardedHeaders: Record<string, string> = {}): Promise<VendoringApiResponse> {
-    return this.request("GET", `/api/vendor/profile/${encodeURIComponent(vendorId)}`, null, forwardedHeaders);
+    return this.request("GET", `/api/vendor/profile/show/${encodeURIComponent(vendorId)}`, null, forwardedHeaders);
   }
 
   private async request(method: string, path: string, body: unknown, forwardedHeaders: Record<string, string>): Promise<VendoringApiResponse> {

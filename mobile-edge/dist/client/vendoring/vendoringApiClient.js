@@ -13,7 +13,7 @@ export class VendoringApiClient {
         this.timeoutMs = timeoutMs;
     }
     getProfile(vendorId, forwardedHeaders = {}) {
-        return this.request("GET", `/api/vendor/profile/${encodeURIComponent(vendorId)}`, null, forwardedHeaders);
+        return this.request("GET", `/api/vendor/profile/show/${encodeURIComponent(vendorId)}`, null, forwardedHeaders);
     }
     async request(method, path, body, forwardedHeaders) {
         const baseUrl = this.baseUrl.trim();
