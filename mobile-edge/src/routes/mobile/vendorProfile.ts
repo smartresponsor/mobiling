@@ -110,6 +110,13 @@ function normalizeErrorPayload(body: unknown): VendoringApiErrorPayload {
     };
   }
 
+  if (isRecord(body) && "string" === typeof body.error) {
+    return {
+      code: body.error,
+      message: body.error.replace(/_/g, " "),
+    };
+  }
+
   return {
     code: "vendoring_api_error",
     message: "Vendoring API returned an unexpected response.",
@@ -123,6 +130,7 @@ function vendorProfileSchemas() {
         200: mobileVendorProfilePayload,
         400: mobileAccessErrorPayload,
         404: mobileAccessErrorPayload,
+        422: mobileAccessErrorPayload,
         500: mobileAccessErrorPayload,
         503: mobileAccessErrorPayload,
       },
