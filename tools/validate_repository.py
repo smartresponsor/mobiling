@@ -40,6 +40,34 @@ for path in android.rglob("*.kt"):
             canonical = symbols.get((owner, name.lower()))
             if canonical and canonical != name: error.append(f"non-canonical Kotlin import: {path.relative_to(root)}: {name} -> {canonical}")
 edge = (root / "mobile-edge/src/app.ts").read_text(encoding="utf-8")
+android_shell = (root / "client/android/app/src/main/java/app/mobiling/client/dashboard/MobileDashboardShell.kt").read_text(encoding="utf-8")
+ios_shell = (root / "client/ios/App/Dashboard/MobileDashboardShellView.swift").read_text(encoding="utf-8")
+
+def require_shell_contains(name: str, text: str, needle: str) -> None:
+    if needle not in text:
+        error.append(f"mobile shell fallback missing {name}: {needle}")
+
+def require_shell_excludes(name: str, text: str, needle: str) -> None:
+    if needle in text:
+        error.append(f"mobile shell fallback contains forbidden {name}: {needle}")
+
+for shell_name, shell_text in [("Android", android_shell), ("iOS", ios_shell)]:
+    require_shell_contains(shell_name, shell_text, "vendor/profile")
+    require_shell_contains(shell_name, shell_text, "access/password")
+    require_shell_contains(shell_name, shell_text, "access/verification")
+    require_shell_contains(shell_name, shell_text, "access.sign_out")
+    require_shell_contains(shell_name, shell_text, "coming_soon")
+    require_shell_contains(shell_name, shell_text, "component_disabled")
+    require_shell_excludes(shell_name, shell_text, "access/change-password")
+
+for route in ["dashboard", "vendor", "vendor/profile", "more"]:
+    require_shell_contains("Android handled route", android_shell, f'"{route}"')
+    require_shell_contains("iOS handled route", ios_shell, f'"{route}"')
+
+for disabled_key in ["access_password", "access_verification", "vendor_attachment", "catalog", "message", "attachment"]:
+    require_shell_contains("Android disabled item", android_shell, f'item("{disabled_key}"')
+    require_shell_contains("iOS disabled item", ios_shell, f'item("{disabled_key}"')
+
 for route in ["Config", "Entitlement", "Push", "Receipt", "Analytic", "Sync", "ApiKey", "Admin", "Webhook"]:
     if f"route{route}(app)" not in edge: error.append(f"unregistered mobile-edge route: {route}")
 if (root / ".materialize").exists(): error.append("bootstrap payload remains")
