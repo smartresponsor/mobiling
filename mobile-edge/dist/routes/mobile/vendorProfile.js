@@ -44,7 +44,8 @@ function nestedString(source, field) {
     return stringValue(source[field]);
 }
 function normalizeProfile(vendorId, body) {
-    const root = isRecord(body) ? body : {};
+    const unwrappedBody = profilePayload(body);
+    const root = isRecord(unwrappedBody) ? unwrappedBody : {};
     const profile = nestedRecord(root, "profile");
     const publicProfile = nestedRecord(root, "publicProfile");
     const publication = nestedRecord(root, "publication");
@@ -108,4 +109,10 @@ export default async function route(app) {
         }
         return reply.code(result.status).send(normalizeErrorPayload(result.body));
     });
+}
+function profilePayload(body) {
+    if (!isRecord(body)) {
+        return body;
+    }
+    return isRecord(body.data) ? body.data : body;
 }

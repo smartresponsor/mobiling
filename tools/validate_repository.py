@@ -128,4 +128,18 @@ if error:
     print("Repository validation failed:")
     for item in error: print(f"- {item}")
     sys.exit(1)
+edge_vendor_profile_route = (root / "mobile-edge/src/routes/mobile/vendorProfile.ts").read_text(encoding="utf-8")
+for needle in [
+    'app.get("/vendor/profile/:vendorId"',
+    "vendoringApiClient.getProfile",
+    "profilePayload(body)",
+    "isRecord(body.data) ? body.data : body",
+    "normalizeProfile(vendorId, result.body)",
+]:
+    require_shell_contains("mobile-edge vendor profile route", edge_vendor_profile_route, needle)
+
+if error:
+    print("Repository validation failed:")
+    for item in error: print(f"- {item}")
+    sys.exit(1)
 print("Repository validation passed")

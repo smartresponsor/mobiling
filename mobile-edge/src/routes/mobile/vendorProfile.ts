@@ -77,7 +77,8 @@ function nestedString(source: Record<string, unknown>, field: string): string | 
 }
 
 function normalizeProfile(vendorId: string, body: unknown): MobileVendorProfilePayload {
-  const root = isRecord(body) ? body : {};
+  const unwrappedBody = profilePayload(body);
+  const root = isRecord(unwrappedBody) ? unwrappedBody : {};
   const profile = nestedRecord(root, "profile");
   const publicProfile = nestedRecord(root, "publicProfile");
   const publication = nestedRecord(root, "publication");
@@ -155,3 +156,11 @@ export default async function route(app: FastifyInstance): Promise<void> {
     return reply.code(result.status).send(normalizeErrorPayload(result.body));
   });
 }
+function profilePayload(body: unknown): unknown {
+  if (!isRecord(body)) {
+    return body;
+  }
+
+  return isRecord(body.data) ? body.data : body;
+}
+
