@@ -68,6 +68,36 @@ for disabled_key in ["access_password", "access_verification", "vendor_attachmen
     require_shell_contains("Android disabled item", android_shell, f'item("{disabled_key}"')
     require_shell_contains("iOS disabled item", ios_shell, f'item("{disabled_key}"')
 
+edge_navigation_route = (root / "mobile-edge/src/routes/mobile/navigationShell.ts").read_text(encoding="utf-8")
+edge_navigation_client = (root / "mobile-edge/src/client/navigating/navigatingApiClient.ts").read_text(encoding="utf-8")
+edge_navigation_contract = (root / "mobile-edge/src/contract/mobile/navigationShell.ts").read_text(encoding="utf-8")
+
+for needle in [
+    'app.get("/navigation/mobile/shell"',
+    "navigatingApiClient.getMobileShell",
+    "forwardedHeaders",
+    "headers.cookie",
+    "return reply.code(200).send(result.body)",
+    "normalizeErrorPayload",
+]:
+    require_shell_contains("mobile-edge navigation shell route", edge_navigation_route, needle)
+
+for needle in [
+    '"/api/navigation/mobile/shell"',
+    "NAVIGATING_API_BASE_URL",
+    "navigating_api_unavailable",
+]:
+    require_shell_contains("mobile-edge navigating API client", edge_navigation_client, needle)
+
+for needle in [
+    "mobileNavigationShellPayload",
+    'required: ["schema", "channel", "platforms", "locations"]',
+    'required: ["key", "label", "enabled", "visible", "status", "location"]',
+    "disabledReason",
+    "additionalProperties: true",
+]:
+    require_shell_contains("mobile-edge navigation shell schema", edge_navigation_contract, needle)
+
 for route in ["Config", "Entitlement", "Push", "Receipt", "Analytic", "Sync", "ApiKey", "Admin", "Webhook"]:
     if f"route{route}(app)" not in edge: error.append(f"unregistered mobile-edge route: {route}")
 if (root / ".materialize").exists(): error.append("bootstrap payload remains")
