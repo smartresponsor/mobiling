@@ -4,7 +4,7 @@ import { getStore } from "../repository/index.js";
 import { verifyReceiptViaCore } from "../adapter/http/commerce.js";
 import { M } from "../metrics.js";
 export default async function route(app) {
-    app.post("/mobile/receipt/verify", {
+    app.post("/receipt/verify", {
         schema: registry.get("receipt.verify", registry.latest("receipt.verify"))
     }, async (req, res) => {
         await requireJwt(req);

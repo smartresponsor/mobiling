@@ -4,7 +4,7 @@ const SNAP = { flags: {
         "wifi_only": { key: "wifi_only" }
     } };
 export default async function route(app) {
-    app.post("/mobile/flag/eval/:key", async (req, res) => {
+    app.post("/flag/eval/:key", async (req, res) => {
         const key = req.params.key;
         const ctx = req.body || {};
         const on = evalFlag(SNAP, key, ctx);

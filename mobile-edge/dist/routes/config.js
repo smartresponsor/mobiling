@@ -6,7 +6,7 @@ const SNAP = {
 };
 function etagOf(s) { return '"' + hmacHex("etag", s).slice(0, 16) + '"'; }
 export default async function route(app) {
-    app.get("/mobile/config", async (req, res) => {
+    app.get("/config", async (req, res) => {
         const v = (req.query?.v || ENV.CONFIG_VERSION).toString();
         const body = JSON.stringify(SNAP[v] || SNAP["1"]);
         const tag = etagOf(body);
