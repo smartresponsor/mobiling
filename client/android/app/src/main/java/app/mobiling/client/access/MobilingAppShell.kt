@@ -14,6 +14,7 @@ import app.mobiling.client.contract.auth.session.AuthSessionPayload
 import app.mobiling.client.auth.AuthFeatureBridge
 import app.mobiling.client.dashboard.MobileDashboardShell
 import app.mobiling.client.data.navigation.shell.NavigationShellGateway
+import app.mobiling.client.data.vendor.payout.VendorPayoutGateway
 import app.mobiling.client.data.vendor.profile.VendorProfileGateway
 import app.mobiling.client.data.vendor.statement.VendorStatementGateway
 import app.mobiling.client.data.vendor.summary.VendorSummaryGateway
@@ -26,6 +27,7 @@ fun MobilingAppShell(
     vendorProfileGateway: VendorProfileGateway? = null,
     vendorSummaryGateway: VendorSummaryGateway? = null,
     vendorStatementGateway: VendorStatementGateway? = null,
+    vendorPayoutGateway: VendorPayoutGateway? = null,
 ) {
     var currentScreen by rememberSaveable { mutableStateOf(AccessScreen.Welcome) }
     var activeVendorId by rememberSaveable { mutableStateOf<String?>(null) }
@@ -68,6 +70,7 @@ fun MobilingAppShell(
                 vendorProfileGateway = vendorProfileGateway,
                 vendorSummaryGateway = vendorSummaryGateway,
                 vendorStatementGateway = vendorStatementGateway,
+                vendorPayoutGateway = vendorPayoutGateway,
                 onSignOut = { clearAccessSession() },
             )
 

@@ -31,11 +31,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import app.mobiling.client.contract.navigation.shell.MobileNavigationItemPayload
 import app.mobiling.client.data.navigation.shell.NavigationShellGateway
+import app.mobiling.client.data.vendor.payout.VendorPayoutGateway
 import app.mobiling.client.data.vendor.profile.VendorProfileGateway
 import app.mobiling.client.data.vendor.statement.VendorStatementGateway
 import app.mobiling.client.data.vendor.summary.VendorSummaryGateway
 import app.mobiling.client.ui.navigation.shell.MobileNavigationShellScreenContract
 import app.mobiling.client.usecase.navigation.shell.LoadNavigationShellUseCase
+import app.mobiling.client.vendor.MobileVendorPayoutScreen
 import app.mobiling.client.vendor.MobileVendorProfileScreen
 import app.mobiling.client.vendor.MobileVendorStatementScreen
 import app.mobiling.client.vendor.MobileVendorSummaryScreen
@@ -48,6 +50,7 @@ fun MobileDashboardShell(
     vendorProfileGateway: VendorProfileGateway? = null,
     vendorSummaryGateway: VendorSummaryGateway? = null,
     vendorStatementGateway: VendorStatementGateway? = null,
+    vendorPayoutGateway: VendorPayoutGateway? = null,
     onSignOut: () -> Unit,
 ) {
     var selectedRoute by remember { mutableStateOf("dashboard") }
@@ -105,6 +108,7 @@ fun MobileDashboardShell(
             vendorProfileGateway = vendorProfileGateway,
             vendorSummaryGateway = vendorSummaryGateway,
             vendorStatementGateway = vendorStatementGateway,
+            vendorPayoutGateway = vendorPayoutGateway,
             onRouteSelected = { route -> if (isHandledRoute(route)) selectedRoute = route },
             padding = padding,
         )
@@ -136,6 +140,7 @@ private fun DashboardContent(
     vendorProfileGateway: VendorProfileGateway?,
     vendorSummaryGateway: VendorSummaryGateway?,
     vendorStatementGateway: VendorStatementGateway?,
+    vendorPayoutGateway: VendorPayoutGateway?,
     onRouteSelected: (String) -> Unit,
     padding: PaddingValues,
 ) {
@@ -182,7 +187,7 @@ private fun DashboardContent(
                 MobileVendorStatementScreen(vendorId = vendorId, vendorStatementGateway = vendorStatementGateway)
             }
             "vendor/payout" -> item {
-                Text("Vendor Payout will be connected to mobile-edge vendor data.")
+                MobileVendorPayoutScreen(vendorId = vendorId, vendorPayoutGateway = vendorPayoutGateway)
             }
             "vendor/transaction" -> item {
                 Text("Vendor Transaction will be connected to mobile-edge vendor data.")
