@@ -29,6 +29,10 @@ export class VendoringApiClient {
     return this.request("GET", `/api/vendor/profile/show/${encodeURIComponent(vendorId)}`, null, forwardedHeaders);
   }
 
+  getSummary(vendorId: string, forwardedHeaders: Record<string, string> = {}): Promise<VendoringApiResponse> {
+    return this.request("GET", `/api/vendor/summary/show/${encodeURIComponent(vendorId)}`, null, forwardedHeaders);
+  }
+
   private async request(method: string, path: string, body: unknown, forwardedHeaders: Record<string, string>): Promise<VendoringApiResponse> {
     const baseUrl = this.baseUrl.trim();
 
