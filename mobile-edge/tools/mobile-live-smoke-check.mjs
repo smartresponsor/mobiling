@@ -7,6 +7,7 @@ const routes = [
   { name: "health", path: "/health", ok: ["ok"] },
   { name: "navigationShell", path: "/navigation/mobile/shell", ok: ["schema", "channel", "platforms", "locations"] },
   { name: "cartCurrent", path: "/cart/current", ok: ["cartId", "cartToken", "ownerReference", "status", "currencyCode", "itemCount", "subtotalMinor", "totalMinor", "items", "expiresAt", "updatedAt", "payload"] },
+  { name: "attachmentList", path: "/attachment?ownerType=vendor&ownerId=vendor-demo-001", ok: ["ownerType", "ownerId", "count", "items", "payload"] },
   { name: "vendorProfile", path: `/vendor/profile/${encodeURIComponent(vendorId)}`, ok: ["vendorId", "displayName", "brandName", "status", "completionPercent", "readyForPublishing", "nextAction", "avatarUrl", "coverUrl", "about", "website", "publicationStatus"] },
   { name: "vendorSummary", path: `/vendor/summary/${encodeURIComponent(vendorId)}`, ok: ["vendorId", "brandName", "status", "profileCompletionPercent", "nextAction", "payload"] },
   { name: "vendorStatement", path: `/vendor/statement/${encodeURIComponent(vendorId)}`, ok: ["vendorId", "statementStatus", "currency", "grossAmount", "netAmount", "payload"] },

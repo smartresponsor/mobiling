@@ -1,0 +1,19 @@
+{
+  "ownerType": "vendor",
+  "ownerId": "vendor-demo-001",
+  "count": 1,
+  "items": [
+    {
+      "attachmentId": "attachment-demo-001",
+      "type": "image",
+      "mimeType": "image/png",
+      "downloadUrl": "https://example.invalid/attachment-demo-001.png",
+      "payload": {
+        "fixture": true
+      }
+    }
+  ],
+  "payload": {
+    "fixture": true
+  }
+}

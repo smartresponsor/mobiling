@@ -35,6 +35,18 @@
       "status": "declared-in-app"
     },
     {
+      "owner": "Attaching",
+      "mobileRoute": "GET /attachment",
+      "upstreamRoute": "GET /attachments",
+      "status": "declared-in-component"
+    },
+    {
+      "owner": "Attaching",
+      "mobileRoute": "POST /attachment/link",
+      "upstreamRoute": "POST /attachments/attach",
+      "status": "declared-in-component"
+    },
+    {
       "owner": "Vendoring",
       "mobileRoute": "GET /vendor/profile/:vendorId",
       "upstreamRoute": "GET /api/vendor/profile/show/{vendorId}",

@@ -241,6 +241,42 @@ paths:
         '201': { description: Created, content: { application/json: { schema: { $ref: '#/components/schemas/MobileCartCheckoutHandoffPayload' } } } }
         '409': { description: Cart not ready, content: { application/json: { schema: { $ref: '#/components/schemas/MobileAccessErrorPayload' } } } }
         '503': { description: Carting API unavailable, content: { application/json: { schema: { $ref: '#/components/schemas/MobileAccessErrorPayload' } } } }
+  /attachment:
+    get:
+      summary: Mobile attachment list
+      parameters:
+        - in: query
+          name: ownerType
+          required: false
+          schema: { type: string, minLength: 1 }
+        - in: query
+          name: ownerId
+          required: false
+          schema: { type: string, minLength: 1 }
+        - in: query
+          name: context
+          required: false
+          schema: { type: string, minLength: 1 }
+        - in: query
+          name: slot
+          required: false
+          schema: { type: string, minLength: 1 }
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/MobileAttachmentListPayload' } } } }
+        '503': { description: Attaching API unavailable, content: { application/json: { schema: { $ref: '#/components/schemas/MobileAccessErrorPayload' } } } }
+  /attachment/link:
+    post:
+      summary: Mobile attachment link
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/MobileAttachmentLinkRequest' }
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/MobileAttachmentLinkPayload' } } } }
+        '201': { description: Created, content: { application/json: { schema: { $ref: '#/components/schemas/MobileAttachmentLinkPayload' } } } }
+        '422': { description: Invalid attachment link payload, content: { application/json: { schema: { $ref: '#/components/schemas/MobileAccessErrorPayload' } } } }
+        '503': { description: Attaching API unavailable, content: { application/json: { schema: { $ref: '#/components/schemas/MobileAccessErrorPayload' } } } }
   /navigation/mobile/shell:
     get:
       summary: Mobile navigation shell
@@ -473,6 +509,54 @@ components:
           type: array
           items: { type: string }
         locations: { type: object, additionalProperties: true }
+    MobileAttachmentItemPayload:
+      type: object
+      additionalProperties: false
+      required: [attachmentId, type, mimeType, downloadUrl, payload]
+      properties:
+        attachmentId: { type: string, minLength: 1 }
+        type: { type: string, minLength: 1 }
+        mimeType: { anyOf: [{ type: string, minLength: 1 }, { type: 'null' }] }
+        downloadUrl: { anyOf: [{ type: string, minLength: 1 }, { type: 'null' }] }
+        payload: { type: object, additionalProperties: true }
+    MobileAttachmentListPayload:
+      type: object
+      additionalProperties: false
+      required: [ownerType, ownerId, count, items, payload]
+      properties:
+        ownerType: { type: string, minLength: 1 }
+        ownerId: { type: string, minLength: 1 }
+        count: { type: integer, minimum: 0 }
+        items:
+          type: array
+          items: { $ref: '#/components/schemas/MobileAttachmentItemPayload' }
+        payload: { type: object, additionalProperties: true }
+    MobileAttachmentLinkRequest:
+      type: object
+      additionalProperties: false
+      required: [attachmentId, ownerType, ownerId]
+      properties:
+        attachmentId: { type: integer, minimum: 1 }
+        ownerType: { type: string, minLength: 1 }
+        ownerId: { type: string, minLength: 1 }
+        context: { anyOf: [{ type: string, minLength: 1 }, { type: 'null' }] }
+        slot: { anyOf: [{ type: string, minLength: 1 }, { type: 'null' }] }
+        position: { type: integer, minimum: 0 }
+        isPrimary: { type: boolean }
+    MobileAttachmentLinkPayload:
+      type: object
+      additionalProperties: false
+      required: [linkId, attachmentId, ownerType, ownerId, payload]
+      properties:
+        linkId: { type: string, minLength: 1 }
+        attachmentId: { type: string, minLength: 1 }
+        ownerType: { type: string, minLength: 1 }
+        ownerId: { type: string, minLength: 1 }
+        context: { anyOf: [{ type: string, minLength: 1 }, { type: 'null' }] }
+        slot: { anyOf: [{ type: string, minLength: 1 }, { type: 'null' }] }
+        position: { type: integer, minimum: 0 }
+        isPrimary: { type: boolean }
+        payload: { type: object, additionalProperties: true }
     MobileCartItemPayload:
       type: object
       additionalProperties: false

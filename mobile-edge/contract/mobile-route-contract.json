@@ -129,6 +129,25 @@
     },
     {
       "method": "GET",
+      "path": "/attachment",
+      "owner": "Attaching",
+      "routeFile": "src/routes/mobile/attachment.ts",
+      "routeClass": "screen",
+      "screen": "attachment.list",
+      "responseSchema": "MobileAttachmentListPayload",
+      "contractFile": "src/contract/mobile/attachment.ts",
+      "fixture": "fixture/mobile/attachment/list.success.json"
+    },
+    {
+      "method": "POST",
+      "path": "/attachment/link",
+      "owner": "Attaching",
+      "routeFile": "src/routes/mobile/attachment.ts",
+      "routeClass": "transport",
+      "responseSchema": "MobileAttachmentLinkPayload"
+    },
+    {
+      "method": "GET",
       "path": "/navigation/mobile/shell",
       "owner": "Navigating",
       "routeFile": "src/routes/mobile/navigationShell.ts",
