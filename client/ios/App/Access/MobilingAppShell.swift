@@ -5,12 +5,12 @@ public struct MobilingAppShell: View {
     @State private var activeVendorId: String?
     private let authFeatureBridge: AuthFeatureBridge?
     private let navigationShellGateway: NavigationShellGateway?
-    private let vendorProfileGateway: VendorProfileGateway?
+    private let vendorProfileGateway: VendorProfileGateway?`r`n    private let vendorSummaryGateway: VendorSummaryGateway?
 
-    public init(authFeatureBridge: AuthFeatureBridge? = nil, navigationShellGateway: NavigationShellGateway? = nil, vendorProfileGateway: VendorProfileGateway? = nil) {
+    public init(authFeatureBridge: AuthFeatureBridge? = nil, navigationShellGateway: NavigationShellGateway? = nil, vendorProfileGateway: VendorProfileGateway? = nil, vendorSummaryGateway: VendorSummaryGateway? = nil) {
         self.authFeatureBridge = authFeatureBridge
         self.navigationShellGateway = navigationShellGateway
-        self.vendorProfileGateway = vendorProfileGateway
+        self.vendorProfileGateway = vendorProfileGateway`r`n        self.vendorSummaryGateway = vendorSummaryGateway
     }
 
     public var body: some View {

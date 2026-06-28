@@ -3,7 +3,8 @@ import SwiftUI
 public struct MobileDashboardShellView: View {
     private let navigationShellGateway: NavigationShellGateway?
     private let vendorId: String?
-    private let vendorProfileGateway: VendorProfileGateway?
+    private let vendorProfileGateway: VendorProfileGateway?`r`n    private let vendorSummaryGateway: VendorSummaryGateway?
+    private let vendorSummaryGateway: VendorSummaryGateway?
     private let onSignOut: () -> Void
 
     @State private var selectedRoute: String = "dashboard"
@@ -11,10 +12,10 @@ public struct MobileDashboardShellView: View {
     @State private var accountOpen: Bool = false
     @State private var shell: MobileNavigationShellScreenContract = MobileDashboardShellView.fallbackShell()
 
-    public init(navigationShellGateway: NavigationShellGateway? = nil, vendorId: String? = nil, vendorProfileGateway: VendorProfileGateway? = nil, onSignOut: @escaping () -> Void) {
+    public init(navigationShellGateway: NavigationShellGateway? = nil, vendorId: String? = nil, vendorProfileGateway: VendorProfileGateway? = nil, vendorSummaryGateway: VendorSummaryGateway? = nil, onSignOut: @escaping () -> Void) {
         self.navigationShellGateway = navigationShellGateway
         self.vendorId = vendorId
-        self.vendorProfileGateway = vendorProfileGateway
+        self.vendorProfileGateway = vendorProfileGateway`r`n        self.vendorSummaryGateway = vendorSummaryGateway
         self.onSignOut = onSignOut
     }
 
@@ -232,5 +233,6 @@ public struct MobileDashboardShellView: View {
         )
     }
 }
+
 
 
