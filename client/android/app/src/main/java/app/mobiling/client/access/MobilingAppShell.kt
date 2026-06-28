@@ -12,6 +12,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import app.mobiling.client.contract.auth.session.AuthSessionPayload
 import app.mobiling.client.auth.AuthFeatureBridge
+import app.mobiling.client.cart.CartFeatureBridge
 import app.mobiling.client.dashboard.MobileDashboardShell
 import app.mobiling.client.data.navigation.shell.NavigationShellGateway
 import app.mobiling.client.data.vendor.payout.VendorPayoutGateway
@@ -24,6 +25,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun MobilingAppShell(
     authFeatureBridge: AuthFeatureBridge? = null,
+    cartFeatureBridge: CartFeatureBridge? = null,
     navigationShellGateway: NavigationShellGateway? = null,
     vendorProfileGateway: VendorProfileGateway? = null,
     vendorSummaryGateway: VendorSummaryGateway? = null,
@@ -68,6 +70,7 @@ fun MobilingAppShell(
         when (currentScreen) {
             AccessScreen.Dashboard -> MobileDashboardShell(
                 navigationShellGateway = navigationShellGateway,
+                cartFeatureBridge = cartFeatureBridge,
                 vendorId = activeVendorId,
                 vendorProfileGateway = vendorProfileGateway,
                 vendorSummaryGateway = vendorSummaryGateway,

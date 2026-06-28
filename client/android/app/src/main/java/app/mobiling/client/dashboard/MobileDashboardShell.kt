@@ -29,6 +29,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import app.mobiling.client.cart.CartFeatureBridge
+import app.mobiling.client.cart.MobileCartScreen
 import app.mobiling.client.contract.navigation.shell.MobileNavigationItemPayload
 import app.mobiling.client.data.navigation.shell.NavigationShellGateway
 import app.mobiling.client.data.vendor.payout.VendorPayoutGateway
@@ -48,6 +50,7 @@ import app.mobiling.client.vendor.MobileVendorTransactionScreen
 @Composable
 fun MobileDashboardShell(
     navigationShellGateway: NavigationShellGateway?,
+    cartFeatureBridge: CartFeatureBridge? = null,
     vendorId: String? = null,
     vendorProfileGateway: VendorProfileGateway? = null,
     vendorSummaryGateway: VendorSummaryGateway? = null,
@@ -107,6 +110,7 @@ fun MobileDashboardShell(
         DashboardContent(
             selectedRoute = selectedRoute,
             shell = shell,
+            cartFeatureBridge = cartFeatureBridge,
             vendorId = vendorId,
             vendorProfileGateway = vendorProfileGateway,
             vendorSummaryGateway = vendorSummaryGateway,
@@ -140,6 +144,7 @@ fun MobileDashboardShell(
 private fun DashboardContent(
     selectedRoute: String,
     shell: MobileNavigationShellScreenContract,
+    cartFeatureBridge: CartFeatureBridge?,
     vendorId: String?,
     vendorProfileGateway: VendorProfileGateway?,
     vendorSummaryGateway: VendorSummaryGateway?,
@@ -159,6 +164,7 @@ private fun DashboardContent(
         item {
             Text(
                 text = when (selectedRoute) {
+                    "cart" -> "Cart"
                     "vendor" -> "Vendor"
                     "vendor/profile" -> "My Profile"
                     "vendor/summary" -> "Vendor Summary"
@@ -177,6 +183,9 @@ private fun DashboardContent(
         }
 
         when (selectedRoute) {
+            "cart" -> item {
+                MobileCartScreen(cartFeatureBridge = cartFeatureBridge)
+            }
             "vendor" -> item {
                 ShellSection(title = "Vendor", items = shell.vendorContext, onItemClick = { item ->
                     item.route?.let(onRouteSelected)
@@ -243,6 +252,7 @@ private fun ShellSection(
 
 private fun iconLabel(item: MobileNavigationItemPayload): String =
     when (item.icon) {
+        "cart" -> "🛒"
         "store" -> "🏬"
         "person" -> "👤"
         "attachment" -> "📎"
@@ -261,6 +271,7 @@ private fun iconLabel(item: MobileNavigationItemPayload): String =
 private fun fallbackShell(): MobileNavigationShellScreenContract = MobileNavigationShellScreenContract(
     bottomPrimary = listOf(
         item("dashboard", "Dashboard", "dashboard", true, "dashboard"),
+        item("cart", "Cart", "cart", true, "cart"),
         item("vendor", "Vendor", "store", true, "vendor"),
         item("more", "More", "menu", true, "more"),
     ),
@@ -273,6 +284,7 @@ private fun fallbackShell(): MobileNavigationShellScreenContract = MobileNavigat
     ),
     moreDrawer = listOf(
         item("dashboard", "Dashboard", "dashboard", true, "dashboard"),
+        item("cart", "Cart", "cart", true, "cart"),
         item("vendor", "Vendor", "store", true, "vendor"),
         item("catalog", "Catalog", "catalog", false, "catalog"),
         item("message", "Message", "message", false, "message"),
@@ -314,6 +326,7 @@ private fun item(
 )
 
 private fun isHandledRoute(route: String?): Boolean =
+    route == "cart" ||
     setOf("dashboard", "vendor", "vendor/profile", "vendor/summary", "vendor/statement", "vendor/payout", "vendor/transaction", "more").contains(route)
 
 
