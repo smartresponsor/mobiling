@@ -1,12 +1,12 @@
 package app.mobiling.client.taxation
 
 import app.mobiling.client.contract.taxation.detail.TaxDetailPayload
-import app.mobiling.client.contract.taxation.summary.LoadTaxSummaryQuery
+import app.mobiling.client.contract.taxation.summary.TaxLoadSummaryQuery
 import app.mobiling.client.contract.taxation.summary.TaxSummary
 import app.mobiling.client.data.taxation.detail.TaxDetailGateway
 import app.mobiling.client.data.taxation.summary.TaxSummaryGateway
-import app.mobiling.client.usecase.taxation.detail.LoadTaxDetailUseCase
-import app.mobiling.client.usecase.taxation.summary.LoadTaxSummaryUseCase
+import app.mobiling.client.usecase.taxation.detail.TaxLoadDetailUseCase
+import app.mobiling.client.usecase.taxation.summary.TaxLoadSummaryUseCase
 
 /**
  * Marketing America Corp. Oleksandr Tishchenko
@@ -22,11 +22,11 @@ class TaxationFeatureBridge(
     private val summaryGateway: TaxSummaryGateway,
     private val detailGateway: TaxDetailGateway,
 ) {
-    suspend fun summary(query: LoadTaxSummaryQuery): TaxSummary =
-        LoadTaxSummaryUseCase(summaryGateway).invoke(query)
+    suspend fun summary(query: TaxLoadSummaryQuery): TaxSummary =
+        TaxLoadSummaryUseCase(summaryGateway).invoke(query)
 
     suspend fun detail(taxationId: String): TaxDetailPayload =
-        LoadTaxDetailUseCase(detailGateway).invoke(taxationId)
+        TaxLoadDetailUseCase(detailGateway).invoke(taxationId)
 
     fun summaryGateway(): TaxSummaryGateway = summaryGateway
 

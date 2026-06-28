@@ -6,7 +6,7 @@ import app.mobiling.client.data.shipment.tracking.ShipmentTrackingGateway
 /**
  * Marketing America Corp. Oleksandr Tishchenko
  */
-class LoadShipmentDetailUseCase(
+class ShipmentLoadDetailUseCase(
     private val shipmentTrackingGateway: ShipmentTrackingGateway,
 ) {
     suspend operator fun invoke(shipmentId: String): ShipmentDetailPayload =

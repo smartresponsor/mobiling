@@ -6,7 +6,7 @@ import app.mobiling.client.data.catalog.detail.CatalogNodeDetailGateway
 /**
  * Marketing America Corp. Oleksandr Tishchenko
  */
-class LoadCatalogNodeDetailUseCase(
+class CatalogLoadNodeDetailUseCase(
     private val gateway: CatalogNodeDetailGateway,
 ) {
     suspend operator fun invoke(nodeId: String): CatalogNodeDetailPayload = gateway.loadNodeDetail(nodeId)

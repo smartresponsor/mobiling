@@ -5,7 +5,7 @@ import app.mobiling.client.contract.product.listing.ProductCardSummary
 import app.mobiling.client.contract.product.listing.ProductListQuery
 import app.mobiling.client.data.product.detail.ProductDetailGateway
 import app.mobiling.client.data.product.listing.ProductListingGateway
-import app.mobiling.client.usecase.product.detail.LoadProductDetailUseCase
+import app.mobiling.client.usecase.product.detail.ProductLoadDetailUseCase
 import app.mobiling.client.usecase.product.listing.ListProductsUseCase
 
 /**
@@ -27,5 +27,5 @@ class ProductFeatureBridge(
         ListProductsUseCase(listingGateway).invoke(query)
 
     suspend fun detail(productId: String): ProductDetailPayload? =
-        LoadProductDetailUseCase(detailGateway).invoke(productId)
+        ProductLoadDetailUseCase(detailGateway).invoke(productId)
 }

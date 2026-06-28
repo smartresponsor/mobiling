@@ -6,7 +6,7 @@ import app.mobiling.client.data.order.detail.OrderDetailGateway
 /**
  * Marketing America Corp. Oleksandr Tishchenko
  */
-class LoadOrderDetailUseCase(
+class OrderLoadDetailUseCase(
     private val gateway: OrderDetailGateway,
 ) {
     suspend operator fun invoke(orderId: String): OrderDetailPayload = gateway.loadOrderDetail(orderId)

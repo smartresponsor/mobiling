@@ -6,7 +6,7 @@ import app.mobiling.client.data.project.listing.ProjectListingGateway
 /**
  * Marketing America Corp. Oleksandr Tishchenko
  */
-class LoadProjectDetailUseCase(
+class ProjectLoadDetailUseCase(
     private val projectListingGateway: ProjectListingGateway,
 ) {
     suspend operator fun invoke(projectId: String): ProjectDetailPayload =

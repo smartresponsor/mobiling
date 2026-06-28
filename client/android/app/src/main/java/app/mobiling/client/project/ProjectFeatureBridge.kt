@@ -4,7 +4,7 @@ import app.mobiling.client.contract.project.detail.ProjectDetailPayload
 import app.mobiling.client.contract.project.listing.ListProjectsQuery
 import app.mobiling.client.contract.project.listing.ProjectSummary
 import app.mobiling.client.data.project.listing.ProjectListingGateway
-import app.mobiling.client.usecase.project.detail.LoadProjectDetailUseCase
+import app.mobiling.client.usecase.project.detail.ProjectLoadDetailUseCase
 import app.mobiling.client.usecase.project.listing.ListProjectsUseCase
 
 /**
@@ -23,5 +23,5 @@ class ProjectFeatureBridge(
         ListProjectsUseCase(listingGateway).invoke(query)
 
     suspend fun detail(projectId: String): ProjectDetailPayload =
-        LoadProjectDetailUseCase(listingGateway).invoke(projectId)
+        ProjectLoadDetailUseCase(listingGateway).invoke(projectId)
 }

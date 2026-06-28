@@ -5,7 +5,7 @@ import app.mobiling.client.contract.order.listing.ListOrdersQuery
 import app.mobiling.client.contract.order.listing.OrderSummary
 import app.mobiling.client.data.order.detail.OrderDetailGateway
 import app.mobiling.client.data.order.listing.OrderListingGateway
-import app.mobiling.client.usecase.order.detail.LoadOrderDetailUseCase
+import app.mobiling.client.usecase.order.detail.OrderLoadDetailUseCase
 import app.mobiling.client.usecase.order.listing.ListOrdersUseCase
 
 /**
@@ -27,5 +27,5 @@ class OrderFeatureBridge(
         ListOrdersUseCase(listingGateway).invoke(query)
 
     suspend fun detail(orderId: String): OrderDetailPayload =
-        LoadOrderDetailUseCase(detailGateway).invoke(orderId)
+        OrderLoadDetailUseCase(detailGateway).invoke(orderId)
 }

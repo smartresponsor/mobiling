@@ -6,7 +6,7 @@ import app.mobiling.client.contract.catalog.detail.CatalogNodeDetailPayload
 import app.mobiling.client.data.catalog.browse.CatalogBrowseGateway
 import app.mobiling.client.data.catalog.detail.CatalogNodeDetailGateway
 import app.mobiling.client.usecase.catalog.browse.ListCatalogNodesUseCase
-import app.mobiling.client.usecase.catalog.detail.LoadCatalogNodeDetailUseCase
+import app.mobiling.client.usecase.catalog.detail.CatalogLoadNodeDetailUseCase
 
 /**
  * Marketing America Corp. Oleksandr Tishchenko
@@ -23,5 +23,5 @@ class CatalogFeatureBridge(
         ListCatalogNodesUseCase(browseGateway).invoke(query)
 
     suspend fun detail(nodeId: String): CatalogNodeDetailPayload? =
-        LoadCatalogNodeDetailUseCase(detailGateway).invoke(nodeId)
+        CatalogLoadNodeDetailUseCase(detailGateway).invoke(nodeId)
 }

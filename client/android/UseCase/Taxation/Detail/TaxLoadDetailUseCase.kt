@@ -6,7 +6,7 @@ import app.mobiling.client.data.taxation.detail.TaxDetailGateway
 /**
  * Marketing America Corp. Oleksandr Tishchenko
  */
-class LoadTaxDetailUseCase(
+class TaxLoadDetailUseCase(
     private val gateway: TaxDetailGateway,
 ) {
     suspend operator fun invoke(taxDocumentId: String): TaxDetailPayload = gateway.loadTaxDetail(taxDocumentId)

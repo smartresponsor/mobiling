@@ -2,7 +2,7 @@ package app.mobiling.client.profile
 
 import app.mobiling.client.contract.profile.detail.ProfileDetailPayload
 import app.mobiling.client.data.profile.detail.ProfileDetailGateway
-import app.mobiling.client.usecase.profile.detail.LoadProfileDetailUseCase
+import app.mobiling.client.usecase.profile.detail.ProfileLoadDetailUseCase
 
 /**
  * Marketing America Corp. Oleksandr Tishchenko
@@ -17,5 +17,5 @@ class ProfileFeatureBridge(
     private val detailGateway: ProfileDetailGateway,
 ) {
     suspend fun detail(profileId: String): ProfileDetailPayload =
-        LoadProfileDetailUseCase(detailGateway).invoke(profileId)
+        ProfileLoadDetailUseCase(detailGateway).invoke(profileId)
 }

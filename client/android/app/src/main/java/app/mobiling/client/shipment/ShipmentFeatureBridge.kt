@@ -4,7 +4,7 @@ import app.mobiling.client.contract.shipment.detail.ShipmentDetailPayload
 import app.mobiling.client.contract.shipment.tracking.ListShipmentsQuery
 import app.mobiling.client.contract.shipment.tracking.ShipmentTrackingSummary
 import app.mobiling.client.data.shipment.tracking.ShipmentTrackingGateway
-import app.mobiling.client.usecase.shipment.detail.LoadShipmentDetailUseCase
+import app.mobiling.client.usecase.shipment.detail.ShipmentLoadDetailUseCase
 import app.mobiling.client.usecase.shipment.tracking.ListShipmentsUseCase
 
 /**
@@ -24,7 +24,7 @@ class ShipmentFeatureBridge(
         ListShipmentsUseCase(trackingGateway).invoke(query)
 
     suspend fun detail(shipmentId: String): ShipmentDetailPayload =
-        LoadShipmentDetailUseCase(trackingGateway).invoke(shipmentId)
+        ShipmentLoadDetailUseCase(trackingGateway).invoke(shipmentId)
 
     fun gateway(): ShipmentTrackingGateway = trackingGateway
 }
