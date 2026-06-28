@@ -27,25 +27,25 @@
       "owner": "Vendoring",
       "mobileRoute": "GET /vendor/summary/:vendorId",
       "upstreamRoute": "GET /api/vendor/summary/show/{vendorId}",
-      "status": "missing-in-app-route-catalog"
+      "status": "declared-in-app"
     },
     {
       "owner": "Vendoring",
       "mobileRoute": "GET /vendor/statement/:vendorId",
       "upstreamRoute": "GET /api/vendor/statement/show/{vendorId}",
-      "status": "missing-in-app-route-catalog"
+      "status": "declared-in-app"
     },
     {
       "owner": "Vendoring",
       "mobileRoute": "GET /vendor/payout/:vendorId",
       "upstreamRoute": "GET /api/vendor/payout/show/{vendorId}",
-      "status": "missing-in-app-route-catalog"
+      "status": "declared-in-app"
     },
     {
       "owner": "Vendoring",
       "mobileRoute": "GET /vendor/transaction/:vendorId",
       "upstreamRoute": "GET /api/vendor/transaction/list/{vendorId}",
-      "status": "missing-in-app-route-catalog"
+      "status": "declared-in-app"
     }
   ]
 }
