@@ -9,13 +9,16 @@ public struct MobilingAppShell: View {
     private let vendorSummaryGateway: VendorSummaryGateway?
     private let vendorStatementGateway: VendorStatementGateway?
     private let vendorPayoutGateway: VendorPayoutGateway?
+    private let vendorTransactionGateway: VendorTransactionGateway?
 
-    public init(authFeatureBridge: AuthFeatureBridge? = nil, navigationShellGateway: NavigationShellGateway? = nil, vendorProfileGateway: VendorProfileGateway? = nil, vendorSummaryGateway: VendorSummaryGateway? = nil, vendorStatementGateway: VendorStatementGateway? = nil, vendorPayoutGateway: VendorPayoutGateway? = nil) {
+    public init(authFeatureBridge: AuthFeatureBridge? = nil, navigationShellGateway: NavigationShellGateway? = nil, vendorProfileGateway: VendorProfileGateway? = nil, vendorSummaryGateway: VendorSummaryGateway? = nil, vendorStatementGateway: VendorStatementGateway? = nil, vendorPayoutGateway: VendorPayoutGateway? = nil, vendorTransactionGateway: VendorTransactionGateway? = nil) {
         self.authFeatureBridge = authFeatureBridge
         self.navigationShellGateway = navigationShellGateway
         self.vendorProfileGateway = vendorProfileGateway
         self.vendorSummaryGateway = vendorSummaryGateway
         self.vendorStatementGateway = vendorStatementGateway
+        self.vendorPayoutGateway = vendorPayoutGateway
+        self.vendorTransactionGateway = vendorTransactionGateway
     }
 
     public var body: some View {
@@ -29,6 +32,7 @@ public struct MobilingAppShell: View {
                     vendorSummaryGateway: vendorSummaryGateway,
                     vendorStatementGateway: vendorStatementGateway,
                     vendorPayoutGateway: vendorPayoutGateway,
+                    vendorTransactionGateway: vendorTransactionGateway,
                     onSignOut: { clearAccessSession() }
                 )
             case .welcome:
@@ -126,3 +130,4 @@ public struct MobilingAppShell: View {
         }
     }
 }
+

@@ -7,6 +7,7 @@ public struct MobileDashboardShellView: View {
     private let vendorSummaryGateway: VendorSummaryGateway?
     private let vendorStatementGateway: VendorStatementGateway?
     private let vendorPayoutGateway: VendorPayoutGateway?
+    private let vendorTransactionGateway: VendorTransactionGateway?
     private let onSignOut: () -> Void
 
     @State private var selectedRoute: String = "dashboard"
@@ -14,13 +15,14 @@ public struct MobileDashboardShellView: View {
     @State private var accountOpen: Bool = false
     @State private var shell: MobileNavigationShellScreenContract = MobileDashboardShellView.fallbackShell()
 
-    public init(navigationShellGateway: NavigationShellGateway? = nil, vendorId: String? = nil, vendorProfileGateway: VendorProfileGateway? = nil, vendorSummaryGateway: VendorSummaryGateway? = nil, vendorStatementGateway: VendorStatementGateway? = nil, vendorPayoutGateway: VendorPayoutGateway? = nil, onSignOut: @escaping () -> Void) {
+    public init(navigationShellGateway: NavigationShellGateway? = nil, vendorId: String? = nil, vendorProfileGateway: VendorProfileGateway? = nil, vendorSummaryGateway: VendorSummaryGateway? = nil, vendorStatementGateway: VendorStatementGateway? = nil, vendorPayoutGateway: VendorPayoutGateway? = nil, vendorTransactionGateway: VendorTransactionGateway? = nil, onSignOut: @escaping () -> Void) {
         self.navigationShellGateway = navigationShellGateway
         self.vendorId = vendorId
         self.vendorProfileGateway = vendorProfileGateway
         self.vendorSummaryGateway = vendorSummaryGateway
         self.vendorStatementGateway = vendorStatementGateway
         self.vendorPayoutGateway = vendorPayoutGateway
+        self.vendorTransactionGateway = vendorTransactionGateway
         self.onSignOut = onSignOut
     }
 
@@ -45,6 +47,9 @@ public struct MobileDashboardShellView: View {
                         .toolbar { accountToolbar }
                 } else if vendorContentRoute == "vendor/payout" {
                     MobileVendorPayoutView(vendorId: vendorId, vendorPayoutGateway: vendorPayoutGateway)
+                        .toolbar { accountToolbar }
+                } else if vendorContentRoute == "vendor/transaction" {
+                    MobileVendorTransactionView(vendorId: vendorId, vendorTransactionGateway: vendorTransactionGateway)
                         .toolbar { accountToolbar }
                 } else {
                     content(title: "Vendor", items: vendorContentRoute == "vendor" ? shell.vendorContext : [])
@@ -247,6 +252,7 @@ public struct MobileDashboardShellView: View {
         )
     }
 }
+
 
 
 
