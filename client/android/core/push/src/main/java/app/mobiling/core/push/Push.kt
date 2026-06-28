@@ -1,7 +1,7 @@
 package app.mobiling.core.push
 
-import app.mobiling.client.data.system.push.PushTokenRegistrar
-import app.mobiling.client.usecase.system.push.RegisterPushTokenUseCase
+import app.mobiling.client.data.system.push.PushRegistrationGateway
+import app.mobiling.client.usecase.system.push.PushRegisterUseCase
 
 /**
  * Legacy-compatible Android entry point bridged to canonical system/push slices.
@@ -9,9 +9,9 @@ import app.mobiling.client.usecase.system.push.RegisterPushTokenUseCase
 class Push(
     baseUrl: String = "https://httpbin.org",
 ) {
-    private val pushTokenRegistrar: PushTokenRegistrar = PushTokenRegistrar(baseUrl)
-    private val registerPushTokenUseCase: RegisterPushTokenUseCase = RegisterPushTokenUseCase(pushTokenRegistrar)
+    private val pushRegistrationGateway: PushRegistrationGateway = PushRegistrationGateway(baseUrl)
+    private val pushRegisterUseCase: PushRegisterUseCase = PushRegisterUseCase(pushRegistrationGateway)
 
     fun register(token: String, platform: String = "android"): Boolean =
-        registerPushTokenUseCase(token = token, platform = platform)
+        pushRegisterUseCase(token = token, platform = platform)
 }
