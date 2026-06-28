@@ -18,6 +18,9 @@ export class VendoringApiClient {
     getSummary(vendorId, forwardedHeaders = {}) {
         return this.request("GET", `/api/vendor/summary/show/${encodeURIComponent(vendorId)}`, null, forwardedHeaders);
     }
+    getStatement(vendorId, forwardedHeaders = {}) {
+        return this.request("GET", `/api/vendor/statement/show/${encodeURIComponent(vendorId)}`, null, forwardedHeaders);
+    }
     async request(method, path, body, forwardedHeaders) {
         const baseUrl = this.baseUrl.trim();
         if ("" === baseUrl) {
