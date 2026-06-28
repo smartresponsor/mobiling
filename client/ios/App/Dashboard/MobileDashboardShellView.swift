@@ -3,7 +3,7 @@ import SwiftUI
 public struct MobileDashboardShellView: View {
     private let navigationShellGateway: NavigationShellGateway?
     private let vendorId: String?
-    private let vendorProfileGateway: VendorProfileGateway?`r`n    private let vendorSummaryGateway: VendorSummaryGateway?
+    private let vendorProfileGateway: VendorProfileGateway?
     private let vendorSummaryGateway: VendorSummaryGateway?
     private let onSignOut: () -> Void
 
@@ -15,7 +15,8 @@ public struct MobileDashboardShellView: View {
     public init(navigationShellGateway: NavigationShellGateway? = nil, vendorId: String? = nil, vendorProfileGateway: VendorProfileGateway? = nil, vendorSummaryGateway: VendorSummaryGateway? = nil, onSignOut: @escaping () -> Void) {
         self.navigationShellGateway = navigationShellGateway
         self.vendorId = vendorId
-        self.vendorProfileGateway = vendorProfileGateway`r`n        self.vendorSummaryGateway = vendorSummaryGateway
+        self.vendorProfileGateway = vendorProfileGateway
+        self.vendorSummaryGateway = vendorSummaryGateway
         self.onSignOut = onSignOut
     }
 
@@ -31,6 +32,9 @@ public struct MobileDashboardShellView: View {
             NavigationView {
                 if vendorContentRoute == "vendor/profile" {
                     MobileVendorProfileView(vendorId: vendorId, vendorProfileGateway: vendorProfileGateway)
+                        .toolbar { accountToolbar }
+                } else if vendorContentRoute == "vendor/summary" {
+                    MobileVendorSummaryView(vendorId: vendorId, vendorSummaryGateway: vendorSummaryGateway)
                         .toolbar { accountToolbar }
                 } else {
                     content(title: "Vendor", items: vendorContentRoute == "vendor" ? shell.vendorContext : [])
