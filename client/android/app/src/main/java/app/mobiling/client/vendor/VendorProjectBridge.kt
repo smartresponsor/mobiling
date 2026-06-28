@@ -2,7 +2,7 @@ package app.mobiling.client.vendor
 
 import app.mobiling.client.project.ProjectFeatureBridge
 import app.mobiling.client.contract.project.detail.ProjectDetailPayload
-import app.mobiling.client.contract.project.listing.ListProjectsQuery
+import app.mobiling.client.contract.project.listing.ProjectListQuery
 import app.mobiling.client.contract.project.listing.ProjectSummary
 
 /**
@@ -13,7 +13,7 @@ import app.mobiling.client.contract.project.listing.ProjectSummary
 class VendorProjectBridge(
     private val feature: ProjectFeatureBridge,
 ) {
-    suspend fun list(query: ListProjectsQuery): List<ProjectSummary> = feature.list(query)
+    suspend fun list(query: ProjectListQuery): List<ProjectSummary> = feature.list(query)
 
     suspend fun detail(projectId: String): ProjectDetailPayload = feature.detail(projectId)
 

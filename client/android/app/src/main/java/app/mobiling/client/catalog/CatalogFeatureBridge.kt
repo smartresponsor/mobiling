@@ -1,11 +1,11 @@
 package app.mobiling.client.catalog
 
 import app.mobiling.client.contract.catalog.browse.CatalogNodeSummary
-import app.mobiling.client.contract.catalog.browse.ListCatalogNodesQuery
+import app.mobiling.client.contract.catalog.browse.CatalogListNodeQuery
 import app.mobiling.client.contract.catalog.detail.CatalogNodeDetailPayload
 import app.mobiling.client.data.catalog.browse.CatalogBrowseGateway
 import app.mobiling.client.data.catalog.detail.CatalogNodeDetailGateway
-import app.mobiling.client.usecase.catalog.browse.ListCatalogNodesUseCase
+import app.mobiling.client.usecase.catalog.browse.CatalogListNodeUseCase
 import app.mobiling.client.usecase.catalog.detail.CatalogLoadNodeDetailUseCase
 
 /**
@@ -19,8 +19,8 @@ class CatalogFeatureBridge(
     private val browseGateway: CatalogBrowseGateway,
     private val detailGateway: CatalogNodeDetailGateway,
 ) {
-    suspend fun list(query: ListCatalogNodesQuery): List<CatalogNodeSummary> =
-        ListCatalogNodesUseCase(browseGateway).invoke(query)
+    suspend fun list(query: CatalogListNodeQuery): List<CatalogNodeSummary> =
+        CatalogListNodeUseCase(browseGateway).invoke(query)
 
     suspend fun detail(nodeId: String): CatalogNodeDetailPayload? =
         CatalogLoadNodeDetailUseCase(detailGateway).invoke(nodeId)

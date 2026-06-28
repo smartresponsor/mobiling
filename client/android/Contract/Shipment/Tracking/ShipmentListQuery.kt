@@ -3,7 +3,7 @@ package app.mobiling.client.contract.shipment.tracking
 /**
  * Marketing America Corp. Oleksandr Tishchenko
  */
-data class ListShipmentsQuery(
+data class ShipmentListQuery(
     val orderId: String?,
     val statusCode: String?,
     val cursor: String?,

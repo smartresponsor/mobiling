@@ -2,7 +2,7 @@ package app.mobiling.core.security
 
 import app.mobiling.client.contract.system.security.SignatureHeaders
 import app.mobiling.client.data.system.security.RequestSignatureApplier
-import app.mobiling.client.usecase.system.security.ApplyRequestSignatureUseCase
+import app.mobiling.client.usecase.system.security.SecurityApplyRequestSignatureUseCase
 import okhttp3.Request
 
 /**
@@ -12,12 +12,12 @@ class Security(
     secret: String,
 ) {
     private val requestSignatureApplier: RequestSignatureApplier = RequestSignatureApplier(secret)
-    private val applyRequestSignatureUseCase: ApplyRequestSignatureUseCase =
-        ApplyRequestSignatureUseCase(requestSignatureApplier)
+    private val securityApplyRequestSignatureUseCase: SecurityApplyRequestSignatureUseCase =
+        SecurityApplyRequestSignatureUseCase(requestSignatureApplier)
 
     fun sign(data: String): String = requestSignatureApplier.sign(data)
 
     fun headersFor(path: String): SignatureHeaders = requestSignatureApplier.headersFor(path)
 
-    fun apply(request: Request): Request = applyRequestSignatureUseCase(request)
+    fun apply(request: Request): Request = securityApplyRequestSignatureUseCase(request)
 }

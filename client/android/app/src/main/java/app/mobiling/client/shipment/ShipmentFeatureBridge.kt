@@ -1,11 +1,11 @@
 package app.mobiling.client.shipment
 
 import app.mobiling.client.contract.shipment.detail.ShipmentDetailPayload
-import app.mobiling.client.contract.shipment.tracking.ListShipmentsQuery
+import app.mobiling.client.contract.shipment.tracking.ShipmentListQuery
 import app.mobiling.client.contract.shipment.tracking.ShipmentTrackingSummary
 import app.mobiling.client.data.shipment.tracking.ShipmentTrackingGateway
 import app.mobiling.client.usecase.shipment.detail.ShipmentLoadDetailUseCase
-import app.mobiling.client.usecase.shipment.tracking.ListShipmentsUseCase
+import app.mobiling.client.usecase.shipment.tracking.ShipmentListUseCase
 
 /**
  * Marketing America Corp. Oleksandr Tishchenko
@@ -20,8 +20,8 @@ import app.mobiling.client.usecase.shipment.tracking.ListShipmentsUseCase
 class ShipmentFeatureBridge(
     private val trackingGateway: ShipmentTrackingGateway,
 ) {
-    suspend fun list(query: ListShipmentsQuery): List<ShipmentTrackingSummary> =
-        ListShipmentsUseCase(trackingGateway).invoke(query)
+    suspend fun list(query: ShipmentListQuery): List<ShipmentTrackingSummary> =
+        ShipmentListUseCase(trackingGateway).invoke(query)
 
     suspend fun detail(shipmentId: String): ShipmentDetailPayload =
         ShipmentLoadDetailUseCase(trackingGateway).invoke(shipmentId)

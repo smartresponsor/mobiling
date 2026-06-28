@@ -6,7 +6,7 @@ import app.mobiling.client.data.message.thread.MessageThreadGateway
 /**
  * Marketing America Corp. Oleksandr Tishchenko
  */
-class ListMessageThreadsUseCase(
+class MessageListThreadUseCase(
     private val gateway: MessageThreadGateway,
 ) {
     suspend operator fun invoke(): List<MessageThreadSummary> = gateway.listThreads()

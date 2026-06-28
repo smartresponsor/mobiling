@@ -1,12 +1,12 @@
 package app.mobiling.client.order
 
 import app.mobiling.client.contract.order.detail.OrderDetailPayload
-import app.mobiling.client.contract.order.listing.ListOrdersQuery
+import app.mobiling.client.contract.order.listing.OrderListQuery
 import app.mobiling.client.contract.order.listing.OrderSummary
 import app.mobiling.client.data.order.detail.OrderDetailGateway
 import app.mobiling.client.data.order.listing.OrderListingGateway
 import app.mobiling.client.usecase.order.detail.OrderLoadDetailUseCase
-import app.mobiling.client.usecase.order.listing.ListOrdersUseCase
+import app.mobiling.client.usecase.order.listing.OrderListUseCase
 
 /**
  * Marketing America Corp. Oleksandr Tishchenko
@@ -23,8 +23,8 @@ class OrderFeatureBridge(
     private val listingGateway: OrderListingGateway,
     private val detailGateway: OrderDetailGateway,
 ) {
-    suspend fun list(query: ListOrdersQuery): List<OrderSummary> =
-        ListOrdersUseCase(listingGateway).invoke(query)
+    suspend fun list(query: OrderListQuery): List<OrderSummary> =
+        OrderListUseCase(listingGateway).invoke(query)
 
     suspend fun detail(orderId: String): OrderDetailPayload =
         OrderLoadDetailUseCase(detailGateway).invoke(orderId)

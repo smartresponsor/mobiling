@@ -6,7 +6,7 @@ import app.mobiling.client.contract.product.listing.ProductListQuery
 import app.mobiling.client.data.product.detail.ProductDetailGateway
 import app.mobiling.client.data.product.listing.ProductListingGateway
 import app.mobiling.client.usecase.product.detail.ProductLoadDetailUseCase
-import app.mobiling.client.usecase.product.listing.ListProductsUseCase
+import app.mobiling.client.usecase.product.listing.ProductListUseCase
 
 /**
  * Marketing America Corp. Oleksandr Tishchenko
@@ -24,7 +24,7 @@ class ProductFeatureBridge(
     private val detailGateway: ProductDetailGateway,
 ) {
     suspend fun list(query: ProductListQuery): List<ProductCardSummary> =
-        ListProductsUseCase(listingGateway).invoke(query)
+        ProductListUseCase(listingGateway).invoke(query)
 
     suspend fun detail(productId: String): ProductDetailPayload? =
         ProductLoadDetailUseCase(detailGateway).invoke(productId)

@@ -2,11 +2,11 @@ package app.mobiling.client.order
 
 import app.mobiling.client.shipment.ShipmentFeatureBridge
 import app.mobiling.client.contract.shipment.detail.ShipmentDetailPayload
-import app.mobiling.client.contract.shipment.tracking.ListShipmentsQuery
+import app.mobiling.client.contract.shipment.tracking.ShipmentListQuery
 import app.mobiling.client.contract.shipment.tracking.ShipmentTrackingSummary
 import app.mobiling.client.data.shipment.tracking.ShipmentTrackingGateway
 import app.mobiling.client.usecase.shipment.detail.ShipmentLoadDetailUseCase
-import app.mobiling.client.usecase.shipment.tracking.ListShipmentsUseCase
+import app.mobiling.client.usecase.shipment.tracking.ShipmentListUseCase
 
 /**
  * Marketing America Corp. Oleksandr Tishchenko
@@ -22,8 +22,8 @@ class OrderShipmentBridge(
 ) {
     constructor(feature: ShipmentFeatureBridge) : this(feature.gateway())
 
-    suspend fun list(query: ListShipmentsQuery): List<ShipmentTrackingSummary> =
-        ListShipmentsUseCase(gateway).invoke(query)
+    suspend fun list(query: ShipmentListQuery): List<ShipmentTrackingSummary> =
+        ShipmentListUseCase(gateway).invoke(query)
 
     suspend fun detail(shipmentId: String): ShipmentDetailPayload =
         ShipmentLoadDetailUseCase(gateway).invoke(shipmentId)

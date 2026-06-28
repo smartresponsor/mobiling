@@ -3,7 +3,7 @@ package app.mobiling.client.contract.project.listing
 /**
  * Marketing America Corp. Oleksandr Tishchenko
  */
-data class ListProjectsQuery(
+data class ProjectListQuery(
     val searchTerm: String?,
     val stateCode: String?,
     val cursor: String?,

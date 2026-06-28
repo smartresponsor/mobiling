@@ -7,7 +7,7 @@ import app.mobiling.client.data.product.listing.ProductListingGateway
 /**
  * Marketing America Corp. Oleksandr Tishchenko
  */
-class ListProductsUseCase(
+class ProductListUseCase(
     private val gateway: ProductListingGateway,
 ) {
     suspend operator fun invoke(query: ProductListQuery): List<ProductCardSummary> = gateway.listProducts(query)

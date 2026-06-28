@@ -2,7 +2,7 @@ package app.mobiling.client.data.message.thread
 
 import app.mobiling.client.contract.message.thread.MessageItemPayload
 import app.mobiling.client.contract.message.thread.MessageThreadSummary
-import app.mobiling.client.contract.message.thread.SendMessageRequest
+import app.mobiling.client.contract.message.thread.MessageSendRequest
 
 /**
  * Marketing America Corp. Oleksandr Tishchenko
@@ -10,5 +10,5 @@ import app.mobiling.client.contract.message.thread.SendMessageRequest
 interface MessageThreadGateway {
     suspend fun listThreads(): List<MessageThreadSummary>
     suspend fun listItems(threadId: String): List<MessageItemPayload>
-    suspend fun sendMessage(request: SendMessageRequest): MessageItemPayload
+    suspend fun sendMessage(request: MessageSendRequest): MessageItemPayload
 }
