@@ -3,7 +3,7 @@ package app.mobiling.client.contract.cart
 /**
  * Marketing America Corp. Oleksandr Tishchenko
  */
-data class MobileCartCheckoutHandoffPayload(
+data class CartCheckoutHandoffPayload(
     val cartId: String?,
     val cartToken: String,
     val handoffId: String,

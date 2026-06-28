@@ -30,7 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import app.mobiling.client.cart.CartFeatureBridge
-import app.mobiling.client.cart.MobileCartScreen
+import app.mobiling.client.cart.CartMobileScreen
 import app.mobiling.client.contract.navigation.shell.MobileNavigationItemPayload
 import app.mobiling.client.data.navigation.shell.NavigationShellGateway
 import app.mobiling.client.data.vendor.payout.VendorPayoutGateway
@@ -184,7 +184,7 @@ private fun DashboardContent(
 
         when (selectedRoute) {
             "cart" -> item {
-                MobileCartScreen(cartFeatureBridge = cartFeatureBridge)
+                CartMobileScreen(cartFeatureBridge = cartFeatureBridge)
             }
             "vendor" -> item {
                 ShellSection(title = "Vendor", items = shell.vendorContext, onItemClick = { item ->

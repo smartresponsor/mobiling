@@ -17,12 +17,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import app.mobiling.client.contract.cart.MobileCartPayload
+import app.mobiling.client.contract.cart.CartMobilePayload
 import kotlinx.coroutines.launch
 
 @Composable
-fun MobileCartScreen(cartFeatureBridge: CartFeatureBridge? = null) {
-    var cart by remember { mutableStateOf<MobileCartPayload?>(null) }
+fun CartMobileScreen(cartFeatureBridge: CartFeatureBridge? = null) {
+    var cart by remember { mutableStateOf<CartMobilePayload?>(null) }
     var error by remember { mutableStateOf<String?>(null) }
     val scope = rememberCoroutineScope()
 

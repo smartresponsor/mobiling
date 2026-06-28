@@ -1,10 +1,10 @@
 package app.mobiling.client.data.cart
 
-import app.mobiling.client.contract.cart.MobileCartPayload
+import app.mobiling.client.contract.cart.CartMobilePayload
 
 /**
  * Marketing America Corp. Oleksandr Tishchenko
  */
 interface CartReader {
-    suspend fun currentCart(): MobileCartPayload
+    suspend fun currentCart(): CartMobilePayload
 }

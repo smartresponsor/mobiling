@@ -1,9 +1,9 @@
 package app.mobiling.client.data.cart
 
-import app.mobiling.client.contract.cart.AddCartItemRequest
+import app.mobiling.client.contract.cart.CartAddItemRequest
+import app.mobiling.client.contract.cart.CartCheckoutHandoffPayload
 import app.mobiling.client.contract.cart.CartItemPayload
-import app.mobiling.client.contract.cart.MobileCartCheckoutHandoffPayload
-import app.mobiling.client.contract.cart.MobileCartPayload
+import app.mobiling.client.contract.cart.CartMobilePayload
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -13,17 +13,17 @@ import org.json.JSONObject
 /**
  * Marketing America Corp. Oleksandr Tishchenko
  */
-class HttpCartGateway(
+class CartHttpGateway(
     private val baseUrl: String,
     private val client: OkHttpClient = OkHttpClient(),
 ) : CartReader, CartWriter, CartCheckoutGateway {
     private val jsonMediaType = "application/json".toMediaType()
 
-    override suspend fun currentCart(): MobileCartPayload = cartFrom(
+    override suspend fun currentCart(): CartMobilePayload = cartFrom(
         sendCartRequest(method = "GET", path = "/cart/current", body = null),
     )
 
-    override suspend fun addItem(request: AddCartItemRequest): MobileCartPayload {
+    override suspend fun addItem(request: CartAddItemRequest): CartMobilePayload {
         val body = JSONObject()
             .put("offerReference", request.offerReference)
             .put("quantity", request.quantity)
@@ -35,17 +35,17 @@ class HttpCartGateway(
         return cartFrom(sendCartRequest(method = "POST", path = "/cart/item", body = body))
     }
 
-    override suspend fun prepareCheckoutHandoff(): MobileCartCheckoutHandoffPayload = handoffFrom(
+    override suspend fun prepareCheckoutHandoff(): CartCheckoutHandoffPayload = handoffFrom(
         sendCartRequest(method = "POST", path = "/cart/checkout-handoff", body = null),
     )
 
-    private fun cartFrom(json: JSONObject): MobileCartPayload {
+    private fun cartFrom(json: JSONObject): CartMobilePayload {
         val array = json.optJSONArray("items")
         val items = (0 until (array?.length() ?: 0)).mapNotNull { index ->
             array?.optJSONObject(index)?.let(::itemFrom)
         }
 
-        return MobileCartPayload(
+        return CartMobilePayload(
             cartId = stringOrNull(json, "cartId"),
             cartToken = json.optString("cartToken", ""),
             ownerReference = stringOrNull(json, "ownerReference"),
@@ -70,7 +70,7 @@ class HttpCartGateway(
         lineTotalMinor = json.optLong("lineTotalMinor", 0L),
     )
 
-    private fun handoffFrom(json: JSONObject): MobileCartCheckoutHandoffPayload = MobileCartCheckoutHandoffPayload(
+    private fun handoffFrom(json: JSONObject): CartCheckoutHandoffPayload = CartCheckoutHandoffPayload(
         cartId = stringOrNull(json, "cartId"),
         cartToken = json.optString("cartToken", ""),
         handoffId = json.optString("handoffId", ""),
