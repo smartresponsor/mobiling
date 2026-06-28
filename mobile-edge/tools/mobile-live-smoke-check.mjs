@@ -13,6 +13,13 @@ const routes = [
   { name: "vendorTransaction", path: `/vendor/transaction/${encodeURIComponent(vendorId)}`, ok: ["vendorId", "transactions", "payload"] },
 ];
 
+const requiredVendorContextRoutes = [
+  "vendor/summary",
+  "vendor/statement",
+  "vendor/payout",
+  "vendor/transaction",
+];
+
 function fail(message) {
   failures.push(message);
 }
@@ -46,6 +53,49 @@ function assertError(name, payload) {
 
   if ("string" !== typeof payload.message || "" === payload.message.trim()) {
     fail(`${name} error response is missing non-empty message.`);
+  }
+}
+
+function normalizeMobileRoute(value) {
+  if ("string" !== typeof value) {
+    return null;
+  }
+
+  let route = value.trim();
+
+  while (route.startsWith("/")) {
+    route = route.slice(1);
+  }
+
+  if (route.endsWith("/:vendorId")) {
+    route = route.slice(0, -10);
+  }
+
+  return route;
+}
+
+function assertNavigationShellVendorContext(payload) {
+  if (!isRecord(payload) || !isRecord(payload.locations)) {
+    fail("navigationShell response is missing locations object.");
+    return;
+  }
+
+  const vendorContext = payload.locations["mobile.vendor.context"];
+
+  if (!Array.isArray(vendorContext)) {
+    fail("navigationShell response is missing mobile.vendor.context location.");
+    return;
+  }
+
+  const activeRoutes = new Set(vendorContext
+    .filter((item) => isRecord(item) && true === item.enabled)
+    .map((item) => normalizeMobileRoute(item.route))
+    .filter((route) => null !== route));
+
+  for (const requiredRoute of requiredVendorContextRoutes) {
+    if (!activeRoutes.has(requiredRoute)) {
+      fail(`navigationShell mobile.vendor.context is missing active route '${requiredRoute}'.`);
+    }
   }
 }
 
@@ -83,6 +133,10 @@ async function request(route) {
 
     if (200 === response.status) {
       assertRequired(route.name, payload, route.ok);
+
+      if ("navigationShell" === route.name) {
+        assertNavigationShellVendorContext(payload);
+      }
     } else if ([400, 404, 422, 500, 503].includes(response.status)) {
       assertError(route.name, payload);
     } else {
