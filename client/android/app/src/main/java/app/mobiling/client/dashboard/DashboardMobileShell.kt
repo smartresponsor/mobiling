@@ -31,15 +31,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import app.mobiling.client.cart.CartFeatureBridge
 import app.mobiling.client.cart.CartMobileScreen
-import app.mobiling.client.contract.navigation.shell.MobileNavigationItemPayload
+import app.mobiling.client.contract.navigation.shell.NavigationMobileItemPayload
 import app.mobiling.client.data.navigation.shell.NavigationShellGateway
 import app.mobiling.client.data.vendor.payout.VendorPayoutGateway
 import app.mobiling.client.data.vendor.profile.VendorProfileGateway
 import app.mobiling.client.data.vendor.statement.VendorStatementGateway
 import app.mobiling.client.data.vendor.summary.VendorSummaryGateway
 import app.mobiling.client.data.vendor.transaction.VendorTransactionGateway
-import app.mobiling.client.ui.navigation.shell.MobileNavigationShellScreenContract
-import app.mobiling.client.usecase.navigation.shell.LoadNavigationShellUseCase
+import app.mobiling.client.ui.navigation.shell.NavigationMobileShellScreenContract
+import app.mobiling.client.usecase.navigation.shell.NavigationLoadShellUseCase
 import app.mobiling.client.vendor.VendorMobilePayoutScreen
 import app.mobiling.client.vendor.VendorMobileProfileScreen
 import app.mobiling.client.vendor.VendorMobileStatementScreen
@@ -48,7 +48,7 @@ import app.mobiling.client.vendor.VendorMobileTransactionScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MobileDashboardShell(
+fun DashboardMobileShell(
     navigationShellGateway: NavigationShellGateway?,
     cartFeatureBridge: CartFeatureBridge? = null,
     vendorId: String? = null,
@@ -66,7 +66,7 @@ fun MobileDashboardShell(
     LaunchedEffect(navigationShellGateway) {
         if (navigationShellGateway != null) {
             shell = try {
-                MobileNavigationShellScreenContract.from(LoadNavigationShellUseCase(navigationShellGateway).invoke())
+                NavigationMobileShellScreenContract.from(NavigationLoadShellUseCase(navigationShellGateway).invoke())
             } catch (_: Exception) {
                 fallbackShell()
             }
@@ -143,7 +143,7 @@ fun MobileDashboardShell(
 @Composable
 private fun DashboardContent(
     selectedRoute: String,
-    shell: MobileNavigationShellScreenContract,
+    shell: NavigationMobileShellScreenContract,
     cartFeatureBridge: CartFeatureBridge?,
     vendorId: String?,
     vendorProfileGateway: VendorProfileGateway?,
@@ -221,8 +221,8 @@ private fun DashboardContent(
 @Composable
 private fun ShellSection(
     title: String,
-    items: List<MobileNavigationItemPayload>,
-    onItemClick: (MobileNavigationItemPayload) -> Unit = {},
+    items: List<NavigationMobileItemPayload>,
+    onItemClick: (NavigationMobileItemPayload) -> Unit = {},
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -250,7 +250,7 @@ private fun ShellSection(
     }
 }
 
-private fun iconLabel(item: MobileNavigationItemPayload): String =
+private fun iconLabel(item: NavigationMobileItemPayload): String =
     when (item.icon) {
         "cart" -> "🛒"
         "store" -> "🏬"
@@ -268,7 +268,7 @@ private fun iconLabel(item: MobileNavigationItemPayload): String =
         else -> "⌂"
     }
 
-private fun fallbackShell(): MobileNavigationShellScreenContract = MobileNavigationShellScreenContract(
+private fun fallbackShell(): NavigationMobileShellScreenContract = NavigationMobileShellScreenContract(
     bottomPrimary = listOf(
         item("dashboard", "Dashboard", "dashboard", true, "dashboard"),
         item("cart", "Cart", "cart", true, "cart"),
@@ -308,7 +308,7 @@ private fun item(
     enabled: Boolean,
     route: String,
     action: String? = null,
-): MobileNavigationItemPayload = MobileNavigationItemPayload(
+): NavigationMobileItemPayload = NavigationMobileItemPayload(
     key = key,
     label = label,
     icon = icon,

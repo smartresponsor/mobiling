@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import app.mobiling.client.contract.auth.session.AccessAuthSessionPayload
 import app.mobiling.client.auth.AccessAuthFeatureBridge
 import app.mobiling.client.cart.CartFeatureBridge
-import app.mobiling.client.dashboard.MobileDashboardShell
+import app.mobiling.client.dashboard.DashboardMobileShell
 import app.mobiling.client.data.navigation.shell.NavigationShellGateway
 import app.mobiling.client.data.vendor.payout.VendorPayoutGateway
 import app.mobiling.client.data.vendor.profile.VendorProfileGateway
@@ -68,7 +68,7 @@ fun MobilingAppShell(
 
     Surface(Modifier.fillMaxSize()) {
         when (currentScreen) {
-            AccessScreen.Dashboard -> MobileDashboardShell(
+            AccessScreen.Dashboard -> DashboardMobileShell(
                 navigationShellGateway = navigationShellGateway,
                 cartFeatureBridge = cartFeatureBridge,
                 vendorId = activeVendorId,

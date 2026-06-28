@@ -12,7 +12,7 @@ import app.mobiling.client.auth.AccessAuthFeatureBridge
 import app.mobiling.client.cart.CartFeatureBridge
 import app.mobiling.client.data.auth.session.AccessHttpAuthSessionGateway
 import app.mobiling.client.data.cart.CartHttpGateway
-import app.mobiling.client.data.navigation.shell.HttpNavigationShellGateway
+import app.mobiling.client.data.navigation.shell.NavigationHttpShellGateway
 import app.mobiling.client.data.vendor.payout.VendorHttpPayoutGateway
 import app.mobiling.client.data.vendor.profile.VendorHttpProfileGateway
 import app.mobiling.client.data.vendor.statement.VendorHttpStatementGateway
@@ -38,7 +38,7 @@ class MainActivity : ComponentActivity() {
                     MobilingAppShell(
                         accessAuthFeatureBridge = accessAuthFeatureBridge,
                         cartFeatureBridge = cartFeatureBridge,
-                        navigationShellGateway = HttpNavigationShellGateway(baseUrl = MobileClientRuntimeConfig.mobileEdgeBaseUrl),
+                        navigationShellGateway = NavigationHttpShellGateway(baseUrl = MobileClientRuntimeConfig.mobileEdgeBaseUrl),
                         vendorProfileGateway = VendorHttpProfileGateway(baseUrl = MobileClientRuntimeConfig.mobileEdgeBaseUrl),
                         vendorSummaryGateway = VendorHttpSummaryGateway(baseUrl = MobileClientRuntimeConfig.mobileEdgeBaseUrl),
                         vendorStatementGateway = VendorHttpStatementGateway(baseUrl = MobileClientRuntimeConfig.mobileEdgeBaseUrl),

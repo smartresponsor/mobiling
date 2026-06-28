@@ -1,17 +1,17 @@
 package app.mobiling.client.data.navigation.shell
 
-import app.mobiling.client.contract.navigation.shell.MobileNavigationItemPayload
-import app.mobiling.client.contract.navigation.shell.MobileNavigationShellPayload
+import app.mobiling.client.contract.navigation.shell.NavigationMobileItemPayload
+import app.mobiling.client.contract.navigation.shell.NavigationMobileShellPayload
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.json.JSONArray
 import org.json.JSONObject
 
-class HttpNavigationShellGateway(
+class NavigationHttpShellGateway(
     private val baseUrl: String,
     private val client: OkHttpClient = OkHttpClient(),
 ) : NavigationShellGateway {
-    override suspend fun loadMobileShell(): MobileNavigationShellPayload {
+    override suspend fun loadMobileShell(): NavigationMobileShellPayload {
         val request = Request.Builder()
             .url(normalizedBaseUrl() + "/navigation/mobile/shell")
             .header("Accept", "application/json")
@@ -28,16 +28,16 @@ class HttpNavigationShellGateway(
         }
     }
 
-    private fun payloadFrom(responseBody: String): MobileNavigationShellPayload {
+    private fun payloadFrom(responseBody: String): NavigationMobileShellPayload {
         val json = JSONObject(responseBody)
         val locationsJson = json.optJSONObject("locations") ?: JSONObject()
-        val locations = mutableMapOf<String, List<MobileNavigationItemPayload>>()
+        val locations = mutableMapOf<String, List<NavigationMobileItemPayload>>()
 
         locationsJson.keys().forEach { location ->
             locations[location] = itemsFrom(locationsJson.optJSONArray(location) ?: JSONArray())
         }
 
-        return MobileNavigationShellPayload(
+        return NavigationMobileShellPayload(
             schema = json.optString("schema", "smartresponsor.navigation.mobile.shell.v1"),
             channel = json.optString("channel", "mobile"),
             platforms = stringsFrom(json.optJSONArray("platforms") ?: JSONArray()),
@@ -45,11 +45,11 @@ class HttpNavigationShellGateway(
         )
     }
 
-    private fun itemsFrom(itemsJson: JSONArray): List<MobileNavigationItemPayload> =
+    private fun itemsFrom(itemsJson: JSONArray): List<NavigationMobileItemPayload> =
         (0 until itemsJson.length()).mapNotNull { index ->
             val item = itemsJson.optJSONObject(index) ?: return@mapNotNull null
 
-            MobileNavigationItemPayload(
+            NavigationMobileItemPayload(
                 key = item.optString("key"),
                 label = item.optString("label"),
                 icon = nullableString(item, "icon"),

@@ -1,15 +1,15 @@
 package app.mobiling.client.contract.navigation.shell
 
-data class MobileNavigationShellPayload(
+data class NavigationMobileShellPayload(
     val schema: String,
     val channel: String,
     val platforms: List<String>,
-    val locations: Map<String, List<MobileNavigationItemPayload>>,
+    val locations: Map<String, List<NavigationMobileItemPayload>>,
 ) {
-    fun items(location: String): List<MobileNavigationItemPayload> = locations[location].orEmpty()
+    fun items(location: String): List<NavigationMobileItemPayload> = locations[location].orEmpty()
 }
 
-data class MobileNavigationItemPayload(
+data class NavigationMobileItemPayload(
     val key: String,
     val label: String,
     val icon: String?,

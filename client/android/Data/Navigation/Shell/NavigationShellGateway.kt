@@ -1,7 +1,7 @@
 package app.mobiling.client.data.navigation.shell
 
-import app.mobiling.client.contract.navigation.shell.MobileNavigationShellPayload
+import app.mobiling.client.contract.navigation.shell.NavigationMobileShellPayload
 
 interface NavigationShellGateway {
-    suspend fun loadMobileShell(): MobileNavigationShellPayload
+    suspend fun loadMobileShell(): NavigationMobileShellPayload
 }
