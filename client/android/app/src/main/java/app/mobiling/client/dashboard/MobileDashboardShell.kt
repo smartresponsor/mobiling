@@ -32,9 +32,11 @@ import androidx.compose.ui.unit.dp
 import app.mobiling.client.contract.navigation.shell.MobileNavigationItemPayload
 import app.mobiling.client.data.navigation.shell.NavigationShellGateway
 import app.mobiling.client.data.vendor.profile.VendorProfileGateway
+import app.mobiling.client.data.vendor.summary.VendorSummaryGateway
 import app.mobiling.client.ui.navigation.shell.MobileNavigationShellScreenContract
 import app.mobiling.client.usecase.navigation.shell.LoadNavigationShellUseCase
 import app.mobiling.client.vendor.MobileVendorProfileScreen
+import app.mobiling.client.vendor.MobileVendorSummaryScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -42,6 +44,7 @@ fun MobileDashboardShell(
     navigationShellGateway: NavigationShellGateway?,
     vendorId: String? = null,
     vendorProfileGateway: VendorProfileGateway? = null,
+    vendorSummaryGateway: VendorSummaryGateway? = null,
     onSignOut: () -> Unit,
 ) {
     var selectedRoute by remember { mutableStateOf("dashboard") }
@@ -97,6 +100,7 @@ fun MobileDashboardShell(
             shell = shell,
             vendorId = vendorId,
             vendorProfileGateway = vendorProfileGateway,
+            vendorSummaryGateway = vendorSummaryGateway,
             onRouteSelected = { route -> if (isHandledRoute(route)) selectedRoute = route },
             padding = padding,
         )
@@ -126,6 +130,7 @@ private fun DashboardContent(
     shell: MobileNavigationShellScreenContract,
     vendorId: String?,
     vendorProfileGateway: VendorProfileGateway?,
+    vendorSummaryGateway: VendorSummaryGateway?,
     onRouteSelected: (String) -> Unit,
     padding: PaddingValues,
 ) {
@@ -166,7 +171,7 @@ private fun DashboardContent(
                 MobileVendorProfileScreen(vendorId = vendorId, vendorProfileGateway = vendorProfileGateway)
             }
             "vendor/summary" -> item {
-                Text("Vendor Summary will be connected to mobile-edge vendor data.")
+                MobileVendorSummaryScreen(vendorId = vendorId, vendorSummaryGateway = vendorSummaryGateway)
             }
             "vendor/statement" -> item {
                 Text("Vendor Statement will be connected to mobile-edge vendor data.")
@@ -295,3 +300,4 @@ private fun item(
 
 private fun isHandledRoute(route: String?): Boolean =
     setOf("dashboard", "vendor", "vendor/profile", "vendor/summary", "vendor/statement", "vendor/payout", "vendor/transaction", "more").contains(route)
+
