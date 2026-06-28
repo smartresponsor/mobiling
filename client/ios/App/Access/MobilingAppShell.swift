@@ -8,8 +8,9 @@ public struct MobilingAppShell: View {
     private let vendorProfileGateway: VendorProfileGateway?
     private let vendorSummaryGateway: VendorSummaryGateway?
     private let vendorStatementGateway: VendorStatementGateway?
+    private let vendorPayoutGateway: VendorPayoutGateway?
 
-    public init(authFeatureBridge: AuthFeatureBridge? = nil, navigationShellGateway: NavigationShellGateway? = nil, vendorProfileGateway: VendorProfileGateway? = nil, vendorSummaryGateway: VendorSummaryGateway? = nil, vendorStatementGateway: VendorStatementGateway? = nil) {
+    public init(authFeatureBridge: AuthFeatureBridge? = nil, navigationShellGateway: NavigationShellGateway? = nil, vendorProfileGateway: VendorProfileGateway? = nil, vendorSummaryGateway: VendorSummaryGateway? = nil, vendorStatementGateway: VendorStatementGateway? = nil, vendorPayoutGateway: VendorPayoutGateway? = nil) {
         self.authFeatureBridge = authFeatureBridge
         self.navigationShellGateway = navigationShellGateway
         self.vendorProfileGateway = vendorProfileGateway
@@ -27,6 +28,7 @@ public struct MobilingAppShell: View {
                     vendorProfileGateway: vendorProfileGateway,
                     vendorSummaryGateway: vendorSummaryGateway,
                     vendorStatementGateway: vendorStatementGateway,
+                    vendorPayoutGateway: vendorPayoutGateway,
                     onSignOut: { clearAccessSession() }
                 )
             case .welcome:
