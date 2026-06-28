@@ -12,7 +12,8 @@
     "smoke:local": "node tools/mobile-live-smoke-check.mjs",
     "smoke:public": "node tools/mobile-public-smoke-check.mjs",
     "quality:gate": "npm run typecheck && npm run build && npm run contract:guard",
-    "start": "node dist/app.js"
+    "start": "node dist/app.js",
+    "dev:restart": "npm run build && node tools/mobile-edge-restart-local.mjs"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.600.0",
