@@ -1,15 +1,15 @@
 package app.mobiling.client.data.vendor.profile
 
-import app.mobiling.client.contract.vendor.profile.MobileVendorProfilePayload
+import app.mobiling.client.contract.vendor.profile.VendorMobileProfilePayload
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.json.JSONObject
 
-class HttpVendorProfileGateway(
+class VendorHttpProfileGateway(
     private val baseUrl: String,
     private val client: OkHttpClient = OkHttpClient(),
 ) : VendorProfileGateway {
-    override suspend fun loadVendorProfile(vendorId: String): MobileVendorProfilePayload {
+    override suspend fun loadVendorProfile(vendorId: String): VendorMobileProfilePayload {
         val request = Request.Builder()
             .url(normalizedBaseUrl() + "/vendor/profile/" + vendorId.encodePathSegment())
             .header("Accept", "application/json")
@@ -26,10 +26,10 @@ class HttpVendorProfileGateway(
         }
     }
 
-    private fun payloadFrom(fallbackVendorId: String, responseBody: String): MobileVendorProfilePayload {
+    private fun payloadFrom(fallbackVendorId: String, responseBody: String): VendorMobileProfilePayload {
         val json = JSONObject(responseBody)
 
-        return MobileVendorProfilePayload(
+        return VendorMobileProfilePayload(
             vendorId = nullableString(json, "vendorId") ?: fallbackVendorId,
             displayName = nullableString(json, "displayName"),
             brandName = nullableString(json, "brandName"),

@@ -13,11 +13,11 @@ import app.mobiling.client.cart.CartFeatureBridge
 import app.mobiling.client.data.auth.session.HttpAuthSessionGateway
 import app.mobiling.client.data.cart.CartHttpGateway
 import app.mobiling.client.data.navigation.shell.HttpNavigationShellGateway
-import app.mobiling.client.data.vendor.payout.HttpVendorPayoutGateway
-import app.mobiling.client.data.vendor.profile.HttpVendorProfileGateway
-import app.mobiling.client.data.vendor.statement.HttpVendorStatementGateway
-import app.mobiling.client.data.vendor.summary.HttpVendorSummaryGateway
-import app.mobiling.client.data.vendor.transaction.HttpVendorTransactionGateway
+import app.mobiling.client.data.vendor.payout.VendorHttpPayoutGateway
+import app.mobiling.client.data.vendor.profile.VendorHttpProfileGateway
+import app.mobiling.client.data.vendor.statement.VendorHttpStatementGateway
+import app.mobiling.client.data.vendor.summary.VendorHttpSummaryGateway
+import app.mobiling.client.data.vendor.transaction.VendorHttpTransactionGateway
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,11 +39,11 @@ class MainActivity : ComponentActivity() {
                         authFeatureBridge = authFeatureBridge,
                         cartFeatureBridge = cartFeatureBridge,
                         navigationShellGateway = HttpNavigationShellGateway(baseUrl = MobileClientRuntimeConfig.mobileEdgeBaseUrl),
-                        vendorProfileGateway = HttpVendorProfileGateway(baseUrl = MobileClientRuntimeConfig.mobileEdgeBaseUrl),
-                        vendorSummaryGateway = HttpVendorSummaryGateway(baseUrl = MobileClientRuntimeConfig.mobileEdgeBaseUrl),
-                        vendorStatementGateway = HttpVendorStatementGateway(baseUrl = MobileClientRuntimeConfig.mobileEdgeBaseUrl),
-                        vendorPayoutGateway = HttpVendorPayoutGateway(baseUrl = MobileClientRuntimeConfig.mobileEdgeBaseUrl),
-                        vendorTransactionGateway = HttpVendorTransactionGateway(baseUrl = MobileClientRuntimeConfig.mobileEdgeBaseUrl),
+                        vendorProfileGateway = VendorHttpProfileGateway(baseUrl = MobileClientRuntimeConfig.mobileEdgeBaseUrl),
+                        vendorSummaryGateway = VendorHttpSummaryGateway(baseUrl = MobileClientRuntimeConfig.mobileEdgeBaseUrl),
+                        vendorStatementGateway = VendorHttpStatementGateway(baseUrl = MobileClientRuntimeConfig.mobileEdgeBaseUrl),
+                        vendorPayoutGateway = VendorHttpPayoutGateway(baseUrl = MobileClientRuntimeConfig.mobileEdgeBaseUrl),
+                        vendorTransactionGateway = VendorHttpTransactionGateway(baseUrl = MobileClientRuntimeConfig.mobileEdgeBaseUrl),
                     )
                 }
             }

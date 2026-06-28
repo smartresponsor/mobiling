@@ -1,12 +1,12 @@
 package app.mobiling.client.usecase.vendor.summary
 
-import app.mobiling.client.contract.vendor.summary.MobileVendorSummaryPayload
+import app.mobiling.client.contract.vendor.summary.VendorMobileSummaryPayload
 import app.mobiling.client.data.vendor.summary.VendorSummaryGateway
 
-class LoadVendorSummaryUseCase(
+class VendorLoadSummaryUseCase(
     private val gateway: VendorSummaryGateway,
 ) {
-    suspend fun load(vendorId: String): MobileVendorSummaryPayload {
+    suspend fun load(vendorId: String): VendorMobileSummaryPayload {
         return gateway.loadVendorSummary(vendorId)
     }
 }

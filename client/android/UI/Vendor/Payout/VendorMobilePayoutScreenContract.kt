@@ -1,8 +1,8 @@
 package app.mobiling.client.ui.vendor.payout
 
-import app.mobiling.client.contract.vendor.payout.MobileVendorPayoutPayload
+import app.mobiling.client.contract.vendor.payout.VendorMobilePayoutPayload
 
-data class MobileVendorPayoutScreenContract(
+data class VendorMobilePayoutScreenContract(
     val vendorId: String,
     val payoutStatus: String?,
     val currency: String?,
@@ -11,7 +11,7 @@ data class MobileVendorPayoutScreenContract(
     val payoutAccountLabel: String?,
 ) {
     companion object {
-        fun from(payload: MobileVendorPayoutPayload): MobileVendorPayoutScreenContract = MobileVendorPayoutScreenContract(
+        fun from(payload: VendorMobilePayoutPayload): VendorMobilePayoutScreenContract = VendorMobilePayoutScreenContract(
             vendorId = payload.vendorId,
             payoutStatus = payload.payoutStatus,
             currency = payload.currency,

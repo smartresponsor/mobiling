@@ -1,15 +1,15 @@
 package app.mobiling.client.data.vendor.summary
 
-import app.mobiling.client.contract.vendor.summary.MobileVendorSummaryPayload
+import app.mobiling.client.contract.vendor.summary.VendorMobileSummaryPayload
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.json.JSONObject
 
-class HttpVendorSummaryGateway(
+class VendorHttpSummaryGateway(
     private val baseUrl: String,
     private val client: OkHttpClient = OkHttpClient(),
 ) : VendorSummaryGateway {
-    override suspend fun loadVendorSummary(vendorId: String): MobileVendorSummaryPayload {
+    override suspend fun loadVendorSummary(vendorId: String): VendorMobileSummaryPayload {
         val request = Request.Builder()
             .url(normalizedBaseUrl() + "/vendor/summary/" + vendorId.encodePathSegment())
             .header("Accept", "application/json")
@@ -26,10 +26,10 @@ class HttpVendorSummaryGateway(
         }
     }
 
-    private fun payloadFrom(fallbackVendorId: String, responseBody: String): MobileVendorSummaryPayload {
+    private fun payloadFrom(fallbackVendorId: String, responseBody: String): VendorMobileSummaryPayload {
         val json = JSONObject(responseBody)
 
-        return MobileVendorSummaryPayload(
+        return VendorMobileSummaryPayload(
             vendorId = nullableString(json, "vendorId") ?: fallbackVendorId,
             brandName = nullableString(json, "brandName"),
             status = nullableString(json, "status"),

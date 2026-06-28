@@ -1,11 +1,11 @@
 package app.mobiling.client.contract.vendor.transaction
 
-data class MobileVendorTransactionPayload(
+data class VendorMobileTransactionPayload(
     val vendorId: String,
-    val transactions: List<MobileVendorTransactionItemPayload>,
+    val transactions: List<VendorMobileTransactionItemPayload>,
 )
 
-data class MobileVendorTransactionItemPayload(
+data class VendorMobileTransactionItemPayload(
     val id: String?,
     val status: String?,
     val type: String?,

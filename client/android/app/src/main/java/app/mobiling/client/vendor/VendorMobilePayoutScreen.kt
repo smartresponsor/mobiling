@@ -13,18 +13,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import app.mobiling.client.data.vendor.payout.VendorPayoutGateway
-import app.mobiling.client.ui.vendor.payout.MobileVendorPayoutScreenContract
-import app.mobiling.client.usecase.vendor.payout.LoadVendorPayoutUseCase
+import app.mobiling.client.ui.vendor.payout.VendorMobilePayoutScreenContract
+import app.mobiling.client.usecase.vendor.payout.VendorLoadPayoutUseCase
 
 @Composable
-fun MobileVendorPayoutScreen(vendorId: String?, vendorPayoutGateway: VendorPayoutGateway?) {
-    var payout by remember { mutableStateOf<MobileVendorPayoutScreenContract?>(null) }
+fun VendorMobilePayoutScreen(vendorId: String?, vendorPayoutGateway: VendorPayoutGateway?) {
+    var payout by remember { mutableStateOf<VendorMobilePayoutScreenContract?>(null) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     LaunchedEffect(vendorId, vendorPayoutGateway) {
         payout = null; errorMessage = null
         if (vendorId.isNullOrBlank()) { errorMessage = "Payout requires an active vendor session."; return@LaunchedEffect }
         if (vendorPayoutGateway == null) { errorMessage = "Vendor payout gateway is not available."; return@LaunchedEffect }
-        try { payout = MobileVendorPayoutScreenContract.from(LoadVendorPayoutUseCase(vendorPayoutGateway).load(vendorId)) } catch (exception: Exception) { errorMessage = exception.message ?: "Vendor payout is temporarily unavailable." }
+        try { payout = VendorMobilePayoutScreenContract.from(VendorLoadPayoutUseCase(vendorPayoutGateway).load(vendorId)) } catch (exception: Exception) { errorMessage = exception.message ?: "Vendor payout is temporarily unavailable." }
     }
     LazyColumn(contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item { Text("Vendor Payout", fontWeight = FontWeight.Bold) }

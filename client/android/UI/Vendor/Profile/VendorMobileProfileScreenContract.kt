@@ -1,8 +1,8 @@
 package app.mobiling.client.ui.vendor.profile
 
-import app.mobiling.client.contract.vendor.profile.MobileVendorProfilePayload
+import app.mobiling.client.contract.vendor.profile.VendorMobileProfilePayload
 
-data class MobileVendorProfileScreenContract(
+data class VendorMobileProfileScreenContract(
     val vendorId: String,
     val title: String,
     val brandName: String?,
@@ -17,8 +17,8 @@ data class MobileVendorProfileScreenContract(
     val publicationStatus: String?,
 ) {
     companion object {
-        fun from(payload: MobileVendorProfilePayload): MobileVendorProfileScreenContract =
-            MobileVendorProfileScreenContract(
+        fun from(payload: VendorMobileProfilePayload): VendorMobileProfileScreenContract =
+            VendorMobileProfileScreenContract(
                 vendorId = payload.vendorId,
                 title = payload.displayName ?: payload.brandName ?: "My Profile",
                 brandName = payload.brandName,

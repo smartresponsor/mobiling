@@ -1,8 +1,8 @@
 package app.mobiling.client.ui.vendor.summary
 
-import app.mobiling.client.contract.vendor.summary.MobileVendorSummaryPayload
+import app.mobiling.client.contract.vendor.summary.VendorMobileSummaryPayload
 
-data class MobileVendorSummaryScreenContract(
+data class VendorMobileSummaryScreenContract(
     val vendorId: String,
     val title: String,
     val brandName: String?,
@@ -11,8 +11,8 @@ data class MobileVendorSummaryScreenContract(
     val nextAction: String?,
 ) {
     companion object {
-        fun from(payload: MobileVendorSummaryPayload): MobileVendorSummaryScreenContract =
-            MobileVendorSummaryScreenContract(
+        fun from(payload: VendorMobileSummaryPayload): VendorMobileSummaryScreenContract =
+            VendorMobileSummaryScreenContract(
                 vendorId = payload.vendorId,
                 title = payload.brandName ?: "Vendor Summary",
                 brandName = payload.brandName,

@@ -13,18 +13,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import app.mobiling.client.data.vendor.statement.VendorStatementGateway
-import app.mobiling.client.ui.vendor.statement.MobileVendorStatementScreenContract
-import app.mobiling.client.usecase.vendor.statement.LoadVendorStatementUseCase
+import app.mobiling.client.ui.vendor.statement.VendorMobileStatementScreenContract
+import app.mobiling.client.usecase.vendor.statement.VendorLoadStatementUseCase
 
 @Composable
-fun MobileVendorStatementScreen(vendorId: String?, vendorStatementGateway: VendorStatementGateway?) {
-    var statement by remember { mutableStateOf<MobileVendorStatementScreenContract?>(null) }
+fun VendorMobileStatementScreen(vendorId: String?, vendorStatementGateway: VendorStatementGateway?) {
+    var statement by remember { mutableStateOf<VendorMobileStatementScreenContract?>(null) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     LaunchedEffect(vendorId, vendorStatementGateway) {
         statement = null; errorMessage = null
         if (vendorId.isNullOrBlank()) { errorMessage = "Statement requires an active vendor session."; return@LaunchedEffect }
         if (vendorStatementGateway == null) { errorMessage = "Vendor statement gateway is not available."; return@LaunchedEffect }
-        try { statement = MobileVendorStatementScreenContract.from(LoadVendorStatementUseCase(vendorStatementGateway).load(vendorId)) } catch (exception: Exception) { errorMessage = exception.message ?: "Vendor statement is temporarily unavailable." }
+        try { statement = VendorMobileStatementScreenContract.from(VendorLoadStatementUseCase(vendorStatementGateway).load(vendorId)) } catch (exception: Exception) { errorMessage = exception.message ?: "Vendor statement is temporarily unavailable." }
     }
     LazyColumn(contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item { Text("Vendor Statement", fontWeight = FontWeight.Bold) }

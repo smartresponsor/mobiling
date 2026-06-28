@@ -1,6 +1,6 @@
 package app.mobiling.client.contract.vendor.summary
 
-data class MobileVendorSummaryPayload(
+data class VendorMobileSummaryPayload(
     val vendorId: String,
     val brandName: String?,
     val status: String?,

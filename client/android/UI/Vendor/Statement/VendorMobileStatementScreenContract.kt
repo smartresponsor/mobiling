@@ -1,8 +1,8 @@
 package app.mobiling.client.ui.vendor.statement
 
-import app.mobiling.client.contract.vendor.statement.MobileVendorStatementPayload
+import app.mobiling.client.contract.vendor.statement.VendorMobileStatementPayload
 
-data class MobileVendorStatementScreenContract(
+data class VendorMobileStatementScreenContract(
     val vendorId: String,
     val statementStatus: String?,
     val currency: String?,
@@ -10,7 +10,7 @@ data class MobileVendorStatementScreenContract(
     val netAmount: Double,
 ) {
     companion object {
-        fun from(payload: MobileVendorStatementPayload): MobileVendorStatementScreenContract = MobileVendorStatementScreenContract(
+        fun from(payload: VendorMobileStatementPayload): VendorMobileStatementScreenContract = VendorMobileStatementScreenContract(
             vendorId = payload.vendorId,
             statementStatus = payload.statementStatus,
             currency = payload.currency,

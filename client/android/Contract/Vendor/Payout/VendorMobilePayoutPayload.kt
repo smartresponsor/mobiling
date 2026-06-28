@@ -1,6 +1,6 @@
 package app.mobiling.client.contract.vendor.payout
 
-data class MobileVendorPayoutPayload(
+data class VendorMobilePayoutPayload(
     val vendorId: String,
     val payoutStatus: String?,
     val currency: String?,

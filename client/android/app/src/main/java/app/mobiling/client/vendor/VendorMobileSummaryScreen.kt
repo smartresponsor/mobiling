@@ -18,15 +18,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import app.mobiling.client.data.vendor.summary.VendorSummaryGateway
-import app.mobiling.client.ui.vendor.summary.MobileVendorSummaryScreenContract
-import app.mobiling.client.usecase.vendor.summary.LoadVendorSummaryUseCase
+import app.mobiling.client.ui.vendor.summary.VendorMobileSummaryScreenContract
+import app.mobiling.client.usecase.vendor.summary.VendorLoadSummaryUseCase
 
 @Composable
-fun MobileVendorSummaryScreen(
+fun VendorMobileSummaryScreen(
     vendorId: String?,
     vendorSummaryGateway: VendorSummaryGateway?,
 ) {
-    var summary by remember { mutableStateOf<MobileVendorSummaryScreenContract?>(null) }
+    var summary by remember { mutableStateOf<VendorMobileSummaryScreenContract?>(null) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(vendorId, vendorSummaryGateway) {
@@ -44,8 +44,8 @@ fun MobileVendorSummaryScreen(
         }
 
         try {
-            summary = MobileVendorSummaryScreenContract.from(
-                LoadVendorSummaryUseCase(vendorSummaryGateway).load(vendorId),
+            summary = VendorMobileSummaryScreenContract.from(
+                VendorLoadSummaryUseCase(vendorSummaryGateway).load(vendorId),
             )
         } catch (exception: Exception) {
             errorMessage = exception.message ?: "Vendor summary is temporarily unavailable."

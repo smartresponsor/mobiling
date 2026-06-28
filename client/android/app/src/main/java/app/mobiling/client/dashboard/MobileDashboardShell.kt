@@ -40,11 +40,11 @@ import app.mobiling.client.data.vendor.summary.VendorSummaryGateway
 import app.mobiling.client.data.vendor.transaction.VendorTransactionGateway
 import app.mobiling.client.ui.navigation.shell.MobileNavigationShellScreenContract
 import app.mobiling.client.usecase.navigation.shell.LoadNavigationShellUseCase
-import app.mobiling.client.vendor.MobileVendorPayoutScreen
-import app.mobiling.client.vendor.MobileVendorProfileScreen
-import app.mobiling.client.vendor.MobileVendorStatementScreen
-import app.mobiling.client.vendor.MobileVendorSummaryScreen
-import app.mobiling.client.vendor.MobileVendorTransactionScreen
+import app.mobiling.client.vendor.VendorMobilePayoutScreen
+import app.mobiling.client.vendor.VendorMobileProfileScreen
+import app.mobiling.client.vendor.VendorMobileStatementScreen
+import app.mobiling.client.vendor.VendorMobileSummaryScreen
+import app.mobiling.client.vendor.VendorMobileTransactionScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -192,19 +192,19 @@ private fun DashboardContent(
                 })
             }
             "vendor/profile" -> item {
-                MobileVendorProfileScreen(vendorId = vendorId, vendorProfileGateway = vendorProfileGateway)
+                VendorMobileProfileScreen(vendorId = vendorId, vendorProfileGateway = vendorProfileGateway)
             }
             "vendor/summary" -> item {
-                MobileVendorSummaryScreen(vendorId = vendorId, vendorSummaryGateway = vendorSummaryGateway)
+                VendorMobileSummaryScreen(vendorId = vendorId, vendorSummaryGateway = vendorSummaryGateway)
             }
             "vendor/statement" -> item {
-                MobileVendorStatementScreen(vendorId = vendorId, vendorStatementGateway = vendorStatementGateway)
+                VendorMobileStatementScreen(vendorId = vendorId, vendorStatementGateway = vendorStatementGateway)
             }
             "vendor/payout" -> item {
-                MobileVendorPayoutScreen(vendorId = vendorId, vendorPayoutGateway = vendorPayoutGateway)
+                VendorMobilePayoutScreen(vendorId = vendorId, vendorPayoutGateway = vendorPayoutGateway)
             }
             "vendor/transaction" -> item {
-                MobileVendorTransactionScreen(vendorId = vendorId, vendorTransactionGateway = vendorTransactionGateway)
+                VendorMobileTransactionScreen(vendorId = vendorId, vendorTransactionGateway = vendorTransactionGateway)
             }
             "more" -> item {
                 ShellSection(title = "More", items = shell.moreDrawer, onItemClick = { item ->

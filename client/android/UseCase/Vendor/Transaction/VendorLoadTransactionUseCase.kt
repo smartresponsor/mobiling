@@ -1,12 +1,12 @@
 package app.mobiling.client.usecase.vendor.transaction
 
-import app.mobiling.client.contract.vendor.transaction.MobileVendorTransactionPayload
+import app.mobiling.client.contract.vendor.transaction.VendorMobileTransactionPayload
 import app.mobiling.client.data.vendor.transaction.VendorTransactionGateway
 
-class LoadVendorTransactionUseCase(
+class VendorLoadTransactionUseCase(
     private val gateway: VendorTransactionGateway,
 ) {
-    suspend fun load(vendorId: String): MobileVendorTransactionPayload {
+    suspend fun load(vendorId: String): VendorMobileTransactionPayload {
         return gateway.loadVendorTransaction(vendorId)
     }
 }

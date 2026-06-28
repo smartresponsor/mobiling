@@ -1,6 +1,6 @@
 package app.mobiling.client.contract.vendor.profile
 
-data class MobileVendorProfilePayload(
+data class VendorMobileProfilePayload(
     val vendorId: String,
     val displayName: String?,
     val brandName: String?,

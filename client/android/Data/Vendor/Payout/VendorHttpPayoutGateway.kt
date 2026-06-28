@@ -1,15 +1,15 @@
 package app.mobiling.client.data.vendor.payout
 
-import app.mobiling.client.contract.vendor.payout.MobileVendorPayoutPayload
+import app.mobiling.client.contract.vendor.payout.VendorMobilePayoutPayload
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.json.JSONObject
 
-class HttpVendorPayoutGateway(
+class VendorHttpPayoutGateway(
     private val baseUrl: String,
     private val client: OkHttpClient = OkHttpClient(),
 ) : VendorPayoutGateway {
-    override suspend fun loadVendorPayout(vendorId: String): MobileVendorPayoutPayload {
+    override suspend fun loadVendorPayout(vendorId: String): VendorMobilePayoutPayload {
         val request = Request.Builder()
             .url(baseUrl.trimEnd('/') + "/vendor/payout/" + vendorId)
             .header("Accept", "application/json")
@@ -22,9 +22,9 @@ class HttpVendorPayoutGateway(
         }
     }
 
-    private fun payloadFrom(fallbackVendorId: String, body: String): MobileVendorPayoutPayload {
+    private fun payloadFrom(fallbackVendorId: String, body: String): VendorMobilePayoutPayload {
         val json = JSONObject(body)
-        return MobileVendorPayoutPayload(
+        return VendorMobilePayoutPayload(
             vendorId = text(json, "vendorId") ?: fallbackVendorId,
             payoutStatus = text(json, "payoutStatus"),
             currency = text(json, "currency"),

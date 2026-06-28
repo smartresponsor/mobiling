@@ -1,15 +1,15 @@
 package app.mobiling.client.data.vendor.statement
 
-import app.mobiling.client.contract.vendor.statement.MobileVendorStatementPayload
+import app.mobiling.client.contract.vendor.statement.VendorMobileStatementPayload
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.json.JSONObject
 
-class HttpVendorStatementGateway(
+class VendorHttpStatementGateway(
     private val baseUrl: String,
     private val client: OkHttpClient = OkHttpClient(),
 ) : VendorStatementGateway {
-    override suspend fun loadVendorStatement(vendorId: String): MobileVendorStatementPayload {
+    override suspend fun loadVendorStatement(vendorId: String): VendorMobileStatementPayload {
         val request = Request.Builder()
             .url(normalizedBaseUrl() + "/vendor/statement/" + vendorId.encodePathSegment())
             .header("Accept", "application/json")
@@ -25,9 +25,9 @@ class HttpVendorStatementGateway(
         }
     }
 
-    private fun payloadFrom(fallbackVendorId: String, responseBody: String): MobileVendorStatementPayload {
+    private fun payloadFrom(fallbackVendorId: String, responseBody: String): VendorMobileStatementPayload {
         val json = JSONObject(responseBody)
-        return MobileVendorStatementPayload(
+        return VendorMobileStatementPayload(
             vendorId = nullableString(json, "vendorId") ?: fallbackVendorId,
             statementStatus = nullableString(json, "statementStatus"),
             currency = nullableString(json, "currency"),

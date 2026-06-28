@@ -19,15 +19,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import app.mobiling.client.data.vendor.profile.VendorProfileGateway
-import app.mobiling.client.ui.vendor.profile.MobileVendorProfileScreenContract
-import app.mobiling.client.usecase.vendor.profile.LoadVendorProfileUseCase
+import app.mobiling.client.ui.vendor.profile.VendorMobileProfileScreenContract
+import app.mobiling.client.usecase.vendor.profile.VendorLoadProfileUseCase
 
 @Composable
-fun MobileVendorProfileScreen(
+fun VendorMobileProfileScreen(
     vendorId: String?,
     vendorProfileGateway: VendorProfileGateway?,
 ) {
-    var profile by remember { mutableStateOf<MobileVendorProfileScreenContract?>(null) }
+    var profile by remember { mutableStateOf<VendorMobileProfileScreenContract?>(null) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(vendorId, vendorProfileGateway) {
@@ -45,8 +45,8 @@ fun MobileVendorProfileScreen(
         }
 
         try {
-            profile = MobileVendorProfileScreenContract.from(
-                LoadVendorProfileUseCase(vendorProfileGateway).invoke(vendorId),
+            profile = VendorMobileProfileScreenContract.from(
+                VendorLoadProfileUseCase(vendorProfileGateway).invoke(vendorId),
             )
         } catch (exception: Exception) {
             errorMessage = exception.message ?: "Vendor profile is temporarily unavailable."

@@ -1,7 +1,7 @@
 package app.mobiling.client.data.vendor.payout
 
-import app.mobiling.client.contract.vendor.payout.MobileVendorPayoutPayload
+import app.mobiling.client.contract.vendor.payout.VendorMobilePayoutPayload
 
 interface VendorPayoutGateway {
-    suspend fun loadVendorPayout(vendorId: String): MobileVendorPayoutPayload
+    suspend fun loadVendorPayout(vendorId: String): VendorMobilePayoutPayload
 }

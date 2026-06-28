@@ -14,18 +14,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import app.mobiling.client.data.vendor.transaction.VendorTransactionGateway
-import app.mobiling.client.ui.vendor.transaction.MobileVendorTransactionScreenContract
-import app.mobiling.client.usecase.vendor.transaction.LoadVendorTransactionUseCase
+import app.mobiling.client.ui.vendor.transaction.VendorMobileTransactionScreenContract
+import app.mobiling.client.usecase.vendor.transaction.VendorLoadTransactionUseCase
 
 @Composable
-fun MobileVendorTransactionScreen(vendorId: String?, vendorTransactionGateway: VendorTransactionGateway?) {
-    var transaction by remember { mutableStateOf<MobileVendorTransactionScreenContract?>(null) }
+fun VendorMobileTransactionScreen(vendorId: String?, vendorTransactionGateway: VendorTransactionGateway?) {
+    var transaction by remember { mutableStateOf<VendorMobileTransactionScreenContract?>(null) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     LaunchedEffect(vendorId, vendorTransactionGateway) {
         transaction = null; errorMessage = null
         if (vendorId.isNullOrBlank()) { errorMessage = "Transaction requires an active vendor session."; return@LaunchedEffect }
         if (vendorTransactionGateway == null) { errorMessage = "Vendor transaction gateway is not available."; return@LaunchedEffect }
-        try { transaction = MobileVendorTransactionScreenContract.from(LoadVendorTransactionUseCase(vendorTransactionGateway).load(vendorId)) } catch (exception: Exception) { errorMessage = exception.message ?: "Vendor transaction is temporarily unavailable." }
+        try { transaction = VendorMobileTransactionScreenContract.from(VendorLoadTransactionUseCase(vendorTransactionGateway).load(vendorId)) } catch (exception: Exception) { errorMessage = exception.message ?: "Vendor transaction is temporarily unavailable." }
     }
     LazyColumn(contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item { Text("Vendor Transaction", fontWeight = FontWeight.Bold) }
