@@ -15,6 +15,7 @@ import app.mobiling.client.data.vendor.payout.HttpVendorPayoutGateway
 import app.mobiling.client.data.vendor.profile.HttpVendorProfileGateway
 import app.mobiling.client.data.vendor.statement.HttpVendorStatementGateway
 import app.mobiling.client.data.vendor.summary.HttpVendorSummaryGateway
+import app.mobiling.client.data.vendor.transaction.HttpVendorTransactionGateway
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,6 +34,7 @@ class MainActivity : ComponentActivity() {
                         vendorSummaryGateway = HttpVendorSummaryGateway(baseUrl = MobileClientRuntimeConfig.mobileEdgeBaseUrl),
                         vendorStatementGateway = HttpVendorStatementGateway(baseUrl = MobileClientRuntimeConfig.mobileEdgeBaseUrl),
                         vendorPayoutGateway = HttpVendorPayoutGateway(baseUrl = MobileClientRuntimeConfig.mobileEdgeBaseUrl),
+                        vendorTransactionGateway = HttpVendorTransactionGateway(baseUrl = MobileClientRuntimeConfig.mobileEdgeBaseUrl),
                     )
                 }
             }

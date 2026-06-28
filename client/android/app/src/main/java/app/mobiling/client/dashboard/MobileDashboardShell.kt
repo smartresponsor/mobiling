@@ -35,12 +35,14 @@ import app.mobiling.client.data.vendor.payout.VendorPayoutGateway
 import app.mobiling.client.data.vendor.profile.VendorProfileGateway
 import app.mobiling.client.data.vendor.statement.VendorStatementGateway
 import app.mobiling.client.data.vendor.summary.VendorSummaryGateway
+import app.mobiling.client.data.vendor.transaction.VendorTransactionGateway
 import app.mobiling.client.ui.navigation.shell.MobileNavigationShellScreenContract
 import app.mobiling.client.usecase.navigation.shell.LoadNavigationShellUseCase
 import app.mobiling.client.vendor.MobileVendorPayoutScreen
 import app.mobiling.client.vendor.MobileVendorProfileScreen
 import app.mobiling.client.vendor.MobileVendorStatementScreen
 import app.mobiling.client.vendor.MobileVendorSummaryScreen
+import app.mobiling.client.vendor.MobileVendorTransactionScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -51,6 +53,7 @@ fun MobileDashboardShell(
     vendorSummaryGateway: VendorSummaryGateway? = null,
     vendorStatementGateway: VendorStatementGateway? = null,
     vendorPayoutGateway: VendorPayoutGateway? = null,
+    vendorTransactionGateway: VendorTransactionGateway? = null,
     onSignOut: () -> Unit,
 ) {
     var selectedRoute by remember { mutableStateOf("dashboard") }
@@ -109,6 +112,7 @@ fun MobileDashboardShell(
             vendorSummaryGateway = vendorSummaryGateway,
             vendorStatementGateway = vendorStatementGateway,
             vendorPayoutGateway = vendorPayoutGateway,
+            vendorTransactionGateway = vendorTransactionGateway,
             onRouteSelected = { route -> if (isHandledRoute(route)) selectedRoute = route },
             padding = padding,
         )
@@ -141,6 +145,7 @@ private fun DashboardContent(
     vendorSummaryGateway: VendorSummaryGateway?,
     vendorStatementGateway: VendorStatementGateway?,
     vendorPayoutGateway: VendorPayoutGateway?,
+    vendorTransactionGateway: VendorTransactionGateway?,
     onRouteSelected: (String) -> Unit,
     padding: PaddingValues,
 ) {
@@ -190,7 +195,7 @@ private fun DashboardContent(
                 MobileVendorPayoutScreen(vendorId = vendorId, vendorPayoutGateway = vendorPayoutGateway)
             }
             "vendor/transaction" -> item {
-                Text("Vendor Transaction will be connected to mobile-edge vendor data.")
+                MobileVendorTransactionScreen(vendorId = vendorId, vendorTransactionGateway = vendorTransactionGateway)
             }
             "more" -> item {
                 ShellSection(title = "More", items = shell.moreDrawer, onItemClick = { item ->
@@ -310,5 +315,6 @@ private fun item(
 
 private fun isHandledRoute(route: String?): Boolean =
     setOf("dashboard", "vendor", "vendor/profile", "vendor/summary", "vendor/statement", "vendor/payout", "vendor/transaction", "more").contains(route)
+
 
 

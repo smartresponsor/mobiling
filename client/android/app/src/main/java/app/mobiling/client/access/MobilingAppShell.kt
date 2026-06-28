@@ -18,6 +18,7 @@ import app.mobiling.client.data.vendor.payout.VendorPayoutGateway
 import app.mobiling.client.data.vendor.profile.VendorProfileGateway
 import app.mobiling.client.data.vendor.statement.VendorStatementGateway
 import app.mobiling.client.data.vendor.summary.VendorSummaryGateway
+import app.mobiling.client.data.vendor.transaction.VendorTransactionGateway
 import kotlinx.coroutines.launch
 
 @Composable
@@ -28,6 +29,7 @@ fun MobilingAppShell(
     vendorSummaryGateway: VendorSummaryGateway? = null,
     vendorStatementGateway: VendorStatementGateway? = null,
     vendorPayoutGateway: VendorPayoutGateway? = null,
+    vendorTransactionGateway: VendorTransactionGateway? = null,
 ) {
     var currentScreen by rememberSaveable { mutableStateOf(AccessScreen.Welcome) }
     var activeVendorId by rememberSaveable { mutableStateOf<String?>(null) }
@@ -71,6 +73,7 @@ fun MobilingAppShell(
                 vendorSummaryGateway = vendorSummaryGateway,
                 vendorStatementGateway = vendorStatementGateway,
                 vendorPayoutGateway = vendorPayoutGateway,
+                vendorTransactionGateway = vendorTransactionGateway,
                 onSignOut = { clearAccessSession() },
             )
 
