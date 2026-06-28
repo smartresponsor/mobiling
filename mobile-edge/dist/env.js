@@ -29,6 +29,8 @@ export const ENV = {
     VENDORING_API_TIMEOUT_MS: integer("VENDORING_API_TIMEOUT_MS", 3000),
     NAVIGATING_API_BASE_URL: process.env.NAVIGATING_API_BASE_URL || "",
     NAVIGATING_API_TIMEOUT_MS: integer("NAVIGATING_API_TIMEOUT_MS", 3000),
+    CARTING_API_BASE_URL: process.env.CARTING_API_BASE_URL || "",
+    CARTING_API_TIMEOUT_MS: integer("CARTING_API_TIMEOUT_MS", 3000),
     CORE_COMMERCE_URL: process.env.CORE_COMMERCE_URL || "http://localhost:9000",
     CORE_AUTH: process.env.CORE_AUTH || "",
     CORE_TIMEOUT_MS: integer("CORE_TIMEOUT_MS", 3000),
@@ -61,6 +63,7 @@ export function assertRuntimeEnv() {
         ["ACCESSING_API_BASE_URL", ENV.ACCESSING_API_BASE_URL, ""],
         ["VENDORING_API_BASE_URL", ENV.VENDORING_API_BASE_URL, ""],
         ["NAVIGATING_API_BASE_URL", ENV.NAVIGATING_API_BASE_URL, ""],
+        ["CARTING_API_BASE_URL", ENV.CARTING_API_BASE_URL, ""],
     ].filter(([, value, forbidden]) => value === forbidden).map(([name]) => name);
     if (invalid.length > 0) {
         throw new Error(`Unsafe production configuration: ${invalid.join(", ")}`);

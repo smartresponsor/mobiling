@@ -99,6 +99,36 @@
     },
     {
       "method": "GET",
+      "path": "/cart/current",
+      "owner": "Carting",
+      "routeFile": "src/routes/mobile/cart.ts",
+      "routeClass": "screen",
+      "screen": "cart.current",
+      "responseSchema": "MobileCartPayload",
+      "contractFile": "src/contract/mobile/cart.ts",
+      "fixture": "fixture/mobile/cart/current.success.json"
+    },
+    {
+      "method": "POST",
+      "path": "/cart/item",
+      "owner": "Carting",
+      "routeFile": "src/routes/mobile/cart.ts",
+      "routeClass": "transport",
+      "responseSchema": "MobileCartPayload"
+    },
+    {
+      "method": "POST",
+      "path": "/cart/checkout-handoff",
+      "owner": "Carting",
+      "routeFile": "src/routes/mobile/cart.ts",
+      "routeClass": "screen",
+      "screen": "cart.checkout-handoff",
+      "responseSchema": "MobileCartCheckoutHandoffPayload",
+      "contractFile": "src/contract/mobile/cart.ts",
+      "fixture": "fixture/mobile/cart/checkout-handoff.success.json"
+    },
+    {
+      "method": "GET",
       "path": "/navigation/mobile/shell",
       "owner": "Navigating",
       "routeFile": "src/routes/mobile/navigationShell.ts",

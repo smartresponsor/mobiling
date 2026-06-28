@@ -185,11 +185,11 @@ if ("mobile-edge" !== upstreamContract.consumer) {
   fail("mobile upstream contract consumer must stay mobile-edge.");
 }
 
-if (!Array.isArray(upstreamContract.routes) || 6 !== upstreamContract.routes.length) {
-  fail("mobile upstream contract must declare the six current screen upstream routes.");
+if (!Array.isArray(upstreamContract.routes) || upstreamContract.routes.length < 6) {
+  fail("mobile upstream contract must declare the baseline screen upstream routes and every added mobile business route.");
 }
 
-for (const file of ["src/client/navigating/navigatingApiClient.ts", "src/client/vendoring/vendoringApiClient.ts"]) {
+for (const file of ["src/client/carting/cartingApiClient.ts", "src/client/navigating/navigatingApiClient.ts", "src/client/vendoring/vendoringApiClient.ts"]) {
   const source = await readText(file);
 
   if (!source.includes("status >= 300 && status < 400") || !source.includes("resolve(this.unavailable())")) {

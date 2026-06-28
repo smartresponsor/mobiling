@@ -17,6 +17,24 @@
       "status": "declared-in-app"
     },
     {
+      "owner": "Carting",
+      "mobileRoute": "GET /cart/current",
+      "upstreamRoute": "GET /api/cart/current",
+      "status": "declared-in-app"
+    },
+    {
+      "owner": "Carting",
+      "mobileRoute": "POST /cart/item",
+      "upstreamRoute": "POST /api/cart/item",
+      "status": "declared-in-app"
+    },
+    {
+      "owner": "Carting",
+      "mobileRoute": "POST /cart/checkout-handoff",
+      "upstreamRoute": "POST /api/cart/checkout-handoff",
+      "status": "declared-in-app"
+    },
+    {
       "owner": "Vendoring",
       "mobileRoute": "GET /vendor/profile/:vendorId",
       "upstreamRoute": "GET /api/vendor/profile/show/{vendorId}",

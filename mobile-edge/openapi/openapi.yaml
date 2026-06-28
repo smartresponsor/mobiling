@@ -214,6 +214,33 @@ paths:
         '202': { description: Accepted, content: { application/json: { schema: { $ref: '#/components/schemas/MobileAccessSessionPayload' } } } }
         '422': { description: Invalid second factor payload, content: { application/json: { schema: { $ref: '#/components/schemas/MobileAccessErrorPayload' } } } }
         '503': { description: Accessing API unavailable, content: { application/json: { schema: { $ref: '#/components/schemas/MobileAccessErrorPayload' } } } }
+  /cart/current:
+    get:
+      summary: Mobile current cart
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/MobileCartPayload' } } } }
+        '503': { description: Carting API unavailable, content: { application/json: { schema: { $ref: '#/components/schemas/MobileAccessErrorPayload' } } } }
+  /cart/item:
+    post:
+      summary: Mobile add cart item
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/MobileCartItemMutationRequest' }
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/MobileCartPayload' } } } }
+        '201': { description: Created, content: { application/json: { schema: { $ref: '#/components/schemas/MobileCartPayload' } } } }
+        '422': { description: Invalid cart item payload, content: { application/json: { schema: { $ref: '#/components/schemas/MobileAccessErrorPayload' } } } }
+        '503': { description: Carting API unavailable, content: { application/json: { schema: { $ref: '#/components/schemas/MobileAccessErrorPayload' } } } }
+  /cart/checkout-handoff:
+    post:
+      summary: Mobile cart checkout handoff
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/MobileCartCheckoutHandoffPayload' } } } }
+        '201': { description: Created, content: { application/json: { schema: { $ref: '#/components/schemas/MobileCartCheckoutHandoffPayload' } } } }
+        '409': { description: Cart not ready, content: { application/json: { schema: { $ref: '#/components/schemas/MobileAccessErrorPayload' } } } }
+        '503': { description: Carting API unavailable, content: { application/json: { schema: { $ref: '#/components/schemas/MobileAccessErrorPayload' } } } }
   /navigation/mobile/shell:
     get:
       summary: Mobile navigation shell
@@ -446,6 +473,61 @@ components:
           type: array
           items: { type: string }
         locations: { type: object, additionalProperties: true }
+    MobileCartItemPayload:
+      type: object
+      additionalProperties: false
+      required: [itemId, offerReference, title, unitPriceMinor, currencyCode, quantity, lineTotalMinor, metadata]
+      properties:
+        itemId: { type: string, minLength: 1 }
+        offerReference: { type: string, minLength: 1 }
+        title: { type: string, minLength: 1 }
+        unitPriceMinor: { type: integer, minimum: 0 }
+        currencyCode: { type: string, minLength: 3 }
+        quantity: { type: integer, minimum: 1 }
+        lineTotalMinor: { type: integer, minimum: 0 }
+        metadata: { type: object, additionalProperties: true }
+    MobileCartPayload:
+      type: object
+      additionalProperties: false
+      required: [cartId, cartToken, ownerReference, status, currencyCode, itemCount, subtotalMinor, totalMinor, items, expiresAt, updatedAt, payload]
+      properties:
+        cartId: { anyOf: [{ type: string, minLength: 1 }, { type: 'null' }] }
+        cartToken: { type: string, minLength: 1 }
+        ownerReference: { anyOf: [{ type: string, minLength: 1 }, { type: 'null' }] }
+        status: { type: string, minLength: 1 }
+        currencyCode: { type: string, minLength: 3 }
+        itemCount: { type: integer, minimum: 0 }
+        subtotalMinor: { type: integer, minimum: 0 }
+        totalMinor: { type: integer, minimum: 0 }
+        items:
+          type: array
+          items: { $ref: '#/components/schemas/MobileCartItemPayload' }
+        expiresAt: { anyOf: [{ type: string, minLength: 1 }, { type: 'null' }] }
+        updatedAt: { anyOf: [{ type: string, minLength: 1 }, { type: 'null' }] }
+        payload: { type: object, additionalProperties: true }
+    MobileCartItemMutationRequest:
+      type: object
+      additionalProperties: false
+      required: [offerReference, quantity]
+      properties:
+        offerReference: { type: string, minLength: 1 }
+        quantity: { type: integer, minimum: 1 }
+        title: { anyOf: [{ type: string, minLength: 1 }, { type: 'null' }] }
+        unitPriceMinor: { anyOf: [{ type: integer, minimum: 0 }, { type: 'null' }] }
+        currencyCode: { anyOf: [{ type: string, minLength: 3 }, { type: 'null' }] }
+        metadata: { type: object, additionalProperties: true }
+    MobileCartCheckoutHandoffPayload:
+      type: object
+      additionalProperties: false
+      required: [cartId, cartToken, handoffId, checkoutUrl, status, expiresAt, payload]
+      properties:
+        cartId: { anyOf: [{ type: string, minLength: 1 }, { type: 'null' }] }
+        cartToken: { type: string, minLength: 1 }
+        handoffId: { type: string, minLength: 1 }
+        checkoutUrl: { anyOf: [{ type: string, minLength: 1 }, { type: 'null' }] }
+        status: { type: string, minLength: 1 }
+        expiresAt: { anyOf: [{ type: string, minLength: 1 }, { type: 'null' }] }
+        payload: { type: object, additionalProperties: true }
     MobileVendorProfilePayload:
       type: object
       additionalProperties: false

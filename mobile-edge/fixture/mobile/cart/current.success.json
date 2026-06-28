@@ -1,0 +1,29 @@
+{
+  "cartId": "cart-demo-001",
+  "cartToken": "cart-token-demo-001",
+  "ownerReference": "vendor-demo-001",
+  "status": "active",
+  "currencyCode": "USD",
+  "itemCount": 1,
+  "subtotalMinor": 2499,
+  "totalMinor": 2499,
+  "items": [
+    {
+      "itemId": "cart-item-demo-001",
+      "offerReference": "offer-demo-001",
+      "title": "Demo product",
+      "unitPriceMinor": 2499,
+      "currencyCode": "USD",
+      "quantity": 1,
+      "lineTotalMinor": 2499,
+      "metadata": {
+        "source": "mobile-contract"
+      }
+    }
+  ],
+  "expiresAt": "2026-07-28T00:00:00.000Z",
+  "updatedAt": "2026-06-28T00:00:00.000Z",
+  "payload": {
+    "fixture": true
+  }
+}
