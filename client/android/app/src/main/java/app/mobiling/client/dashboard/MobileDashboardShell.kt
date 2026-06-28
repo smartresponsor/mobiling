@@ -141,6 +141,10 @@ private fun DashboardContent(
                 text = when (selectedRoute) {
                     "vendor" -> "Vendor"
                     "vendor/profile" -> "My Profile"
+                    "vendor/summary" -> "Vendor Summary"
+                    "vendor/statement" -> "Vendor Statement"
+                    "vendor/payout" -> "Vendor Payout"
+                    "vendor/transaction" -> "Vendor Transaction"
                     "more" -> "More"
                     else -> "Dashboard"
                 },
@@ -160,6 +164,18 @@ private fun DashboardContent(
             }
             "vendor/profile" -> item {
                 MobileVendorProfileScreen(vendorId = vendorId, vendorProfileGateway = vendorProfileGateway)
+            }
+            "vendor/summary" -> item {
+                Text("Vendor Summary will be connected to mobile-edge vendor data.")
+            }
+            "vendor/statement" -> item {
+                Text("Vendor Statement will be connected to mobile-edge vendor data.")
+            }
+            "vendor/payout" -> item {
+                Text("Vendor Payout will be connected to mobile-edge vendor data.")
+            }
+            "vendor/transaction" -> item {
+                Text("Vendor Transaction will be connected to mobile-edge vendor data.")
             }
             "more" -> item {
                 ShellSection(title = "More", items = shell.moreDrawer, onItemClick = { item ->
@@ -214,6 +230,10 @@ private fun iconLabel(item: MobileNavigationItemPayload): String =
         "catalog" -> "🛍"
         "key" -> "🔑"
         "logout" -> "↩"
+        "summary" -> "📊"
+        "statement" -> "🧾"
+        "payout" -> "💵"
+        "receipt" -> "🧾"
         "menu" -> "☰"
         else -> "⌂"
     }
@@ -241,6 +261,10 @@ private fun fallbackShell(): MobileNavigationShellScreenContract = MobileNavigat
     vendorContext = listOf(
         item("vendor_overview", "My Vendor", "store", true, "vendor"),
         item("vendor_profile", "My Profile", "person", true, "vendor/profile"),
+        item("vendor_summary", "Summary", "summary", true, "vendor/summary"),
+        item("vendor_statement", "Statement", "statement", true, "vendor/statement"),
+        item("vendor_payout", "Payout", "payout", true, "vendor/payout"),
+        item("vendor_transaction", "Transaction", "receipt", true, "vendor/transaction"),
         item("vendor_attachment", "My Attachments", "attachment", false, "attachment"),
     ),
 )
@@ -270,4 +294,4 @@ private fun item(
 )
 
 private fun isHandledRoute(route: String?): Boolean =
-    setOf("dashboard", "vendor", "vendor/profile", "more").contains(route)
+    setOf("dashboard", "vendor", "vendor/profile", "vendor/summary", "vendor/statement", "vendor/payout", "vendor/transaction", "more").contains(route)

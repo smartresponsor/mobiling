@@ -32,7 +32,7 @@ public struct MobileDashboardShellView: View {
                     MobileVendorProfileView(vendorId: vendorId, vendorProfileGateway: vendorProfileGateway)
                         .toolbar { accountToolbar }
                 } else {
-                    content(title: "Vendor", items: shell.vendorContext)
+                    content(title: "Vendor", items: vendorContentRoute == "vendor" ? shell.vendorContext : [])
                         .toolbar { accountToolbar }
                 }
             }
@@ -142,7 +142,7 @@ public struct MobileDashboardShellView: View {
             return
         }
 
-        if route == "vendor/profile" {
+        if route.hasPrefix("vendor/") {
             vendorContentRoute = route
             selectedRoute = "vendor"
             accountOpen = false
@@ -167,12 +167,16 @@ public struct MobileDashboardShellView: View {
         case "key": return "key"
         case "logout": return "rectangle.portrait.and.arrow.right"
         case "menu": return "line.3.horizontal"
+        case "summary": return "chart.bar"
+        case "statement": return "doc.text"
+        case "payout": return "dollarsign.circle"
+        case "receipt": return "list.bullet.rectangle"
         default: return "house"
         }
     }
 
     private func isHandledRoute(_ route: String) -> Bool {
-        ["dashboard", "vendor", "vendor/profile", "more"].contains(route)
+        ["dashboard", "vendor", "vendor/profile", "vendor/summary", "vendor/statement", "vendor/payout", "vendor/transaction", "more"].contains(route)
     }
 
     private static func fallbackShell() -> MobileNavigationShellScreenContract {
@@ -199,6 +203,10 @@ public struct MobileDashboardShellView: View {
             vendorContext: [
                 item("vendor_overview", "My Vendor", "store", true, "vendor"),
                 item("vendor_profile", "My Profile", "person", true, "vendor/profile"),
+                item("vendor_summary", "Summary", "summary", true, "vendor/summary"),
+                item("vendor_statement", "Statement", "statement", true, "vendor/statement"),
+                item("vendor_payout", "Payout", "payout", true, "vendor/payout"),
+                item("vendor_transaction", "Transaction", "receipt", true, "vendor/transaction"),
                 item("vendor_attachment", "My Attachments", "attachment", false, "attachment"),
             ]
         )
@@ -224,4 +232,5 @@ public struct MobileDashboardShellView: View {
         )
     }
 }
+
 
