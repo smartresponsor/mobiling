@@ -8,7 +8,9 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "test": "node tools/mobile-contract-guard.mjs",
     "contract:guard": "node tools/mobile-contract-guard.mjs",
-    "smoke": "node tools/mobile-live-smoke-check.mjs",
+    "smoke": "npm run smoke:local",
+    "smoke:local": "node tools/mobile-live-smoke-check.mjs",
+    "smoke:public": "node tools/mobile-public-smoke-check.mjs",
     "quality:gate": "npm run typecheck && npm run build && npm run contract:guard",
     "start": "node dist/app.js"
   },
