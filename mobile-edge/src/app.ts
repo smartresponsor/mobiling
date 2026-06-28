@@ -17,6 +17,7 @@ import routeFlag from "./routes/flag.js";
 import routeHealth from "./routes/health.js";
 import routeMobileAccess from "./routes/mobile/access.js";
 import routeMobileNavigationShell from "./routes/mobile/navigationShell.js";
+import routeMobileVendorPayout from "./routes/mobile/vendor/payout.js";
 import routeMobileVendorProfile from "./routes/mobile/vendor/profile.js";
 import routeMobileVendorStatement from "./routes/mobile/vendor/statement.js";
 import routeMobileVendorSummary from "./routes/mobile/vendor/summary.js";
@@ -64,6 +65,7 @@ app.setErrorHandler((error: any, _request, reply) => {
 await routeHealth(app);
 await routeMobileAccess(app);
 await routeMobileNavigationShell(app);
+await routeMobileVendorPayout(app);
 await routeMobileVendorProfile(app);
 await routeMobileVendorSummary(app);
 await routeMobileVendorStatement(app);

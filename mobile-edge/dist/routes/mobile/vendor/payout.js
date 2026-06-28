@@ -1,0 +1,89 @@
+import { mobileAccessErrorPayload } from "../../../contract/mobile/access.js";
+import { VendoringApiClient } from "../../../client/vendoring/vendoringApiClient.js";
+const vendoringApiClient = new VendoringApiClient();
+const mobileVendorPayoutPayload = {
+    type: "object",
+    additionalProperties: false,
+    required: ["vendorId", "payoutStatus", "currency", "availableAmount", "pendingAmount", "payoutAccountLabel", "payload"],
+    properties: {
+        vendorId: { type: "string", minLength: 1 },
+        payoutStatus: { anyOf: [{ type: "string", minLength: 1 }, { type: "null" }] },
+        currency: { anyOf: [{ type: "string", minLength: 1 }, { type: "null" }] },
+        availableAmount: { type: "number" },
+        pendingAmount: { type: "number" },
+        payoutAccountLabel: { anyOf: [{ type: "string", minLength: 1 }, { type: "null" }] },
+        payload: { type: "object", additionalProperties: true },
+    },
+};
+function forwardedHeaders(request) {
+    const headers = {};
+    const cookie = request.headers.cookie;
+    const authorization = request.headers.authorization;
+    if ("string" === typeof cookie && "" !== cookie.trim()) {
+        headers.cookie = cookie.trim();
+    }
+    if ("string" === typeof authorization && "" !== authorization.trim()) {
+        headers.authorization = authorization.trim();
+    }
+    return headers;
+}
+function isRecord(value) {
+    return null !== value && "object" === typeof value && !Array.isArray(value);
+}
+function stringValue(value) {
+    if ("string" === typeof value && "" !== value.trim()) {
+        return value.trim();
+    }
+    if ("number" === typeof value && Number.isFinite(value)) {
+        return String(value);
+    }
+    return null;
+}
+function numberValue(value) {
+    if ("number" === typeof value && Number.isFinite(value)) {
+        return value;
+    }
+    if ("string" === typeof value && "" !== value.trim()) {
+        const numeric = Number(value.trim());
+        return Number.isFinite(numeric) ? numeric : 0;
+    }
+    return 0;
+}
+function normalizeErrorPayload(body) {
+    if (isRecord(body) && "string" === typeof body.code && "string" === typeof body.message) {
+        return { code: body.code, message: body.message };
+    }
+    if (isRecord(body) && "string" === typeof body.error) {
+        return { code: body.error, message: body.error.replace(/_/g, " ") };
+    }
+    return { code: "vendoring_api_error", message: "Vendoring API returned an unexpected response." };
+}
+function payoutPayload(body) {
+    if (!isRecord(body)) {
+        return {};
+    }
+    return isRecord(body.data) ? body.data : body;
+}
+export default async function route(app) {
+    app.get("/vendor/payout/:vendorId", { schema: { response: { 200: mobileVendorPayoutPayload, 400: mobileAccessErrorPayload, 404: mobileAccessErrorPayload, 422: mobileAccessErrorPayload, 500: mobileAccessErrorPayload, 503: mobileAccessErrorPayload } } }, async (request, reply) => {
+        const params = request.params;
+        const vendorId = stringValue(params.vendorId);
+        if (null === vendorId) {
+            return reply.code(400).send({ code: "invalid_vendor_id", message: "Vendor payout request requires a vendor id." });
+        }
+        const result = await vendoringApiClient.getPayout(vendorId, forwardedHeaders(request));
+        if (result.status < 200 || result.status >= 300) {
+            return reply.code(result.status).send(normalizeErrorPayload(result.body));
+        }
+        const root = payoutPayload(result.body);
+        return reply.code(200).send({
+            vendorId: stringValue(root.vendorId) ?? vendorId,
+            payoutStatus: stringValue(root.payoutStatus ?? root.status),
+            currency: stringValue(root.currency),
+            availableAmount: numberValue(root.availableAmount),
+            pendingAmount: numberValue(root.pendingAmount),
+            payoutAccountLabel: stringValue(root.payoutAccountLabel ?? root.accountLabel),
+            payload: root,
+        });
+    });
+}
