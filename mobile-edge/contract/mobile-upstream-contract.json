@@ -1,0 +1,51 @@
+{
+  "schemaVersion": "2026-06-28.mobile-upstream-contract.v1",
+  "consumer": "mobile-edge",
+  "upstreamRuntime": "App",
+  "upstreamRuntimePort": 8000,
+  "mobileEdgePort": 8080,
+  "policy": {
+    "transport": "mobile-edge must call App runtime as an upstream service and must not expose upstream redirects to native clients.",
+    "authority": "App/Symfony components own business logic and payload authority; mobile-edge owns mobile transport and normalization.",
+    "vendorId": "mobile-edge treats vendorId as an external string identifier unless an upstream route explicitly documents a numeric-only identifier."
+  },
+  "routes": [
+    {
+      "owner": "Navigating",
+      "mobileRoute": "GET /navigation/mobile/shell",
+      "upstreamRoute": "GET /api/navigation/mobile/shell",
+      "status": "declared-in-app"
+    },
+    {
+      "owner": "Vendoring",
+      "mobileRoute": "GET /vendor/profile/:vendorId",
+      "upstreamRoute": "GET /api/vendor/profile/show/{vendorId}",
+      "status": "declared-in-app",
+      "appRouteNote": "current App route requires numeric vendorId; mobile-edge smoke uses vendor-demo-001"
+    },
+    {
+      "owner": "Vendoring",
+      "mobileRoute": "GET /vendor/summary/:vendorId",
+      "upstreamRoute": "GET /api/vendor/summary/show/{vendorId}",
+      "status": "missing-in-app-route-catalog"
+    },
+    {
+      "owner": "Vendoring",
+      "mobileRoute": "GET /vendor/statement/:vendorId",
+      "upstreamRoute": "GET /api/vendor/statement/show/{vendorId}",
+      "status": "missing-in-app-route-catalog"
+    },
+    {
+      "owner": "Vendoring",
+      "mobileRoute": "GET /vendor/payout/:vendorId",
+      "upstreamRoute": "GET /api/vendor/payout/show/{vendorId}",
+      "status": "missing-in-app-route-catalog"
+    },
+    {
+      "owner": "Vendoring",
+      "mobileRoute": "GET /vendor/transaction/:vendorId",
+      "upstreamRoute": "GET /api/vendor/transaction/list/{vendorId}",
+      "status": "missing-in-app-route-catalog"
+    }
+  ]
+}

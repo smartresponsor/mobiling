@@ -188,6 +188,93 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MobileAccessErrorPayload'
+  /access/verification/resend:
+    post:
+      summary: Mobile access verification resend
+      responses:
+        '202': { description: Accepted, content: { application/json: { schema: { $ref: '#/components/schemas/MobileAccessSessionPayload' } } } }
+        '503': { description: Accessing API unavailable, content: { application/json: { schema: { $ref: '#/components/schemas/MobileAccessErrorPayload' } } } }
+  /access/verification/confirm:
+    post:
+      summary: Mobile access verification confirm
+      responses:
+        '202': { description: Accepted, content: { application/json: { schema: { $ref: '#/components/schemas/MobileAccessSessionPayload' } } } }
+        '422': { description: Invalid verification payload, content: { application/json: { schema: { $ref: '#/components/schemas/MobileAccessErrorPayload' } } } }
+        '503': { description: Accessing API unavailable, content: { application/json: { schema: { $ref: '#/components/schemas/MobileAccessErrorPayload' } } } }
+  /access/second-factor/challenge:
+    post:
+      summary: Mobile access second factor challenge
+      responses:
+        '202': { description: Accepted, content: { application/json: { schema: { $ref: '#/components/schemas/MobileAccessSessionPayload' } } } }
+        '503': { description: Accessing API unavailable, content: { application/json: { schema: { $ref: '#/components/schemas/MobileAccessErrorPayload' } } } }
+  /access/second-factor/verify:
+    post:
+      summary: Mobile access second factor verify
+      responses:
+        '202': { description: Accepted, content: { application/json: { schema: { $ref: '#/components/schemas/MobileAccessSessionPayload' } } } }
+        '422': { description: Invalid second factor payload, content: { application/json: { schema: { $ref: '#/components/schemas/MobileAccessErrorPayload' } } } }
+        '503': { description: Accessing API unavailable, content: { application/json: { schema: { $ref: '#/components/schemas/MobileAccessErrorPayload' } } } }
+  /navigation/mobile/shell:
+    get:
+      summary: Mobile navigation shell
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/MobileNavigationShellPayload' } } } }
+        '503': { description: Navigating API unavailable, content: { application/json: { schema: { $ref: '#/components/schemas/MobileAccessErrorPayload' } } } }
+  /vendor/profile/{vendorId}:
+    get:
+      summary: Mobile vendor profile
+      parameters:
+        - in: path
+          name: vendorId
+          required: true
+          schema: { type: string, minLength: 1 }
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/MobileVendorProfilePayload' } } } }
+        '503': { description: Vendoring API unavailable, content: { application/json: { schema: { $ref: '#/components/schemas/MobileAccessErrorPayload' } } } }
+  /vendor/summary/{vendorId}:
+    get:
+      summary: Mobile vendor summary
+      parameters:
+        - in: path
+          name: vendorId
+          required: true
+          schema: { type: string, minLength: 1 }
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/MobileVendorSummaryPayload' } } } }
+        '503': { description: Vendoring API unavailable, content: { application/json: { schema: { $ref: '#/components/schemas/MobileAccessErrorPayload' } } } }
+  /vendor/statement/{vendorId}:
+    get:
+      summary: Mobile vendor statement
+      parameters:
+        - in: path
+          name: vendorId
+          required: true
+          schema: { type: string, minLength: 1 }
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/MobileVendorStatementPayload' } } } }
+        '503': { description: Vendoring API unavailable, content: { application/json: { schema: { $ref: '#/components/schemas/MobileAccessErrorPayload' } } } }
+  /vendor/payout/{vendorId}:
+    get:
+      summary: Mobile vendor payout
+      parameters:
+        - in: path
+          name: vendorId
+          required: true
+          schema: { type: string, minLength: 1 }
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/MobileVendorPayoutPayload' } } } }
+        '503': { description: Vendoring API unavailable, content: { application/json: { schema: { $ref: '#/components/schemas/MobileAccessErrorPayload' } } } }
+  /vendor/transaction/{vendorId}:
+    get:
+      summary: Mobile vendor transaction list
+      parameters:
+        - in: path
+          name: vendorId
+          required: true
+          schema: { type: string, minLength: 1 }
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/MobileVendorTransactionListPayload' } } } }
+        '503': { description: Vendoring API unavailable, content: { application/json: { schema: { $ref: '#/components/schemas/MobileAccessErrorPayload' } } } }
   /push/register:
     post:
       summary: Register push token
@@ -348,6 +435,78 @@ components:
                 type: array
                 items: { type: string }
             - { type: 'null' }
+    MobileNavigationShellPayload:
+      type: object
+      additionalProperties: true
+      required: [schema, channel, platforms, locations]
+      properties:
+        schema: { type: string }
+        channel: { type: string, enum: [mobile] }
+        platforms:
+          type: array
+          items: { type: string }
+        locations: { type: object, additionalProperties: true }
+    MobileVendorProfilePayload:
+      type: object
+      additionalProperties: false
+      required: [vendorId, displayName, brandName, status, completionPercent, readyForPublishing, nextAction, avatarUrl, coverUrl, about, website, publicationStatus]
+      properties:
+        vendorId: { type: string, minLength: 1 }
+        displayName: { anyOf: [{ type: string, minLength: 1 }, { type: 'null' }] }
+        brandName: { anyOf: [{ type: string, minLength: 1 }, { type: 'null' }] }
+        status: { anyOf: [{ type: string, minLength: 1 }, { type: 'null' }] }
+        completionPercent: { type: integer, minimum: 0, maximum: 100 }
+        readyForPublishing: { type: boolean }
+        nextAction: { anyOf: [{ type: string, minLength: 1 }, { type: 'null' }] }
+        avatarUrl: { anyOf: [{ type: string, minLength: 1 }, { type: 'null' }] }
+        coverUrl: { anyOf: [{ type: string, minLength: 1 }, { type: 'null' }] }
+        about: { anyOf: [{ type: string, minLength: 1 }, { type: 'null' }] }
+        website: { anyOf: [{ type: string, minLength: 1 }, { type: 'null' }] }
+        publicationStatus: { anyOf: [{ type: string, minLength: 1 }, { type: 'null' }] }
+    MobileVendorSummaryPayload:
+      type: object
+      additionalProperties: false
+      required: [vendorId, brandName, status, profileCompletionPercent, nextAction, payload]
+      properties:
+        vendorId: { type: string, minLength: 1 }
+        brandName: { anyOf: [{ type: string, minLength: 1 }, { type: 'null' }] }
+        status: { anyOf: [{ type: string, minLength: 1 }, { type: 'null' }] }
+        profileCompletionPercent: { type: integer, minimum: 0, maximum: 100 }
+        nextAction: { anyOf: [{ type: string, minLength: 1 }, { type: 'null' }] }
+        payload: { type: object, additionalProperties: true }
+    MobileVendorStatementPayload:
+      type: object
+      additionalProperties: false
+      required: [vendorId, statementStatus, currency, grossAmount, netAmount, payload]
+      properties:
+        vendorId: { type: string, minLength: 1 }
+        statementStatus: { anyOf: [{ type: string, minLength: 1 }, { type: 'null' }] }
+        currency: { anyOf: [{ type: string, minLength: 1 }, { type: 'null' }] }
+        grossAmount: { type: number }
+        netAmount: { type: number }
+        payload: { type: object, additionalProperties: true }
+    MobileVendorPayoutPayload:
+      type: object
+      additionalProperties: false
+      required: [vendorId, payoutStatus, currency, availableAmount, pendingAmount, payoutAccountLabel, payload]
+      properties:
+        vendorId: { type: string, minLength: 1 }
+        payoutStatus: { anyOf: [{ type: string, minLength: 1 }, { type: 'null' }] }
+        currency: { anyOf: [{ type: string, minLength: 1 }, { type: 'null' }] }
+        availableAmount: { type: number }
+        pendingAmount: { type: number }
+        payoutAccountLabel: { anyOf: [{ type: string, minLength: 1 }, { type: 'null' }] }
+        payload: { type: object, additionalProperties: true }
+    MobileVendorTransactionListPayload:
+      type: object
+      additionalProperties: false
+      required: [vendorId, transactions, payload]
+      properties:
+        vendorId: { type: string, minLength: 1 }
+        transactions:
+          type: array
+          items: { type: object, additionalProperties: true }
+        payload: { type: object, additionalProperties: true }
     ReceiptVerifyV1:
       type: object
       required: [transactionId, productId, platform, receipt]

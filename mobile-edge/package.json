@@ -6,6 +6,10 @@
     "dev": "tsx src/app.ts",
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "node tools/mobile-contract-guard.mjs",
+    "contract:guard": "node tools/mobile-contract-guard.mjs",
+    "smoke": "node tools/mobile-live-smoke-check.mjs",
+    "quality:gate": "npm run typecheck && npm run build && npm run contract:guard",
     "start": "node dist/app.js"
   },
   "dependencies": {

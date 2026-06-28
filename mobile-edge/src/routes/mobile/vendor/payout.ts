@@ -1,23 +1,9 @@
 import type { FastifyInstance } from "fastify";
-import { mobileAccessErrorPayload } from "../../../contract/mobile/access.js";
+import { mobileAccessErrorPayload } from "../../../contract/mobile/access/error.js";
+import { mobileVendorPayoutPayload } from "../../../contract/mobile/vendor/payout.js";
 import { VendoringApiClient, type VendoringApiErrorPayload } from "../../../client/vendoring/vendoringApiClient.js";
 
 const vendoringApiClient = new VendoringApiClient();
-
-const mobileVendorPayoutPayload = {
-  type: "object",
-  additionalProperties: false,
-  required: ["vendorId", "payoutStatus", "currency", "availableAmount", "pendingAmount", "payoutAccountLabel", "payload"],
-  properties: {
-    vendorId: { type: "string", minLength: 1 },
-    payoutStatus: { anyOf: [{ type: "string", minLength: 1 }, { type: "null" }] },
-    currency: { anyOf: [{ type: "string", minLength: 1 }, { type: "null" }] },
-    availableAmount: { type: "number" },
-    pendingAmount: { type: "number" },
-    payoutAccountLabel: { anyOf: [{ type: "string", minLength: 1 }, { type: "null" }] },
-    payload: { type: "object", additionalProperties: true },
-  },
-} as const;
 
 function forwardedHeaders(request: { headers: Record<string, unknown> }): Record<string, string> {
   const headers: Record<string, string> = {};

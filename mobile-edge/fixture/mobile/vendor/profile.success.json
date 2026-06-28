@@ -1,0 +1,14 @@
+{
+  "vendorId": "vendor-demo-001",
+  "displayName": "Demo Vendor",
+  "brandName": "Demo Vendor Brand",
+  "status": "active",
+  "completionPercent": 86,
+  "readyForPublishing": true,
+  "nextAction": "review_publication",
+  "avatarUrl": null,
+  "coverUrl": null,
+  "about": "Demo vendor profile for mobile screen fixtures.",
+  "website": "https://example.test",
+  "publicationStatus": "draft"
+}

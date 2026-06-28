@@ -1,5 +1,5 @@
-import { mobileAccessErrorPayload } from "../../../contract/mobile/access.js";
-import { mobileVendorStatementPayload } from "../../../contract/mobile/vendorStatement.js";
+import { mobileAccessErrorPayload } from "../../../contract/mobile/access/error.js";
+import { mobileVendorStatementPayload } from "../../../contract/mobile/vendor/statement.js";
 import { VendoringApiClient } from "../../../client/vendoring/vendoringApiClient.js";
 const vendoringApiClient = new VendoringApiClient();
 function forwardedHeaders(request) {

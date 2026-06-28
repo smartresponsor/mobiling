@@ -1,31 +1,7 @@
-import { mobileAccessErrorPayload } from "../../../contract/mobile/access.js";
+import { mobileAccessErrorPayload } from "../../../contract/mobile/access/error.js";
+import { mobileVendorTransactionListPayload } from "../../../contract/mobile/vendor/transaction.js";
 import { VendoringApiClient } from "../../../client/vendoring/vendoringApiClient.js";
 const vendoringApiClient = new VendoringApiClient();
-const mobileVendorTransactionListPayload = {
-    type: "object",
-    additionalProperties: false,
-    required: ["vendorId", "transactions", "payload"],
-    properties: {
-        vendorId: { type: "string", minLength: 1 },
-        transactions: {
-            type: "array",
-            items: {
-                type: "object",
-                additionalProperties: false,
-                required: ["id", "status", "type", "amount", "currency", "createdAt"],
-                properties: {
-                    id: { anyOf: [{ type: "string", minLength: 1 }, { type: "null" }] },
-                    status: { anyOf: [{ type: "string", minLength: 1 }, { type: "null" }] },
-                    type: { anyOf: [{ type: "string", minLength: 1 }, { type: "null" }] },
-                    amount: { type: "number" },
-                    currency: { anyOf: [{ type: "string", minLength: 1 }, { type: "null" }] },
-                    createdAt: { anyOf: [{ type: "string", minLength: 1 }, { type: "null" }] },
-                },
-            },
-        },
-        payload: { type: "object", additionalProperties: true },
-    },
-};
 function forwardedHeaders(request) {
     const headers = {};
     const cookie = request.headers.cookie;

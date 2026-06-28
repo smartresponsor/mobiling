@@ -1,0 +1,32 @@
+{
+  "schema": "mobile.navigation.shell.v1",
+  "channel": "mobile",
+  "platforms": ["android", "ios"],
+  "locations": {
+    "dashboard": [
+      {
+        "key": "vendor.summary",
+        "label": "Vendor summary",
+        "icon": "storefront",
+        "badge": null,
+        "enabled": true,
+        "visible": true,
+        "status": "active",
+        "disabledReason": null,
+        "requiredComponent": "Vendoring",
+        "location": "dashboard",
+        "group": "vendor",
+        "groupLabel": "Vendor",
+        "action": "open_route",
+        "route": "/vendor/summary/:vendorId",
+        "target": {
+          "screen": "vendor.summary"
+        },
+        "metadata": {
+          "contract": "MobileVendorSummaryPayload"
+        }
+      }
+    ],
+    "more": []
+  }
+}

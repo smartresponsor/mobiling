@@ -1,6 +1,6 @@
 import type { FastifyInstance } from "fastify";
-import { mobileAccessErrorPayload } from "../../../contract/mobile/access.js";
-import { mobileVendorSummaryPayload } from "../../../contract/mobile/vendorSummary.js";
+import { mobileAccessErrorPayload } from "../../../contract/mobile/access/error.js";
+import { mobileVendorSummaryPayload } from "../../../contract/mobile/vendor/summary.js";
 import { VendoringApiClient, type VendoringApiErrorPayload } from "../../../client/vendoring/vendoringApiClient.js";
 
 const vendoringApiClient = new VendoringApiClient();

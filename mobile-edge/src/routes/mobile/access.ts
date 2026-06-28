@@ -1,14 +1,14 @@
 import type { FastifyInstance, FastifyReply } from "fastify";
+import { mobileAccessErrorPayload } from "../../contract/mobile/access/error.js";
 import {
-  mobileAccessErrorPayload,
   mobileAccessRecoveryRequest,
   mobileAccessRecoveryResetRequest,
   mobileAccessRegisterRequest,
   mobileAccessSecondFactorVerifyRequest,
-  mobileAccessSessionPayload,
   mobileAccessSignInRequest,
   mobileAccessVerificationConfirmRequest,
-} from "../../contract/mobile/access.js";
+} from "../../contract/mobile/access/request.js";
+import { mobileAccessSessionPayload } from "../../contract/mobile/access/session.js";
 import {
   AccessingApiClient,
   type AccessingApiErrorPayload,

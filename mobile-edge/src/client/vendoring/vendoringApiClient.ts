@@ -82,9 +82,16 @@ export class VendoringApiClient {
 
           response.on("data", (chunk: Buffer) => chunks.push(chunk));
           response.on("end", () => {
+            const status = response.statusCode || 502;
+
+            if (status >= 300 && status < 400) {
+              resolve(this.unavailable());
+              return;
+            }
+
             const text = Buffer.concat(chunks).toString("utf8");
             resolve({
-              status: response.statusCode || 502,
+              status,
               body: this.parseResponseBody(text),
             });
           });

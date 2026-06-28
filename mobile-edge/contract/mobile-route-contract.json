@@ -1,0 +1,168 @@
+{
+  "schemaVersion": "2026-06-28.mobile-route-contract.v1",
+  "publicSurface": "mobile-edge",
+  "policy": {
+    "mode": "contract-first",
+    "mobileEdgeRole": "bff-only",
+    "businessAuthority": "upstream Symfony components own business rules",
+    "routeRule": "Every mobile route must be declared here, documented in OpenAPI, backed by a source schema, and guarded before release.",
+    "screenRule": "Every screen route must have a stable fixture payload.",
+    "forbidden": [
+      "mobile-edge owning core business rules",
+      "mobile-edge replacing CRUD ownership",
+      "undocumented mobile routes",
+      "route renames without contract migration",
+      "direct database access from mobile routes",
+      "mock-only screen endpoints"
+    ]
+  },
+  "routes": [
+    {
+      "method": "POST",
+      "path": "/access/signin",
+      "owner": "Accessing",
+      "routeFile": "src/routes/mobile/access.ts",
+      "routeClass": "transport",
+      "responseSchema": "MobileAccessSessionPayload"
+    },
+    {
+      "method": "POST",
+      "path": "/access/register",
+      "owner": "Accessing",
+      "routeFile": "src/routes/mobile/access.ts",
+      "routeClass": "transport",
+      "responseSchema": "MobileAccessSessionPayload"
+    },
+    {
+      "method": "POST",
+      "path": "/access/logout",
+      "owner": "Accessing",
+      "routeFile": "src/routes/mobile/access.ts",
+      "routeClass": "transport",
+      "responseSchema": "MobileAccessSessionPayload"
+    },
+    {
+      "method": "GET",
+      "path": "/access/session",
+      "owner": "Accessing",
+      "routeFile": "src/routes/mobile/access.ts",
+      "routeClass": "transport",
+      "responseSchema": "MobileAccessSessionPayload"
+    },
+    {
+      "method": "POST",
+      "path": "/access/verification/resend",
+      "owner": "Accessing",
+      "routeFile": "src/routes/mobile/access.ts",
+      "routeClass": "transport",
+      "responseSchema": "MobileAccessSessionPayload"
+    },
+    {
+      "method": "POST",
+      "path": "/access/verification/confirm",
+      "owner": "Accessing",
+      "routeFile": "src/routes/mobile/access.ts",
+      "routeClass": "transport",
+      "responseSchema": "MobileAccessSessionPayload"
+    },
+    {
+      "method": "POST",
+      "path": "/access/second-factor/challenge",
+      "owner": "Accessing",
+      "routeFile": "src/routes/mobile/access.ts",
+      "routeClass": "transport",
+      "responseSchema": "MobileAccessSessionPayload"
+    },
+    {
+      "method": "POST",
+      "path": "/access/second-factor/verify",
+      "owner": "Accessing",
+      "routeFile": "src/routes/mobile/access.ts",
+      "routeClass": "transport",
+      "responseSchema": "MobileAccessSessionPayload"
+    },
+    {
+      "method": "POST",
+      "path": "/access/recovery/request",
+      "owner": "Accessing",
+      "routeFile": "src/routes/mobile/access.ts",
+      "routeClass": "transport",
+      "responseSchema": "MobileAccessSessionPayload"
+    },
+    {
+      "method": "POST",
+      "path": "/access/recovery/reset",
+      "owner": "Accessing",
+      "routeFile": "src/routes/mobile/access.ts",
+      "routeClass": "transport",
+      "responseSchema": "MobileAccessSessionPayload"
+    },
+    {
+      "method": "GET",
+      "path": "/navigation/mobile/shell",
+      "owner": "Navigating",
+      "routeFile": "src/routes/mobile/navigationShell.ts",
+      "routeClass": "screen",
+      "screen": "mobile.shell",
+      "responseSchema": "MobileNavigationShellPayload",
+      "contractFile": "src/contract/mobile/navigation/shell.ts",
+      "fixture": "fixture/mobile/navigation/shell.success.json"
+    },
+    {
+      "method": "GET",
+      "path": "/vendor/profile/:vendorId",
+      "owner": "Vendoring",
+      "routeFile": "src/routes/mobile/vendor/profile.ts",
+      "implementationFile": "src/routes/mobile/vendorProfile.ts",
+      "routeClass": "screen",
+      "screen": "vendor.profile",
+      "responseSchema": "MobileVendorProfilePayload",
+      "contractFile": "src/contract/mobile/vendor/profile.ts",
+      "fixture": "fixture/mobile/vendor/profile.success.json"
+    },
+    {
+      "method": "GET",
+      "path": "/vendor/summary/:vendorId",
+      "owner": "Vendoring",
+      "routeFile": "src/routes/mobile/vendor/summary.ts",
+      "routeClass": "screen",
+      "screen": "vendor.summary",
+      "responseSchema": "MobileVendorSummaryPayload",
+      "contractFile": "src/contract/mobile/vendor/summary.ts",
+      "fixture": "fixture/mobile/vendor/summary.success.json"
+    },
+    {
+      "method": "GET",
+      "path": "/vendor/statement/:vendorId",
+      "owner": "Vendoring",
+      "routeFile": "src/routes/mobile/vendor/statement.ts",
+      "routeClass": "screen",
+      "screen": "vendor.statement",
+      "responseSchema": "MobileVendorStatementPayload",
+      "contractFile": "src/contract/mobile/vendor/statement.ts",
+      "fixture": "fixture/mobile/vendor/statement.success.json"
+    },
+    {
+      "method": "GET",
+      "path": "/vendor/payout/:vendorId",
+      "owner": "Vendoring",
+      "routeFile": "src/routes/mobile/vendor/payout.ts",
+      "routeClass": "screen",
+      "screen": "vendor.payout",
+      "responseSchema": "MobileVendorPayoutPayload",
+      "contractFile": "src/contract/mobile/vendor/payout.ts",
+      "fixture": "fixture/mobile/vendor/payout.success.json"
+    },
+    {
+      "method": "GET",
+      "path": "/vendor/transaction/:vendorId",
+      "owner": "Vendoring",
+      "routeFile": "src/routes/mobile/vendor/transaction.ts",
+      "routeClass": "screen",
+      "screen": "vendor.transaction",
+      "responseSchema": "MobileVendorTransactionListPayload",
+      "contractFile": "src/contract/mobile/vendor/transaction.ts",
+      "fixture": "fixture/mobile/vendor/transaction.success.json"
+    }
+  ]
+}

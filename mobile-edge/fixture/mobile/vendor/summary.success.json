@@ -1,0 +1,12 @@
+{
+  "vendorId": "vendor-demo-001",
+  "brandName": "Demo Vendor Brand",
+  "status": "active",
+  "profileCompletionPercent": 86,
+  "nextAction": "review_publication",
+  "payload": {
+    "vendorId": "vendor-demo-001",
+    "brandName": "Demo Vendor Brand",
+    "vendorStatus": "active"
+  }
+}

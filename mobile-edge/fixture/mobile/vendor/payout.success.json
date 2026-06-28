@@ -1,0 +1,12 @@
+{
+  "vendorId": "vendor-demo-001",
+  "payoutStatus": "available",
+  "currency": "USD",
+  "availableAmount": 1000.25,
+  "pendingAmount": 250.25,
+  "payoutAccountLabel": "Primary payout account",
+  "payload": {
+    "status": "available",
+    "accountLabel": "Primary payout account"
+  }
+}

@@ -1,4 +1,6 @@
-import { mobileAccessErrorPayload, mobileAccessRecoveryRequest, mobileAccessRecoveryResetRequest, mobileAccessRegisterRequest, mobileAccessSecondFactorVerifyRequest, mobileAccessSessionPayload, mobileAccessSignInRequest, mobileAccessVerificationConfirmRequest, } from "../../contract/mobile/access.js";
+import { mobileAccessErrorPayload } from "../../contract/mobile/access/error.js";
+import { mobileAccessRecoveryRequest, mobileAccessRecoveryResetRequest, mobileAccessRegisterRequest, mobileAccessSecondFactorVerifyRequest, mobileAccessSignInRequest, mobileAccessVerificationConfirmRequest, } from "../../contract/mobile/access/request.js";
+import { mobileAccessSessionPayload } from "../../contract/mobile/access/session.js";
 import { AccessingApiClient, } from "../../client/accessing/accessingApiClient.js";
 const accessingApiClient = new AccessingApiClient();
 function forwardedHeaders(request) {

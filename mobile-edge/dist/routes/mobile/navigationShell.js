@@ -1,6 +1,6 @@
 import { NavigatingApiClient } from "../../client/navigating/navigatingApiClient.js";
-import { mobileAccessErrorPayload } from "../../contract/mobile/access.js";
-import { mobileNavigationShellPayload } from "../../contract/mobile/navigationShell.js";
+import { mobileAccessErrorPayload } from "../../contract/mobile/access/error.js";
+import { mobileNavigationShellPayload } from "../../contract/mobile/navigation/shell.js";
 const navigatingApiClient = new NavigatingApiClient();
 function forwardedHeaders(request) {
     const headers = {};

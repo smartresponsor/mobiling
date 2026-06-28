@@ -1,0 +1,11 @@
+{
+  "vendorId": "vendor-demo-001",
+  "statementStatus": "ready",
+  "currency": "USD",
+  "grossAmount": 1250.5,
+  "netAmount": 1188.42,
+  "payload": {
+    "statementStatus": "ready",
+    "period": "2026-06"
+  }
+}
