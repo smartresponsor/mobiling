@@ -1,5 +1,5 @@
 package app.mobiling.client.contract.auth.session
 
-data class ConfirmVerificationRequest(
+data class AccessConfirmVerificationRequest(
     val code: String,
 )

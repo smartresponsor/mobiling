@@ -1,5 +1,5 @@
 package app.mobiling.client.contract.auth.session
 
-data class VerifySecondFactorRequest(
+data class AccessVerifySecondFactorRequest(
     val code: String,
 )

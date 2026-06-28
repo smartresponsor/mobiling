@@ -1,6 +1,6 @@
 package app.mobiling.client.dashboard
 
-import app.mobiling.client.auth.AuthFeatureBridge
+import app.mobiling.client.auth.AccessAuthFeatureBridge
 import app.mobiling.client.catalog.CatalogNavigationBridge
 import app.mobiling.client.message.MessageFeatureBridge
 import app.mobiling.client.vendor.VendorBusinessBridge
@@ -20,7 +20,7 @@ class DashboardNavigationBridge(
     private val catalog: CatalogNavigationBridge,
     private val message: MessageFeatureBridge,
     private val vendor: VendorBusinessBridge,
-    private val auth: AuthFeatureBridge,
+    private val auth: AccessAuthFeatureBridge,
 ) {
     fun routeMap(): DashboardRouteMap = routeMap
 
@@ -30,5 +30,5 @@ class DashboardNavigationBridge(
 
     fun vendor(): VendorBusinessBridge = vendor
 
-    fun auth(): AuthFeatureBridge = auth
+    fun auth(): AccessAuthFeatureBridge = auth
 }

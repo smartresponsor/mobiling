@@ -11,16 +11,16 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import app.mobiling.client.contract.auth.session.AuthSessionPayload
-import app.mobiling.client.contract.auth.session.RequestRecoveryRequest
+import app.mobiling.client.contract.auth.session.AccessAuthSessionPayload
+import app.mobiling.client.contract.auth.session.AccessRequestRecoveryRequest
 import kotlinx.coroutines.launch
 
 @Composable
 fun RecoveryRequestScreen(
     onBack: () -> Unit,
     onHaveRecoveryCode: () -> Unit,
-    onRequestRecovery: suspend (RequestRecoveryRequest) -> AuthSessionPayload? = { null },
-    onAccessSession: (AuthSessionPayload) -> Unit = {},
+    onRequestRecovery: suspend (AccessRequestRecoveryRequest) -> AccessAuthSessionPayload? = { null },
+    onAccessSession: (AccessAuthSessionPayload) -> Unit = {},
 ) {
     var email by rememberSaveable { mutableStateOf("") }
     var status by remember { mutableStateOf<String?>(null) }
@@ -35,7 +35,7 @@ fun RecoveryRequestScreen(
             coroutineScope.launch {
                 status = null
                 try {
-                    val payload = onRequestRecovery(RequestRecoveryRequest(email = email))
+                    val payload = onRequestRecovery(AccessRequestRecoveryRequest(email = email))
                     if (payload == null) {
                         status = AccessUnavailableMessage
                     } else {

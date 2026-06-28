@@ -8,9 +8,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import app.mobiling.client.access.MobilingAppShell
-import app.mobiling.client.auth.AuthFeatureBridge
+import app.mobiling.client.auth.AccessAuthFeatureBridge
 import app.mobiling.client.cart.CartFeatureBridge
-import app.mobiling.client.data.auth.session.HttpAuthSessionGateway
+import app.mobiling.client.data.auth.session.AccessHttpAuthSessionGateway
 import app.mobiling.client.data.cart.CartHttpGateway
 import app.mobiling.client.data.navigation.shell.HttpNavigationShellGateway
 import app.mobiling.client.data.vendor.payout.VendorHttpPayoutGateway
@@ -22,8 +22,8 @@ import app.mobiling.client.data.vendor.transaction.VendorHttpTransactionGateway
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val authFeatureBridge = AuthFeatureBridge(
-            HttpAuthSessionGateway(baseUrl = MobileClientRuntimeConfig.mobileEdgeBaseUrl),
+        val accessAuthFeatureBridge = AccessAuthFeatureBridge(
+            AccessHttpAuthSessionGateway(baseUrl = MobileClientRuntimeConfig.mobileEdgeBaseUrl),
         )
         val cartGateway = CartHttpGateway(baseUrl = MobileClientRuntimeConfig.mobileEdgeBaseUrl)
         val cartFeatureBridge = CartFeatureBridge(
@@ -36,7 +36,7 @@ class MainActivity : ComponentActivity() {
             MaterialTheme {
                 Surface(Modifier.fillMaxSize()) {
                     MobilingAppShell(
-                        authFeatureBridge = authFeatureBridge,
+                        accessAuthFeatureBridge = accessAuthFeatureBridge,
                         cartFeatureBridge = cartFeatureBridge,
                         navigationShellGateway = HttpNavigationShellGateway(baseUrl = MobileClientRuntimeConfig.mobileEdgeBaseUrl),
                         vendorProfileGateway = VendorHttpProfileGateway(baseUrl = MobileClientRuntimeConfig.mobileEdgeBaseUrl),

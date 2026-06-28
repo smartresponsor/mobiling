@@ -1,6 +1,6 @@
 package app.mobiling.client.contract.auth.session
 
-data class AuthSessionPayload(
+data class AccessAuthSessionPayload(
     val status: String,
     val sessionId: String?,
     val vendorId: String?,

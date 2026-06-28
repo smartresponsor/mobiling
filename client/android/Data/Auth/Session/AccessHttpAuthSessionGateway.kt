@@ -1,25 +1,25 @@
 package app.mobiling.client.data.auth.session
 
-import app.mobiling.client.contract.auth.session.AuthSessionPayload
-import app.mobiling.client.contract.auth.session.ConfirmVerificationRequest
-import app.mobiling.client.contract.auth.session.RegisterAuthRequest
-import app.mobiling.client.contract.auth.session.RequestRecoveryRequest
-import app.mobiling.client.contract.auth.session.ResetRecoveryRequest
-import app.mobiling.client.contract.auth.session.StartAuthRequest
-import app.mobiling.client.contract.auth.session.VerifySecondFactorRequest
+import app.mobiling.client.contract.auth.session.AccessAuthSessionPayload
+import app.mobiling.client.contract.auth.session.AccessConfirmVerificationRequest
+import app.mobiling.client.contract.auth.session.AccessRegisterAuthRequest
+import app.mobiling.client.contract.auth.session.AccessRequestRecoveryRequest
+import app.mobiling.client.contract.auth.session.AccessResetRecoveryRequest
+import app.mobiling.client.contract.auth.session.AccessStartAuthRequest
+import app.mobiling.client.contract.auth.session.AccessVerifySecondFactorRequest
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 
-class HttpAuthSessionGateway(
+class AccessHttpAuthSessionGateway(
     private val baseUrl: String,
     private val client: OkHttpClient = OkHttpClient(),
-) : AuthSessionGateway {
+) : AccessAuthSessionGateway {
     private val jsonMediaType = "application/json".toMediaType()
 
-    override suspend fun startAuth(request: StartAuthRequest): AuthSessionPayload = sendSessionRequest(
+    override suspend fun startAuth(request: AccessStartAuthRequest): AccessAuthSessionPayload = sendSessionRequest(
         method = "POST",
         path = "/access/signin",
         body = JSONObject()
@@ -27,7 +27,7 @@ class HttpAuthSessionGateway(
             .put("password", request.password),
     )
 
-    override suspend fun registerAuth(request: RegisterAuthRequest): AuthSessionPayload = sendSessionRequest(
+    override suspend fun registerAuth(request: AccessRegisterAuthRequest): AccessAuthSessionPayload = sendSessionRequest(
         method = "POST",
         path = "/access/register",
         body = JSONObject()
@@ -36,7 +36,7 @@ class HttpAuthSessionGateway(
             .put("password", request.password),
     )
 
-    override suspend fun restoreAuth(): AuthSessionPayload = sendSessionRequest(
+    override suspend fun restoreAuth(): AccessAuthSessionPayload = sendSessionRequest(
         method = "GET",
         path = "/access/session",
         body = null,
@@ -50,37 +50,37 @@ class HttpAuthSessionGateway(
         )
     }
 
-    override suspend fun resendVerification(): AuthSessionPayload = sendSessionRequest(
+    override suspend fun resendVerification(): AccessAuthSessionPayload = sendSessionRequest(
         method = "POST",
         path = "/access/verification/resend",
         body = null,
     )
 
-    override suspend fun confirmVerification(request: ConfirmVerificationRequest): AuthSessionPayload = sendSessionRequest(
+    override suspend fun confirmVerification(request: AccessConfirmVerificationRequest): AccessAuthSessionPayload = sendSessionRequest(
         method = "POST",
         path = "/access/verification/confirm",
         body = JSONObject().put("code", request.code),
     )
 
-    override suspend fun challengeSecondFactor(): AuthSessionPayload = sendSessionRequest(
+    override suspend fun challengeSecondFactor(): AccessAuthSessionPayload = sendSessionRequest(
         method = "POST",
         path = "/access/second-factor/challenge",
         body = null,
     )
 
-    override suspend fun verifySecondFactor(request: VerifySecondFactorRequest): AuthSessionPayload = sendSessionRequest(
+    override suspend fun verifySecondFactor(request: AccessVerifySecondFactorRequest): AccessAuthSessionPayload = sendSessionRequest(
         method = "POST",
         path = "/access/second-factor/verify",
         body = JSONObject().put("code", request.code),
     )
 
-    override suspend fun requestRecovery(request: RequestRecoveryRequest): AuthSessionPayload = sendSessionRequest(
+    override suspend fun requestRecovery(request: AccessRequestRecoveryRequest): AccessAuthSessionPayload = sendSessionRequest(
         method = "POST",
         path = "/access/recovery/request",
         body = JSONObject().put("email", request.email),
     )
 
-    override suspend fun resetRecovery(request: ResetRecoveryRequest): AuthSessionPayload = sendSessionRequest(
+    override suspend fun resetRecovery(request: AccessResetRecoveryRequest): AccessAuthSessionPayload = sendSessionRequest(
         method = "POST",
         path = "/access/recovery/reset",
         body = JSONObject()
@@ -89,7 +89,7 @@ class HttpAuthSessionGateway(
             .put("password", request.password),
     )
 
-    private fun sendSessionRequest(method: String, path: String, body: JSONObject?): AuthSessionPayload {
+    private fun sendSessionRequest(method: String, path: String, body: JSONObject?): AccessAuthSessionPayload {
         val requestBuilder = Request.Builder()
             .url(normalizedBaseUrl() + path)
             .header("Accept", "application/json")
@@ -114,9 +114,9 @@ class HttpAuthSessionGateway(
         }
     }
 
-    private fun payloadFrom(responseBody: String): AuthSessionPayload {
+    private fun payloadFrom(responseBody: String): AccessAuthSessionPayload {
         if (responseBody.isBlank()) {
-            return AuthSessionPayload(
+            return AccessAuthSessionPayload(
                 status = "unauthenticated",
                 sessionId = null,
                 vendorId = null,
@@ -131,7 +131,7 @@ class HttpAuthSessionGateway(
         val authenticated = identity != null
         val vendorId = identity?.optString("vendorId")?.trim().takeUnless { it.isNullOrBlank() }
 
-        return AuthSessionPayload(
+        return AccessAuthSessionPayload(
             status = json.optString("status", if (authenticated) "authenticated" else "unauthenticated"),
             sessionId = null,
             vendorId = vendorId,

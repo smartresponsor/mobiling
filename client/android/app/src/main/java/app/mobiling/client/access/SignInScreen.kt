@@ -11,8 +11,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import app.mobiling.client.contract.auth.session.AuthSessionPayload
-import app.mobiling.client.contract.auth.session.StartAuthRequest
+import app.mobiling.client.contract.auth.session.AccessAuthSessionPayload
+import app.mobiling.client.contract.auth.session.AccessStartAuthRequest
 import kotlinx.coroutines.launch
 
 @Composable
@@ -20,8 +20,8 @@ fun SignInScreen(
     onBack: () -> Unit,
     onCreateAccess: () -> Unit,
     onRecoverAccess: () -> Unit,
-    onStartAccess: suspend (StartAuthRequest) -> AuthSessionPayload? = { null },
-    onAccessSession: (AuthSessionPayload) -> Unit = {},
+    onStartAccess: suspend (AccessStartAuthRequest) -> AccessAuthSessionPayload? = { null },
+    onAccessSession: (AccessAuthSessionPayload) -> Unit = {},
 ) {
     var email by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
@@ -38,7 +38,7 @@ fun SignInScreen(
                 status = null
                 try {
                     val payload = onStartAccess(
-                        StartAuthRequest(
+                        AccessStartAuthRequest(
                             login = email,
                             password = password,
                             deviceLabel = "Android",

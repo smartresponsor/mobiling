@@ -10,8 +10,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import app.mobiling.client.contract.auth.session.AuthSessionPayload
-import app.mobiling.client.auth.AuthFeatureBridge
+import app.mobiling.client.contract.auth.session.AccessAuthSessionPayload
+import app.mobiling.client.auth.AccessAuthFeatureBridge
 import app.mobiling.client.cart.CartFeatureBridge
 import app.mobiling.client.dashboard.MobileDashboardShell
 import app.mobiling.client.data.navigation.shell.NavigationShellGateway
@@ -24,7 +24,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun MobilingAppShell(
-    authFeatureBridge: AuthFeatureBridge? = null,
+    accessAuthFeatureBridge: AccessAuthFeatureBridge? = null,
     cartFeatureBridge: CartFeatureBridge? = null,
     navigationShellGateway: NavigationShellGateway? = null,
     vendorProfileGateway: VendorProfileGateway? = null,
@@ -37,7 +37,7 @@ fun MobilingAppShell(
     var activeVendorId by rememberSaveable { mutableStateOf<String?>(null) }
     val coroutineScope = rememberCoroutineScope()
 
-    fun applyAccessSession(payload: AuthSessionPayload) {
+    fun applyAccessSession(payload: AccessAuthSessionPayload) {
         activeVendorId = payload.vendorId
         currentScreen = payload.toAccessScreen()
     }
@@ -45,7 +45,7 @@ fun MobilingAppShell(
     fun clearAccessSession() {
         coroutineScope.launch {
             try {
-                authFeatureBridge?.logout()
+                accessAuthFeatureBridge?.logout()
             } catch (_: Exception) {
             }
 
@@ -54,9 +54,9 @@ fun MobilingAppShell(
         }
     }
 
-    LaunchedEffect(authFeatureBridge) {
+    LaunchedEffect(accessAuthFeatureBridge) {
         val payload = try {
-            authFeatureBridge?.restore()
+            accessAuthFeatureBridge?.restore()
         } catch (_: Exception) {
             null
         }
@@ -89,14 +89,14 @@ fun MobilingAppShell(
                 onBack = { currentScreen = AccessScreen.Welcome },
                 onCreateAccess = { currentScreen = AccessScreen.Register },
                 onRecoverAccess = { currentScreen = AccessScreen.RecoveryRequest },
-                onStartAccess = { request -> authFeatureBridge?.start(request) },
+                onStartAccess = { request -> accessAuthFeatureBridge?.start(request) },
                 onAccessSession = { payload -> applyAccessSession(payload) },
             )
 
             AccessScreen.Register -> RegisterAccessScreen(
                 onBack = { currentScreen = AccessScreen.Welcome },
                 onSignIn = { currentScreen = AccessScreen.SignIn },
-                onRegisterAccess = { request -> authFeatureBridge?.register(request) },
+                onRegisterAccess = { request -> accessAuthFeatureBridge?.register(request) },
                 onAccessSession = { payload -> applyAccessSession(payload) },
             )
 
@@ -113,14 +113,14 @@ fun MobilingAppShell(
             AccessScreen.RecoveryRequest -> RecoveryRequestScreen(
                 onBack = { currentScreen = AccessScreen.SignIn },
                 onHaveRecoveryCode = { currentScreen = AccessScreen.RecoveryReset },
-                onRequestRecovery = { request -> authFeatureBridge?.requestRecovery(request) },
+                onRequestRecovery = { request -> accessAuthFeatureBridge?.requestRecovery(request) },
                 onAccessSession = { payload -> applyAccessSession(payload) },
             )
 
             AccessScreen.RecoveryReset -> RecoveryResetScreen(
                 onBack = { currentScreen = AccessScreen.RecoveryRequest },
                 onRequestRecovery = { currentScreen = AccessScreen.RecoveryRequest },
-                onResetRecovery = { request -> authFeatureBridge?.resetRecovery(request) },
+                onResetRecovery = { request -> accessAuthFeatureBridge?.resetRecovery(request) },
                 onAccessSession = { payload -> applyAccessSession(payload) },
             )
         }

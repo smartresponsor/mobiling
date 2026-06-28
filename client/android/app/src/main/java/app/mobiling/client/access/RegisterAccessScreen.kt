@@ -11,16 +11,16 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import app.mobiling.client.contract.auth.session.AuthSessionPayload
-import app.mobiling.client.contract.auth.session.RegisterAuthRequest
+import app.mobiling.client.contract.auth.session.AccessAuthSessionPayload
+import app.mobiling.client.contract.auth.session.AccessRegisterAuthRequest
 import kotlinx.coroutines.launch
 
 @Composable
 fun RegisterAccessScreen(
     onBack: () -> Unit,
     onSignIn: () -> Unit,
-    onRegisterAccess: suspend (RegisterAuthRequest) -> AuthSessionPayload? = { null },
-    onAccessSession: (AuthSessionPayload) -> Unit = {},
+    onRegisterAccess: suspend (AccessRegisterAuthRequest) -> AccessAuthSessionPayload? = { null },
+    onAccessSession: (AccessAuthSessionPayload) -> Unit = {},
 ) {
     var email by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
@@ -38,7 +38,7 @@ fun RegisterAccessScreen(
                 status = null
                 try {
                     val payload = onRegisterAccess(
-                        RegisterAuthRequest(
+                        AccessRegisterAuthRequest(
                             displayName = companyName,
                             email = email,
                             password = password,

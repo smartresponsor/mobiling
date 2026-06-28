@@ -1,8 +1,7 @@
 package app.mobiling.client.contract.auth.session
 
-data class RegisterAuthRequest(
-    val displayName: String,
+data class AccessResetRecoveryRequest(
     val email: String,
+    val code: String,
     val password: String,
-    val deviceLabel: String?,
 )
