@@ -5,6 +5,7 @@ public struct MobileDashboardShellView: View {
     private let vendorId: String?
     private let vendorProfileGateway: VendorProfileGateway?
     private let vendorSummaryGateway: VendorSummaryGateway?
+    private let vendorStatementGateway: VendorStatementGateway?
     private let onSignOut: () -> Void
 
     @State private var selectedRoute: String = "dashboard"
@@ -12,11 +13,12 @@ public struct MobileDashboardShellView: View {
     @State private var accountOpen: Bool = false
     @State private var shell: MobileNavigationShellScreenContract = MobileDashboardShellView.fallbackShell()
 
-    public init(navigationShellGateway: NavigationShellGateway? = nil, vendorId: String? = nil, vendorProfileGateway: VendorProfileGateway? = nil, vendorSummaryGateway: VendorSummaryGateway? = nil, onSignOut: @escaping () -> Void) {
+    public init(navigationShellGateway: NavigationShellGateway? = nil, vendorId: String? = nil, vendorProfileGateway: VendorProfileGateway? = nil, vendorSummaryGateway: VendorSummaryGateway? = nil, vendorStatementGateway: VendorStatementGateway? = nil, onSignOut: @escaping () -> Void) {
         self.navigationShellGateway = navigationShellGateway
         self.vendorId = vendorId
         self.vendorProfileGateway = vendorProfileGateway
         self.vendorSummaryGateway = vendorSummaryGateway
+        self.vendorStatementGateway = vendorStatementGateway
         self.onSignOut = onSignOut
     }
 
@@ -35,6 +37,9 @@ public struct MobileDashboardShellView: View {
                         .toolbar { accountToolbar }
                 } else if vendorContentRoute == "vendor/summary" {
                     MobileVendorSummaryView(vendorId: vendorId, vendorSummaryGateway: vendorSummaryGateway)
+                        .toolbar { accountToolbar }
+                } else if vendorContentRoute == "vendor/statement" {
+                    MobileVendorStatementView(vendorId: vendorId, vendorStatementGateway: vendorStatementGateway)
                         .toolbar { accountToolbar }
                 } else {
                     content(title: "Vendor", items: vendorContentRoute == "vendor" ? shell.vendorContext : [])
