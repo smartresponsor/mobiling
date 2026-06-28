@@ -15,6 +15,7 @@ import app.mobiling.client.auth.AuthFeatureBridge
 import app.mobiling.client.dashboard.MobileDashboardShell
 import app.mobiling.client.data.navigation.shell.NavigationShellGateway
 import app.mobiling.client.data.vendor.profile.VendorProfileGateway
+import app.mobiling.client.data.vendor.statement.VendorStatementGateway
 import app.mobiling.client.data.vendor.summary.VendorSummaryGateway
 import kotlinx.coroutines.launch
 
@@ -24,6 +25,7 @@ fun MobilingAppShell(
     navigationShellGateway: NavigationShellGateway? = null,
     vendorProfileGateway: VendorProfileGateway? = null,
     vendorSummaryGateway: VendorSummaryGateway? = null,
+    vendorStatementGateway: VendorStatementGateway? = null,
 ) {
     var currentScreen by rememberSaveable { mutableStateOf(AccessScreen.Welcome) }
     var activeVendorId by rememberSaveable { mutableStateOf<String?>(null) }
@@ -65,6 +67,7 @@ fun MobilingAppShell(
                 vendorId = activeVendorId,
                 vendorProfileGateway = vendorProfileGateway,
                 vendorSummaryGateway = vendorSummaryGateway,
+                vendorStatementGateway = vendorStatementGateway,
                 onSignOut = { clearAccessSession() },
             )
 
@@ -114,3 +117,4 @@ fun MobilingAppShell(
         }
     }
 }
+
