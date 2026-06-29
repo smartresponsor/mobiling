@@ -90,3 +90,7 @@ fun VendorMobileSummaryScreen(
 @Composable
 private fun SummaryField(label: String, value: String?) {
     Column(modifier = Modifier.padding(vertical = 2.dp)) {
+        Text(label, fontWeight = FontWeight.SemiBold)
+        Text(value?.takeIf { it.isNotBlank() } ?: "—")
+    }
+}

@@ -13,3 +13,4 @@ data class VendorMobileTransactionScreenContract(
             transactions = payload.transactions,
         )
     }
+}

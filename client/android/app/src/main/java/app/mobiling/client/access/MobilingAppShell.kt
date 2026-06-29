@@ -10,8 +10,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import app.mobiling.client.contract.auth.session.AccessAuthSessionPayload
+import app.mobiling.client.attachment.AttachmentFeatureBridge
 import app.mobiling.client.auth.AccessAuthFeatureBridge
+import app.mobiling.client.contract.auth.session.AccessAuthSessionPayload
 import app.mobiling.client.cart.CartFeatureBridge
 import app.mobiling.client.dashboard.DashboardMobileShell
 import app.mobiling.client.data.navigation.shell.NavigationShellGateway
@@ -26,6 +27,7 @@ import kotlinx.coroutines.launch
 fun MobilingAppShell(
     accessAuthFeatureBridge: AccessAuthFeatureBridge? = null,
     cartFeatureBridge: CartFeatureBridge? = null,
+    attachmentFeatureBridge: AttachmentFeatureBridge? = null,
     navigationShellGateway: NavigationShellGateway? = null,
     vendorProfileGateway: VendorProfileGateway? = null,
     vendorSummaryGateway: VendorSummaryGateway? = null,
@@ -71,6 +73,7 @@ fun MobilingAppShell(
             AccessScreen.Dashboard -> DashboardMobileShell(
                 navigationShellGateway = navigationShellGateway,
                 cartFeatureBridge = cartFeatureBridge,
+                attachmentFeatureBridge = attachmentFeatureBridge,
                 vendorId = activeVendorId,
                 vendorProfileGateway = vendorProfileGateway,
                 vendorSummaryGateway = vendorSummaryGateway,

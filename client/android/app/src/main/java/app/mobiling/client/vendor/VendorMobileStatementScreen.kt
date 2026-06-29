@@ -36,3 +36,5 @@ fun VendorMobileStatementScreen(vendorId: String?, vendorStatementGateway: Vendo
     }
 }
 
+private fun amountLabel(amount: Double, currency: String?): String = listOfNotNull(currency?.takeIf { it.isNotBlank() }, String.format("%.2f", amount)).joinToString(" ")
+

@@ -57,3 +57,5 @@ fun RecoveryRequestScreen(
             label = { Text("Email") },
             singleLine = true,
         )
+    }
+}

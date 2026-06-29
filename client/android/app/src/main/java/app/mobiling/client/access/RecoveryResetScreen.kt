@@ -75,3 +75,9 @@ fun RecoveryResetScreen(
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
+            modifier = Modifier.fillMaxWidth(),
+            label = { Text("New password") },
+            singleLine = true,
+        )
+    }
+}

@@ -8,8 +8,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import app.mobiling.client.access.MobilingAppShell
+import app.mobiling.client.attachment.AttachmentFeatureBridge
 import app.mobiling.client.auth.AccessAuthFeatureBridge
 import app.mobiling.client.cart.CartFeatureBridge
+import app.mobiling.client.data.attachment.AttachmentHttpGateway
 import app.mobiling.client.data.auth.session.AccessHttpAuthSessionGateway
 import app.mobiling.client.data.cart.CartHttpGateway
 import app.mobiling.client.data.navigation.shell.NavigationHttpShellGateway
@@ -31,6 +33,11 @@ class MainActivity : ComponentActivity() {
             writer = cartGateway,
             checkoutGateway = cartGateway,
         )
+        val attachmentGateway = AttachmentHttpGateway(baseUrl = MobileClientRuntimeConfig.mobileEdgeBaseUrl)
+        val attachmentFeatureBridge = AttachmentFeatureBridge(
+            reader = attachmentGateway,
+            writer = attachmentGateway,
+        )
 
         setContent {
             MaterialTheme {
@@ -38,6 +45,7 @@ class MainActivity : ComponentActivity() {
                     MobilingAppShell(
                         accessAuthFeatureBridge = accessAuthFeatureBridge,
                         cartFeatureBridge = cartFeatureBridge,
+                        attachmentFeatureBridge = attachmentFeatureBridge,
                         navigationShellGateway = NavigationHttpShellGateway(baseUrl = MobileClientRuntimeConfig.mobileEdgeBaseUrl),
                         vendorProfileGateway = VendorHttpProfileGateway(baseUrl = MobileClientRuntimeConfig.mobileEdgeBaseUrl),
                         vendorSummaryGateway = VendorHttpSummaryGateway(baseUrl = MobileClientRuntimeConfig.mobileEdgeBaseUrl),

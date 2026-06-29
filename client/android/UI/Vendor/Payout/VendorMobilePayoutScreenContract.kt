@@ -20,3 +20,4 @@ data class VendorMobilePayoutScreenContract(
             payoutAccountLabel = payload.payoutAccountLabel,
         )
     }
+}

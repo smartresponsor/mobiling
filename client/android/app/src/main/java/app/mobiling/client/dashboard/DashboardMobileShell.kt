@@ -29,6 +29,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import app.mobiling.client.attachment.AttachmentFeatureBridge
+import app.mobiling.client.attachment.AttachmentMobileScreen
 import app.mobiling.client.cart.CartFeatureBridge
 import app.mobiling.client.cart.CartMobileScreen
 import app.mobiling.client.contract.navigation.shell.NavigationMobileItemPayload
@@ -51,6 +53,7 @@ import app.mobiling.client.vendor.VendorMobileTransactionScreen
 fun DashboardMobileShell(
     navigationShellGateway: NavigationShellGateway?,
     cartFeatureBridge: CartFeatureBridge? = null,
+    attachmentFeatureBridge: AttachmentFeatureBridge? = null,
     vendorId: String? = null,
     vendorProfileGateway: VendorProfileGateway? = null,
     vendorSummaryGateway: VendorSummaryGateway? = null,
@@ -111,6 +114,7 @@ fun DashboardMobileShell(
             selectedRoute = selectedRoute,
             shell = shell,
             cartFeatureBridge = cartFeatureBridge,
+            attachmentFeatureBridge = attachmentFeatureBridge,
             vendorId = vendorId,
             vendorProfileGateway = vendorProfileGateway,
             vendorSummaryGateway = vendorSummaryGateway,
@@ -145,6 +149,7 @@ private fun DashboardContent(
     selectedRoute: String,
     shell: NavigationMobileShellScreenContract,
     cartFeatureBridge: CartFeatureBridge?,
+    attachmentFeatureBridge: AttachmentFeatureBridge?,
     vendorId: String?,
     vendorProfileGateway: VendorProfileGateway?,
     vendorSummaryGateway: VendorSummaryGateway?,
@@ -164,6 +169,7 @@ private fun DashboardContent(
         item {
             Text(
                 text = when (selectedRoute) {
+                    "attachment" -> "Attachments"
                     "cart" -> "Cart"
                     "vendor" -> "Vendor"
                     "vendor/profile" -> "My Profile"
@@ -183,6 +189,9 @@ private fun DashboardContent(
         }
 
         when (selectedRoute) {
+            "attachment" -> item {
+                AttachmentMobileScreen(vendorId = vendorId, attachmentFeatureBridge = attachmentFeatureBridge)
+            }
             "cart" -> item {
                 CartMobileScreen(cartFeatureBridge = cartFeatureBridge)
             }
@@ -279,7 +288,7 @@ private fun fallbackShell(): NavigationMobileShellScreenContract = NavigationMob
         item("vendor_profile", "My Profile", "person", true, "vendor/profile"),
         item("access_password", "Change Password", "key", false, "access/password"),
         item("access_verification", "Verification", "key", false, "access/verification"),
-        item("vendor_attachment", "My Attachments", "attachment", false, "attachment"),
+        item("vendor_attachment", "My Attachments", "attachment", true, "attachment"),
         item("access_sign_out", "Sign Out", "logout", true, "access/sign-out", action = "access.sign_out"),
     ),
     moreDrawer = listOf(
@@ -288,7 +297,7 @@ private fun fallbackShell(): NavigationMobileShellScreenContract = NavigationMob
         item("vendor", "Vendor", "store", true, "vendor"),
         item("catalog", "Catalog", "catalog", false, "catalog"),
         item("message", "Message", "message", false, "message"),
-        item("attachment", "Attachments", "attachment", false, "attachment"),
+        item("attachment", "Attachments", "attachment", true, "attachment"),
     ),
     vendorContext = listOf(
         item("vendor_overview", "My Vendor", "store", true, "vendor"),
@@ -297,7 +306,7 @@ private fun fallbackShell(): NavigationMobileShellScreenContract = NavigationMob
         item("vendor_statement", "Statement", "statement", true, "vendor/statement"),
         item("vendor_payout", "Payout", "payout", true, "vendor/payout"),
         item("vendor_transaction", "Transaction", "receipt", true, "vendor/transaction"),
-        item("vendor_attachment", "My Attachments", "attachment", false, "attachment"),
+        item("vendor_attachment", "My Attachments", "attachment", true, "attachment"),
     ),
 )
 
@@ -326,6 +335,7 @@ private fun item(
 )
 
 private fun isHandledRoute(route: String?): Boolean =
+    route == "attachment" ||
     route == "cart" ||
     setOf("dashboard", "vendor", "vendor/profile", "vendor/summary", "vendor/statement", "vendor/payout", "vendor/transaction", "more").contains(route)
 
