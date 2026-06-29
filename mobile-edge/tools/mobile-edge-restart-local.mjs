@@ -46,7 +46,8 @@ for (const processId of listeningProcessIds(port)) {
   console.log(`Stopped mobile-edge listener process ${processId}.`);
 }
 
-const startCommand = `Start-Process -FilePath "${process.execPath}" -ArgumentList "dist/app.js" -WorkingDirectory "${root}" -WindowStyle Hidden`;
+const localizingApiBaseUrl = process.env.LOCALIZING_API_BASE_URL || "http://127.0.0.1:8000";
+const startCommand = `$env:LOCALIZING_API_BASE_URL = "${localizingApiBaseUrl}"; Start-Process -FilePath "${process.execPath}" -ArgumentList "dist/app.js" -WorkingDirectory "${root}" -WindowStyle Hidden`;
 const startResult = spawnSync("powershell.exe", ["-NoProfile", "-Command", startCommand], {
   encoding: "utf8",
 });
