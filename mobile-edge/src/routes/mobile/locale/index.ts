@@ -87,7 +87,7 @@ export default async function routeMobileLocale(app: FastifyInstance): Promise<v
     );
 
     if (result.status >= 200 && result.status < 300) {
-      return reply.code(200).send(result.body);
+      return reply.code(200).send(normalizeFallbackPayload(result.body));
     }
 
     return reply.code(result.status).send(normalizeErrorPayload(result.body));
@@ -117,3 +117,15 @@ export default async function routeMobileLocale(app: FastifyInstance): Promise<v
     return reply.code(result.status).send(normalizeErrorPayload(result.body));
   });
 }
+function normalizeFallbackPayload(body: unknown): unknown {
+  if (!isRecord(body)) {
+    return body;
+  }
+
+  if (Array.isArray(body.fallback_chain) && !Object.prototype.hasOwnProperty.call(body, "chain")) {
+    return { ...body, chain: body.fallback_chain };
+  }
+
+  return body;
+}
+
