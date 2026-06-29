@@ -8,3 +8,5 @@ local.properties
 *.keystore
 *.jks
 mobile-edge/var/
+.codebase-memory/
+.mobile-cookie.txt
