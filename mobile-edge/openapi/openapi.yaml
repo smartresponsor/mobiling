@@ -693,3 +693,39 @@ components:
             properties:
               type: { type: string }
               ts: { type: number }
+  "\/locale":
+    get:
+      summary: Mobile locale list
+
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/MobileLocaleListPayload' } } } }
+  /locale:
+    get:
+      summary: Locale list
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/MobileLocaleListPayload' } } } }
+
+  /locale/{code}/fallback:
+    get:
+      summary: Locale fallback
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/MobileLocaleFallbackPayload' } } } }
+
+  /locale/translation/message/resolve:
+    get:
+      summary: Locale translation resolve
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/MobileLocaleTranslationPayload' } } } }
+
+    MobileLocaleErrorPayload:
+      type: object
+      additionalProperties: true
+    MobileLocaleListPayload:
+      type: object
+      additionalProperties: true
+    MobileLocaleFallbackPayload:
+      type: object
+      additionalProperties: true
+    MobileLocaleTranslationPayload:
+      type: object
+      additionalProperties: true

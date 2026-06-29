@@ -47,6 +47,24 @@
       "status": "declared-in-component"
     },
     {
+      "owner": "Localizing",
+      "mobileRoute": "GET /locale",
+      "upstreamRoute": "GET /api/locale",
+      "status": "declared-in-component"
+    },
+    {
+      "owner": "Localizing",
+      "mobileRoute": "GET /locale/:code/fallback",
+      "upstreamRoute": "GET /api/locale/{code}/fallback",
+      "status": "declared-in-component"
+    },
+    {
+      "owner": "Localizing",
+      "mobileRoute": "GET \/locale\/translation\/message\/resolve",
+      "upstreamRoute": "GET \/api\/locale\/translation\/message\/resolve",
+      "status": "declared-in-component"
+    },
+    {
       "owner": "Vendoring",
       "mobileRoute": "GET /vendor/profile/:vendorId",
       "upstreamRoute": "GET /api/vendor/profile/show/{vendorId}",
