@@ -2,6 +2,7 @@ import SwiftUI
 
 public struct MobileDashboardShellView: View {
     private let navigationShellGateway: NavigationShellGateway?
+    private let attachmentFeatureBridge: AttachmentFeatureBridge?
     private let vendorId: String?
     private let vendorProfileGateway: VendorProfileGateway?
     private let vendorSummaryGateway: VendorSummaryGateway?
@@ -15,8 +16,9 @@ public struct MobileDashboardShellView: View {
     @State private var accountOpen: Bool = false
     @State private var shell: MobileNavigationShellScreenContract = MobileDashboardShellView.fallbackShell()
 
-    public init(navigationShellGateway: NavigationShellGateway? = nil, vendorId: String? = nil, vendorProfileGateway: VendorProfileGateway? = nil, vendorSummaryGateway: VendorSummaryGateway? = nil, vendorStatementGateway: VendorStatementGateway? = nil, vendorPayoutGateway: VendorPayoutGateway? = nil, vendorTransactionGateway: VendorTransactionGateway? = nil, onSignOut: @escaping () -> Void) {
+    public init(navigationShellGateway: NavigationShellGateway? = nil, attachmentFeatureBridge: AttachmentFeatureBridge? = nil, vendorId: String? = nil, vendorProfileGateway: VendorProfileGateway? = nil, vendorSummaryGateway: VendorSummaryGateway? = nil, vendorStatementGateway: VendorStatementGateway? = nil, vendorPayoutGateway: VendorPayoutGateway? = nil, vendorTransactionGateway: VendorTransactionGateway? = nil, onSignOut: @escaping () -> Void) {
         self.navigationShellGateway = navigationShellGateway
+        self.attachmentFeatureBridge = attachmentFeatureBridge
         self.vendorId = vendorId
         self.vendorProfileGateway = vendorProfileGateway
         self.vendorSummaryGateway = vendorSummaryGateway
@@ -50,6 +52,9 @@ public struct MobileDashboardShellView: View {
                         .toolbar { accountToolbar }
                 } else if vendorContentRoute == "vendor/transaction" {
                     MobileVendorTransactionView(vendorId: vendorId, vendorTransactionGateway: vendorTransactionGateway)
+                        .toolbar { accountToolbar }
+                } else if vendorContentRoute == "attachment" {
+                    MobileAttachmentView(vendorId: vendorId, attachmentFeatureBridge: attachmentFeatureBridge)
                         .toolbar { accountToolbar }
                 } else {
                     content(title: "Vendor", items: vendorContentRoute == "vendor" ? shell.vendorContext : [])
@@ -162,6 +167,13 @@ public struct MobileDashboardShellView: View {
             return
         }
 
+        if route == "attachment" {
+            vendorContentRoute = "attachment"
+            selectedRoute = "vendor"
+            accountOpen = false
+            return
+        }
+
         if route.hasPrefix("vendor/") {
             vendorContentRoute = route
             selectedRoute = "vendor"
@@ -196,7 +208,7 @@ public struct MobileDashboardShellView: View {
     }
 
     private func isHandledRoute(_ route: String) -> Bool {
-        ["dashboard", "vendor", "vendor/profile", "vendor/summary", "vendor/statement", "vendor/payout", "vendor/transaction", "more"].contains(route)
+        ["dashboard", "vendor", "vendor/profile", "vendor/summary", "vendor/statement", "vendor/payout", "vendor/transaction", "attachment", "more"].contains(route)
     }
 
     private static func fallbackShell() -> MobileNavigationShellScreenContract {
@@ -210,7 +222,7 @@ public struct MobileDashboardShellView: View {
                 item("vendor_profile", "My Profile", "person", true, "vendor/profile"),
                 item("access_password", "Change Password", "key", false, "access/password"),
                 item("access_verification", "Verification", "key", false, "access/verification"),
-                item("vendor_attachment", "My Attachments", "attachment", false, "attachment"),
+                item("vendor_attachment", "My Attachments", "attachment", true, "attachment"),
                 item("access_sign_out", "Sign Out", "logout", true, "access/sign-out", action: "access.sign_out"),
             ],
             moreDrawer: [
@@ -218,7 +230,7 @@ public struct MobileDashboardShellView: View {
                 item("vendor", "Vendor", "store", true, "vendor"),
                 item("catalog", "Catalog", "catalog", false, "catalog"),
                 item("message", "Message", "message", false, "message"),
-                item("attachment", "Attachments", "attachment", false, "attachment"),
+                item("attachment", "Attachments", "attachment", true, "attachment"),
             ],
             vendorContext: [
                 item("vendor_overview", "My Vendor", "store", true, "vendor"),
@@ -227,7 +239,7 @@ public struct MobileDashboardShellView: View {
                 item("vendor_statement", "Statement", "statement", true, "vendor/statement"),
                 item("vendor_payout", "Payout", "payout", true, "vendor/payout"),
                 item("vendor_transaction", "Transaction", "receipt", true, "vendor/transaction"),
-                item("vendor_attachment", "My Attachments", "attachment", false, "attachment"),
+                item("vendor_attachment", "My Attachments", "attachment", true, "attachment"),
             ]
         )
     }

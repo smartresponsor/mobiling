@@ -20,6 +20,7 @@ let package = Package(
         "Navigation",
         "UI",
         "App/Access",
+        "App/Attachment",
         "App/Auth",
         "App/Catalog",
         "App/Dashboard",

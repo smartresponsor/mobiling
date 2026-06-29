@@ -40,7 +40,7 @@ for path in android.rglob("*.kt"):
             canonical = symbols.get((owner, name.lower()))
             if canonical and canonical != name: error.append(f"non-canonical Kotlin import: {path.relative_to(root)}: {name} -> {canonical}")
 edge = (root / "mobile-edge/src/app.ts").read_text(encoding="utf-8")
-android_shell = (root / "client/android/app/src/main/java/app/mobiling/client/dashboard/MobileDashboardShell.kt").read_text(encoding="utf-8")
+android_shell = (root / "client/android/app/src/main/java/app/mobiling/client/dashboard/DashboardMobileShell.kt").read_text(encoding="utf-8")
 ios_shell = (root / "client/ios/App/Dashboard/MobileDashboardShellView.swift").read_text(encoding="utf-8")
 
 def require_shell_contains(name: str, text: str, needle: str) -> None:
@@ -64,7 +64,7 @@ for route in ["dashboard", "vendor", "vendor/profile", "more"]:
     require_shell_contains("Android handled route", android_shell, f'"{route}"')
     require_shell_contains("iOS handled route", ios_shell, f'"{route}"')
 
-for disabled_key in ["access_password", "access_verification", "vendor_attachment", "catalog", "message", "attachment"]:
+for disabled_key in ["access_password", "access_verification", "catalog", "message"]:
     require_shell_contains("Android disabled item", android_shell, f'item("{disabled_key}"')
     require_shell_contains("iOS disabled item", ios_shell, f'item("{disabled_key}"')
 
@@ -114,10 +114,8 @@ for active_item in [
 for disabled_item in [
     'item("access_password", "Change Password", "key", false, "access/password")',
     'item("access_verification", "Verification", "key", false, "access/verification")',
-    'item("vendor_attachment", "My Attachments", "attachment", false, "attachment")',
     'item("catalog", "Catalog", "catalog", false, "catalog")',
     'item("message", "Message", "message", false, "message")',
-    'item("attachment", "Attachments", "attachment", false, "attachment")',
 ]:
     require_shell_contains("Android disabled fallback item", android_shell, disabled_item)
     require_shell_contains("iOS disabled fallback item", ios_shell, disabled_item)

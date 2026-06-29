@@ -4,6 +4,7 @@ public struct MobilingAppShell: View {
     @State private var currentScreen: AccessScreen = .welcome
     @State private var activeVendorId: String?
     private let authFeatureBridge: AuthFeatureBridge?
+    private let attachmentFeatureBridge: AttachmentFeatureBridge?
     private let navigationShellGateway: NavigationShellGateway?
     private let vendorProfileGateway: VendorProfileGateway?
     private let vendorSummaryGateway: VendorSummaryGateway?
@@ -11,8 +12,9 @@ public struct MobilingAppShell: View {
     private let vendorPayoutGateway: VendorPayoutGateway?
     private let vendorTransactionGateway: VendorTransactionGateway?
 
-    public init(authFeatureBridge: AuthFeatureBridge? = nil, navigationShellGateway: NavigationShellGateway? = nil, vendorProfileGateway: VendorProfileGateway? = nil, vendorSummaryGateway: VendorSummaryGateway? = nil, vendorStatementGateway: VendorStatementGateway? = nil, vendorPayoutGateway: VendorPayoutGateway? = nil, vendorTransactionGateway: VendorTransactionGateway? = nil) {
+    public init(authFeatureBridge: AuthFeatureBridge? = nil, attachmentFeatureBridge: AttachmentFeatureBridge? = nil, navigationShellGateway: NavigationShellGateway? = nil, vendorProfileGateway: VendorProfileGateway? = nil, vendorSummaryGateway: VendorSummaryGateway? = nil, vendorStatementGateway: VendorStatementGateway? = nil, vendorPayoutGateway: VendorPayoutGateway? = nil, vendorTransactionGateway: VendorTransactionGateway? = nil) {
         self.authFeatureBridge = authFeatureBridge
+        self.attachmentFeatureBridge = attachmentFeatureBridge
         self.navigationShellGateway = navigationShellGateway
         self.vendorProfileGateway = vendorProfileGateway
         self.vendorSummaryGateway = vendorSummaryGateway
@@ -27,6 +29,7 @@ public struct MobilingAppShell: View {
             case .dashboard:
                 MobileDashboardShellView(
                     navigationShellGateway: navigationShellGateway,
+                    attachmentFeatureBridge: attachmentFeatureBridge,
                     vendorId: activeVendorId,
                     vendorProfileGateway: vendorProfileGateway,
                     vendorSummaryGateway: vendorSummaryGateway,

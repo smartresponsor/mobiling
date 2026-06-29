@@ -7,6 +7,10 @@ struct ContentView: View {
             authFeatureBridge: AuthFeatureBridge(
                 gateway: HttpAuthSessionGateway(baseUrl: MobileClientRuntimeConfig.mobileEdgeBaseUrl)
             ),
+            attachmentFeatureBridge: AttachmentFeatureBridge(
+                reader: HttpAttachmentGateway(baseUrl: MobileClientRuntimeConfig.mobileEdgeBaseUrl),
+                writer: HttpAttachmentGateway(baseUrl: MobileClientRuntimeConfig.mobileEdgeBaseUrl)
+            ),
             navigationShellGateway: HttpNavigationShellGateway(baseUrl: MobileClientRuntimeConfig.mobileEdgeBaseUrl),
             vendorProfileGateway: HttpVendorProfileGateway(baseUrl: MobileClientRuntimeConfig.mobileEdgeBaseUrl),
             vendorSummaryGateway: HttpVendorSummaryGateway(baseUrl: MobileClientRuntimeConfig.mobileEdgeBaseUrl),

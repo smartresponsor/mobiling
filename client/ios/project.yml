@@ -17,6 +17,7 @@ targets:
       - path: Navigation
       - path: UI
       - path: App/Access
+      - path: App/Attachment
       - path: App/Auth
       - path: App/Catalog
       - path: App/Dashboard
