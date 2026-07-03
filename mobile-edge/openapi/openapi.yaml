@@ -325,6 +325,18 @@ paths:
         '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/MobileAttachmentFilePayload' } } } }
         '422': { description: Invalid attachment id, content: { application/json: { schema: { $ref: '#/components/schemas/MobileAccessErrorPayload' } } } }
         '503': { description: Attaching API unavailable, content: { application/json: { schema: { $ref: '#/components/schemas/MobileAccessErrorPayload' } } } }
+  /attachment/upload-handoff:
+    post:
+      summary: Mobile attachment upload handoff
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/MobileAttachmentUploadHandoffRequest' }
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/MobileAttachmentUploadHandoffPayload' } } } }
+        '422': { description: Invalid attachment upload handoff payload, content: { application/json: { schema: { $ref: '#/components/schemas/MobileAccessErrorPayload' } } } }
+        '503': { description: Attaching API unavailable, content: { application/json: { schema: { $ref: '#/components/schemas/MobileAccessErrorPayload' } } } }
   /navigation/mobile/shell:
     get:
       summary: Mobile navigation shell
@@ -677,6 +689,30 @@ components:
         downloadUrl: { type: string, minLength: 1 }
         mimeType: { anyOf: [{ type: string, minLength: 1 }, { type: 'null' }] }
         fileName: { anyOf: [{ type: string, minLength: 1 }, { type: 'null' }] }
+        handoffMode: { type: string, minLength: 1 }
+        payload: { type: object, additionalProperties: true }
+    MobileAttachmentUploadHandoffRequest:
+      type: object
+      additionalProperties: false
+      required: [ownerType, ownerId]
+      properties:
+        ownerType: { type: string, minLength: 1 }
+        ownerId: { type: string, minLength: 1 }
+        context: { anyOf: [{ type: string, minLength: 1 }, { type: 'null' }] }
+        slot: { anyOf: [{ type: string, minLength: 1 }, { type: 'null' }] }
+        isPrimary: { type: boolean }
+        title: { anyOf: [{ type: string, minLength: 1 }, { type: 'null' }] }
+        description: { anyOf: [{ type: string, minLength: 1 }, { type: 'null' }] }
+        altText: { anyOf: [{ type: string, minLength: 1 }, { type: 'null' }] }
+    MobileAttachmentUploadHandoffPayload:
+      type: object
+      additionalProperties: false
+      required: [uploadUrl, method, fieldName, form, handoffMode, payload]
+      properties:
+        uploadUrl: { type: string, minLength: 1 }
+        method: { type: string, minLength: 1 }
+        fieldName: { type: string, minLength: 1 }
+        form: { type: object, additionalProperties: true }
         handoffMode: { type: string, minLength: 1 }
         payload: { type: object, additionalProperties: true }
     MobileCartItemPayload:
