@@ -1,32 +1,189 @@
 {
-  "schema": "mobile.navigation.shell.v1",
+  "schema": "smartresponsor.navigation.mobile.shell.v1",
   "channel": "mobile",
-  "platforms": ["android", "ios"],
+  "platforms": [
+    "android",
+    "ios"
+  ],
   "locations": {
-    "dashboard": [
+    "mobile.bottom.primary": [
       {
-        "key": "vendor.summary",
-        "label": "Vendor summary",
-        "icon": "storefront",
+        "key": "dashboard",
+        "label": "Dashboard",
+        "icon": "dashboard",
         "badge": null,
         "enabled": true,
         "visible": true,
         "status": "active",
         "disabledReason": null,
-        "requiredComponent": "Vendoring",
-        "location": "dashboard",
-        "group": "vendor",
-        "groupLabel": "Vendor",
-        "action": "open_route",
-        "route": "/vendor/summary/:vendorId",
-        "target": {
-          "screen": "vendor.summary"
-        },
+        "requiredComponent": null,
+        "location": "mobile.bottom.primary",
+        "group": "primary",
+        "groupLabel": "Primary",
+        "action": null,
+        "route": "dashboard",
         "metadata": {
-          "contract": "MobileVendorSummaryPayload"
+          "mobile_route": "dashboard"
+        }
+      },
+      {
+        "key": "vendor",
+        "label": "Vendor",
+        "icon": "store",
+        "badge": null,
+        "enabled": true,
+        "visible": true,
+        "status": "active",
+        "disabledReason": null,
+        "requiredComponent": null,
+        "location": "mobile.bottom.primary",
+        "group": "primary",
+        "groupLabel": "Primary",
+        "action": null,
+        "route": "vendor",
+        "metadata": {
+          "mobile_route": "vendor"
+        }
+      },
+      {
+        "key": "more",
+        "label": "More",
+        "icon": "menu",
+        "badge": null,
+        "enabled": true,
+        "visible": true,
+        "status": "active",
+        "disabledReason": null,
+        "requiredComponent": null,
+        "location": "mobile.bottom.primary",
+        "group": "primary",
+        "groupLabel": "Primary",
+        "action": "navigation.open_more",
+        "route": "more",
+        "metadata": {
+          "mobile_route": "more"
         }
       }
     ],
-    "more": []
+    "mobile.account.quick": [
+      {
+        "key": "vendor_attachment",
+        "label": "My Attachments",
+        "icon": "attachment",
+        "badge": null,
+        "enabled": true,
+        "visible": true,
+        "status": "active",
+        "disabledReason": null,
+        "requiredComponent": null,
+        "location": "mobile.account.quick",
+        "group": "account",
+        "groupLabel": "Account",
+        "action": null,
+        "route": "attachment",
+        "metadata": {
+          "mobile_route": "attachment"
+        }
+      },
+      {
+        "key": "access_sign_out",
+        "label": "Sign Out",
+        "icon": "logout",
+        "badge": null,
+        "enabled": true,
+        "visible": true,
+        "status": "active",
+        "disabledReason": null,
+        "requiredComponent": null,
+        "location": "mobile.account.quick",
+        "group": "account",
+        "groupLabel": "Account",
+        "action": "access.sign_out",
+        "route": "access/sign-out",
+        "metadata": {
+          "mobile_route": "access/sign-out"
+        }
+      }
+    ],
+    "mobile.more.drawer": [
+      {
+        "key": "dashboard",
+        "label": "Dashboard",
+        "icon": "dashboard",
+        "badge": null,
+        "enabled": true,
+        "visible": true,
+        "status": "active",
+        "disabledReason": null,
+        "requiredComponent": null,
+        "location": "mobile.more.drawer",
+        "group": "active",
+        "groupLabel": "Active",
+        "action": null,
+        "route": "dashboard",
+        "metadata": {
+          "mobile_route": "dashboard"
+        }
+      },
+      {
+        "key": "vendor",
+        "label": "Vendor",
+        "icon": "store",
+        "badge": null,
+        "enabled": true,
+        "visible": true,
+        "status": "active",
+        "disabledReason": null,
+        "requiredComponent": null,
+        "location": "mobile.more.drawer",
+        "group": "active",
+        "groupLabel": "Active",
+        "action": null,
+        "route": "vendor",
+        "metadata": {
+          "mobile_route": "vendor"
+        }
+      },
+      {
+        "key": "attachment",
+        "label": "Attachments",
+        "icon": "attachment",
+        "badge": null,
+        "enabled": true,
+        "visible": true,
+        "status": "active",
+        "disabledReason": null,
+        "requiredComponent": null,
+        "location": "mobile.more.drawer",
+        "group": "active",
+        "groupLabel": "Active",
+        "action": null,
+        "route": "attachment",
+        "metadata": {
+          "mobile_route": "attachment"
+        }
+      }
+    ],
+    "mobile.vendor.context": [
+      {
+        "key": "vendor_attachment",
+        "label": "My Attachments",
+        "icon": "attachment",
+        "badge": null,
+        "enabled": true,
+        "visible": true,
+        "status": "active",
+        "disabledReason": null,
+        "requiredComponent": null,
+        "location": "mobile.vendor.context",
+        "group": "vendor",
+        "groupLabel": "Vendor",
+        "action": null,
+        "route": "attachment",
+        "metadata": {
+          "mobile_route": "attachment"
+        }
+      }
+    ]
   }
 }
