@@ -32,7 +32,7 @@ export class AttachingApiClient {
   ) {
   }
 
-  listAttachments(query: AttachingListQuery, forwardedHeaders: Record<string, string> = {}): Promise<AttachingApiResponse> {
+  listAttachment(query: AttachingListQuery, forwardedHeaders: Record<string, string> = {}): Promise<AttachingApiResponse> {
     const search = new URLSearchParams();
 
     for (const [key, value] of Object.entries(query)) {

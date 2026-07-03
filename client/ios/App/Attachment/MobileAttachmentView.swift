@@ -16,7 +16,7 @@ public struct MobileAttachmentView: View {
     public var body: some View {
         List {
             Section {
-                Text("Attachments")
+                Text("Attachment")
                     .font(.headline)
                 Text("Vendor-owned attachment links from Attaching.")
                     .font(.footnote)
@@ -25,7 +25,7 @@ public struct MobileAttachmentView: View {
 
             if isLoading {
                 Section {
-                    Text("Loading attachments...")
+                    Text("Loading attachment...")
                 }
             }
 
@@ -43,7 +43,7 @@ public struct MobileAttachmentView: View {
 
                 if attachmentList.items.isEmpty {
                     Section {
-                        Text("No attachments yet.")
+                        Text("No attachment yet.")
                     }
                 } else {
                     Section("Files") {
@@ -72,7 +72,7 @@ public struct MobileAttachmentView: View {
                 }
             }
         }
-        .navigationTitle("Attachments")
+        .navigationTitle("Attachment")
         .task(id: vendorId ?? "") {
             await load()
         }
@@ -93,7 +93,7 @@ public struct MobileAttachmentView: View {
         errorMessage = nil
 
         guard let activeVendorId = vendorId?.trimmingCharacters(in: .whitespacesAndNewlines), !activeVendorId.isEmpty else {
-            errorMessage = "Attachments require an active vendor session."
+            errorMessage = "Attachment require an active vendor session."
             return
         }
 

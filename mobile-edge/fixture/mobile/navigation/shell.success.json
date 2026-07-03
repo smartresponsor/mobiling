@@ -68,7 +68,7 @@
     "mobile.account.quick": [
       {
         "key": "vendor_attachment",
-        "label": "My Attachments",
+        "label": "My Attachment",
         "icon": "attachment",
         "badge": null,
         "enabled": true,
@@ -146,7 +146,7 @@
       },
       {
         "key": "attachment",
-        "label": "Attachments",
+        "label": "Attachment",
         "icon": "attachment",
         "badge": null,
         "enabled": true,
@@ -167,7 +167,7 @@
     "mobile.vendor.context": [
       {
         "key": "vendor_attachment",
-        "label": "My Attachments",
+        "label": "My Attachment",
         "icon": "attachment",
         "badge": null,
         "enabled": true,

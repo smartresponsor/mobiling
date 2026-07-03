@@ -34,7 +34,7 @@ fun AttachmentMobileScreen(
     fun refresh() {
         if (activeVendorId.isBlank()) {
             attachmentList = null
-            error = "Attachments require an active vendor session."
+            error = "Attachment require an active vendor session."
             loading = false
             return
         }
@@ -53,7 +53,7 @@ fun AttachmentMobileScreen(
                 error = null
             } catch (exception: Exception) {
                 attachmentList = null
-                error = exception.message ?: "Attachments are unavailable."
+                error = exception.message ?: "Attachment are unavailable."
             } finally {
                 loading = false
             }
@@ -68,7 +68,7 @@ fun AttachmentMobileScreen(
         modifier = Modifier.fillMaxWidth().padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        Text("Attachments", fontWeight = FontWeight.Bold)
+        Text("Attachment", fontWeight = FontWeight.Bold)
         Text(statusText(loading = loading, error = error, attachmentList = attachmentList))
         attachmentList?.items.orEmpty().forEach { item ->
             ListItem(
@@ -93,7 +93,7 @@ private fun statusText(
     error: String?,
     attachmentList: AttachmentListPayload?,
 ): String = when {
-    loading -> "Loading attachments..."
+    loading -> "Loading attachment..."
     error != null -> error
     attachmentList != null -> "Current attachment status: ${attachmentList.count} item(s)"
     else -> "Current attachment status: not loaded"

@@ -14,7 +14,7 @@ This evidence memo records the current release-candidate status for the mobile A
 Attaching backend -> mobile-edge -> Android -> iOS
 ```
 
-The target surface is the mobile attachment bridge for vendor-owned attachments, using the canonical mobile route names and the existing Mobile Dashboard shell.
+The target surface is the mobile attachment bridge for vendor-owned attachment, using the canonical mobile route names and the existing Mobile Dashboard shell.
 
 ## Canonical decisions
 
@@ -79,8 +79,8 @@ POST /attachment/link
 Upstream mapping:
 
 ```text
-GET /attachment -> GET /attachments
-POST /attachment/link -> POST /attachments/attach
+GET /attachment -> GET /attachment
+POST /attachment/link -> POST /attachment/attach
 ```
 
 Evidence:

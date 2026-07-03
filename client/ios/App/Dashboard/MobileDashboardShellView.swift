@@ -222,7 +222,7 @@ public struct MobileDashboardShellView: View {
                 item("vendor_profile", "My Profile", "person", true, "vendor/profile"),
                 item("access_password", "Change Password", "key", false, "access/password"),
                 item("access_verification", "Verification", "key", false, "access/verification"),
-                item("vendor_attachment", "My Attachments", "attachment", true, "attachment"),
+                item("vendor_attachment", "My Attachment", "attachment", true, "attachment"),
                 item("access_sign_out", "Sign Out", "logout", true, "access/sign-out", action: "access.sign_out"),
             ],
             moreDrawer: [
@@ -230,7 +230,7 @@ public struct MobileDashboardShellView: View {
                 item("vendor", "Vendor", "store", true, "vendor"),
                 item("catalog", "Catalog", "catalog", false, "catalog"),
                 item("message", "Message", "message", false, "message"),
-                item("attachment", "Attachments", "attachment", true, "attachment"),
+                item("attachment", "Attachment", "attachment", true, "attachment"),
             ],
             vendorContext: [
                 item("vendor_overview", "My Vendor", "store", true, "vendor"),
@@ -239,7 +239,7 @@ public struct MobileDashboardShellView: View {
                 item("vendor_statement", "Statement", "statement", true, "vendor/statement"),
                 item("vendor_payout", "Payout", "payout", true, "vendor/payout"),
                 item("vendor_transaction", "Transaction", "receipt", true, "vendor/transaction"),
-                item("vendor_attachment", "My Attachments", "attachment", true, "attachment"),
+                item("vendor_attachment", "My Attachment", "attachment", true, "attachment"),
             ]
         )
     }

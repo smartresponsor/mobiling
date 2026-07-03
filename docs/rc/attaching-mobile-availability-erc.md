@@ -74,7 +74,7 @@ Android availability:
 * `attachment` is a known route.
 * `attachment` is currently renderable.
 * dashboard shell renders `AttachmentMobileScreen` for the `attachment` route.
-* screen loads vendor-owned attachments through `AttachmentFeatureBridge`.
+* screen loads vendor-owned attachment through `AttachmentFeatureBridge`.
 
 ### iOS
 
@@ -94,7 +94,7 @@ iOS availability:
 * `attachment` is a known route.
 * `attachment` is currently renderable.
 * dashboard shell renders `MobileAttachmentView` for the `attachment` route.
-* view loads vendor-owned attachments through `AttachmentFeatureBridge`.
+* view loads vendor-owned attachment through `AttachmentFeatureBridge`.
 
 ## Navigating menu availability
 
@@ -102,10 +102,10 @@ Current mobile menu locations that can expose Attaching:
 
 | Location | Label | Route | Status |
 | --- | --- | --- | --- |
-| account quick | My Attachments | `attachment` | active |
-| more drawer active | Attachments | `attachment` | active |
-| vendor context | My Attachments | `attachment` | active |
-| more drawer coming soon | Attachments | `attachment` | hidden/disabled fallback |
+| account quick | My Attachment | `attachment` | active |
+| more drawer active | Attachment | `attachment` | active |
+| vendor context | My Attachment | `attachment` | active |
+| more drawer coming soon | Attachment | `attachment` | hidden/disabled fallback |
 
 Current web menu candidates remain Navigating-owned:
 

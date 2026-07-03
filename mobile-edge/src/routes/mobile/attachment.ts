@@ -145,7 +145,7 @@ function listQuery(query: unknown): { ownerType?: string; ownerId?: string; cont
 
 export default async function route(app: FastifyInstance): Promise<void> {
   app.get("/attachment", { schema: { response: { 200: mobileAttachmentListPayload, 400: mobileAccessErrorPayload, 404: mobileAccessErrorPayload, 422: mobileAccessErrorPayload, 500: mobileAccessErrorPayload, 503: mobileAccessErrorPayload } } }, async (request, reply) => {
-    const result = await attachingApiClient.listAttachments(
+    const result = await attachingApiClient.listAttachment(
       listQuery(request.query),
       forwardedHeaders(request as { headers: Record<string, unknown> }),
     );
