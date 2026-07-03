@@ -53,7 +53,7 @@ public struct HttpAttachmentGateway: AttachmentReader, AttachmentWriter {
         let rawItems = object["items"] as? [[String: Any]] ?? []
         let items = rawItems.map { itemObject in
             AttachmentItemPayload(
-                attachmentId: int64(itemObject["attachmentId"]) ?? 0,
+                attachmentId: string(itemObject["attachmentId"]) ?? "attachment-unavailable",
                 type: string(itemObject["type"]),
                 mimeType: string(itemObject["mimeType"]),
                 downloadUrl: string(itemObject["downloadUrl"]),
@@ -118,7 +118,7 @@ public struct HttpAttachmentGateway: AttachmentReader, AttachmentWriter {
 
         return AttachmentLinkPayload(
             linkId: string(object["linkId"]),
-            attachmentId: int64(object["attachmentId"]) ?? request.attachmentId,
+            attachmentId: string(object["attachmentId"]) ?? String(request.attachmentId),
             ownerType: string(object["ownerType"]) ?? request.ownerType,
             ownerId: string(object["ownerId"]) ?? request.ownerId,
             context: string(object["context"]),

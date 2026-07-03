@@ -2,7 +2,7 @@ import Foundation
 
 public struct AttachmentLinkPayload: Sendable {
     public let linkId: String?
-    public let attachmentId: Int64
+    public let attachmentId: String
     public let ownerType: String
     public let ownerId: String
     public let context: String?
@@ -13,7 +13,7 @@ public struct AttachmentLinkPayload: Sendable {
 
     public init(
         linkId: String?,
-        attachmentId: Int64,
+        attachmentId: String,
         ownerType: String,
         ownerId: String,
         context: String?,
