@@ -3,6 +3,7 @@ import SwiftUI
 public struct MobileDashboardShellView: View {
     private let navigationShellGateway: NavigationShellGateway?
     private let attachmentFeatureBridge: AttachmentFeatureBridge?
+    private let catalogFeatureBridge: CatalogFeatureBridge?
     private let vendorId: String?
     private let vendorProfileGateway: VendorProfileGateway?
     private let vendorSummaryGateway: VendorSummaryGateway?
@@ -16,9 +17,10 @@ public struct MobileDashboardShellView: View {
     @State private var accountOpen: Bool = false
     @State private var shell: MobileNavigationShellScreenContract = MobileDashboardShellView.fallbackShell()
 
-    public init(navigationShellGateway: NavigationShellGateway? = nil, attachmentFeatureBridge: AttachmentFeatureBridge? = nil, vendorId: String? = nil, vendorProfileGateway: VendorProfileGateway? = nil, vendorSummaryGateway: VendorSummaryGateway? = nil, vendorStatementGateway: VendorStatementGateway? = nil, vendorPayoutGateway: VendorPayoutGateway? = nil, vendorTransactionGateway: VendorTransactionGateway? = nil, onSignOut: @escaping () -> Void) {
+    public init(navigationShellGateway: NavigationShellGateway? = nil, attachmentFeatureBridge: AttachmentFeatureBridge? = nil, catalogFeatureBridge: CatalogFeatureBridge? = nil, vendorId: String? = nil, vendorProfileGateway: VendorProfileGateway? = nil, vendorSummaryGateway: VendorSummaryGateway? = nil, vendorStatementGateway: VendorStatementGateway? = nil, vendorPayoutGateway: VendorPayoutGateway? = nil, vendorTransactionGateway: VendorTransactionGateway? = nil, onSignOut: @escaping () -> Void) {
         self.navigationShellGateway = navigationShellGateway
         self.attachmentFeatureBridge = attachmentFeatureBridge
+        self.catalogFeatureBridge = catalogFeatureBridge
         self.vendorId = vendorId
         self.vendorProfileGateway = vendorProfileGateway
         self.vendorSummaryGateway = vendorSummaryGateway
@@ -65,8 +67,13 @@ public struct MobileDashboardShellView: View {
             .tag("vendor")
 
             NavigationView {
-                content(title: "More", items: shell.moreDrawer)
-                    .toolbar { accountToolbar }
+                if selectedRoute == "catalog" {
+                    MobileCatalogView(catalogFeatureBridge: catalogFeatureBridge)
+                        .toolbar { accountToolbar }
+                } else {
+                    content(title: "More", items: shell.moreDrawer)
+                        .toolbar { accountToolbar }
+                }
             }
             .tabItem { Label("More", systemImage: "line.3.horizontal") }
             .tag("more")

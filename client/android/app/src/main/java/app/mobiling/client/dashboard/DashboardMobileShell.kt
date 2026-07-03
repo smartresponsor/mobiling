@@ -32,6 +32,8 @@ import androidx.compose.ui.unit.dp
 import app.mobiling.client.attachment.AttachmentFeatureBridge
 import app.mobiling.client.attachment.AttachmentMobileScreen
 import app.mobiling.client.cart.CartFeatureBridge
+import app.mobiling.client.catalog.CatalogFeatureBridge
+import app.mobiling.client.catalog.CatalogMobileScreen
 import app.mobiling.client.cart.CartMobileScreen
 import app.mobiling.client.contract.navigation.shell.NavigationMobileItemPayload
 import app.mobiling.client.data.navigation.shell.NavigationShellGateway
@@ -54,6 +56,7 @@ import app.mobiling.client.vendor.VendorMobileTransactionScreen
 fun DashboardMobileShell(
     navigationShellGateway: NavigationShellGateway?,
     cartFeatureBridge: CartFeatureBridge? = null,
+    catalogFeatureBridge: CatalogFeatureBridge? = null,
     attachmentFeatureBridge: AttachmentFeatureBridge? = null,
     vendorId: String? = null,
     vendorProfileGateway: VendorProfileGateway? = null,
@@ -115,6 +118,7 @@ fun DashboardMobileShell(
             selectedRoute = selectedRoute,
             shell = shell,
             cartFeatureBridge = cartFeatureBridge,
+            catalogFeatureBridge = catalogFeatureBridge,
             attachmentFeatureBridge = attachmentFeatureBridge,
             vendorId = vendorId,
             vendorProfileGateway = vendorProfileGateway,
@@ -150,6 +154,7 @@ private fun DashboardContent(
     selectedRoute: String,
     shell: NavigationMobileShellScreenContract,
     cartFeatureBridge: CartFeatureBridge?,
+    catalogFeatureBridge: CatalogFeatureBridge?,
     attachmentFeatureBridge: AttachmentFeatureBridge?,
     vendorId: String?,
     vendorProfileGateway: VendorProfileGateway?,
@@ -172,6 +177,7 @@ private fun DashboardContent(
                 text = when (selectedRoute) {
                     "attachment" -> "Attachment"
                     "cart" -> "Cart"
+                    "catalog" -> "Catalog"
                     "vendor" -> "Vendor"
                     "vendor/profile" -> "My Profile"
                     "vendor/summary" -> "Vendor Summary"
@@ -195,6 +201,9 @@ private fun DashboardContent(
             }
             "cart" -> item {
                 CartMobileScreen(cartFeatureBridge = cartFeatureBridge)
+            }
+            "catalog" -> item {
+                CatalogMobileScreen(catalogFeatureBridge = catalogFeatureBridge)
             }
             "vendor" -> item {
                 ShellSection(title = "Vendor", items = shell.vendorContext, onItemClick = { item ->

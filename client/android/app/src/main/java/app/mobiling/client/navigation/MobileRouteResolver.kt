@@ -64,6 +64,7 @@ object MobileRouteResolver {
         MobileRoute.Vendor.Statement,
         MobileRoute.Vendor.Payout,
         MobileRoute.Vendor.Transaction,
+        MobileRoute.Catalog.Root,
         MobileRoute.Attachment.Root -> true
         else -> false
     }

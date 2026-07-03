@@ -59,6 +59,7 @@ public enum MobileRouteResolver {
              .vendorStatement,
              .vendorPayout,
              .vendorTransaction,
+             .catalog,
              .attachment:
             return true
         default:
