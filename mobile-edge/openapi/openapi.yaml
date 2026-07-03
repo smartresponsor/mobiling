@@ -289,13 +289,13 @@ paths:
       responses:
         '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/MobileCatalogMutationPayload' } } } }
         '503': { description: Cataloging API unavailable, content: { application/json: { schema: { $ref: '#/components/schemas/MobileAccessErrorPayload' } } } }
-  /catalog/virtual/preview:
+  /catalog/preview:
     post:
       summary: Mobile catalog virtual preview
       responses:
         '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/MobileCatalogMutationPayload' } } } }
         '503': { description: Cataloging API unavailable, content: { application/json: { schema: { $ref: '#/components/schemas/MobileAccessErrorPayload' } } } }
-  /catalog/virtual/apply/{catalogNodeId}:
+  /catalog/apply/{catalogNodeId}:
     post:
       summary: Mobile catalog virtual apply
       responses:

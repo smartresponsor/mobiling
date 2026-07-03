@@ -174,29 +174,29 @@
       "method": "GET",
       "path": "/catalog",
       "owner": "Cataloging",
-      "routeFile": "src/routes/mobile/catalog.ts",
+      "routeFile": "src/routes/catalog/mobile.ts",
       "routeClass": "screen",
       "screen": "catalog.list",
       "responseSchema": "MobileCatalogListPayload",
-      "contractFile": "src/contract/mobile/catalog.ts",
+      "contractFile": "src/contract/catalog/index.ts",
       "fixture": "fixture/mobile/catalog/list.success.json"
     },
     {
       "method": "GET",
       "path": "/catalog/node/:catalogNodeId",
       "owner": "Cataloging",
-      "routeFile": "src/routes/mobile/catalog.ts",
+      "routeFile": "src/routes/catalog/mobile.ts",
       "routeClass": "screen",
       "screen": "catalog.detail",
       "responseSchema": "MobileCatalogNodeDetailPayload",
-      "contractFile": "src/contract/mobile/catalog.ts",
+      "contractFile": "src/contract/catalog/index.ts",
       "fixture": "fixture/mobile/catalog/detail.success.json"
     },
     {
       "method": "GET",
       "path": "/catalog/search",
       "owner": "Cataloging",
-      "routeFile": "src/routes/mobile/catalog.ts",
+      "routeFile": "src/routes/catalog/mobile.ts",
       "routeClass": "transport",
       "responseSchema": "MobileCatalogSearchPayload"
     },
@@ -204,7 +204,7 @@
       "method": "POST",
       "path": "/catalog/node/:catalogNodeId/move",
       "owner": "Cataloging",
-      "routeFile": "src/routes/mobile/catalog.ts",
+      "routeFile": "src/routes/catalog/mobile.ts",
       "routeClass": "transport",
       "responseSchema": "MobileCatalogMutationPayload"
     },
@@ -212,7 +212,7 @@
       "method": "POST",
       "path": "/catalog/node/:catalogNodeId/publish",
       "owner": "Cataloging",
-      "routeFile": "src/routes/mobile/catalog.ts",
+      "routeFile": "src/routes/catalog/mobile.ts",
       "routeClass": "transport",
       "responseSchema": "MobileCatalogMutationPayload"
     },
@@ -220,7 +220,7 @@
       "method": "POST",
       "path": "/catalog/attachment/link",
       "owner": "Cataloging",
-      "routeFile": "src/routes/mobile/catalog.ts",
+      "routeFile": "src/routes/catalog/mobile.ts",
       "routeClass": "transport",
       "responseSchema": "MobileCatalogMutationPayload"
     },
@@ -228,23 +228,23 @@
       "method": "POST",
       "path": "/catalog/attachment/detach",
       "owner": "Cataloging",
-      "routeFile": "src/routes/mobile/catalog.ts",
+      "routeFile": "src/routes/catalog/mobile.ts",
       "routeClass": "transport",
       "responseSchema": "MobileCatalogMutationPayload"
     },
     {
       "method": "POST",
-      "path": "/catalog/virtual/preview",
+      "path": "/catalog/preview",
       "owner": "Cataloging",
-      "routeFile": "src/routes/mobile/catalog.ts",
+      "routeFile": "src/routes/catalog/mobile.ts",
       "routeClass": "transport",
       "responseSchema": "MobileCatalogMutationPayload"
     },
     {
       "method": "POST",
-      "path": "/catalog/virtual/apply/:catalogNodeId",
+      "path": "/catalog/apply/:catalogNodeId",
       "owner": "Cataloging",
-      "routeFile": "src/routes/mobile/catalog.ts",
+      "routeFile": "src/routes/catalog/mobile.ts",
       "routeClass": "transport",
       "responseSchema": "MobileCatalogMutationPayload"
     },

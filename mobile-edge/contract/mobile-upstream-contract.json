@@ -108,13 +108,13 @@
     },
     {
       "owner": "Cataloging",
-      "mobileRoute": "POST /catalog/virtual/preview",
+      "mobileRoute": "POST /catalog/preview",
       "upstreamRoute": "POST /api/catalog/category/virtual/preview",
       "status": "declared-in-component"
     },
     {
       "owner": "Cataloging",
-      "mobileRoute": "POST /catalog/virtual/apply/:catalogNodeId",
+      "mobileRoute": "POST /catalog/apply/:catalogNodeId",
       "upstreamRoute": "POST /api/catalog/category/virtual/apply/{catalogNodeId}",
       "status": "declared-in-component"
     },

@@ -18,7 +18,7 @@ import routeHealth from "./routes/health.js";
 import routeMobileAccess from "./routes/mobile/access.js";
 import routeMobileAttachment from "./routes/mobile/attachment.js";
 import routeMobileCart from "./routes/mobile/cart.js";
-import routeMobileCatalog from "./routes/mobile/catalog.js";
+import routeMobileCatalog from "./routes/catalog/mobile.js";
 import routeMobileLocale from "./routes/mobile/locale/index.js";
 import routeMobileNavigationShell from "./routes/mobile/navigationShell.js";
 import routeMobileVendorPayout from "./routes/mobile/vendor/payout.js";

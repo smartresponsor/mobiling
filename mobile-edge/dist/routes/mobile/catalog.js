@@ -164,14 +164,14 @@ export default async function route(app) {
         }
         return reply.code(200).send(normalizeCatalogMutation(result.body, "detached", null, stringValue(body.attachmentId ?? body.attachment_id)));
     });
-    app.post("/catalog/virtual/preview", { schema: { body: mobileCatalogMutationRequest, response: { 200: mobileCatalogMutationPayload, 400: mobileAccessErrorPayload, 422: mobileAccessErrorPayload, 500: mobileAccessErrorPayload, 503: mobileAccessErrorPayload } } }, async (request, reply) => {
+    app.post("/catalog/preview", { schema: { body: mobileCatalogMutationRequest, response: { 200: mobileCatalogMutationPayload, 400: mobileAccessErrorPayload, 422: mobileAccessErrorPayload, 500: mobileAccessErrorPayload, 503: mobileAccessErrorPayload } } }, async (request, reply) => {
         const result = await catalogingApiClient.post("/api/catalog/category/virtual/preview", request.body, forwardedHeaders(request));
         if (result.status < 200 || result.status >= 300) {
             return reply.code(result.status).send(normalizeErrorPayload(result.body));
         }
         return reply.code(200).send(normalizeCatalogMutation(result.body, "previewed"));
     });
-    app.post("/catalog/virtual/apply/:catalogNodeId", { schema: { body: mobileCatalogMutationRequest, response: { 200: mobileCatalogMutationPayload, 400: mobileAccessErrorPayload, 404: mobileAccessErrorPayload, 409: mobileAccessErrorPayload, 422: mobileAccessErrorPayload, 500: mobileAccessErrorPayload, 503: mobileAccessErrorPayload } } }, async (request, reply) => {
+    app.post("/catalog/apply/:catalogNodeId", { schema: { body: mobileCatalogMutationRequest, response: { 200: mobileCatalogMutationPayload, 400: mobileAccessErrorPayload, 404: mobileAccessErrorPayload, 409: mobileAccessErrorPayload, 422: mobileAccessErrorPayload, 500: mobileAccessErrorPayload, 503: mobileAccessErrorPayload } } }, async (request, reply) => {
         const params = recordValue(request.params);
         const catalogNodeId = encodeURIComponent(stringValue(params.catalogNodeId) ?? "");
         const result = await catalogingApiClient.post(`/api/catalog/category/virtual/apply/${catalogNodeId}`, request.body, forwardedHeaders(request));
