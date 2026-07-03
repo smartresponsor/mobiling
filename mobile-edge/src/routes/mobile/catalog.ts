@@ -3,6 +3,8 @@ import { CatalogingApiClient, type CatalogingApiErrorPayload } from "../../clien
 import { mobileAccessErrorPayload } from "../../contract/mobile/access/error.js";
 import {
   mobileCatalogListPayload,
+  mobileCatalogMutationPayload,
+  mobileCatalogMutationRequest,
   mobileCatalogNodeDetailPayload,
   mobileCatalogSearchPayload,
 } from "../../contract/mobile/catalog.js";
@@ -115,6 +117,17 @@ function normalizeCatalogDetail(body: unknown): Record<string, unknown> {
   };
 }
 
+function normalizeCatalogMutation(body: unknown, fallbackStatus: string, catalogNodeId: string | null = null, attachmentId: string | null = null): Record<string, unknown> {
+  const root = catalogRoot(body);
+
+  return {
+    status: stringValue(root.status ?? root.state) ?? fallbackStatus,
+    catalogNodeId: stringValue(root.catalogNodeId ?? root.categoryId ?? root.id) ?? catalogNodeId,
+    attachmentId: stringValue(root.attachmentId ?? root.attachment_id) ?? attachmentId,
+    payload: root,
+  };
+}
+
 function querySuffix(query: unknown): string {
   const source = recordValue(query);
   const search = new URLSearchParams();
@@ -129,7 +142,7 @@ function querySuffix(query: unknown): string {
 
 export default async function route(app: FastifyInstance): Promise<void> {
   app.get("/catalog", { schema: { response: { 200: mobileCatalogListPayload, 503: mobileAccessErrorPayload } } }, async (request, reply) => {
-    const result = await catalogingApiClient.get(`/api/category/storefront${querySuffix(request.query)}`, forwardedHeaders(request as { headers: Record<string, unknown> }));
+    const result = await catalogingApiClient.get(`/api/catalog/category/store${querySuffix(request.query)}`, forwardedHeaders(request as { headers: Record<string, unknown> }));
 
     if (result.status < 200 || result.status >= 300) {
       return reply.code(result.status).send(normalizeErrorPayload(result.body));
@@ -141,7 +154,7 @@ export default async function route(app: FastifyInstance): Promise<void> {
   app.get("/catalog/node/:catalogNodeId", { schema: { response: { 200: mobileCatalogNodeDetailPayload, 503: mobileAccessErrorPayload } } }, async (request, reply) => {
     const params = recordValue(request.params);
     const catalogNodeId = encodeURIComponent(stringValue(params.catalogNodeId) ?? "");
-    const result = await catalogingApiClient.get(`/api/category/${catalogNodeId}`, forwardedHeaders(request as { headers: Record<string, unknown> }));
+    const result = await catalogingApiClient.get(`/api/catalog/category/${catalogNodeId}`, forwardedHeaders(request as { headers: Record<string, unknown> }));
 
     if (result.status < 200 || result.status >= 300) {
       return reply.code(result.status).send(normalizeErrorPayload(result.body));
@@ -151,12 +164,80 @@ export default async function route(app: FastifyInstance): Promise<void> {
   });
 
   app.get("/catalog/search", { schema: { response: { 200: mobileCatalogSearchPayload, 503: mobileAccessErrorPayload } } }, async (request, reply) => {
-    const result = await catalogingApiClient.get(`/api/category/search${querySuffix(request.query)}`, forwardedHeaders(request as { headers: Record<string, unknown> }));
+    const result = await catalogingApiClient.get(`/api/catalog/category/search${querySuffix(request.query)}`, forwardedHeaders(request as { headers: Record<string, unknown> }));
 
     if (result.status < 200 || result.status >= 300) {
       return reply.code(result.status).send(normalizeErrorPayload(result.body));
     }
 
     return reply.code(200).send({ query: stringValue(recordValue(request.query).q), ...normalizeCatalogList(result.body) });
+  });
+
+  app.post("/catalog/node/:catalogNodeId/move", { schema: { body: mobileCatalogMutationRequest, response: { 200: mobileCatalogMutationPayload, 400: mobileAccessErrorPayload, 403: mobileAccessErrorPayload, 409: mobileAccessErrorPayload, 422: mobileAccessErrorPayload, 500: mobileAccessErrorPayload, 503: mobileAccessErrorPayload } } }, async (request, reply) => {
+    const params = recordValue(request.params);
+    const catalogNodeId = encodeURIComponent(stringValue(params.catalogNodeId) ?? "");
+    const result = await catalogingApiClient.post(`/api/catalog/category/move/${catalogNodeId}`, request.body, forwardedHeaders(request as { headers: Record<string, unknown> }));
+
+    if (result.status < 200 || result.status >= 300) {
+      return reply.code(result.status).send(normalizeErrorPayload(result.body));
+    }
+
+    return reply.code(200).send(normalizeCatalogMutation(result.body, "moved", stringValue(params.catalogNodeId)));
+  });
+
+  app.post("/catalog/node/:catalogNodeId/publish", { schema: { body: mobileCatalogMutationRequest, response: { 200: mobileCatalogMutationPayload, 400: mobileAccessErrorPayload, 403: mobileAccessErrorPayload, 409: mobileAccessErrorPayload, 422: mobileAccessErrorPayload, 500: mobileAccessErrorPayload, 503: mobileAccessErrorPayload } } }, async (request, reply) => {
+    const params = recordValue(request.params);
+    const catalogNodeId = encodeURIComponent(stringValue(params.catalogNodeId) ?? "");
+    const result = await catalogingApiClient.post(`/api/catalog/category/publish/${catalogNodeId}`, request.body, forwardedHeaders(request as { headers: Record<string, unknown> }));
+
+    if (result.status < 200 || result.status >= 300) {
+      return reply.code(result.status).send(normalizeErrorPayload(result.body));
+    }
+
+    return reply.code(200).send(normalizeCatalogMutation(result.body, "published", stringValue(params.catalogNodeId)));
+  });
+
+  app.post("/catalog/attachment/link", { schema: { body: mobileCatalogMutationRequest, response: { 200: mobileCatalogMutationPayload, 201: mobileCatalogMutationPayload, 400: mobileAccessErrorPayload, 403: mobileAccessErrorPayload, 422: mobileAccessErrorPayload, 500: mobileAccessErrorPayload, 503: mobileAccessErrorPayload } } }, async (request, reply) => {
+    const result = await catalogingApiClient.post("/api/catalog/category/attachment", request.body, forwardedHeaders(request as { headers: Record<string, unknown> }));
+
+    if (result.status < 200 || result.status >= 300) {
+      return reply.code(result.status).send(normalizeErrorPayload(result.body));
+    }
+
+    return reply.code(201 === result.status ? 201 : 200).send(normalizeCatalogMutation(result.body, "linked"));
+  });
+
+  app.post("/catalog/attachment/detach", { schema: { body: mobileCatalogMutationRequest, response: { 200: mobileCatalogMutationPayload, 400: mobileAccessErrorPayload, 403: mobileAccessErrorPayload, 404: mobileAccessErrorPayload, 422: mobileAccessErrorPayload, 500: mobileAccessErrorPayload, 503: mobileAccessErrorPayload } } }, async (request, reply) => {
+    const body = recordValue(request.body);
+    const attachmentId = encodeURIComponent(stringValue(body.attachmentId ?? body.attachment_id) ?? "");
+    const result = await catalogingApiClient.delete(`/api/catalog/category/attachment/${attachmentId}`, forwardedHeaders(request as { headers: Record<string, unknown> }));
+
+    if (result.status < 200 || result.status >= 300) {
+      return reply.code(result.status).send(normalizeErrorPayload(result.body));
+    }
+
+    return reply.code(200).send(normalizeCatalogMutation(result.body, "detached", null, stringValue(body.attachmentId ?? body.attachment_id)));
+  });
+
+  app.post("/catalog/virtual/preview", { schema: { body: mobileCatalogMutationRequest, response: { 200: mobileCatalogMutationPayload, 400: mobileAccessErrorPayload, 422: mobileAccessErrorPayload, 500: mobileAccessErrorPayload, 503: mobileAccessErrorPayload } } }, async (request, reply) => {
+    const result = await catalogingApiClient.post("/api/catalog/category/virtual/preview", request.body, forwardedHeaders(request as { headers: Record<string, unknown> }));
+
+    if (result.status < 200 || result.status >= 300) {
+      return reply.code(result.status).send(normalizeErrorPayload(result.body));
+    }
+
+    return reply.code(200).send(normalizeCatalogMutation(result.body, "previewed"));
+  });
+
+  app.post("/catalog/virtual/apply/:catalogNodeId", { schema: { body: mobileCatalogMutationRequest, response: { 200: mobileCatalogMutationPayload, 400: mobileAccessErrorPayload, 404: mobileAccessErrorPayload, 409: mobileAccessErrorPayload, 422: mobileAccessErrorPayload, 500: mobileAccessErrorPayload, 503: mobileAccessErrorPayload } } }, async (request, reply) => {
+    const params = recordValue(request.params);
+    const catalogNodeId = encodeURIComponent(stringValue(params.catalogNodeId) ?? "");
+    const result = await catalogingApiClient.post(`/api/catalog/category/virtual/apply/${catalogNodeId}`, request.body, forwardedHeaders(request as { headers: Record<string, unknown> }));
+
+    if (result.status < 200 || result.status >= 300) {
+      return reply.code(result.status).send(normalizeErrorPayload(result.body));
+    }
+
+    return reply.code(200).send(normalizeCatalogMutation(result.body, "applied", stringValue(params.catalogNodeId)));
   });
 }

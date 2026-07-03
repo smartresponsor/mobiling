@@ -45,3 +45,18 @@ export const mobileCatalogSearchPayload = {
         payload: payloadField,
     },
 };
+export const mobileCatalogMutationRequest = {
+    type: "object",
+    additionalProperties: true,
+};
+export const mobileCatalogMutationPayload = {
+    type: "object",
+    additionalProperties: true,
+    required: ["status", "payload"],
+    properties: {
+        status: stringField(1),
+        catalogNodeId: nullableStringField(1),
+        attachmentId: nullableStringField(1),
+        payload: payloadField,
+    },
+};

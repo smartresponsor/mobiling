@@ -201,6 +201,54 @@
       "responseSchema": "MobileCatalogSearchPayload"
     },
     {
+      "method": "POST",
+      "path": "/catalog/node/:catalogNodeId/move",
+      "owner": "Cataloging",
+      "routeFile": "src/routes/mobile/catalog.ts",
+      "routeClass": "transport",
+      "responseSchema": "MobileCatalogMutationPayload"
+    },
+    {
+      "method": "POST",
+      "path": "/catalog/node/:catalogNodeId/publish",
+      "owner": "Cataloging",
+      "routeFile": "src/routes/mobile/catalog.ts",
+      "routeClass": "transport",
+      "responseSchema": "MobileCatalogMutationPayload"
+    },
+    {
+      "method": "POST",
+      "path": "/catalog/attachment/link",
+      "owner": "Cataloging",
+      "routeFile": "src/routes/mobile/catalog.ts",
+      "routeClass": "transport",
+      "responseSchema": "MobileCatalogMutationPayload"
+    },
+    {
+      "method": "POST",
+      "path": "/catalog/attachment/detach",
+      "owner": "Cataloging",
+      "routeFile": "src/routes/mobile/catalog.ts",
+      "routeClass": "transport",
+      "responseSchema": "MobileCatalogMutationPayload"
+    },
+    {
+      "method": "POST",
+      "path": "/catalog/virtual/preview",
+      "owner": "Cataloging",
+      "routeFile": "src/routes/mobile/catalog.ts",
+      "routeClass": "transport",
+      "responseSchema": "MobileCatalogMutationPayload"
+    },
+    {
+      "method": "POST",
+      "path": "/catalog/virtual/apply/:catalogNodeId",
+      "owner": "Cataloging",
+      "routeFile": "src/routes/mobile/catalog.ts",
+      "routeClass": "transport",
+      "responseSchema": "MobileCatalogMutationPayload"
+    },
+    {
       "method": "GET",
       "path": "/locale",
       "owner": "Localizing",

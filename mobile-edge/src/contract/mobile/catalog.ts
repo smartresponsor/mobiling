@@ -50,3 +50,20 @@ export const mobileCatalogSearchPayload = {
     payload: payloadField,
   },
 } as const;
+
+export const mobileCatalogMutationRequest = {
+  type: "object",
+  additionalProperties: true,
+} as const;
+
+export const mobileCatalogMutationPayload = {
+  type: "object",
+  additionalProperties: true,
+  required: ["status", "payload"],
+  properties: {
+    status: stringField(1),
+    catalogNodeId: nullableStringField(1),
+    attachmentId: nullableStringField(1),
+    payload: payloadField,
+  },
+} as const;

@@ -67,20 +67,56 @@
     {
       "owner": "Cataloging",
       "mobileRoute": "GET /catalog",
-      "upstreamRoute": "GET /api/category/storefront",
+      "upstreamRoute": "GET /api/catalog/category/store",
       "status": "declared-in-component-pending-green-report"
     },
     {
       "owner": "Cataloging",
       "mobileRoute": "GET /catalog/node/:catalogNodeId",
-      "upstreamRoute": "GET /api/category/{catalogNodeId}",
+      "upstreamRoute": "GET /api/catalog/category/{catalogNodeId}",
       "status": "declared-in-component-pending-green-report"
     },
     {
       "owner": "Cataloging",
       "mobileRoute": "GET /catalog/search",
-      "upstreamRoute": "GET /api/category/search",
+      "upstreamRoute": "GET /api/catalog/category/search",
       "status": "declared-in-component-pending-green-report"
+    },
+    {
+      "owner": "Cataloging",
+      "mobileRoute": "POST /catalog/node/:catalogNodeId/move",
+      "upstreamRoute": "POST /api/catalog/category/move/{catalogNodeId}",
+      "status": "declared-in-component"
+    },
+    {
+      "owner": "Cataloging",
+      "mobileRoute": "POST /catalog/node/:catalogNodeId/publish",
+      "upstreamRoute": "POST /api/catalog/category/publish/{catalogNodeId}",
+      "status": "declared-in-component"
+    },
+    {
+      "owner": "Cataloging",
+      "mobileRoute": "POST /catalog/attachment/link",
+      "upstreamRoute": "POST /api/catalog/category/attachment",
+      "status": "declared-in-component"
+    },
+    {
+      "owner": "Cataloging",
+      "mobileRoute": "POST /catalog/attachment/detach",
+      "upstreamRoute": "DELETE /api/catalog/category/attachment/{attachmentId}",
+      "status": "declared-in-component"
+    },
+    {
+      "owner": "Cataloging",
+      "mobileRoute": "POST /catalog/virtual/preview",
+      "upstreamRoute": "POST /api/catalog/category/virtual/preview",
+      "status": "declared-in-component"
+    },
+    {
+      "owner": "Cataloging",
+      "mobileRoute": "POST /catalog/virtual/apply/:catalogNodeId",
+      "upstreamRoute": "POST /api/catalog/category/virtual/apply/{catalogNodeId}",
+      "status": "declared-in-component"
     },
     {
       "owner": "Localizing",

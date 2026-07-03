@@ -264,6 +264,43 @@ paths:
       responses:
         '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/MobileCatalogSearchPayload' } } } }
         '503': { description: Cataloging API unavailable, content: { application/json: { schema: { $ref: '#/components/schemas/MobileAccessErrorPayload' } } } }
+  /catalog/node/{catalogNodeId}/move:
+    post:
+      summary: Mobile catalog node move
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/MobileCatalogMutationPayload' } } } }
+        '503': { description: Cataloging API unavailable, content: { application/json: { schema: { $ref: '#/components/schemas/MobileAccessErrorPayload' } } } }
+  /catalog/node/{catalogNodeId}/publish:
+    post:
+      summary: Mobile catalog node publish
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/MobileCatalogMutationPayload' } } } }
+        '503': { description: Cataloging API unavailable, content: { application/json: { schema: { $ref: '#/components/schemas/MobileAccessErrorPayload' } } } }
+  /catalog/attachment/link:
+    post:
+      summary: Mobile catalog attachment link
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/MobileCatalogMutationPayload' } } } }
+        '201': { description: Created, content: { application/json: { schema: { $ref: '#/components/schemas/MobileCatalogMutationPayload' } } } }
+        '503': { description: Cataloging API unavailable, content: { application/json: { schema: { $ref: '#/components/schemas/MobileAccessErrorPayload' } } } }
+  /catalog/attachment/detach:
+    post:
+      summary: Mobile catalog attachment detach
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/MobileCatalogMutationPayload' } } } }
+        '503': { description: Cataloging API unavailable, content: { application/json: { schema: { $ref: '#/components/schemas/MobileAccessErrorPayload' } } } }
+  /catalog/virtual/preview:
+    post:
+      summary: Mobile catalog virtual preview
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/MobileCatalogMutationPayload' } } } }
+        '503': { description: Cataloging API unavailable, content: { application/json: { schema: { $ref: '#/components/schemas/MobileAccessErrorPayload' } } } }
+  /catalog/virtual/apply/{catalogNodeId}:
+    post:
+      summary: Mobile catalog virtual apply
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/MobileCatalogMutationPayload' } } } }
+        '503': { description: Cataloging API unavailable, content: { application/json: { schema: { $ref: '#/components/schemas/MobileAccessErrorPayload' } } } }
   /attachment:
     get:
       summary: Mobile attachment list
@@ -609,6 +646,15 @@ components:
         nodes:
           type: array
           items: { $ref: '#/components/schemas/MobileCatalogNodeSummaryPayload' }
+        payload: { type: object, additionalProperties: true }
+    MobileCatalogMutationPayload:
+      type: object
+      additionalProperties: true
+      required: [status, payload]
+      properties:
+        status: { type: string, minLength: 1 }
+        catalogNodeId: { anyOf: [{ type: string, minLength: 1 }, { type: 'null' }] }
+        attachmentId: { anyOf: [{ type: string, minLength: 1 }, { type: 'null' }] }
         payload: { type: object, additionalProperties: true }
     MobileAttachmentItemPayload:
       type: object

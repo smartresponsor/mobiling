@@ -26,10 +26,18 @@ export class CatalogingApiClient {
   }
 
   get(path: string, forwardedHeaders: Record<string, string> = {}): Promise<CatalogingApiResponse> {
-    return this.request("GET", path, forwardedHeaders);
+    return this.request("GET", path, undefined, forwardedHeaders);
   }
 
-  private async request(method: string, path: string, forwardedHeaders: Record<string, string>): Promise<CatalogingApiResponse> {
+  post(path: string, body: unknown, forwardedHeaders: Record<string, string> = {}): Promise<CatalogingApiResponse> {
+    return this.request("POST", path, body, forwardedHeaders);
+  }
+
+  delete(path: string, forwardedHeaders: Record<string, string> = {}): Promise<CatalogingApiResponse> {
+    return this.request("DELETE", path, undefined, forwardedHeaders);
+  }
+
+  private async request(method: string, path: string, body: unknown, forwardedHeaders: Record<string, string>): Promise<CatalogingApiResponse> {
     const baseUrl = this.baseUrl.trim();
 
     if ("" === baseUrl) {
@@ -55,6 +63,7 @@ export class CatalogingApiClient {
           path: `${url.pathname}${url.search}`,
           headers: {
             accept: "application/json",
+            ...(undefined === body ? {} : { "content-type": "application/json" }),
             ...forwardedHeaders,
           },
           timeout: this.timeoutMs,
@@ -86,6 +95,9 @@ export class CatalogingApiClient {
         resolve(this.unavailable());
       });
       request.on("error", () => resolve(this.unavailable()));
+      if (undefined !== body) {
+        request.write(JSON.stringify(body));
+      }
       request.end();
     });
   }
