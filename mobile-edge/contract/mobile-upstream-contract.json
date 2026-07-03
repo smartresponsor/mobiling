@@ -47,21 +47,27 @@
       "status": "declared-in-component"
     },
     {
+      "owner": "Attaching",
+      "mobileRoute": "POST /attachment/detach",
+      "upstreamRoute": "POST /attachment/detach",
+      "status": "declared-in-component"
+    },
+    {
       "owner": "Cataloging",
       "mobileRoute": "GET /catalog",
-      "upstreamRoute": "GET /api/catalog",
+      "upstreamRoute": "GET /api/category/storefront",
       "status": "declared-in-component-pending-green-report"
     },
     {
       "owner": "Cataloging",
       "mobileRoute": "GET /catalog/node/:catalogNodeId",
-      "upstreamRoute": "GET /api/catalog/node/{catalogNodeId}",
+      "upstreamRoute": "GET /api/category/{catalogNodeId}",
       "status": "declared-in-component-pending-green-report"
     },
     {
       "owner": "Cataloging",
       "mobileRoute": "GET /catalog/search",
-      "upstreamRoute": "GET /api/catalog/search",
+      "upstreamRoute": "GET /api/category/search",
       "status": "declared-in-component-pending-green-report"
     },
     {

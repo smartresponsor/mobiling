@@ -50,6 +50,10 @@ export class AttachingApiClient {
     return this.request("POST", "/attachment/attach", body, forwardedHeaders);
   }
 
+  detachAttachment(body: unknown, forwardedHeaders: Record<string, string> = {}): Promise<AttachingApiResponse> {
+    return this.request("POST", "/attachment/detach", body, forwardedHeaders);
+  }
+
   private async request(method: string, path: string, body: unknown, forwardedHeaders: Record<string, string>): Promise<AttachingApiResponse> {
     const baseUrl = this.baseUrl.trim();
 

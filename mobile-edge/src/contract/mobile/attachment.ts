@@ -66,3 +66,31 @@ export const mobileAttachmentLinkPayload = {
     payload: payloadField,
   },
 } as const;
+
+export const mobileAttachmentDetachRequest = {
+  type: "object",
+  additionalProperties: false,
+  required: ["attachmentId", "ownerType", "ownerId"],
+  properties: {
+    attachmentId: { type: "integer", minimum: 1 },
+    ownerType: stringField(1),
+    ownerId: stringField(1),
+    context: nullableStringField(1),
+    slot: nullableStringField(1),
+  },
+} as const;
+
+export const mobileAttachmentDetachPayload = {
+  type: "object",
+  additionalProperties: false,
+  required: ["status", "attachmentId", "ownerType", "ownerId", "payload"],
+  properties: {
+    status: stringField(1),
+    attachmentId: stringField(1),
+    ownerType: stringField(1),
+    ownerId: stringField(1),
+    context: nullableStringField(1),
+    slot: nullableStringField(1),
+    payload: payloadField,
+  },
+} as const;

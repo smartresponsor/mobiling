@@ -2,6 +2,8 @@ import type { FastifyInstance } from "fastify";
 import { AttachingApiClient, type AttachingApiErrorPayload } from "../../client/attaching/attachingApiClient.js";
 import { mobileAccessErrorPayload } from "../../contract/mobile/access/error.js";
 import {
+  mobileAttachmentDetachPayload,
+  mobileAttachmentDetachRequest,
   mobileAttachmentLinkPayload,
   mobileAttachmentLinkRequest,
   mobileAttachmentListPayload,
@@ -132,6 +134,21 @@ function normalizeAttachmentLink(body: unknown): Record<string, unknown> {
   };
 }
 
+function normalizeAttachmentDetach(body: unknown, requestBody: unknown): Record<string, unknown> {
+  const root = attachmentRoot(body);
+  const request = recordValue(requestBody);
+
+  return {
+    status: stringValue(root.status) ?? "detached",
+    attachmentId: stringValue(root.attachmentId ?? request.attachmentId) ?? "attachment-unavailable",
+    ownerType: stringValue(root.ownerType ?? request.ownerType) ?? "unknown",
+    ownerId: stringValue(root.ownerId ?? request.ownerId) ?? "unknown",
+    context: stringValue(root.context ?? request.context),
+    slot: stringValue(root.slot ?? request.slot),
+    payload: root,
+  };
+}
+
 function listQuery(query: unknown): { ownerType?: string; ownerId?: string; context?: string; slot?: string } {
   const source = recordValue(query);
 
@@ -168,5 +185,18 @@ export default async function route(app: FastifyInstance): Promise<void> {
     }
 
     return reply.code(201 === result.status ? 201 : 200).send(normalizeAttachmentLink(result.body));
+  });
+
+  app.post("/attachment/detach", { schema: { body: mobileAttachmentDetachRequest, response: { 200: mobileAttachmentDetachPayload, 204: mobileAttachmentDetachPayload, 400: mobileAccessErrorPayload, 404: mobileAccessErrorPayload, 409: mobileAccessErrorPayload, 422: mobileAccessErrorPayload, 500: mobileAccessErrorPayload, 503: mobileAccessErrorPayload } } }, async (request, reply) => {
+    const result = await attachingApiClient.detachAttachment(
+      request.body,
+      forwardedHeaders(request as { headers: Record<string, unknown> }),
+    );
+
+    if (result.status < 200 || result.status >= 300) {
+      return reply.code(result.status).send(normalizeErrorPayload(result.body));
+    }
+
+    return reply.code(200).send(normalizeAttachmentDetach(result.body, request.body));
   });
 }

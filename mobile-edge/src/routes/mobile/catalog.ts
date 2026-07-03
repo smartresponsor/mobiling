@@ -129,7 +129,7 @@ function querySuffix(query: unknown): string {
 
 export default async function route(app: FastifyInstance): Promise<void> {
   app.get("/catalog", { schema: { response: { 200: mobileCatalogListPayload, 503: mobileAccessErrorPayload } } }, async (request, reply) => {
-    const result = await catalogingApiClient.get(`/api/catalog${querySuffix(request.query)}`, forwardedHeaders(request as { headers: Record<string, unknown> }));
+    const result = await catalogingApiClient.get(`/api/category/storefront${querySuffix(request.query)}`, forwardedHeaders(request as { headers: Record<string, unknown> }));
 
     if (result.status < 200 || result.status >= 300) {
       return reply.code(result.status).send(normalizeErrorPayload(result.body));
@@ -141,7 +141,7 @@ export default async function route(app: FastifyInstance): Promise<void> {
   app.get("/catalog/node/:catalogNodeId", { schema: { response: { 200: mobileCatalogNodeDetailPayload, 503: mobileAccessErrorPayload } } }, async (request, reply) => {
     const params = recordValue(request.params);
     const catalogNodeId = encodeURIComponent(stringValue(params.catalogNodeId) ?? "");
-    const result = await catalogingApiClient.get(`/api/catalog/node/${catalogNodeId}`, forwardedHeaders(request as { headers: Record<string, unknown> }));
+    const result = await catalogingApiClient.get(`/api/category/${catalogNodeId}`, forwardedHeaders(request as { headers: Record<string, unknown> }));
 
     if (result.status < 200 || result.status >= 300) {
       return reply.code(result.status).send(normalizeErrorPayload(result.body));
@@ -151,7 +151,7 @@ export default async function route(app: FastifyInstance): Promise<void> {
   });
 
   app.get("/catalog/search", { schema: { response: { 200: mobileCatalogSearchPayload, 503: mobileAccessErrorPayload } } }, async (request, reply) => {
-    const result = await catalogingApiClient.get(`/api/catalog/search${querySuffix(request.query)}`, forwardedHeaders(request as { headers: Record<string, unknown> }));
+    const result = await catalogingApiClient.get(`/api/category/search${querySuffix(request.query)}`, forwardedHeaders(request as { headers: Record<string, unknown> }));
 
     if (result.status < 200 || result.status >= 300) {
       return reply.code(result.status).send(normalizeErrorPayload(result.body));
