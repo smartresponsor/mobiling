@@ -55,3 +55,6 @@ fun CatalogMobileScreen(catalogFeatureBridge: CatalogFeatureBridge?) {
                 headlineContent = { Text(node.title) },
                 supportingContent = { Text(node.slug ?: node.nodeId) },
             )
+        }
+    }
+}
