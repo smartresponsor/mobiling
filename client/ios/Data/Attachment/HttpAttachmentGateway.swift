@@ -129,6 +129,77 @@ public struct HttpAttachmentGateway: AttachmentReader, AttachmentWriter {
         )
     }
 
+    public func fileHandoff(attachmentId: String) async throws -> AttachmentFileHandoffPayload {
+        guard let url = URL(string: normalizedBaseUrl() + "/attachment/file/" + (attachmentId.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? "")) else {
+            throw HttpAttachmentGatewayError.invalidUrl
+        }
+
+        let object = try await jsonObject(url: url, method: "GET", body: nil)
+
+        return AttachmentFileHandoffPayload(
+            attachmentId: string(object["attachmentId"]) ?? attachmentId,
+            downloadUrl: string(object["downloadUrl"]) ?? "",
+            mimeType: string(object["mimeType"]),
+            fileName: string(object["fileName"]),
+            handoffMode: string(object["handoffMode"]) ?? "external_url",
+            payloadText: string(object["payloadText"])
+        )
+    }
+
+    public func uploadHandoff(request: AttachmentUploadHandoffRequest) async throws -> AttachmentUploadHandoffPayload {
+        guard let url = URL(string: normalizedBaseUrl() + "/attachment/upload-handoff") else {
+            throw HttpAttachmentGatewayError.invalidUrl
+        }
+
+        var body: [String: Any] = [
+            "ownerType": request.ownerType,
+            "ownerId": request.ownerId,
+            "isPrimary": request.isPrimary
+        ]
+
+        if let context = request.context { body["context"] = context }
+        if let slot = request.slot { body["slot"] = slot }
+        if let title = request.title { body["title"] = title }
+        if let description = request.description { body["description"] = description }
+        if let altText = request.altText { body["altText"] = altText }
+
+        let object = try await jsonObject(url: url, method: "POST", body: body)
+
+        return AttachmentUploadHandoffPayload(
+            uploadUrl: string(object["uploadUrl"]) ?? "",
+            method: string(object["method"]) ?? "POST",
+            fieldName: string(object["fieldName"]) ?? "file",
+            handoffMode: string(object["handoffMode"]) ?? "multipart_direct",
+            payloadText: string(object["payloadText"])
+        )
+    }
+
+    private func jsonObject(url: URL, method: String, body: [String: Any]?) async throws -> [String: Any] {
+        var urlRequest = URLRequest(url: url)
+        urlRequest.httpMethod = method
+        urlRequest.setValue("application/json", forHTTPHeaderField: "Accept")
+
+        if let body {
+            urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
+            urlRequest.httpBody = try JSONSerialization.data(withJSONObject: body)
+        }
+
+        let (data, response) = try await session.data(for: urlRequest)
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw HttpAttachmentGatewayError.invalidResponse
+        }
+
+        guard (200..<300).contains(httpResponse.statusCode) else {
+            throw HttpAttachmentGatewayError.requestFailed(errorMessage(data: data, statusCode: httpResponse.statusCode))
+        }
+
+        guard let object = try JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+            throw HttpAttachmentGatewayError.invalidPayload
+        }
+
+        return object
+    }
+
     private func string(_ value: Any?) -> String? {
         if let value = value as? String {
             let trimmed = value.trimmingCharacters(in: .whitespacesAndNewlines)

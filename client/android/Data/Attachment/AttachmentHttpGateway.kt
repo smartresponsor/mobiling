@@ -1,9 +1,12 @@
 package app.mobiling.client.data.attachment
 
+import app.mobiling.client.contract.attachment.AttachmentFileHandoffPayload
 import app.mobiling.client.contract.attachment.AttachmentItemPayload
 import app.mobiling.client.contract.attachment.AttachmentLinkPayload
 import app.mobiling.client.contract.attachment.AttachmentLinkRequest
 import app.mobiling.client.contract.attachment.AttachmentListPayload
+import app.mobiling.client.contract.attachment.AttachmentUploadHandoffPayload
+import app.mobiling.client.contract.attachment.AttachmentUploadHandoffRequest
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -49,6 +52,24 @@ class AttachmentHttpGateway(
         return linkFrom(sendAttachmentRequest(method = "POST", path = "/attachment/link", body = body))
     }
 
+    override suspend fun fileHandoff(attachmentId: String): AttachmentFileHandoffPayload =
+        fileHandoffFrom(sendAttachmentRequest(method = "GET", path = "/attachment/file/${attachmentId.encodeQuery()}", body = null))
+
+    override suspend fun uploadHandoff(request: AttachmentUploadHandoffRequest): AttachmentUploadHandoffPayload {
+        val body = JSONObject()
+            .put("ownerType", request.ownerType)
+            .put("ownerId", request.ownerId)
+            .put("isPrimary", request.isPrimary)
+
+        request.context?.takeIf { it.isNotBlank() }?.let { body.put("context", it) }
+        request.slot?.takeIf { it.isNotBlank() }?.let { body.put("slot", it) }
+        request.title?.takeIf { it.isNotBlank() }?.let { body.put("title", it) }
+        request.description?.takeIf { it.isNotBlank() }?.let { body.put("description", it) }
+        request.altText?.takeIf { it.isNotBlank() }?.let { body.put("altText", it) }
+
+        return uploadHandoffFrom(sendAttachmentRequest(method = "POST", path = "/attachment/upload-handoff", body = body))
+    }
+
     private fun listFrom(json: JSONObject): AttachmentListPayload {
         val array = json.optJSONArray("items")
         val items = (0 until (array?.length() ?: 0)).mapNotNull { index ->
@@ -81,6 +102,23 @@ class AttachmentHttpGateway(
         slot = stringOrNull(json, "slot"),
         position = json.optInt("position", 0),
         isPrimary = json.optBoolean("isPrimary", false),
+        payloadText = json.optString("payloadText", ""),
+    )
+
+    private fun fileHandoffFrom(json: JSONObject): AttachmentFileHandoffPayload = AttachmentFileHandoffPayload(
+        attachmentId = json.optString("attachmentId", ""),
+        downloadUrl = json.optString("downloadUrl", ""),
+        mimeType = stringOrNull(json, "mimeType"),
+        fileName = stringOrNull(json, "fileName"),
+        handoffMode = json.optString("handoffMode", "external_url"),
+        payloadText = json.optString("payloadText", ""),
+    )
+
+    private fun uploadHandoffFrom(json: JSONObject): AttachmentUploadHandoffPayload = AttachmentUploadHandoffPayload(
+        uploadUrl = json.optString("uploadUrl", ""),
+        method = json.optString("method", "POST"),
+        fieldName = json.optString("fieldName", "file"),
+        handoffMode = json.optString("handoffMode", "multipart_direct"),
         payloadText = json.optString("payloadText", ""),
     )
 

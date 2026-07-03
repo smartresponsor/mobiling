@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import app.mobiling.client.contract.attachment.AttachmentListPayload
+import app.mobiling.client.contract.attachment.AttachmentUploadHandoffRequest
 import kotlinx.coroutines.launch
 
 @Composable
@@ -28,6 +29,7 @@ fun AttachmentMobileScreen(
     var attachmentList by remember { mutableStateOf<AttachmentListPayload?>(null) }
     var error by remember { mutableStateOf<String?>(null) }
     var loading by remember { mutableStateOf(false) }
+    var handoffText by remember { mutableStateOf<String?>(null) }
     val scope = rememberCoroutineScope()
     val activeVendorId = vendorId?.trim().orEmpty()
 
@@ -82,8 +84,46 @@ fun AttachmentMobileScreen(
                 },
             )
         }
+        handoffText?.let { Text(it) }
         Button(onClick = { refresh() }) {
             Text("Refresh")
+        }
+        Button(onClick = {
+            scope.launch {
+                if (attachmentFeatureBridge == null || activeVendorId.isBlank()) {
+                    handoffText = "Upload handoff requires an active attachment bridge and vendor session."
+                    return@launch
+                }
+
+                try {
+                    val handoff = attachmentFeatureBridge.uploadHandoff(
+                        AttachmentUploadHandoffRequest(ownerType = "vendor", ownerId = activeVendorId),
+                    )
+                    handoffText = "Upload handoff: ${handoff.method} ${handoff.uploadUrl} field=${handoff.fieldName} mode=${handoff.handoffMode}"
+                } catch (exception: Exception) {
+                    handoffText = exception.message ?: "Upload handoff is unavailable."
+                }
+            }
+        }) {
+            Text("Prepare Upload")
+        }
+        Button(onClick = {
+            scope.launch {
+                val firstAttachmentId = attachmentList?.items?.firstOrNull()?.attachmentId
+                if (attachmentFeatureBridge == null || firstAttachmentId.isNullOrBlank()) {
+                    handoffText = "File handoff requires at least one attachment."
+                    return@launch
+                }
+
+                try {
+                    val handoff = attachmentFeatureBridge.fileHandoff(firstAttachmentId)
+                    handoffText = "File handoff: ${handoff.downloadUrl} mode=${handoff.handoffMode}"
+                } catch (exception: Exception) {
+                    handoffText = exception.message ?: "File handoff is unavailable."
+                }
+            }
+        }) {
+            Text("Prepare File")
         }
     }
 }

@@ -7,6 +7,7 @@ public struct MobileAttachmentView: View {
     @State private var attachmentList: AttachmentListPayload?
     @State private var errorMessage: String?
     @State private var isLoading: Bool = false
+    @State private var handoffText: String?
 
     public init(vendorId: String?, attachmentFeatureBridge: AttachmentFeatureBridge?) {
         self.vendorId = vendorId
@@ -67,8 +68,17 @@ public struct MobileAttachmentView: View {
             }
 
             Section {
+                if let handoffText {
+                    Text(handoffText)
+                }
                 Button("Refresh") {
                     Task { await load() }
+                }
+                Button("Prepare Upload") {
+                    Task { await prepareUpload() }
+                }
+                Button("Prepare File") {
+                    Task { await prepareFile() }
                 }
             }
         }
@@ -109,6 +119,38 @@ public struct MobileAttachmentView: View {
             attachmentList = try await attachmentFeatureBridge.list(ownerType: "vendor", ownerId: activeVendorId)
         } catch {
             errorMessage = error.localizedDescription
+        }
+    }
+
+    private func prepareUpload() async {
+        guard let activeVendorId = vendorId?.trimmingCharacters(in: .whitespacesAndNewlines), !activeVendorId.isEmpty,
+              let attachmentFeatureBridge else {
+            handoffText = "Upload handoff requires an active attachment bridge and vendor session."
+            return
+        }
+
+        do {
+            let handoff = try await attachmentFeatureBridge.uploadHandoff(
+                request: AttachmentUploadHandoffRequest(ownerType: "vendor", ownerId: activeVendorId, context: nil, slot: nil, isPrimary: false, title: nil, description: nil, altText: nil)
+            )
+            handoffText = "Upload handoff: \(handoff.method) \(handoff.uploadUrl) field=\(handoff.fieldName) mode=\(handoff.handoffMode)"
+        } catch {
+            handoffText = error.localizedDescription
+        }
+    }
+
+    private func prepareFile() async {
+        guard let attachmentId = attachmentList?.items.first?.attachmentId, !attachmentId.isEmpty,
+              let attachmentFeatureBridge else {
+            handoffText = "File handoff requires at least one attachment."
+            return
+        }
+
+        do {
+            let handoff = try await attachmentFeatureBridge.fileHandoff(attachmentId: attachmentId)
+            handoffText = "File handoff: \(handoff.downloadUrl) mode=\(handoff.handoffMode)"
+        } catch {
+            handoffText = error.localizedDescription
         }
     }
 }
