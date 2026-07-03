@@ -1,0 +1,18 @@
+{
+  "node": {
+    "nodeId": "catalog-root",
+    "parentNodeId": null,
+    "title": "Catalog",
+    "slug": "catalog",
+    "childCount": 2,
+    "productCount": 12
+  },
+  "description": "Mobile catalog root.",
+  "breadcrumbLabels": [
+    "Catalog"
+  ],
+  "featuredProductIds": [],
+  "payload": {
+    "id": "catalog-root"
+  }
+}

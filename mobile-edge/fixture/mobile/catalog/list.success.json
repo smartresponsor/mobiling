@@ -1,0 +1,17 @@
+{
+  "nodes": [
+    {
+      "nodeId": "catalog-root",
+      "parentNodeId": null,
+      "title": "Catalog",
+      "slug": "catalog",
+      "childCount": 2,
+      "productCount": 12
+    }
+  ],
+  "payload": {
+    "nodes": [
+      { "id": "catalog-root", "title": "Catalog" }
+    ]
+  }
+}
