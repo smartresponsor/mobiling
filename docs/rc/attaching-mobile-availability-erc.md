@@ -27,6 +27,39 @@ Attaching Symfony component
   -> POST /attachment/attach
 ```
 
+## Current RC evidence
+
+Latest commits in this slice:
+
+```text
+c095f6c Add attachment handoff transport
+83f8a96 Document attachment handoff route
+149580c Add attachment upload handoff
+22571ad Document attachment upload handoff
+54a3258 Add native attachment handoff actions
+a4b3bda Fix catalog mobile screen syntax
+```
+
+Current mobile-edge gates:
+
+```text
+npm run typecheck: PASS
+npm run test: PASS
+Mobile contract guard passed: 30 routes, 13 mobile route files.
+```
+
+Native Android smoke:
+
+```text
+.\gradlew.bat :app:assembleDebug --no-daemon --stacktrace: PASS
+```
+
+Native iOS caveat:
+
+```text
+iOS compile requires macOS, Xcode, and XcodeGen. It is not executable from the current Windows console path.
+```
+
 ## Current materialized surfaces
 
 ### mobile-edge
@@ -34,15 +67,21 @@ Attaching Symfony component
 Current mobile routes:
 
 ```text
-GET /attachment
+GET  /attachment
 POST /attachment/link
+POST /attachment/detach
+GET  /attachment/file/:attachmentId
+POST /attachment/upload-handoff
 ```
 
 Current upstream mapping:
 
 ```text
-GET /attachment      -> GET /attachment
-POST /attachment/link -> POST /attachment/attach
+GET  /attachment                    -> GET  /attachment
+POST /attachment/link               -> POST /attachment/attach
+POST /attachment/detach             -> POST /attachment/detach
+GET  /attachment/file/:attachmentId -> GET  /attachment/{attachmentId}/download
+POST /attachment/upload-handoff     -> POST /attachment/upload
 ```
 
 The mobile-edge layer normalizes Attaching payloads into mobile payloads:
@@ -75,6 +114,9 @@ Android availability:
 * `attachment` is currently renderable.
 * dashboard shell renders `AttachmentMobileScreen` for the `attachment` route.
 * screen loads vendor-owned attachment through `AttachmentFeatureBridge`.
+* screen exposes safe `Prepare Upload` handoff action.
+* screen exposes safe `Prepare File` handoff action.
+* Android compile smoke is green for `:app:assembleDebug`.
 
 ### iOS
 
@@ -95,6 +137,9 @@ iOS availability:
 * `attachment` is currently renderable.
 * dashboard shell renders `MobileAttachmentView` for the `attachment` route.
 * view loads vendor-owned attachment through `AttachmentFeatureBridge`.
+* view exposes safe `Prepare Upload` handoff action.
+* view exposes safe `Prepare File` handoff action.
+* iOS compile remains a macOS/Xcode validation step outside the current Windows console path.
 
 ## Navigating menu availability
 
