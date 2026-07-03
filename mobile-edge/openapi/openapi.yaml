@@ -313,6 +313,18 @@ paths:
         '204': { description: Detached, content: { application/json: { schema: { $ref: '#/components/schemas/MobileAttachmentDetachPayload' } } } }
         '422': { description: Invalid attachment detach payload, content: { application/json: { schema: { $ref: '#/components/schemas/MobileAccessErrorPayload' } } } }
         '503': { description: Attaching API unavailable, content: { application/json: { schema: { $ref: '#/components/schemas/MobileAccessErrorPayload' } } } }
+  /attachment/file/{attachmentId}:
+    get:
+      summary: Mobile attachment file handoff
+      parameters:
+        - in: path
+          name: attachmentId
+          required: true
+          schema: { type: string, minLength: 1 }
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/MobileAttachmentFilePayload' } } } }
+        '422': { description: Invalid attachment id, content: { application/json: { schema: { $ref: '#/components/schemas/MobileAccessErrorPayload' } } } }
+        '503': { description: Attaching API unavailable, content: { application/json: { schema: { $ref: '#/components/schemas/MobileAccessErrorPayload' } } } }
   /navigation/mobile/shell:
     get:
       summary: Mobile navigation shell
@@ -655,6 +667,17 @@ components:
         ownerId: { type: string, minLength: 1 }
         context: { anyOf: [{ type: string, minLength: 1 }, { type: 'null' }] }
         slot: { anyOf: [{ type: string, minLength: 1 }, { type: 'null' }] }
+        payload: { type: object, additionalProperties: true }
+    MobileAttachmentFilePayload:
+      type: object
+      additionalProperties: false
+      required: [attachmentId, downloadUrl, handoffMode, payload]
+      properties:
+        attachmentId: { type: string, minLength: 1 }
+        downloadUrl: { type: string, minLength: 1 }
+        mimeType: { anyOf: [{ type: string, minLength: 1 }, { type: 'null' }] }
+        fileName: { anyOf: [{ type: string, minLength: 1 }, { type: 'null' }] }
+        handoffMode: { type: string, minLength: 1 }
         payload: { type: object, additionalProperties: true }
     MobileCartItemPayload:
       type: object
