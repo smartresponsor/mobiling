@@ -23,8 +23,8 @@ Mobiling mobile-edge
   -> GET /attachment
   -> POST /attachment/link
 Attaching Symfony component
-  -> GET /attachments
-  -> POST /attachments/attach
+  -> GET /attachment
+  -> POST /attachment/attach
 ```
 
 ## Current materialized surfaces
@@ -41,8 +41,8 @@ POST /attachment/link
 Current upstream mapping:
 
 ```text
-GET /attachment      -> GET /attachments
-POST /attachment/link -> POST /attachments/attach
+GET /attachment      -> GET /attachment
+POST /attachment/link -> POST /attachment/attach
 ```
 
 The mobile-edge layer normalizes Attaching payloads into mobile payloads:

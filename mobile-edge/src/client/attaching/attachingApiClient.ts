@@ -43,11 +43,11 @@ export class AttachingApiClient {
 
     const suffix = "" === search.toString() ? "" : `?${search.toString()}`;
 
-    return this.request("GET", `/attachments${suffix}`, null, forwardedHeaders);
+    return this.request("GET", `/attachment${suffix}`, null, forwardedHeaders);
   }
 
   attachAttachment(body: unknown, forwardedHeaders: Record<string, string> = {}): Promise<AttachingApiResponse> {
-    return this.request("POST", "/attachments/attach", body, forwardedHeaders);
+    return this.request("POST", "/attachment/attach", body, forwardedHeaders);
   }
 
   private async request(method: string, path: string, body: unknown, forwardedHeaders: Record<string, string>): Promise<AttachingApiResponse> {

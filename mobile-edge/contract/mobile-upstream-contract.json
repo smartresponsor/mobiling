@@ -37,13 +37,13 @@
     {
       "owner": "Attaching",
       "mobileRoute": "GET /attachment",
-      "upstreamRoute": "GET /attachments",
+      "upstreamRoute": "GET /attachment",
       "status": "declared-in-component"
     },
     {
       "owner": "Attaching",
       "mobileRoute": "POST /attachment/link",
-      "upstreamRoute": "POST /attachments/attach",
+      "upstreamRoute": "POST /attachment/attach",
       "status": "declared-in-component"
     },
     {
