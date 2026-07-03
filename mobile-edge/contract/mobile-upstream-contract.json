@@ -59,6 +59,12 @@
       "status": "mobile-handoff"
     },
     {
+      "owner": "Attaching",
+      "mobileRoute": "POST /attachment/upload-handoff",
+      "upstreamRoute": "POST /attachment/upload",
+      "status": "mobile-handoff"
+    },
+    {
       "owner": "Cataloging",
       "mobileRoute": "GET /catalog",
       "upstreamRoute": "GET /api/category/storefront",

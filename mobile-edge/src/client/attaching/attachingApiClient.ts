@@ -68,6 +68,20 @@ export class AttachingApiClient {
     }
   }
 
+  attachmentUploadUrl(): string | null {
+    const baseUrl = this.baseUrl.trim();
+
+    if ("" === baseUrl) {
+      return null;
+    }
+
+    try {
+      return new URL(`${baseUrl.replace(/\/$/, "")}/attachment/upload`).toString();
+    } catch {
+      return null;
+    }
+  }
+
   private async request(method: string, path: string, body: unknown, forwardedHeaders: Record<string, string>): Promise<AttachingApiResponse> {
     const baseUrl = this.baseUrl.trim();
 

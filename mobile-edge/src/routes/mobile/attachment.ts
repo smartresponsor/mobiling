@@ -6,6 +6,8 @@ import {
   mobileAttachmentDetachRequest,
   mobileAttachmentFilePayload,
   mobileAttachmentLinkPayload,
+  mobileAttachmentUploadHandoffPayload,
+  mobileAttachmentUploadHandoffRequest,
   mobileAttachmentLinkRequest,
   mobileAttachmentListPayload,
 } from "../../contract/mobile/attachment.js";
@@ -161,6 +163,29 @@ function normalizeAttachmentFile(attachmentId: string, downloadUrl: string): Rec
   };
 }
 
+function normalizeAttachmentUploadHandoff(body: unknown, uploadUrl: string): Record<string, unknown> {
+  const source = recordValue(body);
+  const form = {
+    ownerType: stringValue(source.ownerType) ?? "unknown",
+    ownerId: stringValue(source.ownerId) ?? "unknown",
+    context: stringValue(source.context),
+    slot: stringValue(source.slot),
+    isPrimary: booleanValue(source.isPrimary, false),
+    title: stringValue(source.title),
+    description: stringValue(source.description),
+    altText: stringValue(source.altText),
+  };
+
+  return {
+    uploadUrl,
+    method: "POST",
+    fieldName: "file",
+    form,
+    handoffMode: "multipart_direct",
+    payload: { uploadUrl, form },
+  };
+}
+
 function listQuery(query: unknown): { ownerType?: string; ownerId?: string; context?: string; slot?: string } {
   const source = recordValue(query);
 
@@ -227,5 +252,15 @@ export default async function route(app: FastifyInstance): Promise<void> {
     }
 
     return reply.code(200).send(normalizeAttachmentFile(attachmentId, downloadUrl));
+  });
+
+  app.post("/attachment/upload-handoff", { schema: { body: mobileAttachmentUploadHandoffRequest, response: { 200: mobileAttachmentUploadHandoffPayload, 400: mobileAccessErrorPayload, 422: mobileAccessErrorPayload, 500: mobileAccessErrorPayload, 503: mobileAccessErrorPayload } } }, async (request, reply) => {
+    const uploadUrl = attachingApiClient.attachmentUploadUrl();
+
+    if (null === uploadUrl) {
+      return reply.code(503).send({ code: "attaching_api_unavailable", message: "Attaching API is unavailable from mobile-edge." });
+    }
+
+    return reply.code(200).send(normalizeAttachmentUploadHandoff(request.body, uploadUrl));
   });
 }

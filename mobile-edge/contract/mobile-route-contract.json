@@ -163,6 +163,14 @@
       "responseSchema": "MobileAttachmentFilePayload"
     },
     {
+      "method": "POST",
+      "path": "/attachment/upload-handoff",
+      "owner": "Attaching",
+      "routeFile": "src/routes/mobile/attachment.ts",
+      "routeClass": "transport",
+      "responseSchema": "MobileAttachmentUploadHandoffPayload"
+    },
+    {
       "method": "GET",
       "path": "/catalog",
       "owner": "Cataloging",

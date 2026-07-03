@@ -108,3 +108,33 @@ export const mobileAttachmentFilePayload = {
     payload: payloadField,
   },
 } as const;
+
+export const mobileAttachmentUploadHandoffRequest = {
+  type: "object",
+  additionalProperties: false,
+  required: ["ownerType", "ownerId"],
+  properties: {
+    ownerType: stringField(1),
+    ownerId: stringField(1),
+    context: nullableStringField(1),
+    slot: nullableStringField(1),
+    isPrimary: { type: "boolean" },
+    title: nullableStringField(1),
+    description: nullableStringField(1),
+    altText: nullableStringField(1),
+  },
+} as const;
+
+export const mobileAttachmentUploadHandoffPayload = {
+  type: "object",
+  additionalProperties: false,
+  required: ["uploadUrl", "method", "fieldName", "form", "handoffMode", "payload"],
+  properties: {
+    uploadUrl: stringField(1),
+    method: stringField(1),
+    fieldName: stringField(1),
+    form: payloadField,
+    handoffMode: stringField(1),
+    payload: payloadField,
+  },
+} as const;
