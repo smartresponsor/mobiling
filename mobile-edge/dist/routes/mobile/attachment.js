@@ -1,6 +1,6 @@
 import { AttachingApiClient } from "../../client/attaching/attachingApiClient.js";
 import { mobileAccessErrorPayload } from "../../contract/mobile/access/error.js";
-import { mobileAttachmentLinkPayload, mobileAttachmentLinkRequest, mobileAttachmentListPayload, } from "../../contract/mobile/attachment.js";
+import { mobileAttachmentDetachPayload, mobileAttachmentDetachRequest, mobileAttachmentFilePayload, mobileAttachmentLinkPayload, mobileAttachmentUploadHandoffPayload, mobileAttachmentUploadHandoffRequest, mobileAttachmentLinkRequest, mobileAttachmentListPayload, } from "../../contract/mobile/attachment.js";
 const attachingApiClient = new AttachingApiClient();
 function forwardedHeaders(request) {
     const headers = {};
@@ -98,6 +98,50 @@ function normalizeAttachmentLink(body) {
         payload: root,
     };
 }
+function normalizeAttachmentDetach(body, requestBody) {
+    const root = attachmentRoot(body);
+    const request = recordValue(requestBody);
+    return {
+        status: stringValue(root.status) ?? "detached",
+        attachmentId: stringValue(root.attachmentId ?? request.attachmentId) ?? "attachment-unavailable",
+        ownerType: stringValue(root.ownerType ?? request.ownerType) ?? "unknown",
+        ownerId: stringValue(root.ownerId ?? request.ownerId) ?? "unknown",
+        context: stringValue(root.context ?? request.context),
+        slot: stringValue(root.slot ?? request.slot),
+        payload: root,
+    };
+}
+function normalizeAttachmentFile(attachmentId, downloadUrl) {
+    return {
+        attachmentId,
+        downloadUrl,
+        mimeType: null,
+        fileName: null,
+        handoffMode: "external_url",
+        payload: { attachmentId, downloadUrl },
+    };
+}
+function normalizeAttachmentUploadHandoff(body, uploadUrl) {
+    const source = recordValue(body);
+    const form = {
+        ownerType: stringValue(source.ownerType) ?? "unknown",
+        ownerId: stringValue(source.ownerId) ?? "unknown",
+        context: stringValue(source.context),
+        slot: stringValue(source.slot),
+        isPrimary: booleanValue(source.isPrimary, false),
+        title: stringValue(source.title),
+        description: stringValue(source.description),
+        altText: stringValue(source.altText),
+    };
+    return {
+        uploadUrl,
+        method: "POST",
+        fieldName: "file",
+        form,
+        handoffMode: "multipart_direct",
+        payload: { uploadUrl, form },
+    };
+}
 function listQuery(query) {
     const source = recordValue(query);
     return {
@@ -109,7 +153,7 @@ function listQuery(query) {
 }
 export default async function route(app) {
     app.get("/attachment", { schema: { response: { 200: mobileAttachmentListPayload, 400: mobileAccessErrorPayload, 404: mobileAccessErrorPayload, 422: mobileAccessErrorPayload, 500: mobileAccessErrorPayload, 503: mobileAccessErrorPayload } } }, async (request, reply) => {
-        const result = await attachingApiClient.listAttachments(listQuery(request.query), forwardedHeaders(request));
+        const result = await attachingApiClient.listAttachment(listQuery(request.query), forwardedHeaders(request));
         if (result.status < 200 || result.status >= 300) {
             return reply.code(result.status).send(normalizeErrorPayload(result.body));
         }
@@ -121,5 +165,31 @@ export default async function route(app) {
             return reply.code(result.status).send(normalizeErrorPayload(result.body));
         }
         return reply.code(201 === result.status ? 201 : 200).send(normalizeAttachmentLink(result.body));
+    });
+    app.post("/attachment/detach", { schema: { body: mobileAttachmentDetachRequest, response: { 200: mobileAttachmentDetachPayload, 204: mobileAttachmentDetachPayload, 400: mobileAccessErrorPayload, 404: mobileAccessErrorPayload, 409: mobileAccessErrorPayload, 422: mobileAccessErrorPayload, 500: mobileAccessErrorPayload, 503: mobileAccessErrorPayload } } }, async (request, reply) => {
+        const result = await attachingApiClient.detachAttachment(request.body, forwardedHeaders(request));
+        if (result.status < 200 || result.status >= 300) {
+            return reply.code(result.status).send(normalizeErrorPayload(result.body));
+        }
+        return reply.code(200).send(normalizeAttachmentDetach(result.body, request.body));
+    });
+    app.get("/attachment/file/:attachmentId", { schema: { response: { 200: mobileAttachmentFilePayload, 400: mobileAccessErrorPayload, 404: mobileAccessErrorPayload, 422: mobileAccessErrorPayload, 500: mobileAccessErrorPayload, 503: mobileAccessErrorPayload } } }, async (request, reply) => {
+        const params = recordValue(request.params);
+        const attachmentId = stringValue(params.attachmentId);
+        if (null === attachmentId) {
+            return reply.code(422).send({ code: "attachment_id_required", message: "Attachment id is required." });
+        }
+        const downloadUrl = attachingApiClient.attachmentFileUrl(attachmentId);
+        if (null === downloadUrl) {
+            return reply.code(503).send({ code: "attaching_api_unavailable", message: "Attaching API is unavailable from mobile-edge." });
+        }
+        return reply.code(200).send(normalizeAttachmentFile(attachmentId, downloadUrl));
+    });
+    app.post("/attachment/upload-handoff", { schema: { body: mobileAttachmentUploadHandoffRequest, response: { 200: mobileAttachmentUploadHandoffPayload, 400: mobileAccessErrorPayload, 422: mobileAccessErrorPayload, 500: mobileAccessErrorPayload, 503: mobileAccessErrorPayload } } }, async (request, reply) => {
+        const uploadUrl = attachingApiClient.attachmentUploadUrl();
+        if (null === uploadUrl) {
+            return reply.code(503).send({ code: "attaching_api_unavailable", message: "Attaching API is unavailable from mobile-edge." });
+        }
+        return reply.code(200).send(normalizeAttachmentUploadHandoff(request.body, uploadUrl));
     });
 }

@@ -31,6 +31,8 @@ export const ENV = {
     NAVIGATING_API_TIMEOUT_MS: integer("NAVIGATING_API_TIMEOUT_MS", 3000),
     CARTING_API_BASE_URL: process.env.CARTING_API_BASE_URL || "",
     CARTING_API_TIMEOUT_MS: integer("CARTING_API_TIMEOUT_MS", 3000),
+    CATALOGING_API_BASE_URL: process.env.CATALOGING_API_BASE_URL || "",
+    CATALOGING_API_TIMEOUT_MS: integer("CATALOGING_API_TIMEOUT_MS", 3000),
     ATTACHING_API_BASE_URL: process.env.ATTACHING_API_BASE_URL || "",
     ATTACHING_API_TIMEOUT_MS: integer("ATTACHING_API_TIMEOUT_MS", 3000),
     LOCALIZING_API_BASE_URL: process.env.LOCALIZING_API_BASE_URL || "",
@@ -68,6 +70,7 @@ export function assertRuntimeEnv() {
         ["VENDORING_API_BASE_URL", ENV.VENDORING_API_BASE_URL, ""],
         ["NAVIGATING_API_BASE_URL", ENV.NAVIGATING_API_BASE_URL, ""],
         ["CARTING_API_BASE_URL", ENV.CARTING_API_BASE_URL, ""],
+        ["CATALOGING_API_BASE_URL", ENV.CATALOGING_API_BASE_URL, ""],
         ["ATTACHING_API_BASE_URL", ENV.ATTACHING_API_BASE_URL, ""],
     ].filter(([, value, forbidden]) => value === forbidden).map(([name]) => name);
     if (invalid.length > 0) {

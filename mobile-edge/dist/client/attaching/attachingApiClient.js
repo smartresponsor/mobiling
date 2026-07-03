@@ -12,7 +12,7 @@ export class AttachingApiClient {
         this.baseUrl = baseUrl;
         this.timeoutMs = timeoutMs;
     }
-    listAttachments(query, forwardedHeaders = {}) {
+    listAttachment(query, forwardedHeaders = {}) {
         const search = new URLSearchParams();
         for (const [key, value] of Object.entries(query)) {
             if ("string" === typeof value && "" !== value.trim()) {
@@ -20,10 +20,37 @@ export class AttachingApiClient {
             }
         }
         const suffix = "" === search.toString() ? "" : `?${search.toString()}`;
-        return this.request("GET", `/attachments${suffix}`, null, forwardedHeaders);
+        return this.request("GET", `/attachment${suffix}`, null, forwardedHeaders);
     }
     attachAttachment(body, forwardedHeaders = {}) {
-        return this.request("POST", "/attachments/attach", body, forwardedHeaders);
+        return this.request("POST", "/attachment/attach", body, forwardedHeaders);
+    }
+    detachAttachment(body, forwardedHeaders = {}) {
+        return this.request("POST", "/attachment/detach", body, forwardedHeaders);
+    }
+    attachmentFileUrl(attachmentId) {
+        const baseUrl = this.baseUrl.trim();
+        if ("" === baseUrl || "" === attachmentId.trim()) {
+            return null;
+        }
+        try {
+            return new URL(`${baseUrl.replace(/\/$/, "")}/attachment/${encodeURIComponent(attachmentId.trim())}/download`).toString();
+        }
+        catch {
+            return null;
+        }
+    }
+    attachmentUploadUrl() {
+        const baseUrl = this.baseUrl.trim();
+        if ("" === baseUrl) {
+            return null;
+        }
+        try {
+            return new URL(`${baseUrl.replace(/\/$/, "")}/attachment/upload`).toString();
+        }
+        catch {
+            return null;
+        }
     }
     async request(method, path, body, forwardedHeaders) {
         const baseUrl = this.baseUrl.trim();
