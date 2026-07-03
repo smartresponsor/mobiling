@@ -264,7 +264,11 @@ for (const route of manifest.routes ?? []) {
   }
 }
 
-const routeFiles = await collectFiles("src/routes/mobile", ".ts");
+const legacyMobileRouteFiles = await collectFiles("src/routes/mobile", ".ts");
+const manifestRouteFiles = (manifest.routes ?? [])
+  .map((route) => route.routeFile)
+  .filter((routeFile) => "string" === typeof routeFile && routeFile.endsWith(".ts"));
+const routeFiles = [...new Set([...legacyMobileRouteFiles, ...manifestRouteFiles])];
 const discoveredRouteKeys = new Set();
 const forbiddenCrudFragments = ["/crud", "/create", "/update", "/delete", "/edit", "/remove"];
 const forbiddenDatabasePatterns = [
@@ -307,7 +311,7 @@ for (const file of routeFiles) {
   }
 
   if (/const\s+mobile[A-Za-z0-9]+Payload\s*=\s*\{/.test(source)) {
-    fail(`${file} declares an inline mobile response payload schema; place mobile route schemas under src/contract/mobile instead.`);
+    fail(`${file} declares an inline mobile response payload schema; place mobile route schemas under component-first src/contract/<component> instead.`);
   }
 
   if (/contract\/mobile\/vendor[A-Z][A-Za-z0-9]*\.js/.test(source)) {
