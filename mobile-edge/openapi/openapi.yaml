@@ -241,6 +241,29 @@ paths:
         '201': { description: Created, content: { application/json: { schema: { $ref: '#/components/schemas/MobileCartCheckoutHandoffPayload' } } } }
         '409': { description: Cart not ready, content: { application/json: { schema: { $ref: '#/components/schemas/MobileAccessErrorPayload' } } } }
         '503': { description: Carting API unavailable, content: { application/json: { schema: { $ref: '#/components/schemas/MobileAccessErrorPayload' } } } }
+  /catalog:
+    get:
+      summary: Mobile catalog list
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/MobileCatalogListPayload' } } } }
+        '503': { description: Cataloging API unavailable, content: { application/json: { schema: { $ref: '#/components/schemas/MobileAccessErrorPayload' } } } }
+  /catalog/node/{catalogNodeId}:
+    get:
+      summary: Mobile catalog node detail
+      parameters:
+        - in: path
+          name: catalogNodeId
+          required: true
+          schema: { type: string, minLength: 1 }
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/MobileCatalogNodeDetailPayload' } } } }
+        '503': { description: Cataloging API unavailable, content: { application/json: { schema: { $ref: '#/components/schemas/MobileAccessErrorPayload' } } } }
+  /catalog/search:
+    get:
+      summary: Mobile catalog search
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/MobileCatalogSearchPayload' } } } }
+        '503': { description: Cataloging API unavailable, content: { application/json: { schema: { $ref: '#/components/schemas/MobileAccessErrorPayload' } } } }
   /attachment:
     get:
       summary: Mobile attachment list
@@ -509,6 +532,47 @@ components:
           type: array
           items: { type: string }
         locations: { type: object, additionalProperties: true }
+    MobileCatalogNodeSummaryPayload:
+      type: object
+      additionalProperties: true
+      required: [nodeId, title]
+      properties:
+        nodeId: { type: string, minLength: 1 }
+        title: { type: string, minLength: 1 }
+        parentNodeId: { anyOf: [{ type: string, minLength: 1 }, { type: 'null' }] }
+    MobileCatalogListPayload:
+      type: object
+      additionalProperties: true
+      required: [nodes, payload]
+      properties:
+        nodes:
+          type: array
+          items: { $ref: '#/components/schemas/MobileCatalogNodeSummaryPayload' }
+        payload: { type: object, additionalProperties: true }
+    MobileCatalogNodeDetailPayload:
+      type: object
+      additionalProperties: true
+      required: [node, payload]
+      properties:
+        node: { $ref: '#/components/schemas/MobileCatalogNodeSummaryPayload' }
+        description: { anyOf: [{ type: string, minLength: 1 }, { type: 'null' }] }
+        breadcrumbLabels:
+          type: array
+          items: { type: string, minLength: 1 }
+        featuredProductIds:
+          type: array
+          items: { type: string, minLength: 1 }
+        payload: { type: object, additionalProperties: true }
+    MobileCatalogSearchPayload:
+      type: object
+      additionalProperties: true
+      required: [query, nodes, payload]
+      properties:
+        query: { anyOf: [{ type: string, minLength: 1 }, { type: 'null' }] }
+        nodes:
+          type: array
+          items: { $ref: '#/components/schemas/MobileCatalogNodeSummaryPayload' }
+        payload: { type: object, additionalProperties: true }
     MobileAttachmentItemPayload:
       type: object
       additionalProperties: false

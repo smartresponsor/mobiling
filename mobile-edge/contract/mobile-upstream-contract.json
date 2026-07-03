@@ -47,6 +47,24 @@
       "status": "declared-in-component"
     },
     {
+      "owner": "Cataloging",
+      "mobileRoute": "GET /catalog",
+      "upstreamRoute": "GET /api/catalog",
+      "status": "declared-in-component-pending-green-report"
+    },
+    {
+      "owner": "Cataloging",
+      "mobileRoute": "GET /catalog/node/:catalogNodeId",
+      "upstreamRoute": "GET /api/catalog/node/{catalogNodeId}",
+      "status": "declared-in-component-pending-green-report"
+    },
+    {
+      "owner": "Cataloging",
+      "mobileRoute": "GET /catalog/search",
+      "upstreamRoute": "GET /api/catalog/search",
+      "status": "declared-in-component-pending-green-report"
+    },
+    {
       "owner": "Localizing",
       "mobileRoute": "GET /locale",
       "upstreamRoute": "GET /api/locale",

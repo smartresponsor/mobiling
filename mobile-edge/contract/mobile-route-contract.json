@@ -148,6 +148,36 @@
     },
     {
       "method": "GET",
+      "path": "/catalog",
+      "owner": "Cataloging",
+      "routeFile": "src/routes/mobile/catalog.ts",
+      "routeClass": "screen",
+      "screen": "catalog.list",
+      "responseSchema": "MobileCatalogListPayload",
+      "contractFile": "src/contract/mobile/catalog.ts",
+      "fixture": "fixture/mobile/catalog/list.success.json"
+    },
+    {
+      "method": "GET",
+      "path": "/catalog/node/:catalogNodeId",
+      "owner": "Cataloging",
+      "routeFile": "src/routes/mobile/catalog.ts",
+      "routeClass": "screen",
+      "screen": "catalog.detail",
+      "responseSchema": "MobileCatalogNodeDetailPayload",
+      "contractFile": "src/contract/mobile/catalog.ts",
+      "fixture": "fixture/mobile/catalog/detail.success.json"
+    },
+    {
+      "method": "GET",
+      "path": "/catalog/search",
+      "owner": "Cataloging",
+      "routeFile": "src/routes/mobile/catalog.ts",
+      "routeClass": "transport",
+      "responseSchema": "MobileCatalogSearchPayload"
+    },
+    {
+      "method": "GET",
       "path": "/locale",
       "owner": "Localizing",
       "routeFile": "src/routes/mobile/locale/index.ts",
