@@ -94,3 +94,17 @@ export const mobileAttachmentDetachPayload = {
     payload: payloadField,
   },
 } as const;
+
+export const mobileAttachmentFilePayload = {
+  type: "object",
+  additionalProperties: false,
+  required: ["attachmentId", "downloadUrl", "handoffMode", "payload"],
+  properties: {
+    attachmentId: stringField(1),
+    downloadUrl: stringField(1),
+    mimeType: nullableStringField(1),
+    fileName: nullableStringField(1),
+    handoffMode: stringField(1),
+    payload: payloadField,
+  },
+} as const;

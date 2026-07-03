@@ -54,6 +54,20 @@ export class AttachingApiClient {
     return this.request("POST", "/attachment/detach", body, forwardedHeaders);
   }
 
+  attachmentFileUrl(attachmentId: string): string | null {
+    const baseUrl = this.baseUrl.trim();
+
+    if ("" === baseUrl || "" === attachmentId.trim()) {
+      return null;
+    }
+
+    try {
+      return new URL(`${baseUrl.replace(/\/$/, "")}/attachment/${encodeURIComponent(attachmentId.trim())}/download`).toString();
+    } catch {
+      return null;
+    }
+  }
+
   private async request(method: string, path: string, body: unknown, forwardedHeaders: Record<string, string>): Promise<AttachingApiResponse> {
     const baseUrl = this.baseUrl.trim();
 

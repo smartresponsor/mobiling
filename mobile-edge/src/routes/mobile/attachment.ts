@@ -4,6 +4,7 @@ import { mobileAccessErrorPayload } from "../../contract/mobile/access/error.js"
 import {
   mobileAttachmentDetachPayload,
   mobileAttachmentDetachRequest,
+  mobileAttachmentFilePayload,
   mobileAttachmentLinkPayload,
   mobileAttachmentLinkRequest,
   mobileAttachmentListPayload,
@@ -149,6 +150,17 @@ function normalizeAttachmentDetach(body: unknown, requestBody: unknown): Record<
   };
 }
 
+function normalizeAttachmentFile(attachmentId: string, downloadUrl: string): Record<string, unknown> {
+  return {
+    attachmentId,
+    downloadUrl,
+    mimeType: null,
+    fileName: null,
+    handoffMode: "external_url",
+    payload: { attachmentId, downloadUrl },
+  };
+}
+
 function listQuery(query: unknown): { ownerType?: string; ownerId?: string; context?: string; slot?: string } {
   const source = recordValue(query);
 
@@ -198,5 +210,22 @@ export default async function route(app: FastifyInstance): Promise<void> {
     }
 
     return reply.code(200).send(normalizeAttachmentDetach(result.body, request.body));
+  });
+
+  app.get("/attachment/file/:attachmentId", { schema: { response: { 200: mobileAttachmentFilePayload, 400: mobileAccessErrorPayload, 404: mobileAccessErrorPayload, 422: mobileAccessErrorPayload, 500: mobileAccessErrorPayload, 503: mobileAccessErrorPayload } } }, async (request, reply) => {
+    const params = recordValue(request.params);
+    const attachmentId = stringValue(params.attachmentId);
+
+    if (null === attachmentId) {
+      return reply.code(422).send({ code: "attachment_id_required", message: "Attachment id is required." });
+    }
+
+    const downloadUrl = attachingApiClient.attachmentFileUrl(attachmentId);
+
+    if (null === downloadUrl) {
+      return reply.code(503).send({ code: "attaching_api_unavailable", message: "Attaching API is unavailable from mobile-edge." });
+    }
+
+    return reply.code(200).send(normalizeAttachmentFile(attachmentId, downloadUrl));
   });
 }

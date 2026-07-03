@@ -53,6 +53,12 @@
       "status": "declared-in-component"
     },
     {
+      "owner": "Attaching",
+      "mobileRoute": "GET /attachment/file/:attachmentId",
+      "upstreamRoute": "GET /attachment/{attachmentId}/download",
+      "status": "mobile-handoff"
+    },
+    {
       "owner": "Cataloging",
       "mobileRoute": "GET /catalog",
       "upstreamRoute": "GET /api/category/storefront",

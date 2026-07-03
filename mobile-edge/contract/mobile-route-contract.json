@@ -156,6 +156,14 @@
     },
     {
       "method": "GET",
+      "path": "/attachment/file/:attachmentId",
+      "owner": "Attaching",
+      "routeFile": "src/routes/mobile/attachment.ts",
+      "routeClass": "transport",
+      "responseSchema": "MobileAttachmentFilePayload"
+    },
+    {
+      "method": "GET",
       "path": "/catalog",
       "owner": "Cataloging",
       "routeFile": "src/routes/mobile/catalog.ts",
