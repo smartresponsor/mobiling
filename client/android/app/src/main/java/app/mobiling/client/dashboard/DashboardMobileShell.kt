@@ -41,6 +41,7 @@ import app.mobiling.client.data.vendor.statement.VendorStatementGateway
 import app.mobiling.client.data.vendor.summary.VendorSummaryGateway
 import app.mobiling.client.data.vendor.transaction.VendorTransactionGateway
 import app.mobiling.client.ui.navigation.shell.NavigationMobileShellScreenContract
+import app.mobiling.client.navigation.MobileRouteResolver
 import app.mobiling.client.usecase.navigation.shell.NavigationLoadShellUseCase
 import app.mobiling.client.vendor.VendorMobilePayoutScreen
 import app.mobiling.client.vendor.VendorMobileProfileScreen
@@ -133,8 +134,8 @@ fun DashboardMobileShell(
                 items = shell.accountQuick,
                 onItemClick = { item ->
                     when {
-                        item.action == "access.sign_out" -> onSignOut()
-                        item.enabled && isHandledRoute(item.route) -> selectedRoute = item.route ?: item.key
+                        MobileRouteResolver.isSignOutAction(item.action, item.route) -> onSignOut()
+                        item.enabled && isHandledRoute(item.route) -> selectedRoute = MobileRouteResolver.normalizeRoute(item.route)
                         else -> Unit
                     }
                     accountOpen = false
@@ -334,10 +335,7 @@ private fun item(
     route = route,
 )
 
-private fun isHandledRoute(route: String?): Boolean =
-    route == "attachment" ||
-    route == "cart" ||
-    setOf("dashboard", "vendor", "vendor/profile", "vendor/summary", "vendor/statement", "vendor/payout", "vendor/transaction", "more").contains(route)
+private fun isHandledRoute(route: String?): Boolean = MobileRouteResolver.isCurrentlyRenderable(route)
 
 
 

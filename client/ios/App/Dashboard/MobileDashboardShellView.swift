@@ -154,7 +154,7 @@ public struct MobileDashboardShellView: View {
     }
 
     private func handle(_ item: MobileNavigationItemPayload) {
-        if item.action == "access.sign_out" {
+        if MobileRouteResolver.isSignOutAction(action: item.action, route: item.route) {
             onSignOut()
             return
         }
@@ -208,7 +208,7 @@ public struct MobileDashboardShellView: View {
     }
 
     private func isHandledRoute(_ route: String) -> Bool {
-        ["dashboard", "vendor", "vendor/profile", "vendor/summary", "vendor/statement", "vendor/payout", "vendor/transaction", "attachment", "more"].contains(route)
+        MobileRouteResolver.isCurrentlyRenderable(route)
     }
 
     private static func fallbackShell() -> MobileNavigationShellScreenContract {
