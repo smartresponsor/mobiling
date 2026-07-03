@@ -1,0 +1,202 @@
+{
+  "$schema": "https://smartresponsor.dev/schema/mobile-route-contract-v1.json",
+  "schema": "smartresponsor.mobile.route.contract.v1",
+  "source_of_truth": {
+    "published_shell": "Navigating",
+    "crud_execution": "Cruding",
+    "mobile_renderer": "Mobiling"
+  },
+  "policy": {
+    "signin_signout_snackbar_case": false,
+    "unknown_route_behavior": "safe_ignore_or_disabled",
+    "disabled_route_behavior": "visible_inert",
+    "action_route_behavior": "execute_action_before_content_routing",
+    "fallback_shell_behavior": "development_safety_only"
+  },
+  "action": [
+    {
+      "key": "access.sign_out",
+      "route": "access/sign-out",
+      "owner": "Accessing",
+      "state_transition": "clear_session_and_return_to_access_entry",
+      "content_screen": false
+    }
+  ],
+  "currently_renderable": [
+    "dashboard",
+    "more",
+    "vendor",
+    "vendor/profile",
+    "vendor/summary",
+    "vendor/statement",
+    "vendor/payout",
+    "vendor/transaction",
+    "attachment"
+  ],
+  "known_route": [
+    {
+      "route": "access/sign-in",
+      "family": "access",
+      "owner": "Accessing",
+      "published_state": "entry_flow",
+      "android": true,
+      "ios": true
+    },
+    {
+      "route": "access/register",
+      "family": "access",
+      "owner": "Accessing",
+      "published_state": "entry_flow",
+      "android": true,
+      "ios": true
+    },
+    {
+      "route": "access/recovery/request",
+      "family": "access",
+      "owner": "Accessing",
+      "published_state": "entry_flow",
+      "android": true,
+      "ios": true
+    },
+    {
+      "route": "access/recovery/reset",
+      "family": "access",
+      "owner": "Accessing",
+      "published_state": "entry_flow",
+      "android": true,
+      "ios": true
+    },
+    {
+      "route": "access/verification",
+      "family": "access",
+      "owner": "Accessing",
+      "published_state": "disabled_until_published",
+      "android": true,
+      "ios": true
+    },
+    {
+      "route": "access/password",
+      "family": "access",
+      "owner": "Accessing",
+      "published_state": "disabled_until_published",
+      "android": true,
+      "ios": true
+    },
+    {
+      "route": "access/sign-out",
+      "family": "access",
+      "owner": "Accessing",
+      "published_state": "action",
+      "android": true,
+      "ios": true
+    },
+    {
+      "route": "dashboard",
+      "family": "dashboard",
+      "owner": "Interfacing",
+      "published_state": "active",
+      "android": true,
+      "ios": true
+    },
+    {
+      "route": "more",
+      "family": "dashboard",
+      "owner": "Navigating",
+      "published_state": "active",
+      "android": true,
+      "ios": true
+    },
+    {
+      "route": "vendor",
+      "family": "vendor",
+      "owner": "Vendoring",
+      "published_state": "active",
+      "android": true,
+      "ios": true
+    },
+    {
+      "route": "vendor/profile",
+      "family": "vendor",
+      "owner": "Vendoring",
+      "published_state": "active",
+      "android": true,
+      "ios": true
+    },
+    {
+      "route": "vendor/summary",
+      "family": "vendor",
+      "owner": "Vendoring",
+      "published_state": "active",
+      "android": true,
+      "ios": true
+    },
+    {
+      "route": "vendor/statement",
+      "family": "vendor",
+      "owner": "Vendoring",
+      "published_state": "active",
+      "android": true,
+      "ios": true
+    },
+    {
+      "route": "vendor/payout",
+      "family": "vendor",
+      "owner": "Vendoring",
+      "published_state": "active",
+      "android": true,
+      "ios": true
+    },
+    {
+      "route": "vendor/transaction",
+      "family": "vendor",
+      "owner": "Vendoring",
+      "published_state": "active",
+      "android": true,
+      "ios": true
+    },
+    {
+      "route": "attachment",
+      "family": "attachment",
+      "owner": "Attaching",
+      "published_state": "renderable_when_published",
+      "android": true,
+      "ios": true
+    },
+    {
+      "route": "attachment/{attachmentId}",
+      "family": "attachment",
+      "owner": "Attaching",
+      "published_state": "future_detail",
+      "android": true,
+      "ios": true
+    },
+    {
+      "route": "catalog",
+      "family": "catalog",
+      "owner": "Cataloging",
+      "published_state": "disabled_until_published",
+      "android": true,
+      "ios": true
+    },
+    {
+      "route": "catalog/browse",
+      "family": "catalog",
+      "owner": "Cataloging",
+      "published_state": "future_screen",
+      "android": true,
+      "ios": true
+    },
+    {
+      "route": "catalog/node/{catalogNodeId}",
+      "family": "catalog",
+      "owner": "Cataloging",
+      "published_state": "future_screen",
+      "android": true,
+      "ios": true
+    },
+    {
+      "route": "catalog/search",
+      "family": "catalog",
+      "owner": "Cataloging",
+      "published_state": "future_screen",
+      "android": true,
