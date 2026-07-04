@@ -105,7 +105,7 @@
       "routeClass": "screen",
       "screen": "cart.current",
       "responseSchema": "MobileCartPayload",
-      "contractFile": "src/contract/mobile/cart.ts",
+      "contractFile": "src/contract/cart/index.ts",
       "fixture": "fixture/mobile/cart/current.success.json"
     },
     {
@@ -124,7 +124,7 @@
       "routeClass": "screen",
       "screen": "cart.checkout-handoff",
       "responseSchema": "MobileCartCheckoutHandoffPayload",
-      "contractFile": "src/contract/mobile/cart.ts",
+      "contractFile": "src/contract/cart/index.ts",
       "fixture": "fixture/mobile/cart/checkout-handoff.success.json"
     },
     {
