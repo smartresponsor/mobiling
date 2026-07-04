@@ -252,7 +252,7 @@
       "method": "GET",
       "path": "/locale",
       "owner": "Localizing",
-      "routeFile": "src/routes/mobile/locale/index.ts",
+      "routeFile": "src/routes/locale/mobile.ts",
       "routeClass": "transport",
       "responseSchema": "MobileLocaleListPayload"
     },
@@ -260,7 +260,7 @@
       "method": "GET",
       "path": "/locale/:code/fallback",
       "owner": "Localizing",
-      "routeFile": "src/routes/mobile/locale/index.ts",
+      "routeFile": "src/routes/locale/mobile.ts",
       "routeClass": "transport",
       "responseSchema": "MobileLocaleFallbackPayload"
     },
@@ -268,7 +268,7 @@
       "method": "GET",
       "path": "\/locale\/translation\/message\/resolve",
       "owner": "Localizing",
-      "routeFile": "src/routes/mobile/locale/index.ts",
+      "routeFile": "src/routes/locale/mobile.ts",
       "routeClass": "transport",
       "responseSchema": "MobileLocaleTranslationPayload"
     },
