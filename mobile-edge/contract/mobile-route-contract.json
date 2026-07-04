@@ -292,7 +292,7 @@
       "routeClass": "screen",
       "screen": "vendor.profile",
       "responseSchema": "MobileVendorProfilePayload",
-      "contractFile": "src/contract/mobile/vendor/profile.ts",
+      "contractFile": "src/contract/vendor/profile.ts",
       "fixture": "fixture/mobile/vendor/profile.success.json"
     },
     {
@@ -303,7 +303,7 @@
       "routeClass": "screen",
       "screen": "vendor.summary",
       "responseSchema": "MobileVendorSummaryPayload",
-      "contractFile": "src/contract/mobile/vendor/summary.ts",
+      "contractFile": "src/contract/vendor/summary.ts",
       "fixture": "fixture/mobile/vendor/summary.success.json"
     },
     {
@@ -314,7 +314,7 @@
       "routeClass": "screen",
       "screen": "vendor.statement",
       "responseSchema": "MobileVendorStatementPayload",
-      "contractFile": "src/contract/mobile/vendor/statement.ts",
+      "contractFile": "src/contract/vendor/statement.ts",
       "fixture": "fixture/mobile/vendor/statement.success.json"
     },
     {
@@ -325,7 +325,7 @@
       "routeClass": "screen",
       "screen": "vendor.payout",
       "responseSchema": "MobileVendorPayoutPayload",
-      "contractFile": "src/contract/mobile/vendor/payout.ts",
+      "contractFile": "src/contract/vendor/payout.ts",
       "fixture": "fixture/mobile/vendor/payout.success.json"
     },
     {
@@ -336,7 +336,7 @@
       "routeClass": "screen",
       "screen": "vendor.transaction",
       "responseSchema": "MobileVendorTransactionListPayload",
-      "contractFile": "src/contract/mobile/vendor/transaction.ts",
+      "contractFile": "src/contract/vendor/transaction.ts",
       "fixture": "fixture/mobile/vendor/transaction.success.json"
     }
   ]
