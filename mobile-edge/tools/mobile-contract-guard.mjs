@@ -268,7 +268,7 @@ const legacyMobileRouteFiles = await collectFiles("src/routes/mobile", ".ts");
 const manifestRouteFiles = (manifest.routes ?? [])
   .map((route) => route.routeFile)
   .filter((routeFile) => "string" === typeof routeFile && routeFile.endsWith(".ts"));
-const routeFiles = [...new Set([...legacyMobileRouteFiles, ...manifestRouteFiles])];
+const routeFiles = [...new Set([...manifestRouteFiles, ...legacyMobileRouteFiles])];
 const discoveredRouteKeys = new Set();
 const forbiddenCrudFragments = ["/crud", "/create", "/update", "/delete", "/edit", "/remove"];
 const forbiddenDatabasePatterns = [
@@ -280,6 +280,12 @@ const forbiddenDatabasePatterns = [
 for (const file of routeFiles) {
   const source = await readText(file);
   const discoveredRoutes = extractRoutes(source);
+
+  for (const declaredRoute of manifest.routes ?? []) {
+    if (declaredRoute.routeFile === file && source.includes(`"${declaredRoute.path}"`)) {
+      discoveredRouteKeys.add(routeKey(declaredRoute.method, declaredRoute.path));
+    }
+  }
 
   for (const route of discoveredRoutes) {
     const key = routeKey(route.method, route.path);
