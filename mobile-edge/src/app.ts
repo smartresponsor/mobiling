@@ -15,7 +15,7 @@ import routeCore from "./routes/core.js";
 import routeEntitlement from "./routes/entitlement.js";
 import routeFlag from "./routes/flag.js";
 import routeHealth from "./routes/health.js";
-import routeMobileAccess from "./routes/mobile/access.js";
+import routeMobileAccess from "./routes/access/mobile.js";
 import routeMobileAttachment from "./routes/attachment/mobile.js";
 import routeMobileCart from "./routes/cart/mobile.js";
 import routeMobileCatalog from "./routes/catalog/mobile.js";

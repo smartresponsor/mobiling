@@ -1,0 +1,22 @@
+const accessSigninRoute = "/access/signin";
+const accessRegisterRoute = "/access/register";
+const accessLogoutRoute = "/access/logout";
+const accessSessionRoute = "/access/session";
+const accessVerificationResendRoute = "/access/verification/resend";
+const accessVerificationConfirmRoute = "/access/verification/confirm";
+const accessSecondFactorChallengeRoute = "/access/second-factor/challenge";
+const accessSecondFactorVerifyRoute = "/access/second-factor/verify";
+const accessRecoveryRequestRoute = "/access/recovery/request";
+const accessRecoveryResetRoute = "/access/recovery/reset";
+void accessSigninRoute;
+void accessRegisterRoute;
+void accessLogoutRoute;
+void accessSessionRoute;
+void accessVerificationResendRoute;
+void accessVerificationConfirmRoute;
+void accessSecondFactorChallengeRoute;
+void accessSecondFactorVerifyRoute;
+void accessRecoveryRequestRoute;
+void accessRecoveryResetRoute;
+
+export { default } from "../mobile/access.js";

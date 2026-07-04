@@ -21,7 +21,7 @@
       "method": "POST",
       "path": "/access/signin",
       "owner": "Accessing",
-      "routeFile": "src/routes/mobile/access.ts",
+      "routeFile": "src/routes/access/mobile.ts",
       "routeClass": "transport",
       "responseSchema": "MobileAccessSessionPayload"
     },
@@ -29,7 +29,7 @@
       "method": "POST",
       "path": "/access/register",
       "owner": "Accessing",
-      "routeFile": "src/routes/mobile/access.ts",
+      "routeFile": "src/routes/access/mobile.ts",
       "routeClass": "transport",
       "responseSchema": "MobileAccessSessionPayload"
     },
@@ -37,7 +37,7 @@
       "method": "POST",
       "path": "/access/logout",
       "owner": "Accessing",
-      "routeFile": "src/routes/mobile/access.ts",
+      "routeFile": "src/routes/access/mobile.ts",
       "routeClass": "transport",
       "responseSchema": "MobileAccessSessionPayload"
     },
@@ -45,7 +45,7 @@
       "method": "GET",
       "path": "/access/session",
       "owner": "Accessing",
-      "routeFile": "src/routes/mobile/access.ts",
+      "routeFile": "src/routes/access/mobile.ts",
       "routeClass": "transport",
       "responseSchema": "MobileAccessSessionPayload"
     },
@@ -53,7 +53,7 @@
       "method": "POST",
       "path": "/access/verification/resend",
       "owner": "Accessing",
-      "routeFile": "src/routes/mobile/access.ts",
+      "routeFile": "src/routes/access/mobile.ts",
       "routeClass": "transport",
       "responseSchema": "MobileAccessSessionPayload"
     },
@@ -61,7 +61,7 @@
       "method": "POST",
       "path": "/access/verification/confirm",
       "owner": "Accessing",
-      "routeFile": "src/routes/mobile/access.ts",
+      "routeFile": "src/routes/access/mobile.ts",
       "routeClass": "transport",
       "responseSchema": "MobileAccessSessionPayload"
     },
@@ -69,7 +69,7 @@
       "method": "POST",
       "path": "/access/second-factor/challenge",
       "owner": "Accessing",
-      "routeFile": "src/routes/mobile/access.ts",
+      "routeFile": "src/routes/access/mobile.ts",
       "routeClass": "transport",
       "responseSchema": "MobileAccessSessionPayload"
     },
@@ -77,7 +77,7 @@
       "method": "POST",
       "path": "/access/second-factor/verify",
       "owner": "Accessing",
-      "routeFile": "src/routes/mobile/access.ts",
+      "routeFile": "src/routes/access/mobile.ts",
       "routeClass": "transport",
       "responseSchema": "MobileAccessSessionPayload"
     },
@@ -85,7 +85,7 @@
       "method": "POST",
       "path": "/access/recovery/request",
       "owner": "Accessing",
-      "routeFile": "src/routes/mobile/access.ts",
+      "routeFile": "src/routes/access/mobile.ts",
       "routeClass": "transport",
       "responseSchema": "MobileAccessSessionPayload"
     },
@@ -93,7 +93,7 @@
       "method": "POST",
       "path": "/access/recovery/reset",
       "owner": "Accessing",
-      "routeFile": "src/routes/mobile/access.ts",
+      "routeFile": "src/routes/access/mobile.ts",
       "routeClass": "transport",
       "responseSchema": "MobileAccessSessionPayload"
     },
