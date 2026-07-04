@@ -321,15 +321,15 @@ for (const file of routeFiles) {
   }
 
   if (/contract\/mobile\/vendor[A-Z][A-Za-z0-9]*\.js/.test(source)) {
-    fail(`${file} imports a flat vendor mobile contract; use src/contract/mobile/vendor/<name>.ts instead.`);
+    fail(`${file} imports a legacy vendor mobile contract; use component-first src/contract/vendor/<name>.ts instead.`);
   }
 
   if (/contract\/mobile\/access\.js/.test(source)) {
-    fail(`${file} imports a flat access mobile contract; use src/contract/mobile/access/<name>.ts instead.`);
+    fail(`${file} imports a legacy access mobile contract; use component-first src/contract/access/<name>.ts instead.`);
   }
 
   if (/contract\/mobile\/navigationShell\.js/.test(source)) {
-    fail(`${file} imports a flat navigation mobile contract; use src/contract/mobile/navigation/<name>.ts instead.`);
+    fail(`${file} imports a legacy navigation mobile contract; use component-first src/contract/navigation/<name>.ts instead.`);
   }
 }
 

@@ -288,7 +288,6 @@
       "path": "/vendor/profile/:vendorId",
       "owner": "Vendoring",
       "routeFile": "src/routes/vendor/profile.ts",
-      "implementationFile": "src/routes/mobile/vendorProfile.ts",
       "routeClass": "screen",
       "screen": "vendor.profile",
       "responseSchema": "MobileVendorProfilePayload",
