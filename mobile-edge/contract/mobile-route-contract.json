@@ -131,7 +131,7 @@
       "method": "GET",
       "path": "/attachment",
       "owner": "Attaching",
-      "routeFile": "src/routes/mobile/attachment.ts",
+      "routeFile": "src/routes/attachment/mobile.ts",
       "routeClass": "screen",
       "screen": "attachment.list",
       "responseSchema": "MobileAttachmentListPayload",
@@ -142,7 +142,7 @@
       "method": "POST",
       "path": "/attachment/link",
       "owner": "Attaching",
-      "routeFile": "src/routes/mobile/attachment.ts",
+      "routeFile": "src/routes/attachment/mobile.ts",
       "routeClass": "transport",
       "responseSchema": "MobileAttachmentLinkPayload"
     },
@@ -150,7 +150,7 @@
       "method": "POST",
       "path": "/attachment/detach",
       "owner": "Attaching",
-      "routeFile": "src/routes/mobile/attachment.ts",
+      "routeFile": "src/routes/attachment/mobile.ts",
       "routeClass": "transport",
       "responseSchema": "MobileAttachmentDetachPayload"
     },
@@ -158,7 +158,7 @@
       "method": "GET",
       "path": "/attachment/file/:attachmentId",
       "owner": "Attaching",
-      "routeFile": "src/routes/mobile/attachment.ts",
+      "routeFile": "src/routes/attachment/mobile.ts",
       "routeClass": "transport",
       "responseSchema": "MobileAttachmentFilePayload"
     },
@@ -166,7 +166,7 @@
       "method": "POST",
       "path": "/attachment/upload-handoff",
       "owner": "Attaching",
-      "routeFile": "src/routes/mobile/attachment.ts",
+      "routeFile": "src/routes/attachment/mobile.ts",
       "routeClass": "transport",
       "responseSchema": "MobileAttachmentUploadHandoffPayload"
     },
