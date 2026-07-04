@@ -20,7 +20,7 @@ import routeMobileAttachment from "./routes/attachment/mobile.js";
 import routeMobileCart from "./routes/cart/mobile.js";
 import routeMobileCatalog from "./routes/catalog/mobile.js";
 import routeMobileLocale from "./routes/locale/mobile.js";
-import routeMobileNavigationShell from "./routes/mobile/navigationShell.js";
+import routeMobileNavigationShell from "./routes/navigation/mobile.js";
 import routeMobileVendorPayout from "./routes/mobile/vendor/payout.js";
 import routeMobileVendorProfile from "./routes/mobile/vendor/profile.js";
 import routeMobileVendorStatement from "./routes/mobile/vendor/statement.js";
