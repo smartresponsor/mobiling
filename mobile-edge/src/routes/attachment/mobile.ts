@@ -1,6 +1,6 @@
 import type { FastifyInstance } from "fastify";
 import { AttachingApiClient, type AttachingApiErrorPayload } from "../../client/attaching/attachingApiClient.js";
-import { mobileAccessErrorPayload } from "../../contract/mobile/access/error.js";
+import { mobileAccessErrorPayload } from "../../contract/access/error.js";
 import {
   mobileAttachmentDetachPayload,
   mobileAttachmentDetachRequest,

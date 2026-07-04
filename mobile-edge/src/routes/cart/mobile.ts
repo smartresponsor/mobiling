@@ -1,6 +1,6 @@
 import type { FastifyInstance } from "fastify";
 import { CartingApiClient, type CartingApiErrorPayload } from "../../client/carting/cartingApiClient.js";
-import { mobileAccessErrorPayload } from "../../contract/mobile/access/error.js";
+import { mobileAccessErrorPayload } from "../../contract/access/error.js";
 import {
   mobileCartCheckoutHandoffPayload,
   mobileCartItemMutationRequest,

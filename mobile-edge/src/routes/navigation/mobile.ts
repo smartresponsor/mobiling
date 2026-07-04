@@ -1,6 +1,6 @@
 import type { FastifyInstance } from "fastify";
 import { NavigatingApiClient, type NavigatingApiErrorPayload } from "../../client/navigating/navigatingApiClient.js";
-import { mobileAccessErrorPayload } from "../../contract/mobile/access/error.js";
+import { mobileAccessErrorPayload } from "../../contract/access/error.js";
 import { mobileNavigationShellPayload } from "../../contract/navigation/shell.js";
 
 const navigatingApiClient = new NavigatingApiClient();

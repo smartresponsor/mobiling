@@ -1,5 +1,5 @@
 import { AttachingApiClient } from "../../client/attaching/attachingApiClient.js";
-import { mobileAccessErrorPayload } from "../../contract/mobile/access/error.js";
+import { mobileAccessErrorPayload } from "../../contract/access/error.js";
 import { mobileAttachmentDetachPayload, mobileAttachmentDetachRequest, mobileAttachmentFilePayload, mobileAttachmentLinkPayload, mobileAttachmentUploadHandoffPayload, mobileAttachmentUploadHandoffRequest, mobileAttachmentLinkRequest, mobileAttachmentListPayload, } from "../../contract/attachment/index.js";
 const attachingApiClient = new AttachingApiClient();
 function forwardedHeaders(request) {

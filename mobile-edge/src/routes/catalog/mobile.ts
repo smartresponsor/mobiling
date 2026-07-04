@@ -1,6 +1,6 @@
 import type { FastifyInstance } from "fastify";
 import { CatalogingApiClient, type CatalogingApiErrorPayload } from "../../client/cataloging/catalogingApiClient.js";
-import { mobileAccessErrorPayload } from "../../contract/mobile/access/error.js";
+import { mobileAccessErrorPayload } from "../../contract/access/error.js";
 import {
   mobileCatalogListPayload,
   mobileCatalogMutationPayload,

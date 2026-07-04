@@ -1,5 +1,5 @@
 import { CartingApiClient } from "../../client/carting/cartingApiClient.js";
-import { mobileAccessErrorPayload } from "../../contract/mobile/access/error.js";
+import { mobileAccessErrorPayload } from "../../contract/access/error.js";
 import { mobileCartCheckoutHandoffPayload, mobileCartItemMutationRequest, mobileCartPayload, } from "../../contract/cart/index.js";
 const cartingApiClient = new CartingApiClient();
 function forwardedHeaders(request) {

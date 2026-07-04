@@ -1,5 +1,5 @@
 import { CatalogingApiClient } from "../../client/cataloging/catalogingApiClient.js";
-import { mobileAccessErrorPayload } from "../../contract/mobile/access/error.js";
+import { mobileAccessErrorPayload } from "../../contract/access/error.js";
 import { mobileCatalogListPayload, mobileCatalogMutationPayload, mobileCatalogMutationRequest, mobileCatalogNodeDetailPayload, mobileCatalogSearchPayload, } from "../../contract/catalog/index.js";
 const catalogingApiClient = new CatalogingApiClient();
 function forwardedHeaders(request) {

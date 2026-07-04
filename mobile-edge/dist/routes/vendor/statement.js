@@ -1,4 +1,4 @@
-import { mobileAccessErrorPayload } from "../../contract/mobile/access/error.js";
+import { mobileAccessErrorPayload } from "../../contract/access/error.js";
 import { mobileVendorStatementPayload } from "../../contract/vendor/statement.js";
 import { VendoringApiClient } from "../../client/vendoring/vendoringApiClient.js";
 const vendoringApiClient = new VendoringApiClient();

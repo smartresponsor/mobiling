@@ -1,5 +1,5 @@
 import type { FastifyInstance } from "fastify";
-import { mobileAccessErrorPayload } from "../../contract/mobile/access/error.js";
+import { mobileAccessErrorPayload } from "../../contract/access/error.js";
 import { mobileVendorPayoutPayload } from "../../contract/vendor/payout.js";
 import { VendoringApiClient, type VendoringApiErrorPayload } from "../../client/vendoring/vendoringApiClient.js";
 
