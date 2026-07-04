@@ -280,7 +280,7 @@
       "routeClass": "screen",
       "screen": "mobile.shell",
       "responseSchema": "MobileNavigationShellPayload",
-      "contractFile": "src/contract/mobile/navigation/shell.ts",
+      "contractFile": "src/contract/navigation/shell.ts",
       "fixture": "fixture/mobile/navigation/shell.success.json"
     },
     {
