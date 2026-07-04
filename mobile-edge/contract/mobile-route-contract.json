@@ -135,7 +135,7 @@
       "routeClass": "screen",
       "screen": "attachment.list",
       "responseSchema": "MobileAttachmentListPayload",
-      "contractFile": "src/contract/mobile/attachment.ts",
+      "contractFile": "src/contract/attachment/index.ts",
       "fixture": "fixture/mobile/attachment/list.success.json"
     },
     {
