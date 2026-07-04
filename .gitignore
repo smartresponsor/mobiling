@@ -4,6 +4,7 @@ build/
 **/build/
 local.properties
 *.apk
+!dist/Mobiling-debug.apk
 *.aab
 *.keystore
 *.jks
