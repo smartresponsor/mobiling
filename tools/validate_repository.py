@@ -68,7 +68,7 @@ for disabled_key in ["access_password", "access_verification", "catalog", "messa
     require_shell_contains("Android disabled item", android_shell, f'item("{disabled_key}"')
     require_shell_contains("iOS disabled item", ios_shell, f'item("{disabled_key}"')
 
-edge_navigation_route = (root / "mobile-edge/src/routes/mobile/navigationShell.ts").read_text(encoding="utf-8")
+edge_navigation_route = (root / "mobile-edge/src/routes/navigation/mobile.ts").read_text(encoding="utf-8")
 edge_navigation_client = (root / "mobile-edge/src/client/navigating/navigatingApiClient.ts").read_text(encoding="utf-8")
 edge_navigation_contract = (root / "mobile-edge/src/contract/mobile/navigationShell.ts").read_text(encoding="utf-8")
 
@@ -126,7 +126,7 @@ if error:
     print("Repository validation failed:")
     for item in error: print(f"- {item}")
     sys.exit(1)
-edge_vendor_profile_route = (root / "mobile-edge/src/routes/mobile/vendorProfile.ts").read_text(encoding="utf-8")
+edge_vendor_profile_route = (root / "mobile-edge/src/routes/vendor/profile.ts").read_text(encoding="utf-8")
 for needle in [
     'app.get("/vendor/profile/:vendorId"',
     "vendoringApiClient.getProfile",
