@@ -192,6 +192,30 @@ class AccessBehaviorTest {
         composeRule.onNodeWithText("Sign in").assertIsDisplayed()
     }
 
+    @Test
+    fun logoutFailureStillClearsLocalSessionAndReturnsToGuestEntry() {
+        val gateway = FakeAccessAuthSessionGateway(
+            payload = session(authenticated = true),
+            logoutFailure = IllegalStateException("logout unavailable"),
+        )
+
+        composeRule.setContent {
+            MobilingAppShell(
+                accessAuthFeatureBridge = AccessAuthFeatureBridge(gateway),
+                authenticatedContent = { vendorId, onSignOut ->
+                    Button(onClick = onSignOut) {
+                        Text("Sign out vendor: $vendorId")
+                    }
+                },
+            )
+        }
+
+        composeRule.onNodeWithText("Sign out vendor: test-vendor").performClick()
+        composeRule.waitUntil(timeoutMillis = 5_000) { gateway.logoutCalls == 1 }
+        composeRule.onNodeWithText("Guest entry").assertIsDisplayed()
+        composeRule.onNodeWithText("Sign in").assertIsDisplayed()
+    }
+
     private fun bridgeFor(payload: AccessAuthSessionPayload): AccessAuthFeatureBridge =
         AccessAuthFeatureBridge(FakeAccessAuthSessionGateway(payload))
 
@@ -211,6 +235,7 @@ class AccessBehaviorTest {
 
 private class FakeAccessAuthSessionGateway(
     private val payload: AccessAuthSessionPayload,
+    private val logoutFailure: RuntimeException? = null,
 ) : AccessAuthSessionGateway {
     var logoutCalls: Int = 0
         private set
@@ -223,6 +248,7 @@ private class FakeAccessAuthSessionGateway(
 
     override suspend fun logoutAuth() {
         logoutCalls += 1
+        logoutFailure?.let { throw it }
     }
 
     override suspend fun resendVerification(): AccessAuthSessionPayload = payload
