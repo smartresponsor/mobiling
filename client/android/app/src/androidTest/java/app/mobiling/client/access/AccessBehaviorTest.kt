@@ -1,5 +1,6 @@
 package app.mobiling.client.access
 
+import androidx.compose.material3.Text
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
@@ -129,17 +130,58 @@ class AccessBehaviorTest {
             .assertIsDisplayed()
     }
 
+    @Test
+    fun verificationTakesPriorityOverSecondFactorAndAuthenticatedState() {
+        composeRule.setContent {
+            MobilingAppShell(
+                accessAuthFeatureBridge = bridgeFor(
+                    session(
+                        authenticated = true,
+                        requiresVerification = true,
+                        requiresSecondFactor = true,
+                    ),
+                ),
+                authenticatedContent = { vendorId, _ ->
+                    Text("Authenticated vendor: $vendorId")
+                },
+            )
+        }
+
+        composeRule
+            .onNodeWithText("Accessing requires identity verification before this mobile session can continue.")
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun authenticatedSessionUsesInjectedContentAndVendorIdentity() {
+        composeRule.setContent {
+            MobilingAppShell(
+                accessAuthFeatureBridge = bridgeFor(
+                    session(authenticated = true),
+                ),
+                authenticatedContent = { vendorId, _ ->
+                    Text("Authenticated vendor: $vendorId")
+                },
+            )
+        }
+
+        composeRule
+            .onNodeWithText("Authenticated vendor: test-vendor")
+            .assertIsDisplayed()
+    }
+
     private fun bridgeFor(payload: AccessAuthSessionPayload): AccessAuthFeatureBridge =
         AccessAuthFeatureBridge(FakeAccessAuthSessionGateway(payload))
 
     private fun session(
+        authenticated: Boolean = false,
         requiresVerification: Boolean = false,
         requiresSecondFactor: Boolean = false,
     ): AccessAuthSessionPayload = AccessAuthSessionPayload(
         status = "test",
         sessionId = "test-session",
         vendorId = "test-vendor",
-        authenticated = false,
+        authenticated = authenticated,
         requiresVerification = requiresVerification,
         requiresSecondFactor = requiresSecondFactor,
     )
