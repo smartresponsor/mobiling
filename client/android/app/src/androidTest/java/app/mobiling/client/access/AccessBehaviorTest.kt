@@ -4,6 +4,15 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import app.mobiling.client.auth.AccessAuthFeatureBridge
+import app.mobiling.client.contract.auth.session.AccessAuthSessionPayload
+import app.mobiling.client.contract.auth.session.AccessConfirmVerificationRequest
+import app.mobiling.client.contract.auth.session.AccessRegisterAuthRequest
+import app.mobiling.client.contract.auth.session.AccessRequestRecoveryRequest
+import app.mobiling.client.contract.auth.session.AccessResetRecoveryRequest
+import app.mobiling.client.contract.auth.session.AccessStartAuthRequest
+import app.mobiling.client.contract.auth.session.AccessVerifySecondFactorRequest
+import app.mobiling.client.data.auth.session.AccessAuthSessionGateway
 import org.junit.Rule
 import org.junit.Test
 
@@ -89,4 +98,81 @@ class AccessBehaviorTest {
             .onNodeWithText("Request a recovery code for your SmartResponsor access.")
             .assertIsDisplayed()
     }
+
+    @Test
+    fun restoredSessionRoutesToVerificationRequired() {
+        composeRule.setContent {
+            MobilingAppShell(
+                accessAuthFeatureBridge = bridgeFor(
+                    session(requiresVerification = true),
+                ),
+            )
+        }
+
+        composeRule
+            .onNodeWithText("Accessing requires identity verification before this mobile session can continue.")
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun restoredSessionRoutesToSecondFactorRequired() {
+        composeRule.setContent {
+            MobilingAppShell(
+                accessAuthFeatureBridge = bridgeFor(
+                    session(requiresSecondFactor = true),
+                ),
+            )
+        }
+
+        composeRule
+            .onNodeWithText("Accessing requires an additional verification step before this mobile session can continue.")
+            .assertIsDisplayed()
+    }
+
+    private fun bridgeFor(payload: AccessAuthSessionPayload): AccessAuthFeatureBridge =
+        AccessAuthFeatureBridge(FakeAccessAuthSessionGateway(payload))
+
+    private fun session(
+        requiresVerification: Boolean = false,
+        requiresSecondFactor: Boolean = false,
+    ): AccessAuthSessionPayload = AccessAuthSessionPayload(
+        status = "test",
+        sessionId = "test-session",
+        vendorId = "test-vendor",
+        authenticated = false,
+        requiresVerification = requiresVerification,
+        requiresSecondFactor = requiresSecondFactor,
+    )
+}
+
+private class FakeAccessAuthSessionGateway(
+    private val payload: AccessAuthSessionPayload,
+) : AccessAuthSessionGateway {
+    override suspend fun startAuth(request: AccessStartAuthRequest): AccessAuthSessionPayload = payload
+
+    override suspend fun registerAuth(request: AccessRegisterAuthRequest): AccessAuthSessionPayload = payload
+
+    override suspend fun restoreAuth(): AccessAuthSessionPayload = payload
+
+    override suspend fun logoutAuth() = Unit
+
+    override suspend fun resendVerification(): AccessAuthSessionPayload = payload
+
+    override suspend fun confirmVerification(
+        request: AccessConfirmVerificationRequest,
+    ): AccessAuthSessionPayload = payload
+
+    override suspend fun challengeSecondFactor(): AccessAuthSessionPayload = payload
+
+    override suspend fun verifySecondFactor(
+        request: AccessVerifySecondFactorRequest,
+    ): AccessAuthSessionPayload = payload
+
+    override suspend fun requestRecovery(
+        request: AccessRequestRecoveryRequest,
+    ): AccessAuthSessionPayload = payload
+
+    override suspend fun resetRecovery(
+        request: AccessResetRecoveryRequest,
+    ): AccessAuthSessionPayload = payload
 }
