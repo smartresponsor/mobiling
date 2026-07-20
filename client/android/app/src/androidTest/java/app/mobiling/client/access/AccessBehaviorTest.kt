@@ -54,4 +54,39 @@ class AccessBehaviorTest {
         composeRule.onNodeWithText("Back").performClick()
         composeRule.onNodeWithText("Guest entry").assertIsDisplayed()
     }
+
+    @Test
+    fun guestCanOpenRecoveryRequestAndReturnToSignIn() {
+        composeRule.setContent {
+            MobilingAppShell()
+        }
+
+        composeRule.onNodeWithText("Sign in").performClick()
+        composeRule.onNodeWithText("Recover access").performClick()
+        composeRule
+            .onNodeWithText("Request a recovery code for your SmartResponsor access.")
+            .assertIsDisplayed()
+        composeRule.onNodeWithText("Back").performClick()
+        composeRule
+            .onNodeWithText("Use your SmartResponsor access to enter the business workspace.")
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun guestCanMoveBetweenRecoveryRequestAndReset() {
+        composeRule.setContent {
+            MobilingAppShell()
+        }
+
+        composeRule.onNodeWithText("Sign in").performClick()
+        composeRule.onNodeWithText("Recover access").performClick()
+        composeRule.onNodeWithText("I have a recovery code").performClick()
+        composeRule
+            .onNodeWithText("Use your recovery code and choose a new password.")
+            .assertIsDisplayed()
+        composeRule.onNodeWithText("Request code").performClick()
+        composeRule
+            .onNodeWithText("Request a recovery code for your SmartResponsor access.")
+            .assertIsDisplayed()
+    }
 }
