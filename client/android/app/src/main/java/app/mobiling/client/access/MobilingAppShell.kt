@@ -34,6 +34,7 @@ fun MobilingAppShell(
     vendorStatementGateway: VendorStatementGateway? = null,
     vendorPayoutGateway: VendorPayoutGateway? = null,
     vendorTransactionGateway: VendorTransactionGateway? = null,
+    authenticatedContent: (@Composable (vendorId: String?, onSignOut: () -> Unit) -> Unit)? = null,
 ) {
     var currentScreen by rememberSaveable { mutableStateOf(AccessScreen.Welcome) }
     var activeVendorId by rememberSaveable { mutableStateOf<String?>(null) }
@@ -70,18 +71,24 @@ fun MobilingAppShell(
 
     Surface(Modifier.fillMaxSize()) {
         when (currentScreen) {
-            AccessScreen.Dashboard -> DashboardMobileShell(
-                navigationShellGateway = navigationShellGateway,
-                cartFeatureBridge = cartFeatureBridge,
-                attachmentFeatureBridge = attachmentFeatureBridge,
-                vendorId = activeVendorId,
-                vendorProfileGateway = vendorProfileGateway,
-                vendorSummaryGateway = vendorSummaryGateway,
-                vendorStatementGateway = vendorStatementGateway,
-                vendorPayoutGateway = vendorPayoutGateway,
-                vendorTransactionGateway = vendorTransactionGateway,
-                onSignOut = { clearAccessSession() },
-            )
+            AccessScreen.Dashboard -> {
+                if (authenticatedContent != null) {
+                    authenticatedContent(activeVendorId) { clearAccessSession() }
+                } else {
+                    DashboardMobileShell(
+                        navigationShellGateway = navigationShellGateway,
+                        cartFeatureBridge = cartFeatureBridge,
+                        attachmentFeatureBridge = attachmentFeatureBridge,
+                        vendorId = activeVendorId,
+                        vendorProfileGateway = vendorProfileGateway,
+                        vendorSummaryGateway = vendorSummaryGateway,
+                        vendorStatementGateway = vendorStatementGateway,
+                        vendorPayoutGateway = vendorPayoutGateway,
+                        vendorTransactionGateway = vendorTransactionGateway,
+                        onSignOut = { clearAccessSession() },
+                    )
+                }
+            }
 
             AccessScreen.Welcome -> AccessWelcomeScreen(
                 onSignIn = { currentScreen = AccessScreen.SignIn },
@@ -129,4 +136,3 @@ fun MobilingAppShell(
         }
     }
 }
-
