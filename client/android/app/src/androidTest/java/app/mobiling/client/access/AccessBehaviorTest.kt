@@ -34,7 +34,9 @@ class AccessBehaviorTest {
         }
 
         composeRule.onNodeWithText("Sign in").performClick()
-        composeRule.onNodeWithText("Sign in to your workspace").assertIsDisplayed()
+        composeRule
+            .onNodeWithText("Use your SmartResponsor access to enter the business workspace.")
+            .assertIsDisplayed()
         composeRule.onNodeWithText("Back").performClick()
         composeRule.onNodeWithText("Guest entry").assertIsDisplayed()
     }
@@ -46,7 +48,9 @@ class AccessBehaviorTest {
         }
 
         composeRule.onNodeWithText("Create access").performClick()
-        composeRule.onNodeWithText("Create workspace access").assertIsDisplayed()
+        composeRule
+            .onNodeWithText("Set up a guest entry for the SmartResponsor workspace.")
+            .assertIsDisplayed()
         composeRule.onNodeWithText("Back").performClick()
         composeRule.onNodeWithText("Guest entry").assertIsDisplayed()
     }
