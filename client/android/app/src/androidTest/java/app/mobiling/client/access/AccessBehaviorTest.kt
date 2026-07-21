@@ -6,6 +6,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextInput
 import app.mobiling.client.auth.AccessAuthFeatureBridge
 import app.mobiling.client.contract.auth.session.AccessAuthSessionPayload
 import app.mobiling.client.contract.auth.session.AccessConfirmVerificationRequest
@@ -164,6 +165,69 @@ class AccessBehaviorTest {
     }
 
     @Test
+    fun signInResponseRoutesToVerificationRequired() {
+        val gateway = FakeAccessAuthSessionGateway(
+            payload = session(),
+            startPayload = session(requiresVerification = true),
+        )
+
+        composeRule.setContent {
+            MobilingAppShell(
+                accessAuthFeatureBridge = AccessAuthFeatureBridge(gateway),
+            )
+        }
+
+        submitSignIn()
+        composeRule.waitUntil(timeoutMillis = 5_000) { gateway.startCalls == 1 }
+        composeRule
+            .onNodeWithText("Accessing requires identity verification before this mobile session can continue.")
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun signInResponseRoutesToSecondFactorRequired() {
+        val gateway = FakeAccessAuthSessionGateway(
+            payload = session(),
+            startPayload = session(requiresSecondFactor = true),
+        )
+
+        composeRule.setContent {
+            MobilingAppShell(
+                accessAuthFeatureBridge = AccessAuthFeatureBridge(gateway),
+            )
+        }
+
+        submitSignIn()
+        composeRule.waitUntil(timeoutMillis = 5_000) { gateway.startCalls == 1 }
+        composeRule
+            .onNodeWithText("Accessing requires an additional verification step before this mobile session can continue.")
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun signInResponseRoutesToAuthenticatedContentWithVendorIdentity() {
+        val gateway = FakeAccessAuthSessionGateway(
+            payload = session(),
+            startPayload = session(authenticated = true),
+        )
+
+        composeRule.setContent {
+            MobilingAppShell(
+                accessAuthFeatureBridge = AccessAuthFeatureBridge(gateway),
+                authenticatedContent = { vendorId, _ ->
+                    Text("Authenticated vendor: $vendorId")
+                },
+            )
+        }
+
+        submitSignIn()
+        composeRule.waitUntil(timeoutMillis = 5_000) { gateway.startCalls == 1 }
+        composeRule
+            .onNodeWithText("Authenticated vendor: test-vendor")
+            .assertIsDisplayed()
+    }
+
+    @Test
     fun verificationTakesPriorityOverSecondFactorAndAuthenticatedState() {
         composeRule.setContent {
             MobilingAppShell(
@@ -248,6 +312,13 @@ class AccessBehaviorTest {
         composeRule.onNodeWithText("Sign in").assertIsDisplayed()
     }
 
+    private fun submitSignIn() {
+        composeRule.onNodeWithText("Sign in").performClick()
+        composeRule.onNodeWithText("Email").performTextInput("user@example.com")
+        composeRule.onNodeWithText("Password").performTextInput("password")
+        composeRule.onNodeWithText("Sign in").performClick()
+    }
+
     private fun bridgeFor(payload: AccessAuthSessionPayload): AccessAuthFeatureBridge =
         AccessAuthFeatureBridge(FakeAccessAuthSessionGateway(payload))
 
@@ -267,16 +338,24 @@ class AccessBehaviorTest {
 
 private class FakeAccessAuthSessionGateway(
     private val payload: AccessAuthSessionPayload,
+    private val startPayload: AccessAuthSessionPayload = payload,
     private val logoutFailure: RuntimeException? = null,
     private val restoreFailure: RuntimeException? = null,
 ) : AccessAuthSessionGateway {
+    var startCalls: Int = 0
+        private set
+
     var logoutCalls: Int = 0
         private set
 
     var restoreCalls: Int = 0
         private set
 
-    override suspend fun startAuth(request: AccessStartAuthRequest): AccessAuthSessionPayload = payload
+    override suspend fun startAuth(request: AccessStartAuthRequest): AccessAuthSessionPayload {
+        startCalls += 1
+
+        return startPayload
+    }
 
     override suspend fun registerAuth(request: AccessRegisterAuthRequest): AccessAuthSessionPayload = payload
 
