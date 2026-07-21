@@ -132,6 +132,38 @@ class AccessBehaviorTest {
     }
 
     @Test
+    fun restoreGuestPayloadKeepsGuestEntryAvailable() {
+        composeRule.setContent {
+            MobilingAppShell(
+                accessAuthFeatureBridge = bridgeFor(session()),
+            )
+        }
+
+        composeRule.onNodeWithText("Guest entry").assertIsDisplayed()
+        composeRule.onNodeWithText("Sign in").assertIsDisplayed()
+        composeRule.onNodeWithText("Create access").assertIsDisplayed()
+    }
+
+    @Test
+    fun restoreFailureKeepsGuestEntryAvailable() {
+        val gateway = FakeAccessAuthSessionGateway(
+            payload = session(),
+            restoreFailure = IllegalStateException("restore unavailable"),
+        )
+
+        composeRule.setContent {
+            MobilingAppShell(
+                accessAuthFeatureBridge = AccessAuthFeatureBridge(gateway),
+            )
+        }
+
+        composeRule.waitUntil(timeoutMillis = 5_000) { gateway.restoreCalls == 1 }
+        composeRule.onNodeWithText("Guest entry").assertIsDisplayed()
+        composeRule.onNodeWithText("Sign in").assertIsDisplayed()
+        composeRule.onNodeWithText("Create access").assertIsDisplayed()
+    }
+
+    @Test
     fun verificationTakesPriorityOverSecondFactorAndAuthenticatedState() {
         composeRule.setContent {
             MobilingAppShell(
@@ -236,15 +268,24 @@ class AccessBehaviorTest {
 private class FakeAccessAuthSessionGateway(
     private val payload: AccessAuthSessionPayload,
     private val logoutFailure: RuntimeException? = null,
+    private val restoreFailure: RuntimeException? = null,
 ) : AccessAuthSessionGateway {
     var logoutCalls: Int = 0
+        private set
+
+    var restoreCalls: Int = 0
         private set
 
     override suspend fun startAuth(request: AccessStartAuthRequest): AccessAuthSessionPayload = payload
 
     override suspend fun registerAuth(request: AccessRegisterAuthRequest): AccessAuthSessionPayload = payload
 
-    override suspend fun restoreAuth(): AccessAuthSessionPayload = payload
+    override suspend fun restoreAuth(): AccessAuthSessionPayload {
+        restoreCalls += 1
+        restoreFailure?.let { throw it }
+
+        return payload
+    }
 
     override suspend fun logoutAuth() {
         logoutCalls += 1
