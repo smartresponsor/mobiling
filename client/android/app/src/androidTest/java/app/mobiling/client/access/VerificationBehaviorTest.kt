@@ -5,14 +5,6 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import app.mobiling.client.auth.AccessAuthFeatureBridge
-import app.mobiling.client.contract.auth.session.AccessAuthSessionPayload
-import app.mobiling.client.contract.auth.session.AccessConfirmVerificationRequest
-import app.mobiling.client.contract.auth.session.AccessRegisterAuthRequest
-import app.mobiling.client.contract.auth.session.AccessRequestRecoveryRequest
-import app.mobiling.client.contract.auth.session.AccessResetRecoveryRequest
-import app.mobiling.client.contract.auth.session.AccessStartAuthRequest
-import app.mobiling.client.contract.auth.session.AccessVerifySecondFactorRequest
-import app.mobiling.client.data.auth.session.AccessAuthSessionGateway
 import org.junit.Rule
 import org.junit.Test
 
@@ -27,7 +19,9 @@ class VerificationBehaviorTest {
 
     @Test
     fun checkAgainReturnsToSignInWithoutLoggingOut() {
-        val gateway = VerificationGateway()
+        val gateway = AccessAuthSessionGatewayFixture(
+            payload = verificationRequiredPayload(),
+        )
 
         composeRule.setContent {
             MobilingAppShell(
@@ -48,7 +42,9 @@ class VerificationBehaviorTest {
 
     @Test
     fun useDifferentAccessLogsOutAndReturnsToGuestEntry() {
-        val gateway = VerificationGateway()
+        val gateway = AccessAuthSessionGatewayFixture(
+            payload = verificationRequiredPayload(),
+        )
 
         composeRule.setContent {
             MobilingAppShell(
@@ -65,7 +61,8 @@ class VerificationBehaviorTest {
 
     @Test
     fun logoutFailureStillReturnsVerificationUserToGuestEntry() {
-        val gateway = VerificationGateway(
+        val gateway = AccessAuthSessionGatewayFixture(
+            payload = verificationRequiredPayload(),
             logoutFailure = IllegalStateException("logout unavailable"),
         )
 
@@ -80,53 +77,4 @@ class VerificationBehaviorTest {
         composeRule.onNodeWithText("Guest entry").assertIsDisplayed()
         composeRule.onNodeWithText("Sign in").assertIsDisplayed()
     }
-}
-
-private class VerificationGateway(
-    private val logoutFailure: RuntimeException? = null,
-) : AccessAuthSessionGateway {
-    private val verificationPayload = AccessAuthSessionPayload(
-        status = "verification_required",
-        sessionId = "test-session",
-        vendorId = "test-vendor",
-        authenticated = false,
-        requiresVerification = true,
-        requiresSecondFactor = false,
-    )
-
-    var logoutCalls: Int = 0
-        private set
-
-    override suspend fun startAuth(request: AccessStartAuthRequest): AccessAuthSessionPayload =
-        verificationPayload
-
-    override suspend fun registerAuth(request: AccessRegisterAuthRequest): AccessAuthSessionPayload =
-        verificationPayload
-
-    override suspend fun restoreAuth(): AccessAuthSessionPayload = verificationPayload
-
-    override suspend fun logoutAuth() {
-        logoutCalls += 1
-        logoutFailure?.let { throw it }
-    }
-
-    override suspend fun resendVerification(): AccessAuthSessionPayload = verificationPayload
-
-    override suspend fun confirmVerification(
-        request: AccessConfirmVerificationRequest,
-    ): AccessAuthSessionPayload = verificationPayload
-
-    override suspend fun challengeSecondFactor(): AccessAuthSessionPayload = verificationPayload
-
-    override suspend fun verifySecondFactor(
-        request: AccessVerifySecondFactorRequest,
-    ): AccessAuthSessionPayload = verificationPayload
-
-    override suspend fun requestRecovery(
-        request: AccessRequestRecoveryRequest,
-    ): AccessAuthSessionPayload = verificationPayload
-
-    override suspend fun resetRecovery(
-        request: AccessResetRecoveryRequest,
-    ): AccessAuthSessionPayload = verificationPayload
 }
