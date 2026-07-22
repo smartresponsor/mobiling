@@ -228,6 +228,44 @@ class AccessBehaviorTest {
     }
 
     @Test
+    fun unavailableSignInBridgeKeepsFormAndShowsStatus() {
+        composeRule.setContent {
+            MobilingAppShell()
+        }
+
+        submitSignIn()
+        composeRule.onNodeWithText("Access service is unavailable.").assertIsDisplayed()
+        composeRule.onNodeWithText("Email").assertIsDisplayed()
+        composeRule.onNodeWithText("Password").assertIsDisplayed()
+        composeRule
+            .onNodeWithText("Use your SmartResponsor access to enter the business workspace.")
+            .assertIsDisplayed()
+    }
+
+    @Test
+    fun signInFailureKeepsFormAndShowsStatus() {
+        val gateway = FakeAccessAuthSessionGateway(
+            payload = session(),
+            startFailure = IllegalStateException("sign in unavailable"),
+        )
+
+        composeRule.setContent {
+            MobilingAppShell(
+                accessAuthFeatureBridge = AccessAuthFeatureBridge(gateway),
+            )
+        }
+
+        submitSignIn()
+        composeRule.waitUntil(timeoutMillis = 5_000) { gateway.startCalls == 1 }
+        composeRule.onNodeWithText("Access session could not be started.").assertIsDisplayed()
+        composeRule.onNodeWithText("Email").assertIsDisplayed()
+        composeRule.onNodeWithText("Password").assertIsDisplayed()
+        composeRule
+            .onNodeWithText("Use your SmartResponsor access to enter the business workspace.")
+            .assertIsDisplayed()
+    }
+
+    @Test
     fun verificationTakesPriorityOverSecondFactorAndAuthenticatedState() {
         composeRule.setContent {
             MobilingAppShell(
@@ -339,6 +377,7 @@ class AccessBehaviorTest {
 private class FakeAccessAuthSessionGateway(
     private val payload: AccessAuthSessionPayload,
     private val startPayload: AccessAuthSessionPayload = payload,
+    private val startFailure: RuntimeException? = null,
     private val logoutFailure: RuntimeException? = null,
     private val restoreFailure: RuntimeException? = null,
 ) : AccessAuthSessionGateway {
@@ -353,6 +392,7 @@ private class FakeAccessAuthSessionGateway(
 
     override suspend fun startAuth(request: AccessStartAuthRequest): AccessAuthSessionPayload {
         startCalls += 1
+        startFailure?.let { throw it }
 
         return startPayload
     }
