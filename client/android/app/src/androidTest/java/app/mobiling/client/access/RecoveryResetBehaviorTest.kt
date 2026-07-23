@@ -22,38 +22,30 @@ class RecoveryResetBehaviorTest {
     @Test
     fun recoveryResetResponseRoutesToVerificationRequired() {
         val gateway = AccessAuthSessionGatewayFixture(
-            recoveryResetPayload = testSessionPayload(requiresVerification = true),
+            recoveryResetPayload = verificationRequiredPayload(),
         )
 
-        composeRule.setContent {
-            MobilingAppShell(accessAuthFeatureBridge = AccessAuthFeatureBridge(gateway))
-        }
+        composeRule.setAccessShell(gateway)
 
         submitRecoveryReset()
         composeRule.waitUntil(timeoutMillis = 5_000) { gateway.recoveryResetCalls == 1 }
         check(gateway.recoveryResetRequest?.email == "user@example.com")
         check(gateway.recoveryResetRequest?.code == "123456")
         check(gateway.recoveryResetRequest?.password == "new-password")
-        composeRule
-            .onNodeWithText("Accessing requires identity verification before this mobile session can continue.")
-            .assertIsDisplayed()
+        composeRule.assertVerificationRequiredDisplayed()
     }
 
     @Test
     fun recoveryResetResponseRoutesToSecondFactorRequired() {
         val gateway = AccessAuthSessionGatewayFixture(
-            recoveryResetPayload = testSessionPayload(requiresSecondFactor = true),
+            recoveryResetPayload = secondFactorRequiredPayload(),
         )
 
-        composeRule.setContent {
-            MobilingAppShell(accessAuthFeatureBridge = AccessAuthFeatureBridge(gateway))
-        }
+        composeRule.setAccessShell(gateway)
 
         submitRecoveryReset()
         composeRule.waitUntil(timeoutMillis = 5_000) { gateway.recoveryResetCalls == 1 }
-        composeRule
-            .onNodeWithText("Accessing requires an additional verification step before this mobile session can continue.")
-            .assertIsDisplayed()
+        composeRule.assertSecondFactorRequiredDisplayed()
     }
 
     @Test
@@ -89,9 +81,7 @@ class RecoveryResetBehaviorTest {
             recoveryResetFailure = IllegalStateException("recovery reset unavailable"),
         )
 
-        composeRule.setContent {
-            MobilingAppShell(accessAuthFeatureBridge = AccessAuthFeatureBridge(gateway))
-        }
+        composeRule.setAccessShell(gateway)
 
         submitRecoveryReset()
         composeRule.waitUntil(timeoutMillis = 5_000) { gateway.recoveryResetCalls == 1 }
