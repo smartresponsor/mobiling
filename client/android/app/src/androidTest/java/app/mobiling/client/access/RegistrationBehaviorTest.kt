@@ -22,38 +22,30 @@ class RegistrationBehaviorTest {
     @Test
     fun registrationResponseRoutesToVerificationRequired() {
         val gateway = AccessAuthSessionGatewayFixture(
-            registrationPayload = testSessionPayload(requiresVerification = true),
+            registrationPayload = verificationRequiredPayload(),
         )
 
-        composeRule.setContent {
-            MobilingAppShell(accessAuthFeatureBridge = AccessAuthFeatureBridge(gateway))
-        }
+        composeRule.setAccessShell(gateway)
 
         submitRegistration()
         composeRule.waitUntil(timeoutMillis = 5_000) { gateway.registrationCalls == 1 }
         check(gateway.registrationRequest?.displayName == "Test Company")
         check(gateway.registrationRequest?.email == "user@example.com")
         check(gateway.registrationRequest?.password == "password")
-        composeRule
-            .onNodeWithText("Accessing requires identity verification before this mobile session can continue.")
-            .assertIsDisplayed()
+        composeRule.assertVerificationRequiredDisplayed()
     }
 
     @Test
     fun registrationResponseRoutesToSecondFactorRequired() {
         val gateway = AccessAuthSessionGatewayFixture(
-            registrationPayload = testSessionPayload(requiresSecondFactor = true),
+            registrationPayload = secondFactorRequiredPayload(),
         )
 
-        composeRule.setContent {
-            MobilingAppShell(accessAuthFeatureBridge = AccessAuthFeatureBridge(gateway))
-        }
+        composeRule.setAccessShell(gateway)
 
         submitRegistration()
         composeRule.waitUntil(timeoutMillis = 5_000) { gateway.registrationCalls == 1 }
-        composeRule
-            .onNodeWithText("Accessing requires an additional verification step before this mobile session can continue.")
-            .assertIsDisplayed()
+        composeRule.assertSecondFactorRequiredDisplayed()
     }
 
     @Test
@@ -89,9 +81,7 @@ class RegistrationBehaviorTest {
             registrationFailure = IllegalStateException("registration unavailable"),
         )
 
-        composeRule.setContent {
-            MobilingAppShell(accessAuthFeatureBridge = AccessAuthFeatureBridge(gateway))
-        }
+        composeRule.setAccessShell(gateway)
 
         submitRegistration()
         composeRule.waitUntil(timeoutMillis = 5_000) { gateway.registrationCalls == 1 }
