@@ -15,17 +15,48 @@ import app.mobiling.client.data.auth.session.AccessAuthSessionGateway
  * Reusable Android instrumentation fixture for access-session routing tests.
  */
 internal class AccessAuthSessionGatewayFixture(
-    private val payload: AccessAuthSessionPayload,
+    private val payload: AccessAuthSessionPayload = guestSessionPayload(),
+    private val restorePayload: AccessAuthSessionPayload = guestSessionPayload(),
+    private val registrationPayload: AccessAuthSessionPayload = payload,
+    private val recoveryRequestPayload: AccessAuthSessionPayload = payload,
+    private val recoveryResetPayload: AccessAuthSessionPayload = payload,
     private val logoutFailure: RuntimeException? = null,
+    private val registrationFailure: RuntimeException? = null,
+    private val recoveryRequestFailure: RuntimeException? = null,
+    private val recoveryResetFailure: RuntimeException? = null,
 ) : AccessAuthSessionGateway {
     var logoutCalls: Int = 0
         private set
 
+    var registrationCalls: Int = 0
+        private set
+
+    var recoveryRequestCalls: Int = 0
+        private set
+
+    var recoveryResetCalls: Int = 0
+        private set
+
+    var registrationRequest: AccessRegisterAuthRequest? = null
+        private set
+
+    var recoveryRequest: AccessRequestRecoveryRequest? = null
+        private set
+
+    var recoveryResetRequest: AccessResetRecoveryRequest? = null
+        private set
+
     override suspend fun startAuth(request: AccessStartAuthRequest): AccessAuthSessionPayload = payload
 
-    override suspend fun registerAuth(request: AccessRegisterAuthRequest): AccessAuthSessionPayload = payload
+    override suspend fun registerAuth(request: AccessRegisterAuthRequest): AccessAuthSessionPayload {
+        registrationCalls += 1
+        registrationRequest = request
+        registrationFailure?.let { throw it }
 
-    override suspend fun restoreAuth(): AccessAuthSessionPayload = payload
+        return registrationPayload
+    }
+
+    override suspend fun restoreAuth(): AccessAuthSessionPayload = restorePayload
 
     override suspend fun logoutAuth() {
         logoutCalls += 1
@@ -46,27 +77,51 @@ internal class AccessAuthSessionGatewayFixture(
 
     override suspend fun requestRecovery(
         request: AccessRequestRecoveryRequest,
-    ): AccessAuthSessionPayload = payload
+    ): AccessAuthSessionPayload {
+        recoveryRequestCalls += 1
+        recoveryRequest = request
+        recoveryRequestFailure?.let { throw it }
+
+        return recoveryRequestPayload
+    }
 
     override suspend fun resetRecovery(
         request: AccessResetRecoveryRequest,
-    ): AccessAuthSessionPayload = payload
+    ): AccessAuthSessionPayload {
+        recoveryResetCalls += 1
+        recoveryResetRequest = request
+        recoveryResetFailure?.let { throw it }
+
+        return recoveryResetPayload
+    }
 }
 
-internal fun verificationRequiredPayload(): AccessAuthSessionPayload = AccessAuthSessionPayload(
-    status = "verification_required",
-    sessionId = "test-session",
-    vendorId = "test-vendor",
+internal fun guestSessionPayload(): AccessAuthSessionPayload = AccessAuthSessionPayload(
+    status = "guest",
+    sessionId = null,
+    vendorId = null,
     authenticated = false,
-    requiresVerification = true,
+    requiresVerification = false,
     requiresSecondFactor = false,
 )
 
-internal fun secondFactorRequiredPayload(): AccessAuthSessionPayload = AccessAuthSessionPayload(
-    status = "second_factor_required",
+internal fun testSessionPayload(
+    authenticated: Boolean = false,
+    requiresVerification: Boolean = false,
+    requiresSecondFactor: Boolean = false,
+): AccessAuthSessionPayload = AccessAuthSessionPayload(
+    status = "test",
     sessionId = "test-session",
     vendorId = "test-vendor",
-    authenticated = false,
-    requiresVerification = false,
+    authenticated = authenticated,
+    requiresVerification = requiresVerification,
+    requiresSecondFactor = requiresSecondFactor,
+)
+
+internal fun verificationRequiredPayload(): AccessAuthSessionPayload = testSessionPayload(
+    requiresVerification = true,
+)
+
+internal fun secondFactorRequiredPayload(): AccessAuthSessionPayload = testSessionPayload(
     requiresSecondFactor = true,
 )
