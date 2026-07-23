@@ -7,14 +7,6 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import app.mobiling.client.auth.AccessAuthFeatureBridge
-import app.mobiling.client.contract.auth.session.AccessAuthSessionPayload
-import app.mobiling.client.contract.auth.session.AccessConfirmVerificationRequest
-import app.mobiling.client.contract.auth.session.AccessRegisterAuthRequest
-import app.mobiling.client.contract.auth.session.AccessRequestRecoveryRequest
-import app.mobiling.client.contract.auth.session.AccessResetRecoveryRequest
-import app.mobiling.client.contract.auth.session.AccessStartAuthRequest
-import app.mobiling.client.contract.auth.session.AccessVerifySecondFactorRequest
-import app.mobiling.client.data.auth.session.AccessAuthSessionGateway
 import org.junit.Rule
 import org.junit.Test
 
@@ -29,14 +21,12 @@ class RegistrationBehaviorTest {
 
     @Test
     fun registrationResponseRoutesToVerificationRequired() {
-        val gateway = RegistrationGateway(
-            registrationPayload = session(requiresVerification = true),
+        val gateway = AccessAuthSessionGatewayFixture(
+            registrationPayload = testSessionPayload(requiresVerification = true),
         )
 
         composeRule.setContent {
-            MobilingAppShell(
-                accessAuthFeatureBridge = AccessAuthFeatureBridge(gateway),
-            )
+            MobilingAppShell(accessAuthFeatureBridge = AccessAuthFeatureBridge(gateway))
         }
 
         submitRegistration()
@@ -48,14 +38,12 @@ class RegistrationBehaviorTest {
 
     @Test
     fun registrationResponseRoutesToSecondFactorRequired() {
-        val gateway = RegistrationGateway(
-            registrationPayload = session(requiresSecondFactor = true),
+        val gateway = AccessAuthSessionGatewayFixture(
+            registrationPayload = testSessionPayload(requiresSecondFactor = true),
         )
 
         composeRule.setContent {
-            MobilingAppShell(
-                accessAuthFeatureBridge = AccessAuthFeatureBridge(gateway),
-            )
+            MobilingAppShell(accessAuthFeatureBridge = AccessAuthFeatureBridge(gateway))
         }
 
         submitRegistration()
@@ -67,16 +55,14 @@ class RegistrationBehaviorTest {
 
     @Test
     fun registrationResponseRoutesToAuthenticatedContentWithVendorIdentity() {
-        val gateway = RegistrationGateway(
-            registrationPayload = session(authenticated = true),
+        val gateway = AccessAuthSessionGatewayFixture(
+            registrationPayload = testSessionPayload(authenticated = true),
         )
 
         composeRule.setContent {
             MobilingAppShell(
                 accessAuthFeatureBridge = AccessAuthFeatureBridge(gateway),
-                authenticatedContent = { vendorId, _ ->
-                    Text("Registered vendor: $vendorId")
-                },
+                authenticatedContent = { vendorId, _ -> Text("Registered vendor: $vendorId") },
             )
         }
 
@@ -87,9 +73,7 @@ class RegistrationBehaviorTest {
 
     @Test
     fun unavailableRegistrationBridgeKeepsFormAndShowsStatus() {
-        composeRule.setContent {
-            MobilingAppShell()
-        }
+        composeRule.setContent { MobilingAppShell() }
 
         submitRegistration()
         composeRule.onNodeWithText("Access service is unavailable.").assertIsDisplayed()
@@ -98,14 +82,12 @@ class RegistrationBehaviorTest {
 
     @Test
     fun registrationFailureKeepsFormAndShowsStatus() {
-        val gateway = RegistrationGateway(
+        val gateway = AccessAuthSessionGatewayFixture(
             registrationFailure = IllegalStateException("registration unavailable"),
         )
 
         composeRule.setContent {
-            MobilingAppShell(
-                accessAuthFeatureBridge = AccessAuthFeatureBridge(gateway),
-            )
+            MobilingAppShell(accessAuthFeatureBridge = AccessAuthFeatureBridge(gateway))
         }
 
         submitRegistration()
@@ -130,72 +112,4 @@ class RegistrationBehaviorTest {
             .onNodeWithText("Set up a guest entry for the SmartResponsor workspace.")
             .assertIsDisplayed()
     }
-
-    private fun session(
-        authenticated: Boolean = false,
-        requiresVerification: Boolean = false,
-        requiresSecondFactor: Boolean = false,
-    ): AccessAuthSessionPayload = AccessAuthSessionPayload(
-        status = "test",
-        sessionId = "test-session",
-        vendorId = "test-vendor",
-        authenticated = authenticated,
-        requiresVerification = requiresVerification,
-        requiresSecondFactor = requiresSecondFactor,
-    )
-}
-
-private class RegistrationGateway(
-    private val registrationPayload: AccessAuthSessionPayload = AccessAuthSessionPayload(
-        status = "guest",
-        sessionId = null,
-        vendorId = null,
-        authenticated = false,
-        requiresVerification = false,
-        requiresSecondFactor = false,
-    ),
-    private val registrationFailure: RuntimeException? = null,
-) : AccessAuthSessionGateway {
-    var registrationCalls: Int = 0
-        private set
-
-    override suspend fun startAuth(request: AccessStartAuthRequest): AccessAuthSessionPayload = registrationPayload
-
-    override suspend fun registerAuth(request: AccessRegisterAuthRequest): AccessAuthSessionPayload {
-        registrationCalls += 1
-        registrationFailure?.let { throw it }
-
-        return registrationPayload
-    }
-
-    override suspend fun restoreAuth(): AccessAuthSessionPayload = AccessAuthSessionPayload(
-        status = "guest",
-        sessionId = null,
-        vendorId = null,
-        authenticated = false,
-        requiresVerification = false,
-        requiresSecondFactor = false,
-    )
-
-    override suspend fun logoutAuth() = Unit
-
-    override suspend fun resendVerification(): AccessAuthSessionPayload = registrationPayload
-
-    override suspend fun confirmVerification(
-        request: AccessConfirmVerificationRequest,
-    ): AccessAuthSessionPayload = registrationPayload
-
-    override suspend fun challengeSecondFactor(): AccessAuthSessionPayload = registrationPayload
-
-    override suspend fun verifySecondFactor(
-        request: AccessVerifySecondFactorRequest,
-    ): AccessAuthSessionPayload = registrationPayload
-
-    override suspend fun requestRecovery(
-        request: AccessRequestRecoveryRequest,
-    ): AccessAuthSessionPayload = registrationPayload
-
-    override suspend fun resetRecovery(
-        request: AccessResetRecoveryRequest,
-    ): AccessAuthSessionPayload = registrationPayload
 }
