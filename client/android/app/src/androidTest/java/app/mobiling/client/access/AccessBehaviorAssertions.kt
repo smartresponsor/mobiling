@@ -1,0 +1,36 @@
+package app.mobiling.client.access
+
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.junit4.ComposeContentTestRule
+import androidx.compose.ui.test.onNodeWithText
+import app.mobiling.client.auth.AccessAuthFeatureBridge
+
+/**
+ * Copyright (c) 2025 Oleksandr Tishchenko / Marketing America Corp.
+ *
+ * Shared assertions and shell setup for Android access behavior tests.
+ */
+internal fun ComposeContentTestRule.setAccessShell(
+    gateway: AccessAuthSessionGatewayFixture,
+) {
+    setContent {
+        MobilingAppShell(
+            accessAuthFeatureBridge = AccessAuthFeatureBridge(gateway),
+        )
+    }
+}
+
+internal fun ComposeContentTestRule.assertGuestEntryDisplayed(
+    includeRegistrationAction: Boolean = false,
+) {
+    onNodeWithText("Guest entry").assertIsDisplayed()
+    onNodeWithText("Sign in").assertIsDisplayed()
+    if (includeRegistrationAction) {
+        onNodeWithText("Create access").assertIsDisplayed()
+    }
+}
+
+internal fun ComposeContentTestRule.assertSignInDisplayed() {
+    onNodeWithText("Use your SmartResponsor access to enter the business workspace.")
+        .assertIsDisplayed()
+}
