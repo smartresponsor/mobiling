@@ -9,13 +9,6 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import app.mobiling.client.auth.AccessAuthFeatureBridge
 import app.mobiling.client.contract.auth.session.AccessAuthSessionPayload
-import app.mobiling.client.contract.auth.session.AccessConfirmVerificationRequest
-import app.mobiling.client.contract.auth.session.AccessRegisterAuthRequest
-import app.mobiling.client.contract.auth.session.AccessRequestRecoveryRequest
-import app.mobiling.client.contract.auth.session.AccessResetRecoveryRequest
-import app.mobiling.client.contract.auth.session.AccessStartAuthRequest
-import app.mobiling.client.contract.auth.session.AccessVerifySecondFactorRequest
-import app.mobiling.client.data.auth.session.AccessAuthSessionGateway
 import org.junit.Rule
 import org.junit.Test
 
@@ -30,9 +23,7 @@ class AccessBehaviorTest {
 
     @Test
     fun guestEntryShowsSignInAndRegistrationActions() {
-        composeRule.setContent {
-            MobilingAppShell()
-        }
+        composeRule.setContent { MobilingAppShell() }
 
         composeRule.onNodeWithText("SmartResponsor").assertIsDisplayed()
         composeRule.onNodeWithText("Sign in").assertIsDisplayed()
@@ -41,9 +32,7 @@ class AccessBehaviorTest {
 
     @Test
     fun guestCanOpenSignInAndReturnToWelcome() {
-        composeRule.setContent {
-            MobilingAppShell()
-        }
+        composeRule.setContent { MobilingAppShell() }
 
         composeRule.onNodeWithText("Sign in").performClick()
         composeRule
@@ -55,9 +44,7 @@ class AccessBehaviorTest {
 
     @Test
     fun guestCanOpenRegistrationAndReturnToWelcome() {
-        composeRule.setContent {
-            MobilingAppShell()
-        }
+        composeRule.setContent { MobilingAppShell() }
 
         composeRule.onNodeWithText("Create access").performClick()
         composeRule
@@ -69,9 +56,7 @@ class AccessBehaviorTest {
 
     @Test
     fun guestCanOpenRecoveryRequestAndReturnToSignIn() {
-        composeRule.setContent {
-            MobilingAppShell()
-        }
+        composeRule.setContent { MobilingAppShell() }
 
         composeRule.onNodeWithText("Sign in").performClick()
         composeRule.onNodeWithText("Recover access").performClick()
@@ -86,9 +71,7 @@ class AccessBehaviorTest {
 
     @Test
     fun guestCanMoveBetweenRecoveryRequestAndReset() {
-        composeRule.setContent {
-            MobilingAppShell()
-        }
+        composeRule.setContent { MobilingAppShell() }
 
         composeRule.onNodeWithText("Sign in").performClick()
         composeRule.onNodeWithText("Recover access").performClick()
@@ -106,9 +89,7 @@ class AccessBehaviorTest {
     fun restoredSessionRoutesToVerificationRequired() {
         composeRule.setContent {
             MobilingAppShell(
-                accessAuthFeatureBridge = bridgeFor(
-                    session(requiresVerification = true),
-                ),
+                accessAuthFeatureBridge = bridgeFor(testSessionPayload(requiresVerification = true)),
             )
         }
 
@@ -121,9 +102,7 @@ class AccessBehaviorTest {
     fun restoredSessionRoutesToSecondFactorRequired() {
         composeRule.setContent {
             MobilingAppShell(
-                accessAuthFeatureBridge = bridgeFor(
-                    session(requiresSecondFactor = true),
-                ),
+                accessAuthFeatureBridge = bridgeFor(testSessionPayload(requiresSecondFactor = true)),
             )
         }
 
@@ -135,9 +114,7 @@ class AccessBehaviorTest {
     @Test
     fun restoreGuestPayloadKeepsGuestEntryAvailable() {
         composeRule.setContent {
-            MobilingAppShell(
-                accessAuthFeatureBridge = bridgeFor(session()),
-            )
+            MobilingAppShell(accessAuthFeatureBridge = bridgeFor(guestSessionPayload()))
         }
 
         composeRule.onNodeWithText("Guest entry").assertIsDisplayed()
@@ -147,15 +124,13 @@ class AccessBehaviorTest {
 
     @Test
     fun restoreFailureKeepsGuestEntryAvailable() {
-        val gateway = FakeAccessAuthSessionGateway(
-            payload = session(),
+        val gateway = AccessAuthSessionGatewayFixture(
+            payload = guestSessionPayload(),
             restoreFailure = IllegalStateException("restore unavailable"),
         )
 
         composeRule.setContent {
-            MobilingAppShell(
-                accessAuthFeatureBridge = AccessAuthFeatureBridge(gateway),
-            )
+            MobilingAppShell(accessAuthFeatureBridge = AccessAuthFeatureBridge(gateway))
         }
 
         composeRule.waitUntil(timeoutMillis = 5_000) { gateway.restoreCalls == 1 }
@@ -166,15 +141,13 @@ class AccessBehaviorTest {
 
     @Test
     fun signInResponseRoutesToVerificationRequired() {
-        val gateway = FakeAccessAuthSessionGateway(
-            payload = session(),
-            startPayload = session(requiresVerification = true),
+        val gateway = AccessAuthSessionGatewayFixture(
+            payload = guestSessionPayload(),
+            startPayload = verificationRequiredPayload(),
         )
 
         composeRule.setContent {
-            MobilingAppShell(
-                accessAuthFeatureBridge = AccessAuthFeatureBridge(gateway),
-            )
+            MobilingAppShell(accessAuthFeatureBridge = AccessAuthFeatureBridge(gateway))
         }
 
         submitSignIn()
@@ -186,15 +159,13 @@ class AccessBehaviorTest {
 
     @Test
     fun signInResponseRoutesToSecondFactorRequired() {
-        val gateway = FakeAccessAuthSessionGateway(
-            payload = session(),
-            startPayload = session(requiresSecondFactor = true),
+        val gateway = AccessAuthSessionGatewayFixture(
+            payload = guestSessionPayload(),
+            startPayload = secondFactorRequiredPayload(),
         )
 
         composeRule.setContent {
-            MobilingAppShell(
-                accessAuthFeatureBridge = AccessAuthFeatureBridge(gateway),
-            )
+            MobilingAppShell(accessAuthFeatureBridge = AccessAuthFeatureBridge(gateway))
         }
 
         submitSignIn()
@@ -206,63 +177,47 @@ class AccessBehaviorTest {
 
     @Test
     fun signInResponseRoutesToAuthenticatedContentWithVendorIdentity() {
-        val gateway = FakeAccessAuthSessionGateway(
-            payload = session(),
-            startPayload = session(authenticated = true),
+        val gateway = AccessAuthSessionGatewayFixture(
+            payload = guestSessionPayload(),
+            startPayload = testSessionPayload(authenticated = true),
         )
 
         composeRule.setContent {
             MobilingAppShell(
                 accessAuthFeatureBridge = AccessAuthFeatureBridge(gateway),
-                authenticatedContent = { vendorId, _ ->
-                    Text("Authenticated vendor: $vendorId")
-                },
+                authenticatedContent = { vendorId, _ -> Text("Authenticated vendor: $vendorId") },
             )
         }
 
         submitSignIn()
         composeRule.waitUntil(timeoutMillis = 5_000) { gateway.startCalls == 1 }
-        composeRule
-            .onNodeWithText("Authenticated vendor: test-vendor")
-            .assertIsDisplayed()
+        composeRule.onNodeWithText("Authenticated vendor: test-vendor").assertIsDisplayed()
     }
 
     @Test
     fun unavailableSignInBridgeKeepsFormAndShowsStatus() {
-        composeRule.setContent {
-            MobilingAppShell()
-        }
+        composeRule.setContent { MobilingAppShell() }
 
         submitSignIn()
         composeRule.onNodeWithText("Access service is unavailable.").assertIsDisplayed()
-        composeRule.onNodeWithText("Email").assertIsDisplayed()
-        composeRule.onNodeWithText("Password").assertIsDisplayed()
-        composeRule
-            .onNodeWithText("Use your SmartResponsor access to enter the business workspace.")
-            .assertIsDisplayed()
+        assertSignInFormDisplayed()
     }
 
     @Test
     fun signInFailureKeepsFormAndShowsStatus() {
-        val gateway = FakeAccessAuthSessionGateway(
-            payload = session(),
+        val gateway = AccessAuthSessionGatewayFixture(
+            payload = guestSessionPayload(),
             startFailure = IllegalStateException("sign in unavailable"),
         )
 
         composeRule.setContent {
-            MobilingAppShell(
-                accessAuthFeatureBridge = AccessAuthFeatureBridge(gateway),
-            )
+            MobilingAppShell(accessAuthFeatureBridge = AccessAuthFeatureBridge(gateway))
         }
 
         submitSignIn()
         composeRule.waitUntil(timeoutMillis = 5_000) { gateway.startCalls == 1 }
         composeRule.onNodeWithText("Access session could not be started.").assertIsDisplayed()
-        composeRule.onNodeWithText("Email").assertIsDisplayed()
-        composeRule.onNodeWithText("Password").assertIsDisplayed()
-        composeRule
-            .onNodeWithText("Use your SmartResponsor access to enter the business workspace.")
-            .assertIsDisplayed()
+        assertSignInFormDisplayed()
     }
 
     @Test
@@ -270,15 +225,13 @@ class AccessBehaviorTest {
         composeRule.setContent {
             MobilingAppShell(
                 accessAuthFeatureBridge = bridgeFor(
-                    session(
+                    testSessionPayload(
                         authenticated = true,
                         requiresVerification = true,
                         requiresSecondFactor = true,
                     ),
                 ),
-                authenticatedContent = { vendorId, _ ->
-                    Text("Authenticated vendor: $vendorId")
-                },
+                authenticatedContent = { vendorId, _ -> Text("Authenticated vendor: $vendorId") },
             )
         }
 
@@ -291,31 +244,25 @@ class AccessBehaviorTest {
     fun authenticatedSessionUsesInjectedContentAndVendorIdentity() {
         composeRule.setContent {
             MobilingAppShell(
-                accessAuthFeatureBridge = bridgeFor(
-                    session(authenticated = true),
-                ),
-                authenticatedContent = { vendorId, _ ->
-                    Text("Authenticated vendor: $vendorId")
-                },
+                accessAuthFeatureBridge = bridgeFor(testSessionPayload(authenticated = true)),
+                authenticatedContent = { vendorId, _ -> Text("Authenticated vendor: $vendorId") },
             )
         }
 
-        composeRule
-            .onNodeWithText("Authenticated vendor: test-vendor")
-            .assertIsDisplayed()
+        composeRule.onNodeWithText("Authenticated vendor: test-vendor").assertIsDisplayed()
     }
 
     @Test
     fun authenticatedSignOutLogsOutAndReturnsToGuestEntry() {
-        val gateway = FakeAccessAuthSessionGateway(session(authenticated = true))
+        val gateway = AccessAuthSessionGatewayFixture(
+            payload = testSessionPayload(authenticated = true),
+        )
 
         composeRule.setContent {
             MobilingAppShell(
                 accessAuthFeatureBridge = AccessAuthFeatureBridge(gateway),
                 authenticatedContent = { vendorId, onSignOut ->
-                    Button(onClick = onSignOut) {
-                        Text("Sign out vendor: $vendorId")
-                    }
+                    Button(onClick = onSignOut) { Text("Sign out vendor: $vendorId") }
                 },
             )
         }
@@ -328,8 +275,8 @@ class AccessBehaviorTest {
 
     @Test
     fun logoutFailureStillClearsLocalSessionAndReturnsToGuestEntry() {
-        val gateway = FakeAccessAuthSessionGateway(
-            payload = session(authenticated = true),
+        val gateway = AccessAuthSessionGatewayFixture(
+            payload = testSessionPayload(authenticated = true),
             logoutFailure = IllegalStateException("logout unavailable"),
         )
 
@@ -337,9 +284,7 @@ class AccessBehaviorTest {
             MobilingAppShell(
                 accessAuthFeatureBridge = AccessAuthFeatureBridge(gateway),
                 authenticatedContent = { vendorId, onSignOut ->
-                    Button(onClick = onSignOut) {
-                        Text("Sign out vendor: $vendorId")
-                    }
+                    Button(onClick = onSignOut) { Text("Sign out vendor: $vendorId") }
                 },
             )
         }
@@ -357,77 +302,14 @@ class AccessBehaviorTest {
         composeRule.onNodeWithText("Sign in").performClick()
     }
 
+    private fun assertSignInFormDisplayed() {
+        composeRule.onNodeWithText("Email").assertIsDisplayed()
+        composeRule.onNodeWithText("Password").assertIsDisplayed()
+        composeRule
+            .onNodeWithText("Use your SmartResponsor access to enter the business workspace.")
+            .assertIsDisplayed()
+    }
+
     private fun bridgeFor(payload: AccessAuthSessionPayload): AccessAuthFeatureBridge =
-        AccessAuthFeatureBridge(FakeAccessAuthSessionGateway(payload))
-
-    private fun session(
-        authenticated: Boolean = false,
-        requiresVerification: Boolean = false,
-        requiresSecondFactor: Boolean = false,
-    ): AccessAuthSessionPayload = AccessAuthSessionPayload(
-        status = "test",
-        sessionId = "test-session",
-        vendorId = "test-vendor",
-        authenticated = authenticated,
-        requiresVerification = requiresVerification,
-        requiresSecondFactor = requiresSecondFactor,
-    )
-}
-
-private class FakeAccessAuthSessionGateway(
-    private val payload: AccessAuthSessionPayload,
-    private val startPayload: AccessAuthSessionPayload = payload,
-    private val startFailure: RuntimeException? = null,
-    private val logoutFailure: RuntimeException? = null,
-    private val restoreFailure: RuntimeException? = null,
-) : AccessAuthSessionGateway {
-    var startCalls: Int = 0
-        private set
-
-    var logoutCalls: Int = 0
-        private set
-
-    var restoreCalls: Int = 0
-        private set
-
-    override suspend fun startAuth(request: AccessStartAuthRequest): AccessAuthSessionPayload {
-        startCalls += 1
-        startFailure?.let { throw it }
-
-        return startPayload
-    }
-
-    override suspend fun registerAuth(request: AccessRegisterAuthRequest): AccessAuthSessionPayload = payload
-
-    override suspend fun restoreAuth(): AccessAuthSessionPayload {
-        restoreCalls += 1
-        restoreFailure?.let { throw it }
-
-        return payload
-    }
-
-    override suspend fun logoutAuth() {
-        logoutCalls += 1
-        logoutFailure?.let { throw it }
-    }
-
-    override suspend fun resendVerification(): AccessAuthSessionPayload = payload
-
-    override suspend fun confirmVerification(
-        request: AccessConfirmVerificationRequest,
-    ): AccessAuthSessionPayload = payload
-
-    override suspend fun challengeSecondFactor(): AccessAuthSessionPayload = payload
-
-    override suspend fun verifySecondFactor(
-        request: AccessVerifySecondFactorRequest,
-    ): AccessAuthSessionPayload = payload
-
-    override suspend fun requestRecovery(
-        request: AccessRequestRecoveryRequest,
-    ): AccessAuthSessionPayload = payload
-
-    override suspend fun resetRecovery(
-        request: AccessResetRecoveryRequest,
-    ): AccessAuthSessionPayload = payload
+        AccessAuthFeatureBridge(AccessAuthSessionGatewayFixture(payload = payload))
 }
