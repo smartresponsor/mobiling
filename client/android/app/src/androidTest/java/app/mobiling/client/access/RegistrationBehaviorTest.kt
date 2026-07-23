@@ -31,6 +31,9 @@ class RegistrationBehaviorTest {
 
         submitRegistration()
         composeRule.waitUntil(timeoutMillis = 5_000) { gateway.registrationCalls == 1 }
+        check(gateway.registrationRequest?.displayName == "Test Company")
+        check(gateway.registrationRequest?.email == "user@example.com")
+        check(gateway.registrationRequest?.password == "password")
         composeRule
             .onNodeWithText("Accessing requires identity verification before this mobile session can continue.")
             .assertIsDisplayed()
