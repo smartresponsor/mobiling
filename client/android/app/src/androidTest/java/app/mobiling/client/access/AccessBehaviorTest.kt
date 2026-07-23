@@ -191,6 +191,9 @@ class AccessBehaviorTest {
 
         submitSignIn()
         composeRule.waitUntil(timeoutMillis = 5_000) { gateway.startCalls == 1 }
+        check(gateway.startRequest?.login == "user@example.com")
+        check(gateway.startRequest?.password == "password")
+        check(gateway.startRequest?.deviceLabel == null)
         composeRule.onNodeWithText("Authenticated vendor: test-vendor").assertIsDisplayed()
     }
 
