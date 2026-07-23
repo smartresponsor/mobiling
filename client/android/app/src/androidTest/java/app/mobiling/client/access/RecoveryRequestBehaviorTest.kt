@@ -22,36 +22,28 @@ class RecoveryRequestBehaviorTest {
     @Test
     fun recoveryRequestResponseRoutesToVerificationRequired() {
         val gateway = AccessAuthSessionGatewayFixture(
-            recoveryRequestPayload = testSessionPayload(requiresVerification = true),
+            recoveryRequestPayload = verificationRequiredPayload(),
         )
 
-        composeRule.setContent {
-            MobilingAppShell(accessAuthFeatureBridge = AccessAuthFeatureBridge(gateway))
-        }
+        composeRule.setAccessShell(gateway)
 
         submitRecoveryRequest()
         composeRule.waitUntil(timeoutMillis = 5_000) { gateway.recoveryRequestCalls == 1 }
         check(gateway.recoveryRequest?.email == "user@example.com")
-        composeRule
-            .onNodeWithText("Accessing requires identity verification before this mobile session can continue.")
-            .assertIsDisplayed()
+        composeRule.assertVerificationRequiredDisplayed()
     }
 
     @Test
     fun recoveryRequestResponseRoutesToSecondFactorRequired() {
         val gateway = AccessAuthSessionGatewayFixture(
-            recoveryRequestPayload = testSessionPayload(requiresSecondFactor = true),
+            recoveryRequestPayload = secondFactorRequiredPayload(),
         )
 
-        composeRule.setContent {
-            MobilingAppShell(accessAuthFeatureBridge = AccessAuthFeatureBridge(gateway))
-        }
+        composeRule.setAccessShell(gateway)
 
         submitRecoveryRequest()
         composeRule.waitUntil(timeoutMillis = 5_000) { gateway.recoveryRequestCalls == 1 }
-        composeRule
-            .onNodeWithText("Accessing requires an additional verification step before this mobile session can continue.")
-            .assertIsDisplayed()
+        composeRule.assertSecondFactorRequiredDisplayed()
     }
 
     @Test
@@ -87,9 +79,7 @@ class RecoveryRequestBehaviorTest {
             recoveryRequestFailure = IllegalStateException("recovery unavailable"),
         )
 
-        composeRule.setContent {
-            MobilingAppShell(accessAuthFeatureBridge = AccessAuthFeatureBridge(gateway))
-        }
+        composeRule.setAccessShell(gateway)
 
         submitRecoveryRequest()
         composeRule.waitUntil(timeoutMillis = 5_000) { gateway.recoveryRequestCalls == 1 }
