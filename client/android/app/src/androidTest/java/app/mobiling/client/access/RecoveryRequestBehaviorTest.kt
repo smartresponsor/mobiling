@@ -31,6 +31,7 @@ class RecoveryRequestBehaviorTest {
 
         submitRecoveryRequest()
         composeRule.waitUntil(timeoutMillis = 5_000) { gateway.recoveryRequestCalls == 1 }
+        check(gateway.recoveryRequest?.email == "user@example.com")
         composeRule
             .onNodeWithText("Accessing requires identity verification before this mobile session can continue.")
             .assertIsDisplayed()
