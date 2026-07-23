@@ -16,15 +16,24 @@ import app.mobiling.client.data.auth.session.AccessAuthSessionGateway
  */
 internal class AccessAuthSessionGatewayFixture(
     private val payload: AccessAuthSessionPayload = guestSessionPayload(),
-    private val restorePayload: AccessAuthSessionPayload = guestSessionPayload(),
+    private val startPayload: AccessAuthSessionPayload = payload,
+    private val restorePayload: AccessAuthSessionPayload = payload,
     private val registrationPayload: AccessAuthSessionPayload = payload,
     private val recoveryRequestPayload: AccessAuthSessionPayload = payload,
     private val recoveryResetPayload: AccessAuthSessionPayload = payload,
+    private val startFailure: RuntimeException? = null,
+    private val restoreFailure: RuntimeException? = null,
     private val logoutFailure: RuntimeException? = null,
     private val registrationFailure: RuntimeException? = null,
     private val recoveryRequestFailure: RuntimeException? = null,
     private val recoveryResetFailure: RuntimeException? = null,
 ) : AccessAuthSessionGateway {
+    var startCalls: Int = 0
+        private set
+
+    var restoreCalls: Int = 0
+        private set
+
     var logoutCalls: Int = 0
         private set
 
@@ -37,6 +46,9 @@ internal class AccessAuthSessionGatewayFixture(
     var recoveryResetCalls: Int = 0
         private set
 
+    var startRequest: AccessStartAuthRequest? = null
+        private set
+
     var registrationRequest: AccessRegisterAuthRequest? = null
         private set
 
@@ -46,7 +58,13 @@ internal class AccessAuthSessionGatewayFixture(
     var recoveryResetRequest: AccessResetRecoveryRequest? = null
         private set
 
-    override suspend fun startAuth(request: AccessStartAuthRequest): AccessAuthSessionPayload = payload
+    override suspend fun startAuth(request: AccessStartAuthRequest): AccessAuthSessionPayload {
+        startCalls += 1
+        startRequest = request
+        startFailure?.let { throw it }
+
+        return startPayload
+    }
 
     override suspend fun registerAuth(request: AccessRegisterAuthRequest): AccessAuthSessionPayload {
         registrationCalls += 1
@@ -56,7 +74,12 @@ internal class AccessAuthSessionGatewayFixture(
         return registrationPayload
     }
 
-    override suspend fun restoreAuth(): AccessAuthSessionPayload = restorePayload
+    override suspend fun restoreAuth(): AccessAuthSessionPayload {
+        restoreCalls += 1
+        restoreFailure?.let { throw it }
+
+        return restorePayload
+    }
 
     override suspend fun logoutAuth() {
         logoutCalls += 1
