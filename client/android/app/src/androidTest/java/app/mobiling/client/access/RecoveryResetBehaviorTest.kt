@@ -7,14 +7,6 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import app.mobiling.client.auth.AccessAuthFeatureBridge
-import app.mobiling.client.contract.auth.session.AccessAuthSessionPayload
-import app.mobiling.client.contract.auth.session.AccessConfirmVerificationRequest
-import app.mobiling.client.contract.auth.session.AccessRegisterAuthRequest
-import app.mobiling.client.contract.auth.session.AccessRequestRecoveryRequest
-import app.mobiling.client.contract.auth.session.AccessResetRecoveryRequest
-import app.mobiling.client.contract.auth.session.AccessStartAuthRequest
-import app.mobiling.client.contract.auth.session.AccessVerifySecondFactorRequest
-import app.mobiling.client.data.auth.session.AccessAuthSessionGateway
 import org.junit.Rule
 import org.junit.Test
 
@@ -29,18 +21,16 @@ class RecoveryResetBehaviorTest {
 
     @Test
     fun recoveryResetResponseRoutesToVerificationRequired() {
-        val gateway = RecoveryResetGateway(
-            resetPayload = session(requiresVerification = true),
+        val gateway = AccessAuthSessionGatewayFixture(
+            recoveryResetPayload = testSessionPayload(requiresVerification = true),
         )
 
         composeRule.setContent {
-            MobilingAppShell(
-                accessAuthFeatureBridge = AccessAuthFeatureBridge(gateway),
-            )
+            MobilingAppShell(accessAuthFeatureBridge = AccessAuthFeatureBridge(gateway))
         }
 
         submitRecoveryReset()
-        composeRule.waitUntil(timeoutMillis = 5_000) { gateway.resetCalls == 1 }
+        composeRule.waitUntil(timeoutMillis = 5_000) { gateway.recoveryResetCalls == 1 }
         composeRule
             .onNodeWithText("Accessing requires identity verification before this mobile session can continue.")
             .assertIsDisplayed()
@@ -48,18 +38,16 @@ class RecoveryResetBehaviorTest {
 
     @Test
     fun recoveryResetResponseRoutesToSecondFactorRequired() {
-        val gateway = RecoveryResetGateway(
-            resetPayload = session(requiresSecondFactor = true),
+        val gateway = AccessAuthSessionGatewayFixture(
+            recoveryResetPayload = testSessionPayload(requiresSecondFactor = true),
         )
 
         composeRule.setContent {
-            MobilingAppShell(
-                accessAuthFeatureBridge = AccessAuthFeatureBridge(gateway),
-            )
+            MobilingAppShell(accessAuthFeatureBridge = AccessAuthFeatureBridge(gateway))
         }
 
         submitRecoveryReset()
-        composeRule.waitUntil(timeoutMillis = 5_000) { gateway.resetCalls == 1 }
+        composeRule.waitUntil(timeoutMillis = 5_000) { gateway.recoveryResetCalls == 1 }
         composeRule
             .onNodeWithText("Accessing requires an additional verification step before this mobile session can continue.")
             .assertIsDisplayed()
@@ -67,29 +55,25 @@ class RecoveryResetBehaviorTest {
 
     @Test
     fun recoveryResetResponseRoutesToAuthenticatedContentWithVendorIdentity() {
-        val gateway = RecoveryResetGateway(
-            resetPayload = session(authenticated = true),
+        val gateway = AccessAuthSessionGatewayFixture(
+            recoveryResetPayload = testSessionPayload(authenticated = true),
         )
 
         composeRule.setContent {
             MobilingAppShell(
                 accessAuthFeatureBridge = AccessAuthFeatureBridge(gateway),
-                authenticatedContent = { vendorId, _ ->
-                    Text("Recovered vendor: $vendorId")
-                },
+                authenticatedContent = { vendorId, _ -> Text("Recovered vendor: $vendorId") },
             )
         }
 
         submitRecoveryReset()
-        composeRule.waitUntil(timeoutMillis = 5_000) { gateway.resetCalls == 1 }
+        composeRule.waitUntil(timeoutMillis = 5_000) { gateway.recoveryResetCalls == 1 }
         composeRule.onNodeWithText("Recovered vendor: test-vendor").assertIsDisplayed()
     }
 
     @Test
     fun unavailableRecoveryResetBridgeKeepsFormAndShowsStatus() {
-        composeRule.setContent {
-            MobilingAppShell()
-        }
+        composeRule.setContent { MobilingAppShell() }
 
         submitRecoveryReset()
         composeRule.onNodeWithText("Access service is unavailable.").assertIsDisplayed()
@@ -98,18 +82,16 @@ class RecoveryResetBehaviorTest {
 
     @Test
     fun recoveryResetFailureKeepsFormAndShowsStatus() {
-        val gateway = RecoveryResetGateway(
-            resetFailure = IllegalStateException("recovery reset unavailable"),
+        val gateway = AccessAuthSessionGatewayFixture(
+            recoveryResetFailure = IllegalStateException("recovery reset unavailable"),
         )
 
         composeRule.setContent {
-            MobilingAppShell(
-                accessAuthFeatureBridge = AccessAuthFeatureBridge(gateway),
-            )
+            MobilingAppShell(accessAuthFeatureBridge = AccessAuthFeatureBridge(gateway))
         }
 
         submitRecoveryReset()
-        composeRule.waitUntil(timeoutMillis = 5_000) { gateway.resetCalls == 1 }
+        composeRule.waitUntil(timeoutMillis = 5_000) { gateway.recoveryResetCalls == 1 }
         composeRule.onNodeWithText("Recovery reset could not be completed.").assertIsDisplayed()
         assertRecoveryResetFormDisplayed()
     }
@@ -134,67 +116,4 @@ class RecoveryResetBehaviorTest {
             .onNodeWithText("Use your recovery code and choose a new password.")
             .assertIsDisplayed()
     }
-
-    private fun session(
-        authenticated: Boolean = false,
-        requiresVerification: Boolean = false,
-        requiresSecondFactor: Boolean = false,
-    ): AccessAuthSessionPayload = AccessAuthSessionPayload(
-        status = "test",
-        sessionId = "test-session",
-        vendorId = "test-vendor",
-        authenticated = authenticated,
-        requiresVerification = requiresVerification,
-        requiresSecondFactor = requiresSecondFactor,
-    )
 }
-
-private class RecoveryResetGateway(
-    private val resetPayload: AccessAuthSessionPayload = guestSession(),
-    private val resetFailure: RuntimeException? = null,
-) : AccessAuthSessionGateway {
-    var resetCalls: Int = 0
-        private set
-
-    override suspend fun startAuth(request: AccessStartAuthRequest): AccessAuthSessionPayload = resetPayload
-
-    override suspend fun registerAuth(request: AccessRegisterAuthRequest): AccessAuthSessionPayload = resetPayload
-
-    override suspend fun restoreAuth(): AccessAuthSessionPayload = guestSession()
-
-    override suspend fun logoutAuth() = Unit
-
-    override suspend fun resendVerification(): AccessAuthSessionPayload = resetPayload
-
-    override suspend fun confirmVerification(
-        request: AccessConfirmVerificationRequest,
-    ): AccessAuthSessionPayload = resetPayload
-
-    override suspend fun challengeSecondFactor(): AccessAuthSessionPayload = resetPayload
-
-    override suspend fun verifySecondFactor(
-        request: AccessVerifySecondFactorRequest,
-    ): AccessAuthSessionPayload = resetPayload
-
-    override suspend fun requestRecovery(
-        request: AccessRequestRecoveryRequest,
-    ): AccessAuthSessionPayload = resetPayload
-
-    override suspend fun resetRecovery(
-        request: AccessResetRecoveryRequest,
-    ): AccessAuthSessionPayload {
-        resetCalls += 1
-        resetFailure?.let { throw it }
-
-        return resetPayload
-    }
-}
-
-private fun guestSession(): AccessAuthSessionPayload = AccessAuthSessionPayload(
-    status = "guest",
-    sessionId = null,
-    vendorId = null,
-    authenticated = false,
-    requiresVerification = false,
-    requiresSecondFactor = false,
-)
