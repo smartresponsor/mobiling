@@ -34,3 +34,13 @@ internal fun ComposeContentTestRule.assertSignInDisplayed() {
     onNodeWithText("Use your SmartResponsor access to enter the business workspace.")
         .assertIsDisplayed()
 }
+
+internal fun ComposeContentTestRule.assertVerificationRequiredDisplayed() {
+    onNodeWithText("Accessing requires identity verification before this mobile session can continue.")
+        .assertIsDisplayed()
+}
+
+internal fun ComposeContentTestRule.assertSecondFactorRequiredDisplayed() {
+    onNodeWithText("Accessing requires an additional verification step before this mobile session can continue.")
+        .assertIsDisplayed()
+}
