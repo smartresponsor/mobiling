@@ -4,7 +4,6 @@ import androidx.compose.material3.Text
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
-import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
 import app.mobiling.client.auth.AccessAuthFeatureBridge
 import org.junit.Rule
@@ -90,11 +89,11 @@ class RegistrationBehaviorTest {
     }
 
     private fun submitRegistration() {
-        composeRule.onNodeWithText("Create access").performClick()
+        composeRule.performAccessAction("Create access")
         composeRule.onNodeWithText("Company name").performTextInput("Test Company")
         composeRule.onNodeWithText("Email").performTextInput("user@example.com")
         composeRule.onNodeWithText("Password").performTextInput("password")
-        composeRule.onNodeWithText("Create access").performClick()
+        composeRule.performAccessAction("Create access")
     }
 
     private fun assertRegistrationFormDisplayed() {
