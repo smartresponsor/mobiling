@@ -96,7 +96,7 @@ class RecoveryResetBehaviorTest {
         composeRule.onNodeWithText("Email").performTextInput("user@example.com")
         composeRule.onNodeWithText("Recovery code").performTextInput("123456")
         composeRule.onNodeWithText("New password").performTextInput("new-password")
-        composeRule.onNodeWithText("Reset access").performClick()
+        composeRule.performAccessAction("Reset access")
     }
 
     private fun assertRecoveryResetFormDisplayed() {
