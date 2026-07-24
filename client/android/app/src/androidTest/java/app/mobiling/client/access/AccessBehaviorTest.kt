@@ -26,8 +26,7 @@ class AccessBehaviorTest {
         composeRule.setContent { MobilingAppShell() }
 
         composeRule.onNodeWithText("SmartResponsor").assertIsDisplayed()
-        composeRule.onNodeWithText("Sign in").assertIsDisplayed()
-        composeRule.onNodeWithText("Create access").assertIsDisplayed()
+        composeRule.assertGuestEntryDisplayed(includeRegistrationAction = true)
     }
 
     @Test
@@ -35,11 +34,9 @@ class AccessBehaviorTest {
         composeRule.setContent { MobilingAppShell() }
 
         composeRule.onNodeWithText("Sign in").performClick()
-        composeRule
-            .onNodeWithText("Use your SmartResponsor access to enter the business workspace.")
-            .assertIsDisplayed()
+        composeRule.assertSignInDisplayed()
         composeRule.onNodeWithText("Back").performClick()
-        composeRule.onNodeWithText("Guest entry").assertIsDisplayed()
+        composeRule.assertGuestEntryDisplayed()
     }
 
     @Test
@@ -51,7 +48,7 @@ class AccessBehaviorTest {
             .onNodeWithText("Set up a guest entry for the SmartResponsor workspace.")
             .assertIsDisplayed()
         composeRule.onNodeWithText("Back").performClick()
-        composeRule.onNodeWithText("Guest entry").assertIsDisplayed()
+        composeRule.assertGuestEntryDisplayed()
     }
 
     @Test
@@ -64,9 +61,7 @@ class AccessBehaviorTest {
             .onNodeWithText("Request a recovery code for your SmartResponsor access.")
             .assertIsDisplayed()
         composeRule.onNodeWithText("Back").performClick()
-        composeRule
-            .onNodeWithText("Use your SmartResponsor access to enter the business workspace.")
-            .assertIsDisplayed()
+        composeRule.assertSignInDisplayed()
     }
 
     @Test
@@ -93,9 +88,7 @@ class AccessBehaviorTest {
             )
         }
 
-        composeRule
-            .onNodeWithText("Accessing requires identity verification before this mobile session can continue.")
-            .assertIsDisplayed()
+        composeRule.assertVerificationRequiredDisplayed()
     }
 
     @Test
@@ -106,9 +99,7 @@ class AccessBehaviorTest {
             )
         }
 
-        composeRule
-            .onNodeWithText("Accessing requires an additional verification step before this mobile session can continue.")
-            .assertIsDisplayed()
+        composeRule.assertSecondFactorRequiredDisplayed()
     }
 
     @Test
@@ -117,9 +108,7 @@ class AccessBehaviorTest {
             MobilingAppShell(accessAuthFeatureBridge = bridgeFor(guestSessionPayload()))
         }
 
-        composeRule.onNodeWithText("Guest entry").assertIsDisplayed()
-        composeRule.onNodeWithText("Sign in").assertIsDisplayed()
-        composeRule.onNodeWithText("Create access").assertIsDisplayed()
+        composeRule.assertGuestEntryDisplayed(includeRegistrationAction = true)
     }
 
     @Test
@@ -129,14 +118,10 @@ class AccessBehaviorTest {
             restoreFailure = IllegalStateException("restore unavailable"),
         )
 
-        composeRule.setContent {
-            MobilingAppShell(accessAuthFeatureBridge = AccessAuthFeatureBridge(gateway))
-        }
+        composeRule.setAccessShell(gateway)
 
         composeRule.waitUntil(timeoutMillis = 5_000) { gateway.restoreCalls == 1 }
-        composeRule.onNodeWithText("Guest entry").assertIsDisplayed()
-        composeRule.onNodeWithText("Sign in").assertIsDisplayed()
-        composeRule.onNodeWithText("Create access").assertIsDisplayed()
+        composeRule.assertGuestEntryDisplayed(includeRegistrationAction = true)
     }
 
     @Test
@@ -146,15 +131,11 @@ class AccessBehaviorTest {
             startPayload = verificationRequiredPayload(),
         )
 
-        composeRule.setContent {
-            MobilingAppShell(accessAuthFeatureBridge = AccessAuthFeatureBridge(gateway))
-        }
+        composeRule.setAccessShell(gateway)
 
         submitSignIn()
         composeRule.waitUntil(timeoutMillis = 5_000) { gateway.startCalls == 1 }
-        composeRule
-            .onNodeWithText("Accessing requires identity verification before this mobile session can continue.")
-            .assertIsDisplayed()
+        composeRule.assertVerificationRequiredDisplayed()
     }
 
     @Test
@@ -164,15 +145,11 @@ class AccessBehaviorTest {
             startPayload = secondFactorRequiredPayload(),
         )
 
-        composeRule.setContent {
-            MobilingAppShell(accessAuthFeatureBridge = AccessAuthFeatureBridge(gateway))
-        }
+        composeRule.setAccessShell(gateway)
 
         submitSignIn()
         composeRule.waitUntil(timeoutMillis = 5_000) { gateway.startCalls == 1 }
-        composeRule
-            .onNodeWithText("Accessing requires an additional verification step before this mobile session can continue.")
-            .assertIsDisplayed()
+        composeRule.assertSecondFactorRequiredDisplayed()
     }
 
     @Test
@@ -213,9 +190,7 @@ class AccessBehaviorTest {
             startFailure = IllegalStateException("sign in unavailable"),
         )
 
-        composeRule.setContent {
-            MobilingAppShell(accessAuthFeatureBridge = AccessAuthFeatureBridge(gateway))
-        }
+        composeRule.setAccessShell(gateway)
 
         submitSignIn()
         composeRule.waitUntil(timeoutMillis = 5_000) { gateway.startCalls == 1 }
@@ -238,9 +213,7 @@ class AccessBehaviorTest {
             )
         }
 
-        composeRule
-            .onNodeWithText("Accessing requires identity verification before this mobile session can continue.")
-            .assertIsDisplayed()
+        composeRule.assertVerificationRequiredDisplayed()
     }
 
     @Test
@@ -272,8 +245,7 @@ class AccessBehaviorTest {
 
         composeRule.onNodeWithText("Sign out vendor: test-vendor").performClick()
         composeRule.waitUntil(timeoutMillis = 5_000) { gateway.logoutCalls == 1 }
-        composeRule.onNodeWithText("Guest entry").assertIsDisplayed()
-        composeRule.onNodeWithText("Sign in").assertIsDisplayed()
+        composeRule.assertGuestEntryDisplayed()
     }
 
     @Test
@@ -294,8 +266,7 @@ class AccessBehaviorTest {
 
         composeRule.onNodeWithText("Sign out vendor: test-vendor").performClick()
         composeRule.waitUntil(timeoutMillis = 5_000) { gateway.logoutCalls == 1 }
-        composeRule.onNodeWithText("Guest entry").assertIsDisplayed()
-        composeRule.onNodeWithText("Sign in").assertIsDisplayed()
+        composeRule.assertGuestEntryDisplayed()
     }
 
     private fun submitSignIn() {
@@ -308,9 +279,7 @@ class AccessBehaviorTest {
     private fun assertSignInFormDisplayed() {
         composeRule.onNodeWithText("Email").assertIsDisplayed()
         composeRule.onNodeWithText("Password").assertIsDisplayed()
-        composeRule
-            .onNodeWithText("Use your SmartResponsor access to enter the business workspace.")
-            .assertIsDisplayed()
+        composeRule.assertSignInDisplayed()
     }
 
     private fun bridgeFor(payload: AccessAuthSessionPayload): AccessAuthFeatureBridge =
