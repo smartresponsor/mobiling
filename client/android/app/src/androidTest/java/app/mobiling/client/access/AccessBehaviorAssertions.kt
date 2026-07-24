@@ -1,8 +1,13 @@
 package app.mobiling.client.access
 
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.filter
+import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
+import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
 import app.mobiling.client.auth.AccessAuthFeatureBridge
 
 /**
@@ -18,6 +23,13 @@ internal fun ComposeContentTestRule.setAccessShell(
             accessAuthFeatureBridge = AccessAuthFeatureBridge(gateway),
         )
     }
+}
+
+internal fun ComposeContentTestRule.performAccessAction(label: String) {
+    onAllNodesWithText(label)
+        .filter(hasClickAction())
+        .onFirst()
+        .performClick()
 }
 
 internal fun ComposeContentTestRule.assertGuestEntryDisplayed(
