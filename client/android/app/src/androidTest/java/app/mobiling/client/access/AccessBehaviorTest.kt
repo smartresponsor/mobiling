@@ -33,7 +33,7 @@ class AccessBehaviorTest {
     fun guestCanOpenSignInAndReturnToWelcome() {
         composeRule.setContent { MobilingAppShell() }
 
-        composeRule.onNodeWithText("Sign in").performClick()
+        composeRule.performAccessAction("Sign in")
         composeRule.assertSignInDisplayed()
         composeRule.onNodeWithText("Back").performClick()
         composeRule.assertGuestEntryDisplayed()
@@ -43,7 +43,7 @@ class AccessBehaviorTest {
     fun guestCanOpenRegistrationAndReturnToWelcome() {
         composeRule.setContent { MobilingAppShell() }
 
-        composeRule.onNodeWithText("Create access").performClick()
+        composeRule.performAccessAction("Create access")
         composeRule
             .onNodeWithText("Set up a guest entry for the SmartResponsor workspace.")
             .assertIsDisplayed()
@@ -55,7 +55,7 @@ class AccessBehaviorTest {
     fun guestCanOpenRecoveryRequestAndReturnToSignIn() {
         composeRule.setContent { MobilingAppShell() }
 
-        composeRule.onNodeWithText("Sign in").performClick()
+        composeRule.performAccessAction("Sign in")
         composeRule.onNodeWithText("Recover access").performClick()
         composeRule
             .onNodeWithText("Request a recovery code for your SmartResponsor access.")
@@ -68,7 +68,7 @@ class AccessBehaviorTest {
     fun guestCanMoveBetweenRecoveryRequestAndReset() {
         composeRule.setContent { MobilingAppShell() }
 
-        composeRule.onNodeWithText("Sign in").performClick()
+        composeRule.performAccessAction("Sign in")
         composeRule.onNodeWithText("Recover access").performClick()
         composeRule.onNodeWithText("I have a recovery code").performClick()
         composeRule
@@ -270,10 +270,10 @@ class AccessBehaviorTest {
     }
 
     private fun submitSignIn() {
-        composeRule.onNodeWithText("Sign in").performClick()
+        composeRule.performAccessAction("Sign in")
         composeRule.onNodeWithText("Email").performTextInput("user@example.com")
         composeRule.onNodeWithText("Password").performTextInput("password")
-        composeRule.onNodeWithText("Sign in").performClick()
+        composeRule.performAccessAction("Sign in")
     }
 
     private fun assertSignInFormDisplayed() {
