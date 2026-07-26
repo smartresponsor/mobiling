@@ -99,8 +99,24 @@ $testExitCode = -1
 try {
     Push-Location $androidRoot
     try {
-        & $gradleWrapper @gradleArguments 2>&1 | Tee-Object -FilePath $instrumentationLog
-        $testExitCode = $LASTEXITCODE
+        $previousErrorActionPreference = $ErrorActionPreference
+        $nativeCommandPreferenceWasSet = Test-Path variable:PSNativeCommandUseErrorActionPreference
+        if ($nativeCommandPreferenceWasSet) {
+            $previousNativeCommandPreference = $PSNativeCommandUseErrorActionPreference
+            $PSNativeCommandUseErrorActionPreference = $false
+        }
+
+        try {
+            $ErrorActionPreference = "Continue"
+            & $gradleWrapper @gradleArguments 2>&1 | Tee-Object -FilePath $instrumentationLog
+            $testExitCode = $LASTEXITCODE
+        }
+        finally {
+            $ErrorActionPreference = $previousErrorActionPreference
+            if ($nativeCommandPreferenceWasSet) {
+                $PSNativeCommandUseErrorActionPreference = $previousNativeCommandPreference
+            }
+        }
     }
     finally {
         Pop-Location
