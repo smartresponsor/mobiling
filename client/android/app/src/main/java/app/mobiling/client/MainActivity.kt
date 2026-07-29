@@ -34,16 +34,17 @@ class MainActivity : ComponentActivity() {
             isAppearanceLightStatusBars = false
             isAppearanceLightNavigationBars = true
         }
+        val composition = MobileApplicationComposer.current()
         val accessAuthFeatureBridge = AccessAuthFeatureBridge(
-            AccessHttpAuthSessionGateway(baseUrl = MobileClientRuntimeConfig.mobileEdgeBaseUrl),
+            AccessHttpAuthSessionGateway(baseUrl = composition.mobileEdgeBaseUrl),
         )
-        val cartGateway = CartHttpGateway(baseUrl = MobileClientRuntimeConfig.mobileEdgeBaseUrl)
+        val cartGateway = CartHttpGateway(baseUrl = composition.mobileEdgeBaseUrl)
         val cartFeatureBridge = CartFeatureBridge(
             reader = cartGateway,
             writer = cartGateway,
             checkoutGateway = cartGateway,
         )
-        val attachmentGateway = AttachmentHttpGateway(baseUrl = MobileClientRuntimeConfig.mobileEdgeBaseUrl)
+        val attachmentGateway = AttachmentHttpGateway(baseUrl = composition.mobileEdgeBaseUrl)
         val attachmentFeatureBridge = AttachmentFeatureBridge(
             reader = attachmentGateway,
             writer = attachmentGateway,
@@ -56,15 +57,15 @@ class MainActivity : ComponentActivity() {
                         accessAuthFeatureBridge = accessAuthFeatureBridge,
                         cartFeatureBridge = cartFeatureBridge,
                         attachmentFeatureBridge = attachmentFeatureBridge,
-                        navigationShellGateway = NavigationHttpShellGateway(baseUrl = MobileClientRuntimeConfig.mobileEdgeBaseUrl),
-                        productGateway = ProductHttpGateway(baseUrl = MobileClientRuntimeConfig.mobileEdgeBaseUrl),
-                        orderGateway = OrderHttpGateway(baseUrl = MobileClientRuntimeConfig.mobileEdgeBaseUrl),
-                        projectGateway = ProjectHttpGateway(baseUrl = MobileClientRuntimeConfig.mobileEdgeBaseUrl),
-                        vendorProfileGateway = VendorHttpProfileGateway(baseUrl = MobileClientRuntimeConfig.mobileEdgeBaseUrl),
-                        vendorSummaryGateway = VendorHttpSummaryGateway(baseUrl = MobileClientRuntimeConfig.mobileEdgeBaseUrl),
-                        vendorStatementGateway = VendorHttpStatementGateway(baseUrl = MobileClientRuntimeConfig.mobileEdgeBaseUrl),
-                        vendorPayoutGateway = VendorHttpPayoutGateway(baseUrl = MobileClientRuntimeConfig.mobileEdgeBaseUrl),
-                        vendorTransactionGateway = VendorHttpTransactionGateway(baseUrl = MobileClientRuntimeConfig.mobileEdgeBaseUrl),
+                        navigationShellGateway = NavigationHttpShellGateway(baseUrl = composition.mobileEdgeBaseUrl),
+                        productGateway = ProductHttpGateway(baseUrl = composition.mobileEdgeBaseUrl),
+                        orderGateway = OrderHttpGateway(baseUrl = composition.mobileEdgeBaseUrl),
+                        projectGateway = ProjectHttpGateway(baseUrl = composition.mobileEdgeBaseUrl),
+                        vendorProfileGateway = VendorHttpProfileGateway(baseUrl = composition.mobileEdgeBaseUrl),
+                        vendorSummaryGateway = VendorHttpSummaryGateway(baseUrl = composition.mobileEdgeBaseUrl),
+                        vendorStatementGateway = VendorHttpStatementGateway(baseUrl = composition.mobileEdgeBaseUrl),
+                        vendorPayoutGateway = VendorHttpPayoutGateway(baseUrl = composition.mobileEdgeBaseUrl),
+                        vendorTransactionGateway = VendorHttpTransactionGateway(baseUrl = composition.mobileEdgeBaseUrl),
                     )
                 }
             }

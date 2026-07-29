@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0"><dict>
+  <key>MOBILE_PRODUCT_PROFILE</key><string>$(MOBILE_PRODUCT_PROFILE)</string>
+  <key>MOBILE_BRAND_PROFILE</key><string>$(MOBILE_BRAND_PROFILE)</string>
+  <key>MOBILE_ENVIRONMENT_PROFILE</key><string>$(MOBILE_ENVIRONMENT_PROFILE)</string>
+  <key>MOBILE_EDGE_BASE_URL</key><string>$(MOBILE_EDGE_BASE_URL)</string>
+  <key>MOBILE_INITIAL_DESTINATION</key><string>$(MOBILE_INITIAL_DESTINATION)</string>
+  <key>MOBILE_PRIMARY_CATALOG</key><string>$(MOBILE_PRIMARY_CATALOG)</string>
+  <key>MOBILE_ENABLED_CATALOGS</key><string>$(MOBILE_ENABLED_CATALOGS)</string>
   <key>BGTaskSchedulerPermittedIdentifiers</key>
   <array>
     <string>dev.smartresponsor.mobile.refresh</string>

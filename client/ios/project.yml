@@ -6,6 +6,9 @@ options:
 settings:
   base:
     SWIFT_VERSION: "5.9"
+configFiles:
+  Debug: Config/Base.xcconfig
+  Release: Config/Base.xcconfig
 targets:
   MobileClient:
     type: framework
@@ -66,6 +69,8 @@ targets:
       - path: App/ContentView.swift
       - path: App/MobileApp.swift
       - path: App/MobileClientRuntimeConfig.swift
+      - path: App/MobileApplicationComposition.swift
+      - path: Resources/Localizable.xcstrings
     info:
       path: App/Info.plist
     settings:

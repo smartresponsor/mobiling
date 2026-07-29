@@ -20,6 +20,13 @@ android {
         versionName = "0.2.0-access-entry-materialized"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments["clearPackageData"] = "true"
+        buildConfigField("String", "PRODUCT_PROFILE", quotedBuildConfigValue("one_tasker"))
+        buildConfigField("String", "BRAND_PROFILE", quotedBuildConfigValue("one_tasker"))
+        buildConfigField("String", "ENVIRONMENT_PROFILE", quotedBuildConfigValue("local"))
+        buildConfigField("String", "MOBILE_EDGE_BASE_URL", quotedBuildConfigValue("http://10.0.2.2:8080"))
+        buildConfigField("String", "INITIAL_DESTINATION", quotedBuildConfigValue("dashboard"))
+        buildConfigField("String", "PRIMARY_CATALOG", quotedBuildConfigValue("service"))
+        buildConfigField("String", "ENABLED_CATALOGS", quotedBuildConfigValue("service,product,project"))
     }
     buildTypes {
         getByName("release") {
@@ -67,5 +74,6 @@ dependencies {
     androidTestImplementation("androidx.test:rules:1.5.0")
     androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.6.0")
     debugImplementation("androidx.compose.ui:ui-test-manifest:1.6.0")
+    testImplementation("junit:junit:4.13.2")
     androidTestUtil("androidx.test:orchestrator:1.4.2")
 }

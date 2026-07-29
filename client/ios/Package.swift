@@ -39,5 +39,6 @@ let package = Package(
         .target(name: "CoreAnalytic", dependencies: ["MobileClient"], path: "Sources/CoreAnalytic"),
         .target(name: "CorePush", dependencies: ["MobileClient"], path: "Sources/CorePush"),
         .target(name: "CoreSecurity", dependencies: ["MobileClient"], path: "Sources/CoreSecurity"),
+        .testTarget(name: "CoreConfigTests", dependencies: ["CoreConfig"], path: "Tests/CoreConfigTests"),
     ]
 )

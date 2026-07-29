@@ -1,0 +1,52 @@
+package app.mobiling.client
+
+data class ProductProfile(val code: String)
+data class BrandProfile(val code: String)
+data class EnvironmentProfile(val code: String, val mobileEdgeBaseUrl: String)
+data class InitialDestinationPolicy(val destination: String)
+
+data class CatalogPolicy(val primaryCatalog: String, val enabledCatalogs: Set<String>) {
+    init { require(primaryCatalog in enabledCatalogs) { "Primary catalog must be enabled." } }
+}
+
+enum class MobileTextKey(val semanticKey: String) {
+    Dashboard("navigation.dashboard"),
+    Catalog("navigation.catalog"),
+    Message("navigation.message"),
+    Vendor("navigation.vendor"),
+}
+
+class MobileTextResolver(private val localText: Map<String, String>) {
+    fun resolve(semanticKey: String?, backendLabel: String): String =
+        semanticKey?.let(localText::get)?.takeIf(String::isNotBlank) ?: backendLabel
+}
+
+data class MobileApplicationConfiguration(
+    val product: ProductProfile,
+    val brand: BrandProfile,
+    val environment: EnvironmentProfile,
+    val initialDestination: InitialDestinationPolicy,
+    val catalog: CatalogPolicy,
+    val textResolver: MobileTextResolver,
+)
+
+object MobileApplicationConfigurationFactory {
+    fun current(): MobileApplicationConfiguration = MobileApplicationConfiguration(
+        product = ProductProfile(BuildConfig.PRODUCT_PROFILE),
+        brand = BrandProfile(BuildConfig.BRAND_PROFILE),
+        environment = EnvironmentProfile(BuildConfig.ENVIRONMENT_PROFILE, BuildConfig.MOBILE_EDGE_BASE_URL),
+        initialDestination = InitialDestinationPolicy(BuildConfig.INITIAL_DESTINATION),
+        catalog = CatalogPolicy(
+            primaryCatalog = BuildConfig.PRIMARY_CATALOG,
+            enabledCatalogs = BuildConfig.ENABLED_CATALOGS.split(',').map(String::trim).filter(String::isNotBlank).toSet(),
+        ),
+        textResolver = MobileTextResolver(
+            mapOf(
+                MobileTextKey.Dashboard.semanticKey to "Dashboard",
+                MobileTextKey.Catalog.semanticKey to "Catalog",
+                MobileTextKey.Message.semanticKey to "Message",
+                MobileTextKey.Vendor.semanticKey to "Vendor",
+            ),
+        ),
+    )
+}
