@@ -11,3 +11,6 @@ local.properties
 mobile-edge/var/
 .codebase-memory/
 .mobile-cookie.txt
+.console-mcp/
+**/.console-mcp/
+watchdog/

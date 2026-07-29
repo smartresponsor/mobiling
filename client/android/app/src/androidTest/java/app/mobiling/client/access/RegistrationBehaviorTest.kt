@@ -3,6 +3,7 @@ package app.mobiling.client.access
 import androidx.compose.material3.Text
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performTextInput
 import app.mobiling.client.auth.AccessAuthFeatureBridge
@@ -28,7 +29,7 @@ class RegistrationBehaviorTest {
 
         submitRegistration()
         composeRule.waitUntil(timeoutMillis = 5_000) { gateway.registrationCalls == 1 }
-        check(gateway.registrationRequest?.displayName == "Test Company")
+        check(gateway.registrationRequest?.displayName == "user")
         check(gateway.registrationRequest?.email == "user@example.com")
         check(gateway.registrationRequest?.password == "password")
         composeRule.assertVerificationRequiredDisplayed()
@@ -70,7 +71,7 @@ class RegistrationBehaviorTest {
         composeRule.setContent { MobilingAppShell() }
 
         submitRegistration()
-        composeRule.onNodeWithText("Access service is unavailable.").assertIsDisplayed()
+        composeRule.onNodeWithText(AccessUnavailableMessage).assertIsDisplayed()
         assertRegistrationFormDisplayed()
     }
 
@@ -90,18 +91,20 @@ class RegistrationBehaviorTest {
 
     private fun submitRegistration() {
         composeRule.performAccessAction("Create access")
-        composeRule.onNodeWithText("Company name").performTextInput("Test Company")
         composeRule.onNodeWithText("Email").performTextInput("user@example.com")
         composeRule.onNodeWithText("Password").performTextInput("password")
+        composeRule.onNodeWithText("Confirm password").performTextInput("password")
         composeRule.performAccessAction("Create access")
     }
 
     private fun assertRegistrationFormDisplayed() {
-        composeRule.onNodeWithText("Company name").assertIsDisplayed()
         composeRule.onNodeWithText("Email").assertIsDisplayed()
         composeRule.onNodeWithText("Password").assertIsDisplayed()
+        composeRule.onNodeWithText("Confirm password").assertIsDisplayed()
+        composeRule.onNodeWithText("Password quality: Weak").assertIsDisplayed()
+        composeRule.onAllNodesWithText("At least 8 characters")[0].assertIsDisplayed()
         composeRule
-            .onNodeWithText("Set up a guest entry for the SmartResponsor workspace.")
+            .onNodeWithText("Set up a guest entry for the 1tasker workspace.")
             .assertIsDisplayed()
     }
 }

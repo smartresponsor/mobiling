@@ -11,7 +11,7 @@ struct RecoveryResetView: View {
     @State private var statusMessage: String?
 
     var body: some View {
-        AccessEntryFormView(
+        AccessFlowShellView(
             title: "Reset access",
             subtitle: "Use your recovery code and choose a new password.",
             primaryActionTitle: "Reset access",

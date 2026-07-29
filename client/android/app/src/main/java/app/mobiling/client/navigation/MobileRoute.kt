@@ -52,15 +52,23 @@ sealed class MobileRoute(open val routePath: String) {
 
     sealed class Product(routePath: String) : MobileRoute(routePath) {
         object Listing : Product("vendor/product")
+        object New : Product("vendor/product/new")
         data class Detail(val productId: String) : Product("vendor/product/$productId")
     }
 
     sealed class Order(routePath: String) : MobileRoute(routePath) {
         object Listing : Order("vendor/order")
+        object New : Order("vendor/order/new")
         data class Detail(val orderId: String) : Order("vendor/order/$orderId")
         data class Shipment(val orderId: String) : Order("vendor/order/$orderId/shipment")
         data class ShipmentDetail(val orderId: String, val shipmentId: String) : Order("vendor/order/$orderId/shipment/$shipmentId")
         data class Tax(val orderId: String) : Order("vendor/order/$orderId/tax")
         data class TaxDetail(val orderId: String, val taxId: String) : Order("vendor/order/$orderId/tax/$taxId")
+    }
+
+    sealed class Project(routePath: String) : MobileRoute(routePath) {
+        object Listing : Project("vendor/project")
+        object New : Project("vendor/project/new")
+        data class Detail(val projectId: String) : Project("vendor/project/$projectId")
     }
 }

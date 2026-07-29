@@ -16,7 +16,8 @@ struct ContentView: View {
             vendorSummaryGateway: HttpVendorSummaryGateway(baseUrl: MobileClientRuntimeConfig.mobileEdgeBaseUrl),
             vendorStatementGateway: HttpVendorStatementGateway(baseUrl: MobileClientRuntimeConfig.mobileEdgeBaseUrl),
             vendorPayoutGateway: HttpVendorPayoutGateway(baseUrl: MobileClientRuntimeConfig.mobileEdgeBaseUrl),
-            vendorTransactionGateway: HttpVendorTransactionGateway(baseUrl: MobileClientRuntimeConfig.mobileEdgeBaseUrl)
+            vendorTransactionGateway: HttpVendorTransactionGateway(baseUrl: MobileClientRuntimeConfig.mobileEdgeBaseUrl),
+            vendorCrudGateway: HttpVendorCrudGateway(baseUrl: MobileClientRuntimeConfig.mobileEdgeBaseUrl)
         )
     }
 }

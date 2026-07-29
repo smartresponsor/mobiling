@@ -69,7 +69,7 @@ class RecoveryRequestBehaviorTest {
         composeRule.setContent { MobilingAppShell() }
 
         submitRecoveryRequest()
-        composeRule.onNodeWithText("Access service is unavailable.").assertIsDisplayed()
+        composeRule.onNodeWithText(AccessUnavailableMessage).assertIsDisplayed()
         assertRecoveryRequestFormDisplayed()
     }
 

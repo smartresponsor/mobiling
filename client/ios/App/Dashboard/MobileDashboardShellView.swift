@@ -10,14 +10,17 @@ public struct MobileDashboardShellView: View {
     private let vendorStatementGateway: VendorStatementGateway?
     private let vendorPayoutGateway: VendorPayoutGateway?
     private let vendorTransactionGateway: VendorTransactionGateway?
+    private let vendorCrudGateway: VendorCrudGateway?
     private let onSignOut: () -> Void
 
     @State private var selectedRoute: String = "dashboard"
     @State private var vendorContentRoute: String = "vendor"
+    @State private var navigationOpen: Bool = false
     @State private var accountOpen: Bool = false
+    @State private var newChooserOpen: Bool = false
     @State private var shell: MobileNavigationShellScreenContract = MobileDashboardShellView.fallbackShell()
 
-    public init(navigationShellGateway: NavigationShellGateway? = nil, attachmentFeatureBridge: AttachmentFeatureBridge? = nil, catalogFeatureBridge: CatalogFeatureBridge? = nil, vendorId: String? = nil, vendorProfileGateway: VendorProfileGateway? = nil, vendorSummaryGateway: VendorSummaryGateway? = nil, vendorStatementGateway: VendorStatementGateway? = nil, vendorPayoutGateway: VendorPayoutGateway? = nil, vendorTransactionGateway: VendorTransactionGateway? = nil, onSignOut: @escaping () -> Void) {
+    public init(navigationShellGateway: NavigationShellGateway? = nil, attachmentFeatureBridge: AttachmentFeatureBridge? = nil, catalogFeatureBridge: CatalogFeatureBridge? = nil, vendorId: String? = nil, vendorProfileGateway: VendorProfileGateway? = nil, vendorSummaryGateway: VendorSummaryGateway? = nil, vendorStatementGateway: VendorStatementGateway? = nil, vendorPayoutGateway: VendorPayoutGateway? = nil, vendorTransactionGateway: VendorTransactionGateway? = nil, vendorCrudGateway: VendorCrudGateway? = nil, onSignOut: @escaping () -> Void) {
         self.navigationShellGateway = navigationShellGateway
         self.attachmentFeatureBridge = attachmentFeatureBridge
         self.catalogFeatureBridge = catalogFeatureBridge
@@ -27,6 +30,7 @@ public struct MobileDashboardShellView: View {
         self.vendorStatementGateway = vendorStatementGateway
         self.vendorPayoutGateway = vendorPayoutGateway
         self.vendorTransactionGateway = vendorTransactionGateway
+        self.vendorCrudGateway = vendorCrudGateway
         self.onSignOut = onSignOut
     }
 
@@ -55,8 +59,26 @@ public struct MobileDashboardShellView: View {
                 } else if vendorContentRoute == "vendor/transaction" {
                     MobileVendorTransactionView(vendorId: vendorId, vendorTransactionGateway: vendorTransactionGateway)
                         .toolbar { accountToolbar }
-                } else if vendorContentRoute == "attachment" {
+                } else if vendorContentRoute == "attachment" || vendorContentRoute == "vendor/attachment" {
                     MobileAttachmentView(vendorId: vendorId, attachmentFeatureBridge: attachmentFeatureBridge)
+                        .toolbar { accountToolbar }
+                } else if vendorContentRoute == "vendor/product/new" {
+                    VendorNewCrudView(singular: "Product", resource: "product", listRoute: "vendor/product", fields: ProductNewFields, gateway: vendorCrudGateway, onRouteSelected: { vendorContentRoute = $0 })
+                        .toolbar { accountToolbar }
+                } else if vendorContentRoute == "vendor/order/new" {
+                    VendorNewCrudView(singular: "Order", resource: "order", listRoute: "vendor/order", fields: OrderNewFields, gateway: vendorCrudGateway, onRouteSelected: { vendorContentRoute = $0 })
+                        .toolbar { accountToolbar }
+                } else if vendorContentRoute == "vendor/project/new" {
+                    ProjectNewWizardView(gateway: vendorCrudGateway, onRouteSelected: { vendorContentRoute = $0 })
+                        .toolbar { accountToolbar }
+                } else if vendorContentRoute == "vendor/product" || vendorContentRoute.hasPrefix("vendor/product/") {
+                    VendorOwnedCrudView(title: "Products", resource: "product", routeRoot: "vendor/product", selectedId: selectedIdentity(routeRoot: "vendor/product"), gateway: vendorCrudGateway, onRouteSelected: { vendorContentRoute = $0 })
+                        .toolbar { accountToolbar }
+                } else if vendorContentRoute == "vendor/order" || vendorContentRoute.hasPrefix("vendor/order/") {
+                    VendorOwnedCrudView(title: "Orders", resource: "order", routeRoot: "vendor/order", selectedId: selectedIdentity(routeRoot: "vendor/order"), gateway: vendorCrudGateway, onRouteSelected: { vendorContentRoute = $0 })
+                        .toolbar { accountToolbar }
+                } else if vendorContentRoute == "vendor/project" || vendorContentRoute.hasPrefix("vendor/project/") {
+                    VendorOwnedCrudView(title: "Projects", resource: "project", routeRoot: "vendor/project", selectedId: selectedIdentity(routeRoot: "vendor/project"), gateway: vendorCrudGateway, onRouteSelected: { vendorContentRoute = $0 })
                         .toolbar { accountToolbar }
                 } else {
                     content(title: "Vendor", items: vendorContentRoute == "vendor" ? shell.vendorContext : [])
@@ -78,6 +100,23 @@ public struct MobileDashboardShellView: View {
             .tabItem { Label("More", systemImage: "line.3.horizontal") }
             .tag("more")
         }
+        .sheet(isPresented: $navigationOpen) {
+            NavigationView {
+                List {
+                    Section("Navigation") {
+                        ForEach(shell.moreDrawer.filter { $0.visible }) { item in
+                            row(item)
+                                .onTapGesture {
+                                    handle(item)
+                                    navigationOpen = false
+                                }
+                        }
+                    }
+                }
+                .navigationTitle("1tasker")
+                .navigationBarTitleDisplayMode(.inline)
+            }
+        }
         .sheet(isPresented: $accountOpen) {
             NavigationView {
                 List {
@@ -92,6 +131,23 @@ public struct MobileDashboardShellView: View {
                 .navigationBarTitleDisplayMode(.inline)
             }
             
+        }
+        .confirmationDialog("New", isPresented: $newChooserOpen, titleVisibility: .visible) {
+            Button("Product") {
+                vendorContentRoute = "vendor/product/new"
+                selectedRoute = "vendor"
+            }
+            Button("Order") {
+                vendorContentRoute = "vendor/order/new"
+                selectedRoute = "vendor"
+            }
+            Button("Project") {
+                vendorContentRoute = "vendor/project/new"
+                selectedRoute = "vendor"
+            }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("Choose what you want to add.")
         }
         .task {
             guard let navigationShellGateway else {
@@ -110,6 +166,20 @@ public struct MobileDashboardShellView: View {
 
     @ToolbarContentBuilder
     private var accountToolbar: some ToolbarContent {
+        ToolbarItem(placement: .navigationBarLeading) {
+            Button {
+                navigationOpen = true
+            } label: {
+                Image(systemName: "line.3.horizontal")
+            }
+            .accessibilityLabel("Open navigation")
+        }
+        if selectedRoute == "vendor" || vendorContentRoute.hasPrefix("vendor/") {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button { newChooserOpen = true } label: { Image(systemName: "plus") }
+                    .accessibilityLabel("New")
+            }
+        }
         ToolbarItem(placement: .navigationBarTrailing) {
             Button("Account") { accountOpen = true }
         }
@@ -131,6 +201,35 @@ public struct MobileDashboardShellView: View {
             }
         }
         .navigationTitle(title)
+    }
+
+    private func selectedIdentity(routeRoot: String) -> String? {
+        guard vendorContentRoute.hasPrefix(routeRoot + "/") else { return nil }
+        return vendorContentRoute.split(separator: "/").dropFirst(2).first.map(String.init)
+    }
+
+    private func vendorOwnedRouteView(title: String, routeRoot: String) -> some View {
+        let isDetail = vendorContentRoute != routeRoot
+        return List {
+            Section {
+                Text(isDetail ? "\(title.dropLast()) Detail" : title)
+                    .font(.headline)
+                Text(isDetail ? vendorContentRoute : "Select an item to open its detail view.")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                if isDetail {
+                    Button("Back to \(title)") { vendorContentRoute = routeRoot }
+                }
+            }
+            if routeRoot == "vendor/order", isDetail {
+                Section("Order") {
+                    let orderId = vendorContentRoute.split(separator: "/").dropFirst(2).first.map(String.init) ?? ""
+                    Button("Shipments") { vendorContentRoute = "vendor/order/\(orderId)/shipment" }
+                    Button("Tax") { vendorContentRoute = "vendor/order/\(orderId)/tax" }
+                }
+            }
+        }
+        .navigationTitle(isDetail ? "\(title.dropLast()) Detail" : title)
     }
 
     private func row(_ item: MobileNavigationItemPayload) -> some View {
@@ -247,6 +346,9 @@ public struct MobileDashboardShellView: View {
                 item("vendor_payout", "Payout", "payout", true, "vendor/payout"),
                 item("vendor_transaction", "Transaction", "receipt", true, "vendor/transaction"),
                 item("vendor_attachment", "My Attachment", "attachment", true, "attachment"),
+                item("vendor_product", "Products", "catalog", true, "vendor/product"),
+                item("vendor_order", "Orders", "statement", true, "vendor/order"),
+                item("vendor_project", "Projects", "summary", true, "vendor/project"),
             ]
         )
     }

@@ -8,7 +8,7 @@ fun VerificationRequiredScreen(
     onBack: () -> Unit,
     onUseDifferentAccess: () -> Unit,
 ) {
-    AccessEntryFormScaffold(
+    AccessFlowShell(
         title = "Verification required",
         subtitle = "Accessing requires identity verification before this mobile session can continue.",
         primaryActionLabel = "Check again",

@@ -12,10 +12,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import app.mobiling.client.attachment.AttachmentFeatureBridge
 import app.mobiling.client.auth.AccessAuthFeatureBridge
+import app.mobiling.client.catalog.CatalogFeatureBridge
 import app.mobiling.client.contract.auth.session.AccessAuthSessionPayload
 import app.mobiling.client.cart.CartFeatureBridge
 import app.mobiling.client.dashboard.DashboardMobileShell
 import app.mobiling.client.data.navigation.shell.NavigationShellGateway
+import app.mobiling.client.data.order.OrderGateway
+import app.mobiling.client.data.product.ProductGateway
+import app.mobiling.client.data.project.ProjectGateway
 import app.mobiling.client.data.vendor.payout.VendorPayoutGateway
 import app.mobiling.client.data.vendor.profile.VendorProfileGateway
 import app.mobiling.client.data.vendor.statement.VendorStatementGateway
@@ -28,7 +32,11 @@ fun MobilingAppShell(
     accessAuthFeatureBridge: AccessAuthFeatureBridge? = null,
     cartFeatureBridge: CartFeatureBridge? = null,
     attachmentFeatureBridge: AttachmentFeatureBridge? = null,
+    catalogFeatureBridge: CatalogFeatureBridge? = null,
     navigationShellGateway: NavigationShellGateway? = null,
+    productGateway: ProductGateway? = null,
+    orderGateway: OrderGateway? = null,
+    projectGateway: ProjectGateway? = null,
     vendorProfileGateway: VendorProfileGateway? = null,
     vendorSummaryGateway: VendorSummaryGateway? = null,
     vendorStatementGateway: VendorStatementGateway? = null,
@@ -77,7 +85,11 @@ fun MobilingAppShell(
                 } else {
                     DashboardMobileShell(
                         navigationShellGateway = navigationShellGateway,
+                        productGateway = productGateway,
+                        orderGateway = orderGateway,
+                        projectGateway = projectGateway,
                         cartFeatureBridge = cartFeatureBridge,
+                        catalogFeatureBridge = catalogFeatureBridge,
                         attachmentFeatureBridge = attachmentFeatureBridge,
                         vendorId = activeVendorId,
                         vendorProfileGateway = vendorProfileGateway,
@@ -91,6 +103,8 @@ fun MobilingAppShell(
             }
 
             AccessScreen.Welcome -> AccessWelcomeScreen(
+                catalogFeatureBridge = catalogFeatureBridge,
+                cartFeatureBridge = cartFeatureBridge,
                 onSignIn = { currentScreen = AccessScreen.SignIn },
                 onCreateAccess = { currentScreen = AccessScreen.Register },
             )

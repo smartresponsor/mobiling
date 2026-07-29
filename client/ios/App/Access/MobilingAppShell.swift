@@ -11,8 +11,9 @@ public struct MobilingAppShell: View {
     private let vendorStatementGateway: VendorStatementGateway?
     private let vendorPayoutGateway: VendorPayoutGateway?
     private let vendorTransactionGateway: VendorTransactionGateway?
+    private let vendorCrudGateway: VendorCrudGateway?
 
-    public init(authFeatureBridge: AuthFeatureBridge? = nil, attachmentFeatureBridge: AttachmentFeatureBridge? = nil, navigationShellGateway: NavigationShellGateway? = nil, vendorProfileGateway: VendorProfileGateway? = nil, vendorSummaryGateway: VendorSummaryGateway? = nil, vendorStatementGateway: VendorStatementGateway? = nil, vendorPayoutGateway: VendorPayoutGateway? = nil, vendorTransactionGateway: VendorTransactionGateway? = nil) {
+    public init(authFeatureBridge: AuthFeatureBridge? = nil, attachmentFeatureBridge: AttachmentFeatureBridge? = nil, navigationShellGateway: NavigationShellGateway? = nil, vendorProfileGateway: VendorProfileGateway? = nil, vendorSummaryGateway: VendorSummaryGateway? = nil, vendorStatementGateway: VendorStatementGateway? = nil, vendorPayoutGateway: VendorPayoutGateway? = nil, vendorTransactionGateway: VendorTransactionGateway? = nil, vendorCrudGateway: VendorCrudGateway? = nil) {
         self.authFeatureBridge = authFeatureBridge
         self.attachmentFeatureBridge = attachmentFeatureBridge
         self.navigationShellGateway = navigationShellGateway
@@ -21,6 +22,7 @@ public struct MobilingAppShell: View {
         self.vendorStatementGateway = vendorStatementGateway
         self.vendorPayoutGateway = vendorPayoutGateway
         self.vendorTransactionGateway = vendorTransactionGateway
+        self.vendorCrudGateway = vendorCrudGateway
     }
 
     public var body: some View {
@@ -36,6 +38,7 @@ public struct MobilingAppShell: View {
                     vendorStatementGateway: vendorStatementGateway,
                     vendorPayoutGateway: vendorPayoutGateway,
                     vendorTransactionGateway: vendorTransactionGateway,
+                    vendorCrudGateway: vendorCrudGateway,
                     onSignOut: { clearAccessSession() }
                 )
             case .welcome:

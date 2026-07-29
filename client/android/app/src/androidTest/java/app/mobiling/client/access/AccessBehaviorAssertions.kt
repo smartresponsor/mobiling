@@ -23,6 +23,7 @@ internal fun ComposeContentTestRule.setAccessShell(
             accessAuthFeatureBridge = AccessAuthFeatureBridge(gateway),
         )
     }
+    waitUntil(timeoutMillis = 5_000) { gateway.restoreCalls == 1 }
 }
 
 internal fun ComposeContentTestRule.performAccessAction(label: String) {
@@ -43,7 +44,7 @@ internal fun ComposeContentTestRule.assertGuestEntryDisplayed(
 }
 
 internal fun ComposeContentTestRule.assertSignInDisplayed() {
-    onNodeWithText("Use your SmartResponsor access to enter the business workspace.")
+    onNodeWithText("Use your 1tasker access to enter the business workspace.")
         .assertIsDisplayed()
 }
 

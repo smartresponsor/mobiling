@@ -4,9 +4,13 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performTextInput
+import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.test.performSemanticsAction
+import androidx.compose.ui.text.AnnotatedString
 import app.mobiling.client.auth.AccessAuthFeatureBridge
 import app.mobiling.client.contract.auth.session.AccessAuthSessionPayload
 import org.junit.Rule
@@ -25,7 +29,7 @@ class AccessBehaviorTest {
     fun guestEntryShowsSignInAndRegistrationActions() {
         composeRule.setContent { MobilingAppShell() }
 
-        composeRule.onNodeWithText("SmartResponsor").assertIsDisplayed()
+        composeRule.onNodeWithText("Your Trusted Home Specialist").assertIsDisplayed()
         composeRule.assertGuestEntryDisplayed(includeRegistrationAction = true)
     }
 
@@ -35,7 +39,7 @@ class AccessBehaviorTest {
 
         composeRule.performAccessAction("Sign in")
         composeRule.assertSignInDisplayed()
-        composeRule.onNodeWithText("Back").performClick()
+        composeRule.onNodeWithText("Return to access welcome").performClick()
         composeRule.assertGuestEntryDisplayed()
     }
 
@@ -43,11 +47,11 @@ class AccessBehaviorTest {
     fun guestCanOpenRegistrationAndReturnToWelcome() {
         composeRule.setContent { MobilingAppShell() }
 
-        composeRule.performAccessAction("Create access")
+        composeRule.performAccessAction("Create account")
         composeRule
-            .onNodeWithText("Set up a guest entry for the SmartResponsor workspace.")
+            .onNodeWithText("Set up a guest entry for the 1tasker workspace.")
             .assertIsDisplayed()
-        composeRule.onNodeWithText("Back").performClick()
+        composeRule.onNodeWithText("Return to access welcome").performClick()
         composeRule.assertGuestEntryDisplayed()
     }
 
@@ -60,7 +64,7 @@ class AccessBehaviorTest {
         composeRule
             .onNodeWithText("Request a recovery code for your SmartResponsor access.")
             .assertIsDisplayed()
-        composeRule.onNodeWithText("Back").performClick()
+        composeRule.onNodeWithText("Return to access welcome").performClick()
         composeRule.assertSignInDisplayed()
     }
 
@@ -104,10 +108,11 @@ class AccessBehaviorTest {
 
     @Test
     fun restoreGuestPayloadKeepsGuestEntryAvailable() {
-        composeRule.setContent {
-            MobilingAppShell(accessAuthFeatureBridge = bridgeFor(guestSessionPayload()))
-        }
+        val gateway = AccessAuthSessionGatewayFixture(payload = guestSessionPayload())
 
+        composeRule.setAccessShell(gateway)
+
+        composeRule.waitUntil(timeoutMillis = 5_000) { gateway.restoreCalls == 1 }
         composeRule.assertGuestEntryDisplayed(includeRegistrationAction = true)
     }
 
@@ -122,6 +127,20 @@ class AccessBehaviorTest {
 
         composeRule.waitUntil(timeoutMillis = 5_000) { gateway.restoreCalls == 1 }
         composeRule.assertGuestEntryDisplayed(includeRegistrationAction = true)
+    }
+
+    @Test
+    fun emptySignInShowsFieldErrorsWithoutCallingGateway() {
+        val gateway = AccessAuthSessionGatewayFixture(payload = guestSessionPayload())
+
+        composeRule.setAccessShell(gateway)
+        composeRule.performAccessAction("Sign in")
+        composeRule.performAccessAction("Sign in")
+
+        composeRule.onNodeWithText("Enter your email address.").assertIsDisplayed()
+        composeRule.onNodeWithText("Enter your password.").assertIsDisplayed()
+        composeRule.onNodeWithText("Check the highlighted fields and try again.").assertIsDisplayed()
+        check(gateway.startCalls == 0)
     }
 
     @Test
@@ -170,7 +189,7 @@ class AccessBehaviorTest {
         composeRule.waitUntil(timeoutMillis = 5_000) { gateway.startCalls == 1 }
         check(gateway.startRequest?.login == "user@example.com")
         check(gateway.startRequest?.password == "password")
-        check(gateway.startRequest?.deviceLabel == null)
+        check(gateway.startRequest?.deviceLabel == "Android")
         composeRule.onNodeWithText("Authenticated vendor: test-vendor").assertIsDisplayed()
     }
 
@@ -179,7 +198,12 @@ class AccessBehaviorTest {
         composeRule.setContent { MobilingAppShell() }
 
         submitSignIn()
-        composeRule.onNodeWithText("Access service is unavailable.").assertIsDisplayed()
+        composeRule.waitUntil(timeoutMillis = 5_000) {
+            composeRule.onAllNodesWithText(AccessUnavailableMessage)
+                .fetchSemanticsNodes()
+                .isNotEmpty()
+        }
+        composeRule.onNodeWithText(AccessUnavailableMessage).assertIsDisplayed()
         assertSignInFormDisplayed()
     }
 
@@ -271,8 +295,12 @@ class AccessBehaviorTest {
 
     private fun submitSignIn() {
         composeRule.performAccessAction("Sign in")
-        composeRule.onNodeWithText("Email").performTextInput("user@example.com")
-        composeRule.onNodeWithText("Password").performTextInput("password")
+        composeRule.onNodeWithTag("access-sign-in-email").performSemanticsAction(SemanticsActions.SetText) {
+            it(AnnotatedString("user@example.com"))
+        }
+        composeRule.onNodeWithTag("access-sign-in-password").performSemanticsAction(SemanticsActions.SetText) {
+            it(AnnotatedString("password"))
+        }
         composeRule.performAccessAction("Sign in")
     }
 

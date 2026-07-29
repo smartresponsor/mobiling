@@ -1,4 +1,14 @@
+import java.util.Properties
+
 plugins { id("com.android.application"); id("org.jetbrains.kotlin.android"); id("org.jetbrains.kotlin.kapt") }
+
+val localProperties = Properties().apply {
+    val file = rootProject.file("local.properties")
+    if (file.exists()) file.inputStream().use(::load)
+}
+
+fun quotedBuildConfigValue(value: String): String =
+    "\"" + value.replace("\\", "\\\\").replace("\"", "\\\"") + "\""
 android {
     namespace = "app.mobiling.client"
     compileSdk = 34
@@ -12,10 +22,22 @@ android {
         testInstrumentationRunnerArguments["clearPackageData"] = "true"
     }
     buildTypes {
-        getByName("release") { isMinifyEnabled = true; proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro") }
-        getByName("debug") { isMinifyEnabled = false }
+        getByName("release") {
+            isMinifyEnabled = true
+            buildConfigField("String", "DEBUG_LOGIN", quotedBuildConfigValue(""))
+            buildConfigField("String", "DEBUG_PASSWORD", quotedBuildConfigValue(""))
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+        }
+        getByName("debug") {
+            isMinifyEnabled = false
+            buildConfigField("String", "DEBUG_LOGIN", quotedBuildConfigValue(localProperties.getProperty("mobiling.debug.login", "")))
+            buildConfigField("String", "DEBUG_PASSWORD", quotedBuildConfigValue(localProperties.getProperty("mobiling.debug.password", "")))
+        }
     }
-    buildFeatures { compose = true }
+    buildFeatures {
+        compose = true
+        buildConfig = true
+    }
     composeOptions { kotlinCompilerExtensionVersion = "1.5.3" }
 
     testOptions {
@@ -37,6 +59,7 @@ dependencies {
     implementation(project(":core:config")); implementation(project(":core:entitlement")); implementation(project(":core:billing")); implementation(project(":core:analytic")); implementation(project(":core:push")); implementation(project(":core:security"))
     implementation("androidx.core:core-ktx:1.12.0"); implementation("androidx.activity:activity-compose:1.8.2")
     implementation("androidx.compose.ui:ui:1.6.0"); implementation("androidx.compose.material3:material3:1.1.2")
+    implementation("androidx.compose.material:material-icons-extended:1.6.0")
     implementation("androidx.work:work-runtime-ktx:2.9.0")
 
     androidTestImplementation("androidx.test.ext:junit:1.1.5")

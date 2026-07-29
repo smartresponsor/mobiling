@@ -31,7 +31,11 @@ public enum MobileRouteResolver {
         case "cart": return .cart
         case "cart/checkout": return .cartCheckout
         case "vendor/product": return .vendorProduct
+        case "vendor/product/new": return .vendorProductNew
         case "vendor/order": return .vendorOrder
+        case "vendor/order/new": return .vendorOrderNew
+        case "vendor/project": return .vendorProject
+        case "vendor/project/new": return .vendorProjectNew
         default:
             return resolveSegmentedRoute(segments)
         }
@@ -59,6 +63,20 @@ public enum MobileRouteResolver {
              .vendorStatement,
              .vendorPayout,
              .vendorTransaction,
+             .vendorAttachment,
+             .vendorProduct,
+             .vendorProductNew,
+             .vendorProductDetail,
+             .vendorOrder,
+             .vendorOrderNew,
+             .vendorOrderDetail,
+             .vendorOrderShipment,
+             .vendorOrderShipmentDetail,
+             .vendorOrderTax,
+             .vendorOrderTaxDetail,
+             .vendorProject,
+             .vendorProjectNew,
+             .vendorProjectDetail,
              .catalog,
              .attachment:
             return true
@@ -104,6 +122,9 @@ public enum MobileRouteResolver {
         }
         if segments.count == 5, segments[0] == "vendor", segments[1] == "order", segments[3] == "tax" {
             return .vendorOrderTaxDetail(orderId: segments[2], taxId: segments[4])
+        }
+        if segments.count == 3, segments[0] == "vendor", segments[1] == "project" {
+            return .vendorProjectDetail(projectId: segments[2])
         }
         return nil
     }

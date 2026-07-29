@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct AccessEntryFormView<Content: View>: View {
+struct AccessFlowShellView<Content: View>: View {
     let title: String
     let subtitle: String
     let primaryActionTitle: String
@@ -36,6 +36,23 @@ struct AccessEntryFormView<Content: View>: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
+                HStack(spacing: 12) {
+                    Button(action: onBack) {
+                        Image(systemName: "chevron.backward")
+                            .font(.headline)
+                    }
+                    .accessibilityLabel("Back")
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("1tasker")
+                            .font(.headline.weight(.bold))
+                        Text("Secure access")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                }
+
                 VStack(alignment: .leading, spacing: 10) {
                     Text("SmartResponsor")
                         .font(.largeTitle.weight(.semibold))

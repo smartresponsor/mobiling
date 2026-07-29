@@ -37,13 +37,18 @@ object MobileRouteResolver {
             route == "cart/checkout" -> MobileRoute.Cart.Checkout
             segments.size == 4 && segments[0] == "cart" && segments[1] == "checkout" && segments[2] == "result" -> MobileRoute.Cart.CheckoutResult(segments[3])
             route == "vendor/product" -> MobileRoute.Product.Listing
+            route == "vendor/product/new" -> MobileRoute.Product.New
             segments.size == 3 && segments[0] == "vendor" && segments[1] == "product" -> MobileRoute.Product.Detail(segments[2])
             route == "vendor/order" -> MobileRoute.Order.Listing
+            route == "vendor/order/new" -> MobileRoute.Order.New
             segments.size == 3 && segments[0] == "vendor" && segments[1] == "order" -> MobileRoute.Order.Detail(segments[2])
             segments.size == 4 && segments[0] == "vendor" && segments[1] == "order" && segments[3] == "shipment" -> MobileRoute.Order.Shipment(segments[2])
             segments.size == 5 && segments[0] == "vendor" && segments[1] == "order" && segments[3] == "shipment" -> MobileRoute.Order.ShipmentDetail(segments[2], segments[4])
             segments.size == 4 && segments[0] == "vendor" && segments[1] == "order" && segments[3] == "tax" -> MobileRoute.Order.Tax(segments[2])
             segments.size == 5 && segments[0] == "vendor" && segments[1] == "order" && segments[3] == "tax" -> MobileRoute.Order.TaxDetail(segments[2], segments[4])
+            route == "vendor/project" -> MobileRoute.Project.Listing
+            route == "vendor/project/new" -> MobileRoute.Project.New
+            segments.size == 3 && segments[0] == "vendor" && segments[1] == "project" -> MobileRoute.Project.Detail(segments[2])
             else -> null
         }
     }
@@ -64,6 +69,20 @@ object MobileRouteResolver {
         MobileRoute.Vendor.Statement,
         MobileRoute.Vendor.Payout,
         MobileRoute.Vendor.Transaction,
+        MobileRoute.Vendor.Attachment,
+        MobileRoute.Product.Listing,
+        MobileRoute.Product.New,
+        is MobileRoute.Product.Detail,
+        MobileRoute.Order.Listing,
+        MobileRoute.Order.New,
+        is MobileRoute.Order.Detail,
+        is MobileRoute.Order.Shipment,
+        is MobileRoute.Order.ShipmentDetail,
+        is MobileRoute.Order.Tax,
+        is MobileRoute.Order.TaxDetail,
+        MobileRoute.Project.Listing,
+        MobileRoute.Project.New,
+        is MobileRoute.Project.Detail,
         MobileRoute.Catalog.Root,
         MobileRoute.Attachment.Root -> true
         else -> false
