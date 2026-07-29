@@ -17,6 +17,8 @@ Machine-readable ownership is stored in `client/contract/navigation/ownership.js
 
 This baseline materializes build and runtime structure only. Product visual direction remains intentionally undecided.
 
+The preparatory product-configuration foundation and preserved defaults are documented in `docs/product-configuration.md`.
+
 ## Local Android runtime
 
 The local runtime chain is intentionally split across the emulator and the Windows host:
