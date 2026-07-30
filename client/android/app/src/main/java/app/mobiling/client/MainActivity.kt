@@ -21,7 +21,7 @@ class MainActivity : ComponentActivity() {
             isAppearanceLightStatusBars = false
             isAppearanceLightNavigationBars = true
         }
-        val graph = MobileApplicationGraph.current()
+        val graph = MobileApplicationGraph.current(AndroidMobileTextCatalog.current(this))
 
         setContent {
             OneTaskerTheme {

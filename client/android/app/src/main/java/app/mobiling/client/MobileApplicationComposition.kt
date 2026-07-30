@@ -8,6 +8,6 @@ data class MobileApplicationComposition(
 }
 
 object MobileApplicationComposer {
-    fun current(): MobileApplicationComposition =
-        MobileApplicationComposition(MobileApplicationConfigurationFactory.current())
+    fun current(localText: Map<String, String> = emptyMap()): MobileApplicationComposition =
+        MobileApplicationComposition(MobileApplicationConfigurationFactory.current(localText))
 }

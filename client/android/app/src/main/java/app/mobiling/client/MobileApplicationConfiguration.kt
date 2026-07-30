@@ -47,7 +47,7 @@ data class MobileApplicationConfiguration(
 )
 
 object MobileApplicationConfigurationFactory {
-    fun current(): MobileApplicationConfiguration = MobileApplicationConfiguration(
+    fun current(localText: Map<String, String> = emptyMap()): MobileApplicationConfiguration = MobileApplicationConfiguration(
         product = ProductProfile(BuildConfig.PRODUCT_PROFILE),
         brand = BrandProfile(BuildConfig.BRAND_PROFILE),
         environment = EnvironmentProfile(BuildConfig.ENVIRONMENT_PROFILE, BuildConfig.MOBILE_EDGE_BASE_URL),
@@ -56,13 +56,6 @@ object MobileApplicationConfigurationFactory {
             primaryCatalog = BuildConfig.PRIMARY_CATALOG,
             enabledCatalogs = BuildConfig.ENABLED_CATALOGS.split(',').map(String::trim).filter(String::isNotBlank).toSet(),
         ),
-        textResolver = MobileTextResolver(
-            mapOf(
-                MobileTextKey.Dashboard.semanticKey to "Dashboard",
-                MobileTextKey.Catalog.semanticKey to "Catalog",
-                MobileTextKey.Message.semanticKey to "Message",
-                MobileTextKey.Vendor.semanticKey to "Vendor",
-            ),
-        ),
+        textResolver = MobileTextResolver(localText),
     )
 }

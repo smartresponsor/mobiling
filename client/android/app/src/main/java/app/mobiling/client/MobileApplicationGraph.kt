@@ -37,5 +37,8 @@ class MobileApplicationGraph private constructor(val composition: MobileApplicat
     companion object {
         fun current(composition: MobileApplicationComposition = MobileApplicationComposer.current()) =
             MobileApplicationGraph(composition)
+
+        fun current(localText: Map<String, String>): MobileApplicationGraph =
+            MobileApplicationGraph(MobileApplicationComposer.current(localText))
     }
 }
