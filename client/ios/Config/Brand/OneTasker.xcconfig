@@ -1,0 +1,4 @@
+#include "../Base.xcconfig"
+MOBILE_PRODUCT_PROFILE = one_tasker
+MOBILE_BRAND_PROFILE = one_tasker
+PRODUCT_DISPLAY_NAME = 1Tasker

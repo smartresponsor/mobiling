@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0"><dict>
+  <key>CFBundleDisplayName</key><string>$(PRODUCT_DISPLAY_NAME)</string>
   <key>MOBILE_PRODUCT_PROFILE</key><string>$(MOBILE_PRODUCT_PROFILE)</string>
   <key>MOBILE_BRAND_PROFILE</key><string>$(MOBILE_BRAND_PROFILE)</string>
   <key>MOBILE_ENVIRONMENT_PROFILE</key><string>$(MOBILE_ENVIRONMENT_PROFILE)</string>

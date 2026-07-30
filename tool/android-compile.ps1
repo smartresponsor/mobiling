@@ -14,7 +14,13 @@ if (-not (Test-Path $gradle)) {
 
 Push-Location $androidRoot
 try {
-    & $gradle ":app:compileDebugKotlin" ":app:compileDebugAndroidTestKotlin" ":app:testDebugUnitTest"
+    & $gradle `
+        ":app:compileOneTaskerDebugKotlin" `
+        ":app:compileOneTaskerDebugAndroidTestKotlin" `
+        ":app:testOneTaskerDebugUnitTest" `
+        ":app:compileSmartResponsorDebugKotlin" `
+        ":app:compileSmartResponsorDebugAndroidTestKotlin" `
+        ":app:testSmartResponsorDebugUnitTest"
     if ($LASTEXITCODE -ne 0) { throw "Android compile gate failed with exit code $LASTEXITCODE." }
 } finally {
     Pop-Location

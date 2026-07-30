@@ -6,9 +6,16 @@ options:
 settings:
   base:
     SWIFT_VERSION: "5.9"
+configs:
+  DebugOneTasker: debug
+  ReleaseOneTasker: release
+  DebugSmartResponsor: debug
+  ReleaseSmartResponsor: release
 configFiles:
-  Debug: Config/Base.xcconfig
-  Release: Config/Base.xcconfig
+  DebugOneTasker: Config/Brand/OneTasker.xcconfig
+  ReleaseOneTasker: Config/Brand/OneTasker.xcconfig
+  DebugSmartResponsor: Config/Brand/SmartResponsor.xcconfig
+  ReleaseSmartResponsor: Config/Brand/SmartResponsor.xcconfig
 targets:
   MobileClient:
     type: framework
@@ -78,8 +85,15 @@ targets:
     info:
       path: App/Info.plist
     settings:
-      base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.smartresponsor.mobile
+      configs:
+        DebugOneTasker:
+          PRODUCT_BUNDLE_IDENTIFIER: com.smartresponsor.mobile.onetasker
+        ReleaseOneTasker:
+          PRODUCT_BUNDLE_IDENTIFIER: com.smartresponsor.mobile.onetasker
+        DebugSmartResponsor:
+          PRODUCT_BUNDLE_IDENTIFIER: com.smartresponsor.mobile.platform
+        ReleaseSmartResponsor:
+          PRODUCT_BUNDLE_IDENTIFIER: com.smartresponsor.mobile.platform
     dependencies:
       - target: MobileClient
       - target: CoreConfig
@@ -89,9 +103,19 @@ targets:
       - target: CorePush
       - target: CoreSecurity
 schemes:
-  Mobiling:
+  OneTasker:
     build:
       targets:
         Mobiling: all
     run:
-      config: Debug
+      config: DebugOneTasker
+    archive:
+      config: ReleaseOneTasker
+  SmartResponsor:
+    build:
+      targets:
+        Mobiling: all
+    run:
+      config: DebugSmartResponsor
+    archive:
+      config: ReleaseSmartResponsor
