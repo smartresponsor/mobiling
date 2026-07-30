@@ -1,5 +1,6 @@
 import SwiftUI
 import MobileClient
+import CoreConfig
 
 struct ContentView: View {
     private let graph = MobileApplicationGraph.current()
@@ -14,7 +15,11 @@ struct ContentView: View {
             vendorStatementGateway: graph.vendorStatementGateway,
             vendorPayoutGateway: graph.vendorPayoutGateway,
             vendorTransactionGateway: graph.vendorTransactionGateway,
-            vendorCrudGateway: graph.vendorCrudGateway
+            vendorCrudGateway: graph.vendorCrudGateway,
+            initialRoute: graph.composition.configuration.initialDestination.resolvedRoute(
+                isRenderable: MobileRouteResolver.isCurrentlyRenderable
+            ),
+            catalogEnabled: graph.composition.configuration.catalog.isPrimaryCatalogEnabled
         )
     }
 }

@@ -106,9 +106,11 @@ fun DashboardMobileShell(
     vendorStatementGateway: VendorStatementGateway? = null,
     vendorPayoutGateway: VendorPayoutGateway? = null,
     vendorTransactionGateway: VendorTransactionGateway? = null,
+    initialRoute: String = "dashboard",
+    catalogEnabled: Boolean = true,
     onSignOut: () -> Unit,
 ) {
-    var selectedRoute by remember { mutableStateOf("dashboard") }
+    var selectedRoute by remember { mutableStateOf(initialRoute) }
     var navigationOpen by remember { mutableStateOf(false) }
     var accountOpen by remember { mutableStateOf(false) }
     var newChooserOpen by remember { mutableStateOf(false) }
@@ -161,7 +163,7 @@ fun DashboardMobileShell(
                     NavigationBarItem(
                         selected = selectedRoute == item.route,
                         onClick = {
-                            if (item.enabled && isHandledRoute(item.route)) {
+                            if (item.enabled && isHandledRoute(item.route) && (item.route != "catalog" || catalogEnabled)) {
                                 selectedRoute = item.route ?: item.key
                             }
                         },
@@ -226,7 +228,7 @@ fun DashboardMobileShell(
                     title = "Navigation",
                     items = shell.moreDrawer,
                     onItemClick = { item ->
-                        if (item.enabled && isHandledRoute(item.route)) {
+                        if (item.enabled && isHandledRoute(item.route) && (item.route != "catalog" || catalogEnabled)) {
                             selectedRoute = MobileRouteResolver.normalizeRoute(item.route)
                         }
                         navigationOpen = false
@@ -245,7 +247,7 @@ fun DashboardMobileShell(
                 onItemClick = { item ->
                     when {
                         MobileRouteResolver.isSignOutAction(item.action, item.route) -> onSignOut()
-                        item.enabled && isHandledRoute(item.route) -> selectedRoute = MobileRouteResolver.normalizeRoute(item.route)
+                        item.enabled && isHandledRoute(item.route) && (item.route != "catalog" || catalogEnabled) -> selectedRoute = MobileRouteResolver.normalizeRoute(item.route)
                         else -> Unit
                     }
                     accountOpen = false

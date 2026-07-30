@@ -10,6 +10,13 @@ public struct EnvironmentProfile: Equatable {
 public struct InitialDestinationPolicy: Equatable {
     public let destination: String
     public init(destination: String) { self.destination = destination }
+    public func resolvedRoute(isRenderable: (String) -> Bool) -> String {
+        let normalized = destination
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .split(separator: "/", omittingEmptySubsequences: true)
+            .joined(separator: "/")
+        return !normalized.isEmpty && isRenderable(normalized) ? normalized : "dashboard"
+    }
 }
 public struct CatalogPolicy: Equatable {
     public let primaryCatalog: String
@@ -19,6 +26,8 @@ public struct CatalogPolicy: Equatable {
         self.primaryCatalog = primaryCatalog
         self.enabledCatalogs = enabledCatalogs
     }
+    public func isCatalogEnabled(_ catalog: String) -> Bool { enabledCatalogs.contains(catalog) }
+    public var isPrimaryCatalogEnabled: Bool { isCatalogEnabled(primaryCatalog) }
 }
 public enum MobileTextKey: String {
     case dashboard = "navigation.dashboard"

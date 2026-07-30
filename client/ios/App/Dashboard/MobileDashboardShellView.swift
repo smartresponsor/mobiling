@@ -11,16 +11,18 @@ public struct MobileDashboardShellView: View {
     private let vendorPayoutGateway: VendorPayoutGateway?
     private let vendorTransactionGateway: VendorTransactionGateway?
     private let vendorCrudGateway: VendorCrudGateway?
+    private let initialRoute: String
+    private let catalogEnabled: Bool
     private let onSignOut: () -> Void
 
-    @State private var selectedRoute: String = "dashboard"
+    @State private var selectedRoute: String
     @State private var vendorContentRoute: String = "vendor"
     @State private var navigationOpen: Bool = false
     @State private var accountOpen: Bool = false
     @State private var newChooserOpen: Bool = false
     @State private var shell: MobileNavigationShellScreenContract = MobileDashboardShellView.fallbackShell()
 
-    public init(navigationShellGateway: NavigationShellGateway? = nil, attachmentFeatureBridge: AttachmentFeatureBridge? = nil, catalogFeatureBridge: CatalogFeatureBridge? = nil, vendorId: String? = nil, vendorProfileGateway: VendorProfileGateway? = nil, vendorSummaryGateway: VendorSummaryGateway? = nil, vendorStatementGateway: VendorStatementGateway? = nil, vendorPayoutGateway: VendorPayoutGateway? = nil, vendorTransactionGateway: VendorTransactionGateway? = nil, vendorCrudGateway: VendorCrudGateway? = nil, onSignOut: @escaping () -> Void) {
+    public init(navigationShellGateway: NavigationShellGateway? = nil, attachmentFeatureBridge: AttachmentFeatureBridge? = nil, catalogFeatureBridge: CatalogFeatureBridge? = nil, vendorId: String? = nil, vendorProfileGateway: VendorProfileGateway? = nil, vendorSummaryGateway: VendorSummaryGateway? = nil, vendorStatementGateway: VendorStatementGateway? = nil, vendorPayoutGateway: VendorPayoutGateway? = nil, vendorTransactionGateway: VendorTransactionGateway? = nil, vendorCrudGateway: VendorCrudGateway? = nil, initialRoute: String = "dashboard", catalogEnabled: Bool = true, onSignOut: @escaping () -> Void) {
         self.navigationShellGateway = navigationShellGateway
         self.attachmentFeatureBridge = attachmentFeatureBridge
         self.catalogFeatureBridge = catalogFeatureBridge
@@ -31,6 +33,9 @@ public struct MobileDashboardShellView: View {
         self.vendorPayoutGateway = vendorPayoutGateway
         self.vendorTransactionGateway = vendorTransactionGateway
         self.vendorCrudGateway = vendorCrudGateway
+        self.initialRoute = initialRoute
+        self.catalogEnabled = catalogEnabled
+        self._selectedRoute = State(initialValue: initialRoute)
         self.onSignOut = onSignOut
     }
 
@@ -280,7 +285,7 @@ public struct MobileDashboardShellView: View {
             return
         }
 
-        guard isHandledRoute(route) else {
+        guard isHandledRoute(route), route != "catalog" || catalogEnabled else {
             return
         }
 

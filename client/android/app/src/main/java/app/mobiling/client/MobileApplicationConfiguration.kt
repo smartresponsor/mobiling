@@ -3,10 +3,18 @@ package app.mobiling.client
 data class ProductProfile(val code: String)
 data class BrandProfile(val code: String)
 data class EnvironmentProfile(val code: String, val mobileEdgeBaseUrl: String)
-data class InitialDestinationPolicy(val destination: String)
+data class InitialDestinationPolicy(val destination: String) {
+    fun resolvedRoute(isRenderable: (String) -> Boolean): String {
+        val normalized = destination.trim().trim('/').replace(Regex("/{2,}"), "/")
+        return normalized.takeIf { it.isNotBlank() && isRenderable(it) } ?: "dashboard"
+    }
+}
 
 data class CatalogPolicy(val primaryCatalog: String, val enabledCatalogs: Set<String>) {
     init { require(primaryCatalog in enabledCatalogs) { "Primary catalog must be enabled." } }
+
+    fun isCatalogEnabled(catalog: String): Boolean = catalog in enabledCatalogs
+    fun isPrimaryCatalogEnabled(): Boolean = isCatalogEnabled(primaryCatalog)
 }
 
 enum class MobileTextKey(val semanticKey: String) {

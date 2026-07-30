@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
 import app.mobiling.client.access.MobilingAppShell
 import app.mobiling.client.consumer.OneTaskerTheme
+import app.mobiling.client.navigation.MobileRouteResolver
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,6 +42,10 @@ class MainActivity : ComponentActivity() {
                         vendorStatementGateway = graph.vendorStatementGateway,
                         vendorPayoutGateway = graph.vendorPayoutGateway,
                         vendorTransactionGateway = graph.vendorTransactionGateway,
+                        initialRoute = graph.composition.configuration.initialDestination.resolvedRoute(
+                            MobileRouteResolver::isCurrentlyRenderable,
+                        ),
+                        catalogEnabled = graph.composition.configuration.catalog.isPrimaryCatalogEnabled(),
                     )
                 }
             }
