@@ -70,6 +70,7 @@ targets:
       - path: App/MobileApp.swift
       - path: App/MobileClientRuntimeConfig.swift
       - path: App/MobileApplicationComposition.swift
+      - path: App/MobileApplicationGraph.swift
       - path: Resources/Localizable.xcstrings
       - path: Resources/RichText
         type: folder
