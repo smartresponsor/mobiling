@@ -25,6 +25,19 @@ class MobileApplicationConfigurationTest {
     }
 
     @Test
+    fun navigationTextResolvesKnownRootsAndPreservesUnknownLabels() {
+        val resolver = MobileTextResolver(
+            mapOf(
+                MobileTextKey.Dashboard.semanticKey to "Local dashboard",
+                MobileTextKey.Vendor.semanticKey to "Local vendor",
+            ),
+        )
+        assertEquals("Local dashboard", resolver.resolveNavigation("dashboard", "dashboard", "Backend dashboard"))
+        assertEquals("Local vendor", resolver.resolveNavigation("vendor/profile", "vendor_profile", "Backend vendor"))
+        assertEquals("Backend attachment", resolver.resolveNavigation("attachment", "attachment", "Backend attachment"))
+    }
+
+    @Test
     fun semanticTextFallsBackToBackendLabel() {
         val resolver = MobileTextResolver(mapOf("navigation.catalog" to "Catalog"))
         assertEquals("Catalog", resolver.resolve("navigation.catalog", "Backend catalog"))

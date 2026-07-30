@@ -19,7 +19,8 @@ struct ContentView: View {
             initialRoute: graph.composition.configuration.initialDestination.resolvedRoute(
                 isRenderable: MobileRouteResolver.isCurrentlyRenderable
             ),
-            catalogEnabled: graph.composition.configuration.catalog.isPrimaryCatalogEnabled
+            catalogEnabled: graph.composition.configuration.catalog.isPrimaryCatalogEnabled,
+            navigationLabelResolver: graph.composition.configuration.textResolver.resolveNavigation
         )
     }
 }

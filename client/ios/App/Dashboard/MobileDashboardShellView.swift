@@ -13,6 +13,7 @@ public struct MobileDashboardShellView: View {
     private let vendorCrudGateway: VendorCrudGateway?
     private let initialRoute: String
     private let catalogEnabled: Bool
+    private let navigationLabelResolver: (String?, String, String) -> String
     private let onSignOut: () -> Void
 
     @State private var selectedRoute: String
@@ -22,7 +23,7 @@ public struct MobileDashboardShellView: View {
     @State private var newChooserOpen: Bool = false
     @State private var shell: MobileNavigationShellScreenContract = MobileDashboardShellView.fallbackShell()
 
-    public init(navigationShellGateway: NavigationShellGateway? = nil, attachmentFeatureBridge: AttachmentFeatureBridge? = nil, catalogFeatureBridge: CatalogFeatureBridge? = nil, vendorId: String? = nil, vendorProfileGateway: VendorProfileGateway? = nil, vendorSummaryGateway: VendorSummaryGateway? = nil, vendorStatementGateway: VendorStatementGateway? = nil, vendorPayoutGateway: VendorPayoutGateway? = nil, vendorTransactionGateway: VendorTransactionGateway? = nil, vendorCrudGateway: VendorCrudGateway? = nil, initialRoute: String = "dashboard", catalogEnabled: Bool = true, onSignOut: @escaping () -> Void) {
+    public init(navigationShellGateway: NavigationShellGateway? = nil, attachmentFeatureBridge: AttachmentFeatureBridge? = nil, catalogFeatureBridge: CatalogFeatureBridge? = nil, vendorId: String? = nil, vendorProfileGateway: VendorProfileGateway? = nil, vendorSummaryGateway: VendorSummaryGateway? = nil, vendorStatementGateway: VendorStatementGateway? = nil, vendorPayoutGateway: VendorPayoutGateway? = nil, vendorTransactionGateway: VendorTransactionGateway? = nil, vendorCrudGateway: VendorCrudGateway? = nil, initialRoute: String = "dashboard", catalogEnabled: Bool = true, navigationLabelResolver: @escaping (String?, String, String) -> String = { _, _, label in label }, onSignOut: @escaping () -> Void) {
         self.navigationShellGateway = navigationShellGateway
         self.attachmentFeatureBridge = attachmentFeatureBridge
         self.catalogFeatureBridge = catalogFeatureBridge
@@ -35,6 +36,7 @@ public struct MobileDashboardShellView: View {
         self.vendorCrudGateway = vendorCrudGateway
         self.initialRoute = initialRoute
         self.catalogEnabled = catalogEnabled
+        self.navigationLabelResolver = navigationLabelResolver
         self._selectedRoute = State(initialValue: initialRoute)
         self.onSignOut = onSignOut
     }
@@ -45,7 +47,7 @@ public struct MobileDashboardShellView: View {
                 content(title: "Dashboard", items: shell.bottomPrimary)
                     .toolbar { accountToolbar }
             }
-            .tabItem { Label("Dashboard", systemImage: "house") }
+            .tabItem { Label(navigationLabelResolver("dashboard", "dashboard", "Dashboard"), systemImage: "house") }
             .tag("dashboard")
 
             NavigationView {
@@ -90,7 +92,7 @@ public struct MobileDashboardShellView: View {
                         .toolbar { accountToolbar }
                 }
             }
-            .tabItem { Label("Vendor", systemImage: "storefront") }
+            .tabItem { Label(navigationLabelResolver("vendor", "vendor", "Vendor"), systemImage: "storefront") }
             .tag("vendor")
 
             NavigationView {
@@ -255,7 +257,7 @@ public struct MobileDashboardShellView: View {
                 .frame(width: 24)
 
             VStack(alignment: .leading, spacing: 2) {
-                Text(item.label)
+                Text(navigationLabelResolver(item.route, item.key, item.label))
                 Text(item.badge ?? item.route ?? item.key)
                     .font(.caption)
                     .foregroundStyle(.secondary)

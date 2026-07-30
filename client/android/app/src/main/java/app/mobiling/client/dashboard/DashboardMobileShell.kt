@@ -108,20 +108,24 @@ fun DashboardMobileShell(
     vendorTransactionGateway: VendorTransactionGateway? = null,
     initialRoute: String = "dashboard",
     catalogEnabled: Boolean = true,
+    navigationLabelResolver: (route: String?, key: String, backendLabel: String) -> String = { _, _, label -> label },
     onSignOut: () -> Unit,
 ) {
     var selectedRoute by remember { mutableStateOf(initialRoute) }
     var navigationOpen by remember { mutableStateOf(false) }
     var accountOpen by remember { mutableStateOf(false) }
     var newChooserOpen by remember { mutableStateOf(false) }
-    var shell by remember { mutableStateOf(fallbackShell()) }
+    var shell by remember { mutableStateOf(localizeShell(fallbackShell(), navigationLabelResolver)) }
 
     LaunchedEffect(navigationShellGateway) {
         if (navigationShellGateway != null) {
             shell = try {
-                NavigationMobileShellScreenContract.from(NavigationLoadShellUseCase(navigationShellGateway).invoke())
+                localizeShell(
+                    NavigationMobileShellScreenContract.from(NavigationLoadShellUseCase(navigationShellGateway).invoke()),
+                    navigationLabelResolver,
+                )
             } catch (_: Exception) {
-                fallbackShell()
+                localizeShell(fallbackShell(), navigationLabelResolver)
             }
         }
     }
@@ -173,7 +177,7 @@ fun DashboardMobileShell(
                                 contentDescription = item.label,
                             )
                         },
-                        label = { Text(item.label) },
+                        label = { Text(navigationLabelResolver(item.route, item.key, item.label)) },
                         enabled = item.enabled,
                         colors = NavigationBarItemDefaults.colors(
                             selectedIconColor = MaterialTheme.colorScheme.onSurface,
@@ -227,6 +231,7 @@ fun DashboardMobileShell(
                 ShellSection(
                     title = "Navigation",
                     items = shell.moreDrawer,
+                    navigationLabelResolver = navigationLabelResolver,
                     onItemClick = { item ->
                         if (item.enabled && isHandledRoute(item.route) && (item.route != "catalog" || catalogEnabled)) {
                             selectedRoute = MobileRouteResolver.normalizeRoute(item.route)
@@ -510,6 +515,7 @@ private fun NewChoice(title: String, description: String, icon: ImageVector, onC
 private fun ShellSection(
     title: String,
     items: List<NavigationMobileItemPayload>,
+    navigationLabelResolver: (route: String?, key: String, backendLabel: String) -> String = { _, _, label -> label },
     onItemClick: (NavigationMobileItemPayload) -> Unit = {},
 ) {
     Column(
@@ -546,7 +552,7 @@ private fun ShellSection(
                         )
                     }
                     Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        Text(item.label, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                        Text(navigationLabelResolver(item.route, item.key, item.label), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
                         Text(
                             text = itemDescription(item),
                             style = MaterialTheme.typography.bodySmall,
@@ -653,6 +659,21 @@ private fun item(
     action = action,
     route = route,
 )
+
+private fun localizeShell(
+    shell: NavigationMobileShellScreenContract,
+    resolver: (route: String?, key: String, backendLabel: String) -> String,
+): NavigationMobileShellScreenContract {
+    fun localize(items: List<NavigationMobileItemPayload>): List<NavigationMobileItemPayload> =
+        items.map { item -> item.copy(label = resolver(item.route, item.key, item.label)) }
+
+    return shell.copy(
+        bottomPrimary = localize(shell.bottomPrimary),
+        accountQuick = localize(shell.accountQuick),
+        moreDrawer = localize(shell.moreDrawer),
+        vendorContext = localize(shell.vendorContext),
+    )
+}
 
 private fun isHandledRoute(route: String?): Boolean = MobileRouteResolver.isCurrentlyRenderable(route)
 

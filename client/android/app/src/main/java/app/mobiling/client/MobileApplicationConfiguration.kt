@@ -27,6 +27,14 @@ enum class MobileTextKey(val semanticKey: String) {
 class MobileTextResolver(private val localText: Map<String, String>) {
     fun resolve(semanticKey: String?, backendLabel: String): String =
         semanticKey?.let(localText::get)?.takeIf(String::isNotBlank) ?: backendLabel
+
+    fun resolveNavigation(route: String?, key: String, backendLabel: String): String =
+        resolve(navigationSemanticKey(route, key), backendLabel)
+
+    private fun navigationSemanticKey(route: String?, key: String): String? {
+        val root = route?.trim('/')?.substringBefore('/')?.takeIf(String::isNotBlank) ?: key.substringBefore('_')
+        return MobileTextKey.entries.firstOrNull { it.name.equals(root, ignoreCase = true) }?.semanticKey
+    }
 }
 
 data class MobileApplicationConfiguration(

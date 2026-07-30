@@ -46,6 +46,7 @@ class MainActivity : ComponentActivity() {
                             MobileRouteResolver::isCurrentlyRenderable,
                         ),
                         catalogEnabled = graph.composition.configuration.catalog.isPrimaryCatalogEnabled(),
+                        navigationLabelResolver = graph.composition.configuration.textResolver::resolveNavigation,
                     )
                 }
             }

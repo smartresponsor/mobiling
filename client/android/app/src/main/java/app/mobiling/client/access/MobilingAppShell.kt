@@ -44,6 +44,7 @@ fun MobilingAppShell(
     vendorTransactionGateway: VendorTransactionGateway? = null,
     initialRoute: String = "dashboard",
     catalogEnabled: Boolean = true,
+    navigationLabelResolver: (route: String?, key: String, backendLabel: String) -> String = { _, _, label -> label },
     authenticatedContent: (@Composable (vendorId: String?, onSignOut: () -> Unit) -> Unit)? = null,
 ) {
     var currentScreen by rememberSaveable { mutableStateOf(AccessScreen.Welcome) }
@@ -101,6 +102,7 @@ fun MobilingAppShell(
                         vendorTransactionGateway = vendorTransactionGateway,
                         initialRoute = initialRoute,
                         catalogEnabled = catalogEnabled,
+                        navigationLabelResolver = navigationLabelResolver,
                         onSignOut = { clearAccessSession() },
                     )
                 }

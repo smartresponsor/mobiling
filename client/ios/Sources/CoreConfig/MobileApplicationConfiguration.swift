@@ -29,11 +29,13 @@ public struct CatalogPolicy: Equatable {
     public func isCatalogEnabled(_ catalog: String) -> Bool { enabledCatalogs.contains(catalog) }
     public var isPrimaryCatalogEnabled: Bool { isCatalogEnabled(primaryCatalog) }
 }
-public enum MobileTextKey: String {
+public enum MobileTextKey: String, CaseIterable {
     case dashboard = "navigation.dashboard"
     case catalog = "navigation.catalog"
     case message = "navigation.message"
     case vendor = "navigation.vendor"
+
+    var navigationRoot: String { String(rawValue.split(separator: ".").last ?? "") }
 }
 public struct MobileTextResolver {
     private let localText: [String: String]
@@ -41,6 +43,16 @@ public struct MobileTextResolver {
     public func resolve(semanticKey: String?, backendLabel: String) -> String {
         guard let semanticKey, let value = localText[semanticKey], !value.isEmpty else { return backendLabel }
         return value
+    }
+    public func resolveNavigation(route: String?, key: String, backendLabel: String) -> String {
+        let routeRoot = route?
+            .split(separator: "/", omittingEmptySubsequences: true)
+            .first
+            .map(String.init)
+        let keyRoot = key.split(separator: "_", omittingEmptySubsequences: true).first.map(String.init)
+        let root = routeRoot ?? keyRoot
+        let semanticKey = MobileTextKey.allCases.first { $0.navigationRoot == root }?.rawValue
+        return resolve(semanticKey: semanticKey, backendLabel: backendLabel)
     }
 }
 public struct MobileApplicationConfiguration {
