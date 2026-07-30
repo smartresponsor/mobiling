@@ -1,4 +1,5 @@
 import SwiftUI
+import WebKit
 
 public struct VendorNewField: Hashable, Sendable {
     let key: String
@@ -99,6 +100,90 @@ public struct VendorNewCrudView: View {
     }
 }
 
+private struct ProjectStoryRichTextEditor: View {
+    @Binding var documentJson: String
+    @Binding var plainText: String
+    let error: String?
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Project story *").font(.headline)
+            TiptapEditorView(documentJson: $documentJson, plainText: $plainText)
+                .frame(minHeight: 340)
+            if let error {
+                Text(error).font(.caption).foregroundStyle(.red)
+            }
+        }
+    }
+}
+
+private struct TiptapEditorView: UIViewRepresentable {
+    @Binding var documentJson: String
+    @Binding var plainText: String
+
+    func makeCoordinator() -> Coordinator {
+        Coordinator(documentJson: $documentJson, plainText: $plainText)
+    }
+
+    func makeUIView(context: Context) -> WKWebView {
+        let configuration = WKWebViewConfiguration()
+        configuration.websiteDataStore = .nonPersistent()
+        configuration.userContentController.add(context.coordinator, name: "richText")
+        let webView = WKWebView(frame: .zero, configuration: configuration)
+        webView.navigationDelegate = context.coordinator
+        webView.isOpaque = false
+        webView.backgroundColor = .clear
+        guard let url = Bundle.main.url(forResource: "index", withExtension: "html", subdirectory: "RichText") else {
+            assertionFailure("RichText/index.html is missing from the application bundle.")
+            return webView
+        }
+        webView.loadFileURL(url, allowingReadAccessTo: url.deletingLastPathComponent())
+        return webView
+    }
+
+    func updateUIView(_ webView: WKWebView, context: Context) {
+        context.coordinator.documentJson = $documentJson
+        context.coordinator.plainText = $plainText
+    }
+
+    static func dismantleUIView(_ webView: WKWebView, coordinator: Coordinator) {
+        webView.configuration.userContentController.removeScriptMessageHandler(forName: "richText")
+    }
+
+    final class Coordinator: NSObject, WKScriptMessageHandler, WKNavigationDelegate {
+        var documentJson: Binding<String>
+        var plainText: Binding<String>
+
+        init(documentJson: Binding<String>, plainText: Binding<String>) {
+            self.documentJson = documentJson
+            self.plainText = plainText
+        }
+
+        func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+            guard !documentJson.wrappedValue.isEmpty,
+                  let data = documentJson.wrappedValue.data(using: .utf8),
+                  let object = try? JSONSerialization.jsonObject(with: data),
+                  let serialized = try? JSONSerialization.data(withJSONObject: object),
+                  let literal = String(data: serialized, encoding: .utf8) else { return }
+            webView.evaluateJavaScript("window.MobilingRichText.setContent(\(literal));")
+        }
+
+        func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+            guard let envelope = message.body as? [String: Any],
+                  envelope["type"] as? String == "change",
+                  let payload = envelope["payload"] as? [String: Any],
+                  let document = payload["json"],
+                  JSONSerialization.isValidJSONObject(document),
+                  let data = try? JSONSerialization.data(withJSONObject: document),
+                  let json = String(data: data, encoding: .utf8) else { return }
+            DispatchQueue.main.async {
+                self.documentJson.wrappedValue = json
+                self.plainText.wrappedValue = payload["text"] as? String ?? ""
+            }
+        }
+    }
+}
+
 private struct ProjectWizardStep: Hashable {
     let key: String
     let title: String
@@ -194,10 +279,18 @@ public struct ProjectNewWizardView: View {
             } else {
                 Section(step.title) {
                     ForEach(step.fields, id: \.key) { field in
-                        VStack(alignment: .leading, spacing: 4) {
-                            TextField(field.label + (field.required ? " *" : ""), text: binding(field.key), axis: field.key == "title" || field.key == "geography" ? .horizontal : .vertical)
-                            if let message = fieldErrors[field.key] {
-                                Text(message).font(.caption).foregroundStyle(.red)
+                        if field.key == "rawText" {
+                            ProjectStoryRichTextEditor(
+                                documentJson: binding("rawTextDocument"),
+                                plainText: binding(field.key),
+                                error: fieldErrors[field.key]
+                            )
+                        } else {
+                            VStack(alignment: .leading, spacing: 4) {
+                                TextField(field.label + (field.required ? " *" : ""), text: binding(field.key), axis: field.key == "title" || field.key == "geography" ? .horizontal : .vertical)
+                                if let message = fieldErrors[field.key] {
+                                    Text(message).font(.caption).foregroundStyle(.red)
+                                }
                             }
                         }
                     }

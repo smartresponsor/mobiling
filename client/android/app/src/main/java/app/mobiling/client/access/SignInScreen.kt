@@ -42,6 +42,7 @@ fun SignInScreen(
     var password by rememberSaveable { mutableStateOf(BuildConfig.DEBUG_PASSWORD) }
     var passwordVisible by rememberSaveable { mutableStateOf(false) }
     var status by remember { mutableStateOf<String?>(null) }
+    var isSubmitting by rememberSaveable { mutableStateOf(false) }
     var emailError by rememberSaveable { mutableStateOf<String?>(null) }
     var passwordError by rememberSaveable { mutableStateOf<String?>(null) }
     val emailFocusRequester = remember { FocusRequester() }
@@ -59,6 +60,7 @@ fun SignInScreen(
             append(" access to enter the business workspace.")
         },
         primaryActionLabel = "Sign in",
+        primaryActionLoading = isSubmitting,
         secondaryActionLabel = "Recover access",
         onPrimaryAction = {
             val normalizedEmail = email.trim()
@@ -75,8 +77,9 @@ fun SignInScreen(
                     emailError != null -> emailFocusRequester.requestFocus()
                     passwordError != null -> passwordFocusRequester.requestFocus()
                 }
-            } else {
+            } else if (!isSubmitting) {
                 coroutineScope.launch {
+                    isSubmitting = true
                     status = null
                     try {
                         val payload = onStartAccess(
@@ -100,6 +103,8 @@ fun SignInScreen(
                     } catch (error: Exception) {
                         status = error.message?.takeIf { it.isNotBlank() }
                             ?: "We couldn't sign you in. Check your connection and try again."
+                    } finally {
+                        isSubmitting = false
                     }
                 }
             }

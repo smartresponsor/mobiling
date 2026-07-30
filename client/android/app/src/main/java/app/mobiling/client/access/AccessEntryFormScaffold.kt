@@ -2,6 +2,8 @@ package app.mobiling.client.access
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -10,6 +12,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -33,6 +36,7 @@ internal fun AccessFlowShell(
     subtitle: String,
     styledSubtitle: AnnotatedString? = null,
     primaryActionLabel: String,
+    primaryActionLoading: Boolean = false,
     secondaryActionLabel: String,
     onPrimaryAction: () -> Unit,
     onSecondaryAction: () -> Unit,
@@ -41,6 +45,7 @@ internal fun AccessFlowShell(
     content: @Composable () -> Unit,
 ) {
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
                 navigationIcon = {
@@ -73,18 +78,31 @@ internal fun AccessFlowShell(
             Text(title, style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.SemiBold)
             Text(styledSubtitle ?: AnnotatedString(subtitle), style = MaterialTheme.typography.bodyLarge)
 
-            Card {
+            Card(colors = androidx.compose.material3.CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
                 Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     content()
                 }
             }
 
             if (status != null) {
-                Text(status, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary)
+                Text(status, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurface)
             }
 
-            Button(onClick = onPrimaryAction, modifier = Modifier.fillMaxWidth()) {
-                Text(primaryActionLabel)
+            Button(
+                onClick = onPrimaryAction,
+                modifier = Modifier.fillMaxWidth(),
+                enabled = !primaryActionLoading,
+            ) {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    if (primaryActionLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(20.dp),
+                            strokeWidth = 2.dp,
+                            color = MaterialTheme.colorScheme.onPrimary,
+                        )
+                    }
+                    Text(if (primaryActionLoading) "Signing in…" else primaryActionLabel)
+                }
             }
             OutlinedButton(onClick = onSecondaryAction, modifier = Modifier.fillMaxWidth()) {
                 Text(secondaryActionLabel)

@@ -28,7 +28,7 @@ internal fun GuestLegalFooter() {
             text = "Privacy Policy  ·  Terms of Service  ·  Support",
             style = MaterialTheme.typography.labelLarge,
             fontWeight = FontWeight.Medium,
-            color = MaterialTheme.colorScheme.primary,
+            color = MaterialTheme.colorScheme.onSurface,
             textAlign = TextAlign.Center,
         )
         Text(

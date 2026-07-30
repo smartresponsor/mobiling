@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
@@ -20,7 +21,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import android.webkit.JavascriptInterface
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.viewinterop.AndroidView
+import org.json.JSONObject
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 
@@ -30,6 +36,48 @@ data class VendorNewField(
     val required: Boolean = false,
     val numeric: Boolean = false,
 )
+
+@Composable
+private fun ProjectStoryRichTextEditor(
+    initialDocument: String,
+    onDocumentChange: (documentJson: String, plainText: String) -> Unit,
+    error: String?,
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        Text("Project story *", fontWeight = FontWeight.SemiBold)
+        AndroidView(
+            modifier = Modifier.fillMaxWidth().height(340.dp),
+            factory = { context ->
+                WebView(context).apply {
+                    settings.javaScriptEnabled = true
+                    settings.domStorageEnabled = false
+                    settings.allowFileAccess = true
+                    addJavascriptInterface(object {
+                        @JavascriptInterface
+                        fun postMessage(message: String) {
+                            val envelope = JSONObject(message)
+                            if (envelope.optString("type") != "change") return
+                            val payload = envelope.getJSONObject("payload")
+                            val json = payload.getJSONObject("json").toString()
+                            val text = payload.optString("text")
+                            post { onDocumentChange(json, text) }
+                        }
+                    }, "AndroidRichText")
+                    webViewClient = object : WebViewClient() {
+                        override fun onPageFinished(view: WebView, url: String) {
+                            if (initialDocument.isNotBlank()) {
+                                val quoted = JSONObject.quote(initialDocument)
+                                view.evaluateJavascript("window.MobilingRichText.setContent(JSON.parse($quoted));", null)
+                            }
+                        }
+                    }
+                    loadUrl("file:///android_asset/richtext/index.html")
+                }
+            },
+        )
+        error?.let { Text(it) }
+    }
+}
 
 @Composable
 fun VendorNewMobileScreen(
@@ -207,18 +255,32 @@ fun ProjectNewMobileScreen(
         }
         step.fields.forEach { field ->
             item(field.key) {
-                OutlinedTextField(
-                    value = values[field.key].orEmpty(),
-                    onValueChange = { value ->
-                        values = values + (field.key to value)
-                        fieldErrors = fieldErrors - field.key
-                    },
-                    label = { Text(field.label + if (field.required) " *" else "") },
-                    supportingText = { fieldErrors[field.key]?.let { Text(it) } },
-                    isError = field.key in fieldErrors,
-                    singleLine = field.key == "title" || field.key == "geography",
-                    modifier = Modifier.fillMaxWidth(),
-                )
+                if (field.key == "rawText") {
+                    ProjectStoryRichTextEditor(
+                        initialDocument = values["rawTextDocument"].orEmpty(),
+                        onDocumentChange = { documentJson, plainText ->
+                            values = values + mapOf(
+                                "rawTextDocument" to documentJson,
+                                field.key to plainText,
+                            )
+                            fieldErrors = fieldErrors - field.key
+                        },
+                        error = fieldErrors[field.key],
+                    )
+                } else {
+                    OutlinedTextField(
+                        value = values[field.key].orEmpty(),
+                        onValueChange = { value ->
+                            values = values + (field.key to value)
+                            fieldErrors = fieldErrors - field.key
+                        },
+                        label = { Text(field.label + if (field.required) " *" else "") },
+                        supportingText = { fieldErrors[field.key]?.let { Text(it) } },
+                        isError = field.key in fieldErrors,
+                        singleLine = field.key == "title" || field.key == "geography",
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
             }
         }
         if (step.review) {

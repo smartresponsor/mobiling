@@ -32,7 +32,7 @@ let package = Package(
         "App/Shipment",
         "App/Taxation",
         "App/Vendor"
-        ]),
+        ], resources: [.process("Resources/RichText")]),
         .target(name: "CoreConfig", dependencies: ["MobileClient"], path: "Sources/CoreConfig"),
         .target(name: "CoreEntitlement", dependencies: ["MobileClient"], path: "Sources/CoreEntitlement"),
         .target(name: "CoreBilling", dependencies: ["MobileClient"], path: "Sources/CoreBilling"),

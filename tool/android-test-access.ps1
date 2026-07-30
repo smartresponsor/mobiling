@@ -73,6 +73,9 @@ function Invoke-AdbDiagnostic {
 $repositoryRoot = Split-Path -Parent $PSScriptRoot
 $androidRoot = Join-Path $repositoryRoot "client/android"
 $gradleWrapper = Join-Path $androidRoot "gradlew.bat"
+$appPackageName = "app.mobiling.client"
+$appActivityName = ".MainActivity"
+$appApkPath = Join-Path $androidRoot "app/build/outputs/apk/debug/app-debug.apk"
 
 if (-not (Test-Path $gradleWrapper)) {
     throw "Gradle wrapper was not found at $gradleWrapper"
@@ -256,6 +259,29 @@ finally {
     }
     catch {
         "Screenshot capture failed: $($_.Exception.Message)" | Out-File -Encoding utf8 (Join-Path $outputDirectory "screenshot-error.txt")
+    }
+
+    if (-not (Test-Path $appApkPath)) {
+        Push-Location $androidRoot
+        try {
+            & $gradleWrapper :app:assembleDebug --console=plain --no-daemon
+            if ($LASTEXITCODE -ne 0) {
+                throw "Unable to rebuild the persistent application APK after instrumentation cleanup."
+            }
+        }
+        finally {
+            Pop-Location
+        }
+    }
+
+    & adb -s $DeviceSerial install -r -t $appApkPath | Out-Null
+    if ($LASTEXITCODE -ne 0) {
+        throw "Unable to restore '$appPackageName' after instrumentation cleanup."
+    }
+
+    & adb -s $DeviceSerial shell am start -W -n "$appPackageName/$appActivityName" | Out-Null
+    if ($LASTEXITCODE -ne 0) {
+        throw "The restored application could not be launched after instrumentation cleanup."
     }
 }
 

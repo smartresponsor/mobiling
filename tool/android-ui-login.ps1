@@ -39,7 +39,13 @@ function Find-Node {
     foreach ($node in $nodes) {
         if ($Text -and $node.text -ne $Text -and $node.'content-desc' -ne $Text) { continue }
         if ($ResourceId -and $node.'resource-id' -notlike "*$ResourceId*") { continue }
-        if ($Clickable -and $node.clickable -ne 'true') { continue }
+        if ($Clickable) {
+            $clickTarget = $node
+            while ($null -ne $clickTarget -and $clickTarget.Name -eq 'node' -and $clickTarget.clickable -ne 'true') {
+                $clickTarget = $clickTarget.ParentNode
+            }
+            if ($null -eq $clickTarget -or $clickTarget.Name -ne 'node' -or $clickTarget.clickable -ne 'true') { continue }
+        }
         return $node
     }
     return $null
@@ -84,7 +90,7 @@ function Tap-Node {
     $center = Get-Center $target
     & adb -s $DeviceSerial shell input tap $center[0] $center[1] | Out-Null
     if ($LASTEXITCODE -ne 0) { throw 'Android tap command failed.' }
-    Start-Sleep -Milliseconds 700
+    Start-Sleep -Milliseconds 1000
 }
 
 function Clear-Field {
@@ -130,8 +136,7 @@ $hierarchy = Get-Hierarchy
 $diagnosticRoot = Join-Path (Split-Path $PSScriptRoot -Parent) 'watchdog\runtime\device'
 New-Item -ItemType Directory -Force -Path $diagnosticRoot | Out-Null
 $hierarchy.Save((Join-Path $diagnosticRoot 'current-ui.xml'))
-$signInEntry = Find-Node -Hierarchy $hierarchy -Text 'Sign in' -Clickable
-if ($null -eq $signInEntry) { $signInEntry = Find-Node -Hierarchy $hierarchy -Text 'Sign in' }
+$signInEntry = Find-ClickableAncestorByText -Hierarchy $hierarchy -Text 'Sign in'
 if ($null -ne $signInEntry) {
     Tap-Node $signInEntry
     $hierarchy = Get-Hierarchy
@@ -171,7 +176,7 @@ $hierarchy = Get-Hierarchy
 $submit = Find-ClickableAncestorByText -Hierarchy $hierarchy -Text 'Sign in'
 if ($null -eq $submit) { throw 'Sign in submit button was not found.' }
 Tap-Node $submit
-Start-Sleep -Seconds 3
+Start-Sleep -Seconds 5
 
 $runtimeRoot = Join-Path (Split-Path $PSScriptRoot -Parent) 'watchdog\runtime\device'
 New-Item -ItemType Directory -Force -Path $runtimeRoot | Out-Null

@@ -15,6 +15,11 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
+import androidx.test.espresso.web.sugar.Web.onWebView
+import androidx.test.espresso.web.webdriver.DriverAtoms.findElement
+import androidx.test.espresso.web.webdriver.DriverAtoms.webClick
+import androidx.test.espresso.web.webdriver.DriverAtoms.webKeys
+import androidx.test.espresso.web.webdriver.Locator
 import app.mobiling.client.contract.order.OrderMobileItemPayload
 import app.mobiling.client.contract.product.ProductMobileItemPayload
 import app.mobiling.client.contract.project.ProjectMobileItemPayload
@@ -175,7 +180,10 @@ class DashboardBehaviorTest {
         composeRule.onNodeWithText("New Project").performClick()
         composeRule.onNodeWithText("Title *").performTextInput("Behavior Project")
         composeRule.onNodeWithText("Next").performScrollTo().performClick()
-        composeRule.onNodeWithText("Project story *").performTextInput("Behavior project story")
+        onWebView()
+            .withElement(findElement(Locator.CSS_SELECTOR, ".ProseMirror"))
+            .perform(webClick())
+            .perform(webKeys("Behavior project story"))
         composeRule.onNodeWithText("Next").performScrollTo().performClick()
         composeRule.onNodeWithText("Next").performScrollTo().performClick()
         composeRule.onNodeWithText("Create Project").performScrollTo().performClick()

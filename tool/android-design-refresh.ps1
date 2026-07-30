@@ -87,7 +87,7 @@ $resolvedSerial = Resolve-AdbDeviceSerial -RequestedSerial $DeviceSerial -Reques
 if (-not $SkipBuild) {
     Push-Location $androidRoot
     try {
-        & $gradleWrapper :app:assembleDebug --console=plain --stacktrace
+        & $gradleWrapper :app:assembleDebug --console=plain --stacktrace --no-daemon
         if ($LASTEXITCODE -ne 0) {
             throw "Debug APK build failed with exit code $LASTEXITCODE."
         }

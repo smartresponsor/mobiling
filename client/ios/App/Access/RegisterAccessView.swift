@@ -112,7 +112,7 @@ private struct PasswordQualityHint: View {
             ForEach(Array(checks.enumerated()), id: \.offset) { _, check in
                 Label(check.0, systemImage: check.1 ? "checkmark.circle.fill" : "circle")
                     .font(.caption)
-                    .foregroundStyle(check.1 ? Color.accentColor : Color.secondary)
+                    .foregroundStyle(check.1 ? Color(red: 51 / 255, green: 51 / 255, blue: 51 / 255) : Color.secondary)
             }
             if !confirmPassword.isEmpty {
                 Label(
@@ -120,7 +120,7 @@ private struct PasswordQualityHint: View {
                     systemImage: password == confirmPassword ? "checkmark.circle.fill" : "circle"
                 )
                 .font(.caption)
-                .foregroundStyle(password == confirmPassword ? Color.accentColor : Color.secondary)
+                .foregroundStyle(password == confirmPassword ? Color(red: 51 / 255, green: 51 / 255, blue: 51 / 255) : Color.secondary)
             }
             Text("Required: at least 8 characters. Other checks improve password strength.")
                 .font(.caption)

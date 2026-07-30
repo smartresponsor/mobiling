@@ -41,6 +41,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -124,6 +125,7 @@ fun DashboardMobileShell(
     }
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
                 navigationIcon = {
@@ -151,7 +153,10 @@ fun DashboardMobileShell(
             )
         },
         bottomBar = {
-            NavigationBar {
+            NavigationBar(
+                containerColor = MaterialTheme.colorScheme.surface,
+                tonalElevation = 0.dp,
+            ) {
                 shell.bottomPrimary.filter { it.visible }.forEach { item ->
                     NavigationBarItem(
                         selected = selectedRoute == item.route,
@@ -168,14 +173,21 @@ fun DashboardMobileShell(
                         },
                         label = { Text(item.label) },
                         enabled = item.enabled,
+                        colors = NavigationBarItemDefaults.colors(
+                            selectedIconColor = MaterialTheme.colorScheme.onSurface,
+                            selectedTextColor = MaterialTheme.colorScheme.onSurface,
+                            indicatorColor = MaterialTheme.colorScheme.secondaryContainer,
+                            unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        ),
                     )
                 }
             }
         },
         floatingActionButton = {
-            if (selectedRoute == "vendor" || selectedRoute.startsWith("vendor/")) {
+            if (!selectedRoute.endsWith("/new")) {
                 FloatingActionButton(onClick = { newChooserOpen = true }) {
-                    Icon(Icons.Default.Add, contentDescription = "New")
+                    Icon(Icons.Default.Add, contentDescription = "Create new")
                 }
             }
         },
@@ -205,16 +217,23 @@ fun DashboardMobileShell(
 
     if (navigationOpen) {
         ModalBottomSheet(onDismissRequest = { navigationOpen = false }) {
-            ShellSection(
-                title = "Navigation",
-                items = shell.moreDrawer,
-                onItemClick = { item ->
-                    if (item.enabled && isHandledRoute(item.route)) {
-                        selectedRoute = MobileRouteResolver.normalizeRoute(item.route)
-                    }
-                    navigationOpen = false
-                },
-            )
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 8.dp),
+            ) {
+                ShellSection(
+                    title = "Navigation",
+                    items = shell.moreDrawer,
+                    onItemClick = { item ->
+                        if (item.enabled && isHandledRoute(item.route)) {
+                            selectedRoute = MobileRouteResolver.normalizeRoute(item.route)
+                        }
+                        navigationOpen = false
+                    },
+                )
+                Spacer(Modifier.height(24.dp))
+            }
         }
     }
 
@@ -241,17 +260,15 @@ fun DashboardMobileShell(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                Text("New", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
-                Text("Choose what you want to add.", color = MaterialTheme.colorScheme.onSurfaceVariant)
-                NewChoice("Product", "Add a product or service you offer.") {
+                NewChoice("Product", "Add a product or service you offer.", Icons.Default.Inventory2) {
                     selectedRoute = "vendor/product/new"
                     newChooserOpen = false
                 }
-                NewChoice("Order", "Create an order record for your vendor workspace.") {
+                NewChoice("Order", "Create an order record for your vendor workspace.", Icons.Default.ReceiptLong) {
                     selectedRoute = "vendor/order/new"
                     newChooserOpen = false
                 }
-                NewChoice("Project", "Create a project and define its scope.") {
+                NewChoice("Project", "Create a project and define its scope.", Icons.Default.Dashboard) {
                     selectedRoute = "vendor/project/new"
                     newChooserOpen = false
                 }
@@ -467,14 +484,17 @@ private fun DashboardContent(
 }
 
 @Composable
-private fun NewChoice(title: String, description: String, onClick: () -> Unit) {
-    ElevatedCard(modifier = Modifier.fillMaxWidth().clickable(onClick = onClick)) {
+private fun NewChoice(title: String, description: String, icon: ImageVector, onClick: () -> Unit) {
+    ElevatedCard(
+        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick),
+        colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surface),
+    ) {
         Row(
             modifier = Modifier.fillMaxWidth().padding(16.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Surface(shape = MaterialTheme.shapes.medium, color = MaterialTheme.colorScheme.primaryContainer) {
-                Icon(Icons.Default.Add, contentDescription = null, modifier = Modifier.padding(10.dp).size(24.dp))
+                Icon(icon, contentDescription = null, modifier = Modifier.padding(10.dp).size(24.dp))
             }
             Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)

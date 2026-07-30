@@ -2,9 +2,12 @@ package app.mobiling.client.access
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -19,6 +22,7 @@ import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -26,6 +30,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -66,6 +71,7 @@ fun AccessWelcomeScreen(
     var accountOpen by remember { mutableStateOf(false) }
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
                 navigationIcon = {
@@ -93,13 +99,23 @@ fun AccessWelcomeScreen(
             )
         },
         bottomBar = {
-            NavigationBar {
+            NavigationBar(
+                containerColor = MaterialTheme.colorScheme.surface,
+                tonalElevation = 0.dp,
+            ) {
                 GuestRoute.entries.forEach { route ->
                     NavigationBarItem(
                         selected = selectedRoute == route,
                         onClick = { selectedRoute = route },
                         icon = { Icon(route.icon, contentDescription = route.label) },
                         label = { Text(route.label) },
+                        colors = NavigationBarItemDefaults.colors(
+                            selectedIconColor = MaterialTheme.colorScheme.onSurface,
+                            selectedTextColor = MaterialTheme.colorScheme.onSurface,
+                            indicatorColor = MaterialTheme.colorScheme.secondaryContainer,
+                            unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                            unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                        ),
                     )
                 }
             }
@@ -118,22 +134,36 @@ fun AccessWelcomeScreen(
     if (navigationOpen) {
         ModalBottomSheet(onDismissRequest = { navigationOpen = false }) {
             Column(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 12.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 20.dp, vertical = 8.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                Text("Navigate", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
                 GuestRoute.entries.forEach { route ->
-                    OutlinedButton(
+                    ElevatedCard(
                         onClick = {
                             selectedRoute = route
                             navigationOpen = false
                         },
                         modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.elevatedCardColors(
+                            containerColor = MaterialTheme.colorScheme.surface,
+                        ),
                     ) {
-                        Icon(route.icon, contentDescription = null)
-                        Text(route.label, modifier = Modifier.padding(start = 8.dp))
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(16.dp),
+                            horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        ) {
+                            Icon(route.icon, contentDescription = null)
+                            Text(
+                                text = route.label,
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.SemiBold,
+                            )
+                        }
                     }
                 }
+                Spacer(Modifier.height(24.dp))
             }
         }
     }
@@ -190,7 +220,7 @@ private fun GuestRouteContent(
             GuestRoute.Home -> {
                 Text("Your Trusted Home Specialist", style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.SemiBold)
                 Text("MDF · IDF · Guest Rooms")
-                Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
+                Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
                     Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         Text("Explore 1tasker", style = MaterialTheme.typography.titleMedium)
                         Text("Browse the marketplace, review public users, explore orders, and keep a guest cart before signing in.")
@@ -217,7 +247,7 @@ private fun GuestRouteContent(
 @Composable
 private fun GuestPlaceholder(title: String, description: String) {
     Text(title, style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
-    Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)) {
+    Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
         Text(description, modifier = Modifier.padding(16.dp))
     }
 }

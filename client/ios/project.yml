@@ -71,6 +71,9 @@ targets:
       - path: App/MobileClientRuntimeConfig.swift
       - path: App/MobileApplicationComposition.swift
       - path: Resources/Localizable.xcstrings
+      - path: Resources/RichText
+        type: folder
+        buildPhase: resources
     info:
       path: App/Info.plist
     settings:

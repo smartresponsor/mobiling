@@ -110,14 +110,20 @@ function Restore-EmulatorWindowPlacement {
 
     if (Test-Path $windowPlacementPath) {
         $placement = Get-Content $windowPlacementPath -Raw | ConvertFrom-Json
+        $screens = [System.Windows.Forms.Screen]::AllScreens
+        $target = if ($screens.Count -gt 1) { $screens[1].WorkingArea } else { $screens[0].WorkingArea }
+        $placement.x = $target.Left + 20
+        $placement.y = $target.Top + 20
+        $placement.width = [Math]::Min(1200, $target.Width - 40)
+        $placement.height = [Math]::Min(1900, $target.Height - 40)
     } else {
         $screens = [System.Windows.Forms.Screen]::AllScreens
         $target = if ($screens.Count -gt 1) { $screens[1].WorkingArea } else { $screens[0].WorkingArea }
         $placement = [pscustomobject]@{
             x = $target.Left + 20
             y = $target.Top + 20
-            width = [Math]::Min(600, $target.Width - 40)
-            height = [Math]::Min(1080, $target.Height - 40)
+            width = [Math]::Min(1200, $target.Width - 40)
+            height = [Math]::Min(1900, $target.Height - 40)
         }
     }
 
@@ -225,6 +231,7 @@ function Start-LightAvd {
     Start-Process -FilePath $emulator -ArgumentList @("@$AvdName", '-gpu', 'host', '-scale', '1.0', '-use-keycode-forwarding', '-no-snapshot-load', '-no-boot-anim', '-netdelay', 'none', '-netspeed', 'full') -WorkingDirectory (Split-Path $emulator)
 
     Start-Sleep -Seconds 5
+    Restore-EmulatorWindowPlacement
     $shell = New-Object -ComObject WScript.Shell
     [void] $shell.AppActivate($AvdName)
 }

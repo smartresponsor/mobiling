@@ -100,37 +100,18 @@ public struct MobileDashboardShellView: View {
             .tabItem { Label("More", systemImage: "line.3.horizontal") }
             .tag("more")
         }
+        .tint(Color(red: 51 / 255, green: 51 / 255, blue: 51 / 255))
         .sheet(isPresented: $navigationOpen) {
-            NavigationView {
-                List {
-                    Section("Navigation") {
-                        ForEach(shell.moreDrawer.filter { $0.visible }) { item in
-                            row(item)
-                                .onTapGesture {
-                                    handle(item)
-                                    navigationOpen = false
-                                }
-                        }
-                    }
-                }
-                .navigationTitle("1tasker")
-                .navigationBarTitleDisplayMode(.inline)
+            menuSheet(items: shell.moreDrawer) { item in
+                handle(item)
+                navigationOpen = false
             }
         }
         .sheet(isPresented: $accountOpen) {
-            NavigationView {
-                List {
-                    Section("Account") {
-                        ForEach(shell.accountQuick.filter { $0.visible }) { item in
-                            row(item)
-                                .onTapGesture { handle(item) }
-                        }
-                    }
-                }
-                .navigationTitle("Account")
-                .navigationBarTitleDisplayMode(.inline)
+            menuSheet(items: shell.accountQuick) { item in
+                handle(item)
+                accountOpen = false
             }
-            
         }
         .confirmationDialog("New", isPresented: $newChooserOpen, titleVisibility: .visible) {
             Button("Product") {
@@ -232,10 +213,40 @@ public struct MobileDashboardShellView: View {
         .navigationTitle(isDetail ? "\(title.dropLast()) Detail" : title)
     }
 
+    private func menuSheet(
+        items: [MobileNavigationItemPayload],
+        onSelect: @escaping (MobileNavigationItemPayload) -> Void
+    ) -> some View {
+        ScrollView {
+            LazyVStack(spacing: 12) {
+                ForEach(items.filter { $0.visible }) { item in
+                    Button {
+                        onSelect(item)
+                    } label: {
+                        row(item)
+                            .padding(16)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .background(
+                                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                    .fill(Color(.systemBackground))
+                            )
+                            .shadow(color: Color.black.opacity(0.06), radius: 8, y: 2)
+                    }
+                    .buttonStyle(.plain)
+                    .disabled(!item.enabled)
+                }
+            }
+            .padding(.horizontal, 20)
+            .padding(.top, 8)
+            .padding(.bottom, 24)
+        }
+        .background(Color(red: 244 / 255, green: 245 / 255, blue: 246 / 255))
+    }
+
     private func row(_ item: MobileNavigationItemPayload) -> some View {
         HStack(spacing: 12) {
             Image(systemName: systemImage(for: item))
-                .foregroundColor(item.enabled ? .blue : .secondary)
+                .foregroundColor(item.enabled ? Color(red: 51 / 255, green: 51 / 255, blue: 51 / 255) : .secondary)
                 .frame(width: 24)
 
             VStack(alignment: .leading, spacing: 2) {
