@@ -82,7 +82,7 @@ function Invoke-MobileCrudRequest {
     )
 
     $suffix = if ($Identity) { "/$Identity" } else { "" }
-    $uri = "http://127.0.0.1:8080/crud/my/$Resource$suffix"
+    $uri = "http://127.0.0.1:8080/my/$Resource$suffix"
     $outputPath = Join-Path $repositoryRoot "build/live-crud-$Resource-$($Method.ToLowerInvariant()).json"
     $arguments = @("-s", "-o", $outputPath, "-w", "%{http_code}", "-X", $Method, "-H", "Accept: application/json", "-H", $authorizationHeader)
     if ($null -ne $Body) {
@@ -114,13 +114,20 @@ function Resolve-CrudIdentity {
     throw "Could not resolve $Resource identity from create response."
 }
 
+$existingRetail = Invoke-MobileCrudRequest -Method "GET" -Resource "retail"
+foreach ($item in @($existingRetail.Body.items)) {
+    $title = [string]$item.title
+    $identity = if ($item.id) { [string]$item.id } elseif ($item.retailId) { [string]$item.retailId } else { "" }
+    if ($identity -and $title.StartsWith("Mobile Smoke Task", [System.StringComparison]::Ordinal)) {
+        Invoke-MobileCrudRequest -Method "DELETE" -Resource "retail" -Identity $identity | Out-Null
+    }
+}
+
 $created = [System.Collections.Generic.List[object]]::new()
 $stamp = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
 try {
     foreach ($definition in @(
-        @{ Resource = "order"; Create = @{ reference = "MOBILE-$stamp"; total = "29.95"; status = "pending" }; Update = @{ reference = "MOBILE-UPDATED-$stamp" } },
-        @{ Resource = "product"; Create = @{ title = "Mobile Smoke Product $stamp"; price = "19.95"; status = "active" }; Update = @{ title = "Mobile Smoke Product Updated $stamp" } },
-        @{ Resource = "project"; Create = @{ kind = "social_non_profit"; title = "Mobile Smoke Project $stamp"; rawText = "Live mobile CRUD smoke project." }; Update = @{ title = "Mobile Smoke Project Updated $stamp" } }
+        @{ Resource = "retail"; Create = @{ kind = "task"; categoryId = "884"; title = "Mobile Smoke Task $stamp"; description = "Live mobile Retail CRUD smoke task."; amountMinor = 1995; currency = "USD"; location = "Katy, TX" }; Update = @{ title = "Mobile Smoke Task Updated $stamp"; amountMinor = 2495 } }
     )) {
         $resource = [string]$definition.Resource
         Invoke-MobileCrudRequest -Method "GET" -Resource $resource | Out-Null

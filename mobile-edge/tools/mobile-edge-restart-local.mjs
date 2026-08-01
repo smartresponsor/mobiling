@@ -49,6 +49,7 @@ for (const processId of listeningProcessIds(port)) {
 const localizingApiBaseUrl = process.env.LOCALIZING_API_BASE_URL || "http://127.0.0.1:8000";
 const accessingApiBaseUrl = process.env.ACCESSING_API_BASE_URL || "http://127.0.0.1:8000";
 const crudingApiBaseUrl = process.env.CRUDING_API_BASE_URL || "http://127.0.0.1:8000";
+const catalogingApiBaseUrl = process.env.CATALOGING_API_BASE_URL || "http://127.0.0.1:8000";
 
 async function assertAccessingBackendAvailable() {
   const sessionUrl = `${accessingApiBaseUrl.replace(/\/$/, "")}/api/access/session`;
@@ -78,7 +79,7 @@ async function assertAccessingBackendAvailable() {
 }
 
 await assertAccessingBackendAvailable();
-const startCommand = `$env:LOCALIZING_API_BASE_URL = "${localizingApiBaseUrl}"; $env:ACCESSING_API_BASE_URL = "${accessingApiBaseUrl}"; $env:CRUDING_API_BASE_URL = "${crudingApiBaseUrl}"; Start-Process -FilePath "${process.execPath}" -ArgumentList "dist/app.js" -WorkingDirectory "${root}" -WindowStyle Hidden`;
+const startCommand = `$env:LOCALIZING_API_BASE_URL = "${localizingApiBaseUrl}"; $env:ACCESSING_API_BASE_URL = "${accessingApiBaseUrl}"; $env:CRUDING_API_BASE_URL = "${crudingApiBaseUrl}"; $env:CATALOGING_API_BASE_URL = "${catalogingApiBaseUrl}"; Start-Process -FilePath "${process.execPath}" -ArgumentList "dist/app.js" -WorkingDirectory "${root}" -WindowStyle Hidden`;
 const startResult = spawnSync("powershell.exe", ["-NoProfile", "-Command", startCommand], {
   encoding: "utf8",
 });

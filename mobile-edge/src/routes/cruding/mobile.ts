@@ -2,7 +2,7 @@ import type { FastifyInstance } from "fastify";
 import { CrudingApiClient } from "../../client/cruding/crudingApiClient.js";
 
 const client = new CrudingApiClient();
-const allowed = new Set(["product", "order", "project"]);
+const allowed = new Set(["retail", "order", "project"]);
 
 function forwarded(headers: Record<string, unknown>): Record<string, string> {
   const result: Record<string, string> = {};
@@ -16,7 +16,7 @@ function forwarded(headers: Record<string, unknown>): Record<string, string> {
 export default async function route(app: FastifyInstance): Promise<void> {
   app.route({
     method: ["GET", "POST", "PUT", "PATCH", "DELETE"],
-    url: "/crud/my/:resource/:identity?",
+    url: "/my/:resource/:identity?",
     handler: async (request, reply) => {
       const params = request.params as { resource?: string; identity?: string };
       const resource = (params.resource || "").trim();

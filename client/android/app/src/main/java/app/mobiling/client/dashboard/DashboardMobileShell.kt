@@ -86,7 +86,7 @@ import app.mobiling.client.vendor.ProductMobileScreen
 import app.mobiling.client.vendor.OrderMobileScreen
 import app.mobiling.client.vendor.ProjectMobileScreen
 import app.mobiling.client.vendor.VendorNewMobileScreen
-import app.mobiling.client.vendor.ProductNewFields
+import app.mobiling.client.vendor.RetailNewFields
 import app.mobiling.client.vendor.OrderNewFields
 import app.mobiling.client.vendor.ProjectNewMobileScreen
 
@@ -115,6 +115,7 @@ fun DashboardMobileShell(
     var navigationOpen by remember { mutableStateOf(false) }
     var accountOpen by remember { mutableStateOf(false) }
     var newChooserOpen by remember { mutableStateOf(false) }
+    var selectedProductKind by remember { mutableStateOf("task") }
     var shell by remember { mutableStateOf(localizeShell(fallbackShell(), navigationLabelResolver)) }
 
     LaunchedEffect(navigationShellGateway) {
@@ -140,10 +141,11 @@ fun DashboardMobileShell(
                     }
                 },
                 title = {
-                    Column {
-                        Text("1tasker", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
-                        Text("Mobile dashboard", style = MaterialTheme.typography.bodySmall)
-                    }
+                    Text(
+                        text = routeTitle(selectedRoute, selectedProductKind),
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.SemiBold,
+                    )
                 },
                 actions = {
                     IconButton(onClick = { accountOpen = true }) {
@@ -200,6 +202,7 @@ fun DashboardMobileShell(
     ) { padding ->
         DashboardContent(
             selectedRoute = selectedRoute,
+            selectedProductKind = selectedProductKind,
             shell = shell,
             productGateway = productGateway,
             orderGateway = orderGateway,
@@ -267,16 +270,24 @@ fun DashboardMobileShell(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                NewChoice("Product", "Add a product or service you offer.", Icons.Default.Inventory2) {
-                    selectedRoute = "vendor/product/new"
+                NewChoice("Task", "Post work you need someone to complete.", Icons.Default.ReceiptLong) {
+                    selectedProductKind = "task"
+                    selectedRoute = "vendor/retail/new"
                     newChooserOpen = false
                 }
-                NewChoice("Order", "Create an order record for your vendor workspace.", Icons.Default.ReceiptLong) {
-                    selectedRoute = "vendor/order/new"
+                NewChoice("Service", "Offer your skills or professional service.", Icons.Default.Storefront) {
+                    selectedProductKind = "service"
+                    selectedRoute = "vendor/retail/new"
                     newChooserOpen = false
                 }
-                NewChoice("Project", "Create a project and define its scope.", Icons.Default.Dashboard) {
-                    selectedRoute = "vendor/project/new"
+                NewChoice("Product", "Sell a physical or digital item.", Icons.Default.Inventory2) {
+                    selectedProductKind = "goods"
+                    selectedRoute = "vendor/retail/new"
+                    newChooserOpen = false
+                }
+                NewChoice("Project", "Publish a project to the marketplace.", Icons.Default.Dashboard) {
+                    selectedProductKind = "project"
+                    selectedRoute = "vendor/retail/new"
                     newChooserOpen = false
                 }
                 Spacer(Modifier.height(16.dp))
@@ -288,6 +299,7 @@ fun DashboardMobileShell(
 @Composable
 private fun DashboardContent(
     selectedRoute: String,
+    selectedProductKind: String,
     shell: NavigationMobileShellScreenContract,
     productGateway: ProductGateway?,
     orderGateway: OrderGateway?,
@@ -363,7 +375,7 @@ private fun DashboardContent(
             }
             return
         }
-        "vendor/product" -> {
+        "vendor/retail" -> {
             Box(Modifier.fillMaxSize().padding(padding)) {
                 ProductMobileScreen(vendorId, null, productGateway, onRouteSelected)
             }
@@ -384,9 +396,19 @@ private fun DashboardContent(
         else -> {
             val segments = selectedRoute.split('/').filter(String::isNotBlank)
             when {
-                selectedRoute == "vendor/product/new" -> {
+                selectedRoute == "vendor/retail/new" -> {
                     Box(Modifier.fillMaxSize().padding(padding)) {
-                        VendorNewMobileScreen("Product", "vendor/product", ProductNewFields, { fields -> productGateway?.createProduct(fields) ?: error("Product gateway is not available.") }, onRouteSelected)
+                        VendorNewMobileScreen(
+                            singular = retailKindLabel(selectedProductKind),
+                            listRoute = "vendor/retail",
+                            fields = RetailNewFields,
+                            onCreate = { fields -> productGateway?.createProduct(fields) ?: error("Retail gateway is not available.") },
+                            onRouteSelected = onRouteSelected,
+                            initialValues = mapOf(
+                                "kind" to selectedProductKind,
+                                "currency" to "USD",
+                            ),
+                        )
                     }
                     return
                 }
@@ -425,29 +447,6 @@ private fun DashboardContent(
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        item {
-            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text(
-                    text = when (selectedRoute) {
-                        "vendor" -> "Vendor workspace"
-                        "more" -> "More tools"
-                        else -> "Dashboard"
-                    },
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold,
-                )
-                Text(
-                    text = when (selectedRoute) {
-                        "vendor" -> "Manage your vendor profile, payments, statements, and activity."
-                        "more" -> "Explore available modules and upcoming capabilities."
-                        else -> "Your workspace at a glance."
-                    },
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-        }
-
         when (selectedRoute) {
             "attachment" -> item {
                 AttachmentMobileScreen(vendorId = vendorId, attachmentFeatureBridge = attachmentFeatureBridge)
@@ -522,7 +521,6 @@ private fun ShellSection(
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
         items.filter { it.visible }.forEach { item ->
             ElevatedCard(
                 modifier = Modifier
@@ -551,14 +549,12 @@ private fun ShellSection(
                             tint = MaterialTheme.colorScheme.onPrimaryContainer,
                         )
                     }
-                    Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                        Text(navigationLabelResolver(item.route, item.key, item.label), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-                        Text(
-                            text = itemDescription(item),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        )
-                    }
+                    Text(
+                        text = navigationLabelResolver(item.route, item.key, item.label),
+                        modifier = Modifier.weight(1f),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
+                    )
                     if (!item.enabled) {
                         AssistChip(onClick = {}, label = { Text(item.badge ?: "Coming soon") })
                     }
@@ -630,7 +626,7 @@ private fun fallbackShell(): NavigationMobileShellScreenContract = NavigationMob
         item("vendor_payout", "Payout", "payout", true, "vendor/payout"),
         item("vendor_transaction", "Transaction", "receipt", true, "vendor/transaction"),
         item("vendor_attachment", "My Attachment", "attachment", true, "attachment"),
-        item("vendor_product", "Products", "catalog", true, "vendor/product"),
+        item("vendor_product", "Products", "catalog", true, "vendor/retail"),
         item("vendor_order", "Orders", "statement", true, "vendor/order"),
         item("vendor_project", "Projects", "summary", true, "vendor/project"),
     ),
@@ -673,6 +669,38 @@ private fun localizeShell(
         moreDrawer = localize(shell.moreDrawer),
         vendorContext = localize(shell.vendorContext),
     )
+}
+
+private fun routeTitle(route: String, retailKind: String): String = when {
+    route == "dashboard" -> "Dashboard"
+    route == "cart" -> "Cart"
+    route == "catalog" -> "Catalog"
+    route == "vendor" -> "Vendor"
+    route == "more" -> "More"
+    route == "attachment" || route == "vendor/attachment" -> "Attachment"
+    route == "vendor/profile" -> "Profile"
+    route == "vendor/summary" -> "Summary"
+    route == "vendor/statement" -> "Statement"
+    route == "vendor/payout" -> "Payout"
+    route == "vendor/transaction" -> "Transactions"
+    route == "vendor/retail/new" -> "New ${retailKindLabel(retailKind)}"
+    route == "vendor/order/new" -> "New Order"
+    route == "vendor/project/new" -> "New Project"
+    route == "vendor/retail" -> "Products"
+    route == "vendor/order" -> "Orders"
+    route == "vendor/project" -> "Projects"
+    route.startsWith("vendor/retail/") -> "Product"
+    route.startsWith("vendor/order/") -> "Order"
+    route.startsWith("vendor/project/") -> "Project"
+    else -> "1tasker"
+}
+
+private fun retailKindLabel(kind: String): String = when (kind) {
+    "task" -> "Task"
+    "service" -> "Service"
+    "goods" -> "Product"
+    "project" -> "Project"
+    else -> "Listing"
 }
 
 private fun isHandledRoute(route: String?): Boolean = MobileRouteResolver.isCurrentlyRenderable(route)

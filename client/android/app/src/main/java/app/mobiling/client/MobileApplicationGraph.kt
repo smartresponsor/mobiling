@@ -3,9 +3,11 @@
 import app.mobiling.client.attachment.AttachmentFeatureBridge
 import app.mobiling.client.auth.AccessAuthFeatureBridge
 import app.mobiling.client.cart.CartFeatureBridge
+import app.mobiling.client.catalog.CatalogFeatureBridge
 import app.mobiling.client.data.attachment.AttachmentHttpGateway
 import app.mobiling.client.data.auth.session.AccessHttpAuthSessionGateway
 import app.mobiling.client.data.cart.CartHttpGateway
+import app.mobiling.client.data.catalog.CatalogHttpGateway
 import app.mobiling.client.data.navigation.shell.NavigationHttpShellGateway
 import app.mobiling.client.data.order.OrderHttpGateway
 import app.mobiling.client.data.product.ProductHttpGateway
@@ -20,10 +22,15 @@ class MobileApplicationGraph private constructor(val composition: MobileApplicat
     private val baseUrl = composition.mobileEdgeBaseUrl
     private val cartGateway = CartHttpGateway(baseUrl)
     private val attachmentGateway = AttachmentHttpGateway(baseUrl)
+    private val catalogGateway = CatalogHttpGateway(
+        baseUrl,
+        composition.configuration.catalog.primaryCatalog,
+    )
 
     val accessAuthFeatureBridge = AccessAuthFeatureBridge(AccessHttpAuthSessionGateway(baseUrl))
     val cartFeatureBridge = CartFeatureBridge(cartGateway, cartGateway, cartGateway)
     val attachmentFeatureBridge = AttachmentFeatureBridge(attachmentGateway, attachmentGateway)
+    val catalogFeatureBridge = CatalogFeatureBridge(catalogGateway, catalogGateway)
     val navigationShellGateway = NavigationHttpShellGateway(baseUrl)
     val productGateway = ProductHttpGateway(baseUrl)
     val orderGateway = OrderHttpGateway(baseUrl)

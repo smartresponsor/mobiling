@@ -37,6 +37,13 @@ data class VendorNewField(
     val numeric: Boolean = false,
 )
 
+private val ProductKindChoices = listOf(
+    "task" to "Task — I need something done",
+    "service" to "Service — I offer my skills",
+    "goods" to "Product — I am selling an item",
+    "project" to "Project — I am publishing a project",
+)
+
 @Composable
 private fun ProjectStoryRichTextEditor(
     initialDocument: String,
@@ -86,9 +93,12 @@ fun VendorNewMobileScreen(
     fields: List<VendorNewField>,
     onCreate: suspend (Map<String, String>) -> Unit,
     onRouteSelected: (String) -> Unit,
+    initialValues: Map<String, String> = emptyMap(),
 ) {
     val scope = rememberCoroutineScope()
-    var values by remember(fields) { mutableStateOf(fields.associate { it.key to "" }) }
+    var values by remember(fields, initialValues) {
+        mutableStateOf(fields.associate { it.key to "" } + initialValues)
+    }
     var fieldErrors by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
     var submitError by remember { mutableStateOf<String?>(null) }
     var saving by remember { mutableStateOf(false) }
@@ -109,15 +119,26 @@ fun VendorNewMobileScreen(
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        item {
-            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text("New $singular", fontWeight = FontWeight.Bold)
-                Text("Complete the required fields, then create the $singular.")
-            }
-        }
         fields.forEach { field ->
             item(field.key) {
-                OutlinedTextField(
+                if (field.key == "kind") {
+                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        Text("Listing type *", fontWeight = FontWeight.SemiBold)
+                        ProductKindChoices.forEach { (value, label) ->
+                            Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+                                RadioButton(
+                                    selected = values["kind"] == value,
+                                    onClick = {
+                                        values = values + ("kind" to value)
+                                        fieldErrors = fieldErrors - "kind"
+                                    },
+                                )
+                                Text(label)
+                            }
+                        }
+                        fieldErrors["kind"]?.let { Text(it) }
+                    }
+                } else OutlinedTextField(
                     value = values[field.key].orEmpty(),
                     onValueChange = { value ->
                         values = values + (field.key to value)
@@ -230,7 +251,6 @@ fun ProjectNewMobileScreen(
 
     LazyColumn(contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item {
-            Text("New Project", fontWeight = FontWeight.Bold)
             Text("Step ${currentStep + 1} of ${visibleSteps.size}: ${step.title}")
             LinearProgressIndicator(
                 progress = (currentStep + 1).toFloat() / visibleSteps.size.toFloat(),
@@ -323,11 +343,14 @@ fun ProjectNewMobileScreen(
     }
 }
 
-val ProductNewFields = listOf(
+val RetailNewFields = listOf(
+    VendorNewField("kind", "Listing type", required = true),
+    VendorNewField("categoryId", "Category ID", required = true),
     VendorNewField("title", "Title", required = true),
     VendorNewField("description", "Description"),
-    VendorNewField("price", "Price", numeric = true),
-    VendorNewField("status", "Status"),
+    VendorNewField("amountMinor", "Budget / price in cents", numeric = true),
+    VendorNewField("currency", "Currency", required = true),
+    VendorNewField("location", "Location"),
 )
 
 val OrderNewFields = listOf(

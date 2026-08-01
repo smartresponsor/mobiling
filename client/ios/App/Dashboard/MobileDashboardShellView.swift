@@ -69,8 +69,8 @@ public struct MobileDashboardShellView: View {
                 } else if vendorContentRoute == "attachment" || vendorContentRoute == "vendor/attachment" {
                     MobileAttachmentView(vendorId: vendorId, attachmentFeatureBridge: attachmentFeatureBridge)
                         .toolbar { accountToolbar }
-                } else if vendorContentRoute == "vendor/product/new" {
-                    VendorNewCrudView(singular: "Product", resource: "product", listRoute: "vendor/product", fields: ProductNewFields, gateway: vendorCrudGateway, onRouteSelected: { vendorContentRoute = $0 })
+                } else if vendorContentRoute == "vendor/retail/new" {
+                    VendorNewCrudView(singular: "Product", resource: "retail", listRoute: "vendor/retail", fields: ProductNewFields, gateway: vendorCrudGateway, onRouteSelected: { vendorContentRoute = $0 })
                         .toolbar { accountToolbar }
                 } else if vendorContentRoute == "vendor/order/new" {
                     VendorNewCrudView(singular: "Order", resource: "order", listRoute: "vendor/order", fields: OrderNewFields, gateway: vendorCrudGateway, onRouteSelected: { vendorContentRoute = $0 })
@@ -78,8 +78,8 @@ public struct MobileDashboardShellView: View {
                 } else if vendorContentRoute == "vendor/project/new" {
                     ProjectNewWizardView(gateway: vendorCrudGateway, onRouteSelected: { vendorContentRoute = $0 })
                         .toolbar { accountToolbar }
-                } else if vendorContentRoute == "vendor/product" || vendorContentRoute.hasPrefix("vendor/product/") {
-                    VendorOwnedCrudView(title: "Products", resource: "product", routeRoot: "vendor/product", selectedId: selectedIdentity(routeRoot: "vendor/product"), gateway: vendorCrudGateway, onRouteSelected: { vendorContentRoute = $0 })
+                } else if vendorContentRoute == "vendor/retail" || vendorContentRoute.hasPrefix("vendor/retail/") {
+                    VendorOwnedCrudView(title: "Products", resource: "retail", routeRoot: "vendor/retail", selectedId: selectedIdentity(routeRoot: "vendor/retail"), gateway: vendorCrudGateway, onRouteSelected: { vendorContentRoute = $0 })
                         .toolbar { accountToolbar }
                 } else if vendorContentRoute == "vendor/order" || vendorContentRoute.hasPrefix("vendor/order/") {
                     VendorOwnedCrudView(title: "Orders", resource: "order", routeRoot: "vendor/order", selectedId: selectedIdentity(routeRoot: "vendor/order"), gateway: vendorCrudGateway, onRouteSelected: { vendorContentRoute = $0 })
@@ -122,7 +122,7 @@ public struct MobileDashboardShellView: View {
         }
         .confirmationDialog("New", isPresented: $newChooserOpen, titleVisibility: .visible) {
             Button("Product") {
-                vendorContentRoute = "vendor/product/new"
+                vendorContentRoute = "vendor/retail/new"
                 selectedRoute = "vendor"
             }
             Button("Order") {
@@ -176,12 +176,6 @@ public struct MobileDashboardShellView: View {
     private func content(title: String, items: [MobileNavigationItemPayload]) -> some View {
         List {
             Section {
-                Text("Root shell is loaded from Navigating publication. Inactive modules stay visible as Coming soon.")
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-            }
-
-            Section(title) {
                 ForEach(items.filter { $0.visible }) { item in
                     row(item)
                         .onTapGesture { handle(item) }
@@ -256,12 +250,7 @@ public struct MobileDashboardShellView: View {
                 .foregroundColor(item.enabled ? Color(red: 51 / 255, green: 51 / 255, blue: 51 / 255) : .secondary)
                 .frame(width: 24)
 
-            VStack(alignment: .leading, spacing: 2) {
-                Text(navigationLabelResolver(item.route, item.key, item.label))
-                Text(item.badge ?? item.route ?? item.key)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
+            Text(navigationLabelResolver(item.route, item.key, item.label))
 
             Spacer()
 
@@ -364,7 +353,7 @@ public struct MobileDashboardShellView: View {
                 item("vendor_payout", "Payout", "payout", true, "vendor/payout"),
                 item("vendor_transaction", "Transaction", "receipt", true, "vendor/transaction"),
                 item("vendor_attachment", "My Attachment", "attachment", true, "attachment"),
-                item("vendor_product", "Products", "catalog", true, "vendor/product"),
+                item("vendor_product", "Products", "catalog", true, "vendor/retail"),
                 item("vendor_order", "Orders", "statement", true, "vendor/order"),
                 item("vendor_project", "Projects", "summary", true, "vendor/project"),
             ]

@@ -36,8 +36,8 @@ object MobileRouteResolver {
             route == "cart" -> MobileRoute.Cart.Current
             route == "cart/checkout" -> MobileRoute.Cart.Checkout
             segments.size == 4 && segments[0] == "cart" && segments[1] == "checkout" && segments[2] == "result" -> MobileRoute.Cart.CheckoutResult(segments[3])
-            route == "vendor/product" -> MobileRoute.Product.Listing
-            route == "vendor/product/new" -> MobileRoute.Product.New
+            route == "vendor/retail" -> MobileRoute.Product.Listing
+            route == "vendor/retail/new" -> MobileRoute.Product.New
             segments.size == 3 && segments[0] == "vendor" && segments[1] == "product" -> MobileRoute.Product.Detail(segments[2])
             route == "vendor/order" -> MobileRoute.Order.Listing
             route == "vendor/order/new" -> MobileRoute.Order.New

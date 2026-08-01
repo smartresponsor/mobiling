@@ -24,7 +24,7 @@ class ProjectHttpGateway(private val baseUrl: String, private val client: OkHttp
     override suspend fun deleteProject(projectId: String) { request("DELETE", projectId, null) }
 
     private fun request(method: String, identity: String?, fields: Map<String, String>?): JSONObject {
-        val url = baseUrl.trimEnd('/') + "/crud/my/project" + (identity?.let { "/$it" } ?: "")
+        val url = baseUrl.trimEnd('/') + "/my/project" + (identity?.let { "/$it" } ?: "")
         val payload = fields?.let { JSONObject(it).toString().toRequestBody("application/json".toMediaType()) }
         val builder = Request.Builder().url(url).header("Accept", "application/json")
         when (method) {

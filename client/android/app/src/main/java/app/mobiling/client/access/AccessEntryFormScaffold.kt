@@ -54,10 +54,7 @@ internal fun AccessFlowShell(
                     }
                 },
                 title = {
-                    Column {
-                        Text("1tasker", fontWeight = FontWeight.Bold)
-                        Text("Secure access", style = MaterialTheme.typography.bodySmall)
-                    }
+                    Text(title, fontWeight = FontWeight.SemiBold)
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primary,
@@ -75,9 +72,6 @@ internal fun AccessFlowShell(
                 .padding(24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            Text(title, style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.SemiBold)
-            Text(styledSubtitle ?: AnnotatedString(subtitle), style = MaterialTheme.typography.bodyLarge)
-
             Card(colors = androidx.compose.material3.CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
                 Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
                     content()

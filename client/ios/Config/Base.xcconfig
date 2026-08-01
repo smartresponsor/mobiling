@@ -1,5 +1,5 @@
 MOBILE_ENVIRONMENT_PROFILE = local
 MOBILE_EDGE_BASE_URL = http:/$()/localhost:8080
 MOBILE_INITIAL_DESTINATION = dashboard
-MOBILE_PRIMARY_CATALOG = service
-MOBILE_ENABLED_CATALOGS = service,product,project
+MOBILE_PRIMARY_CATALOG = services
+MOBILE_ENABLED_CATALOGS = services,products,projects

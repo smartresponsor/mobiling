@@ -48,7 +48,6 @@ class DashboardBehaviorTest {
             )
         }
 
-        composeRule.onNodeWithText("Mobile dashboard").assertIsDisplayed()
         composeRule.onAllNodesWithText("Dashboard").onFirst().assertIsDisplayed()
         composeRule.onAllNodesWithText("Cart").onFirst().assertIsDisplayed()
         composeRule.onAllNodesWithText("Vendor").onFirst().assertIsDisplayed()

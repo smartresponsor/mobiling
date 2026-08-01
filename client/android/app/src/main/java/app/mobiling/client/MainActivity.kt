@@ -33,6 +33,7 @@ class MainActivity : ComponentActivity() {
                         accessAuthFeatureBridge = graph.accessAuthFeatureBridge,
                         cartFeatureBridge = graph.cartFeatureBridge,
                         attachmentFeatureBridge = graph.attachmentFeatureBridge,
+                        catalogFeatureBridge = graph.catalogFeatureBridge,
                         navigationShellGateway = graph.navigationShellGateway,
                         productGateway = graph.productGateway,
                         orderGateway = graph.orderGateway,

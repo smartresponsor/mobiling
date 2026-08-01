@@ -24,7 +24,7 @@ class OrderHttpGateway(private val baseUrl: String, private val client: OkHttpCl
     override suspend fun deleteOrder(orderId: String) { request("DELETE", orderId, null) }
 
     private fun request(method: String, identity: String?, fields: Map<String, String>?): JSONObject {
-        val url = baseUrl.trimEnd('/') + "/crud/my/order" + (identity?.let { "/$it" } ?: "")
+        val url = baseUrl.trimEnd('/') + "/my/order" + (identity?.let { "/$it" } ?: "")
         val payload = fields?.let { JSONObject(it).toString().toRequestBody("application/json".toMediaType()) }
         val builder = Request.Builder().url(url).header("Accept", "application/json")
         when (method) {

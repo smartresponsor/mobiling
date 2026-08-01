@@ -108,7 +108,6 @@ private fun <T> ProductList(
     LazyColumn(contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
         item {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Text(if (selectedId == null) "My $title" else "${title.dropLast(1)} Detail", fontWeight = FontWeight.Bold)
                 mutationError?.let { Text(it) }
                 if (selectedId == null) {
                     Button(onClick = { onRouteSelected(routeFor(title, "new")) }) { Text("New ${title.dropLast(1)}") }

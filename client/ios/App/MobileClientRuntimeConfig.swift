@@ -11,8 +11,8 @@ enum MobileClientRuntimeConfig {
         ),
         initialDestination: InitialDestinationPolicy(destination: setting("MOBILE_INITIAL_DESTINATION", fallback: "dashboard")),
         catalog: CatalogPolicy(
-            primaryCatalog: setting("MOBILE_PRIMARY_CATALOG", fallback: "service"),
-            enabledCatalogs: Set(setting("MOBILE_ENABLED_CATALOGS", fallback: "service,product,project").split(separator: ",").map { $0.trimmingCharacters(in: .whitespaces) })
+            primaryCatalog: setting("MOBILE_PRIMARY_CATALOG", fallback: "services"),
+            enabledCatalogs: Set(setting("MOBILE_ENABLED_CATALOGS", fallback: "services,products,projects").split(separator: ",").map { $0.trimmingCharacters(in: .whitespaces) })
         ),
         textResolver: MobileTextResolver(localText: [
             MobileTextKey.dashboard.rawValue: String(localized: "navigation.dashboard", defaultValue: "Dashboard"),

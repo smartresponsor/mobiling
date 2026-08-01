@@ -1,6 +1,6 @@
 import { CrudingApiClient } from "../../client/cruding/crudingApiClient.js";
 const client = new CrudingApiClient();
-const allowed = new Set(["product", "order", "project"]);
+const allowed = new Set(["retail", "order", "project"]);
 function forwarded(headers) {
     const result = {};
     for (const key of ["cookie", "authorization"]) {
@@ -13,7 +13,7 @@ function forwarded(headers) {
 export default async function route(app) {
     app.route({
         method: ["GET", "POST", "PUT", "PATCH", "DELETE"],
-        url: "/crud/my/:resource/:identity?",
+        url: "/my/:resource/:identity?",
         handler: async (request, reply) => {
             const params = request.params;
             const resource = (params.resource || "").trim();

@@ -38,6 +38,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -67,6 +68,7 @@ fun AccessWelcomeScreen(
     onCreateAccess: () -> Unit,
 ) {
     var selectedRoute by remember { mutableStateOf(GuestRoute.Home) }
+    var catalogRootRequest by remember { mutableIntStateOf(0) }
     var navigationOpen by remember { mutableStateOf(false) }
     var accountOpen by remember { mutableStateOf(false) }
 
@@ -80,10 +82,7 @@ fun AccessWelcomeScreen(
                     }
                 },
                 title = {
-                    Column {
-                        Text("1tasker", fontWeight = FontWeight.Bold)
-                        Text("Residential · Commercial · Hospitality", style = MaterialTheme.typography.bodySmall)
-                    }
+                    Text(selectedRoute.label, fontWeight = FontWeight.SemiBold)
                 },
                 actions = {
                     IconButton(onClick = { accountOpen = true }) {
@@ -106,7 +105,12 @@ fun AccessWelcomeScreen(
                 GuestRoute.entries.forEach { route ->
                     NavigationBarItem(
                         selected = selectedRoute == route,
-                        onClick = { selectedRoute = route },
+                        onClick = {
+                            if (route == GuestRoute.Catalog && selectedRoute == GuestRoute.Catalog) {
+                                catalogRootRequest += 1
+                            }
+                            selectedRoute = route
+                        },
                         icon = { Icon(route.icon, contentDescription = route.label) },
                         label = { Text(route.label) },
                         colors = NavigationBarItemDefaults.colors(
@@ -125,6 +129,7 @@ fun AccessWelcomeScreen(
             route = selectedRoute,
             padding = padding,
             catalogFeatureBridge = catalogFeatureBridge,
+            catalogRootRequest = catalogRootRequest,
             cartFeatureBridge = cartFeatureBridge,
             onSignIn = onSignIn,
             onCreateAccess = onCreateAccess,
@@ -204,6 +209,7 @@ private fun GuestRouteContent(
     route: GuestRoute,
     padding: PaddingValues,
     catalogFeatureBridge: CatalogFeatureBridge?,
+    catalogRootRequest: Int,
     cartFeatureBridge: CartFeatureBridge?,
     onSignIn: () -> Unit,
     onCreateAccess: () -> Unit,
@@ -218,26 +224,19 @@ private fun GuestRouteContent(
     ) {
         when (route) {
             GuestRoute.Home -> {
-                Text("Your Trusted Home Specialist", style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.SemiBold)
-                Text("MDF · IDF · Guest Rooms")
-                Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
-                    Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        Text("Explore 1tasker", style = MaterialTheme.typography.titleMedium)
-                        Text("Browse the marketplace, review public users, explore orders, and keep a guest cart before signing in.")
-                    }
-                }
                 Button(onClick = onSignIn, modifier = Modifier.fillMaxWidth()) { Text("Sign in") }
                 OutlinedButton(onClick = onCreateAccess, modifier = Modifier.fillMaxWidth()) { Text("Create account") }
                 GuestLegalFooter()
             }
-            GuestRoute.Catalog -> CatalogMobileScreen(catalogFeatureBridge = catalogFeatureBridge)
+            GuestRoute.Catalog -> CatalogMobileScreen(
+                catalogFeatureBridge = catalogFeatureBridge,
+                rootRequest = catalogRootRequest,
+            )
             GuestRoute.Cart -> CartMobileScreen(cartFeatureBridge = cartFeatureBridge)
             GuestRoute.User -> GuestPlaceholder(
-                title = "Users",
                 description = "Public customer, specialist, vendor, and sponsor profiles will be available here without exposing private account data.",
             )
             GuestRoute.Order -> GuestPlaceholder(
-                title = "Orders",
                 description = "Guests can start sponsorship or checkout activity here. Personal order history remains available only after authentication.",
             )
         }
@@ -245,8 +244,7 @@ private fun GuestRouteContent(
 }
 
 @Composable
-private fun GuestPlaceholder(title: String, description: String) {
-    Text(title, style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
+private fun GuestPlaceholder(description: String) {
     Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
         Text(description, modifier = Modifier.padding(16.dp))
     }

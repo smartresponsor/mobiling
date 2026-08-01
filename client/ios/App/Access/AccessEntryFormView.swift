@@ -42,25 +42,9 @@ struct AccessFlowShellView<Content: View>: View {
                             .font(.headline)
                     }
                     .accessibilityLabel("Back")
-
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("1tasker")
-                            .font(.headline.weight(.bold))
-                        Text("Secure access")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    Spacer()
-                }
-
-                VStack(alignment: .leading, spacing: 10) {
-                    Text("SmartResponsor")
-                        .font(.largeTitle.weight(.semibold))
                     Text(title)
-                        .font(.title2.weight(.semibold))
-                    Text(subtitle)
-                        .font(.body)
-                        .foregroundStyle(.secondary)
+                        .font(.headline.weight(.semibold))
+                    Spacer()
                 }
 
                 VStack(alignment: .leading, spacing: 16) {

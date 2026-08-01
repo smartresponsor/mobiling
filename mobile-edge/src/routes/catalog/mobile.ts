@@ -85,6 +85,33 @@ function catalogItems(root: Record<string, unknown>): unknown[] {
   return [];
 }
 
+function catalogNodeId(value: unknown): string | null {
+  const item = recordValue(value);
+
+  return stringValue(item.nodeId ?? item.catalogNodeId ?? item.categoryId ?? item.id);
+}
+
+function catalogChildren(value: unknown): unknown[] {
+  const item = recordValue(value);
+
+  return Array.isArray(item.children) ? item.children : [];
+}
+
+function findCatalogNode(value: unknown, nodeId: string): Record<string, unknown> | null {
+  const item = recordValue(value);
+
+  if (catalogNodeId(item) === nodeId) {
+    return item;
+  }
+
+  for (const child of catalogChildren(item)) {
+    const match = findCatalogNode(child, nodeId);
+    if (match) return match;
+  }
+
+  return null;
+}
+
 function normalizeCatalogNode(value: unknown): Record<string, unknown> {
   const item = recordValue(value);
 
@@ -141,14 +168,31 @@ function querySuffix(query: unknown): string {
 }
 
 export default async function route(app: FastifyInstance): Promise<void> {
-  app.get("/catalog", { schema: { response: { 200: mobileCatalogListPayload, 503: mobileAccessErrorPayload } } }, async (request, reply) => {
-    const result = await catalogingApiClient.get(`/api/catalog/category/store${querySuffix(request.query)}`, forwardedHeaders(request as { headers: Record<string, unknown> }));
+  app.get("/catalog", { schema: { response: { 200: mobileCatalogListPayload, 400: mobileAccessErrorPayload, 404: mobileAccessErrorPayload, 503: mobileAccessErrorPayload } } }, async (request, reply) => {
+    const catalogCode = stringValue(recordValue(request.query).catalogCode);
+    if (!catalogCode) {
+      return reply.code(400).send({ code: "catalog_code_required", message: "catalogCode is required." });
+    }
+    const result = await catalogingApiClient.get(`/api/catalog/${encodeURIComponent(catalogCode)}/category/tree`, forwardedHeaders(request as { headers: Record<string, unknown> }));
 
     if (result.status < 200 || result.status >= 300) {
       return reply.code(result.status).send(normalizeErrorPayload(result.body));
     }
 
-    return reply.code(200).send(normalizeCatalogList(result.body));
+    const normalized = normalizeCatalogList(result.body);
+    const parentNodeId = stringValue(recordValue(request.query).parentNodeId);
+
+    if (!parentNodeId) {
+      return reply.code(200).send(normalized);
+    }
+
+    const root = catalogRoot(result.body);
+    const parent = findCatalogNode(recordValue(root.root), parentNodeId);
+
+    return reply.code(200).send({
+      nodes: catalogChildren(parent).map(normalizeCatalogNode),
+      payload: root,
+    });
   });
 
   app.get("/catalog/node/:catalogNodeId", { schema: { response: { 200: mobileCatalogNodeDetailPayload, 503: mobileAccessErrorPayload } } }, async (request, reply) => {

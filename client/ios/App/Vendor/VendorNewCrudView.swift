@@ -40,11 +40,6 @@ public struct VendorNewCrudView: View {
 
     public var body: some View {
         Form {
-            Section {
-                Text("Complete the required fields, then create the \(singular.lowercased()).")
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-            }
             Section("Details") {
                 ForEach(fields, id: \.key) { field in
                     VStack(alignment: .leading, spacing: 4) {

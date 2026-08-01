@@ -78,17 +78,6 @@ fun VendorMobileOverviewScreen(
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
-        item {
-            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
-                Text("My Vendor", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
-                Text(
-                    "Business status, profile readiness, payments, and activity in one place.",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                )
-            }
-        }
-
         when {
             summary != null -> item {
                 val currentSummary = summary ?: return@item
@@ -138,10 +127,6 @@ fun VendorMobileOverviewScreen(
             }
 
             else -> item { Text("Loading vendor overview...") }
-        }
-
-        item {
-            Text("Workspace", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
         }
 
         item {

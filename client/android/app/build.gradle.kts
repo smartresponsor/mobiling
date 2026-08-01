@@ -25,8 +25,8 @@ android {
         buildConfigField("String", "ENVIRONMENT_PROFILE", quotedBuildConfigValue("local"))
         buildConfigField("String", "MOBILE_EDGE_BASE_URL", quotedBuildConfigValue("http://10.0.2.2:8080"))
         buildConfigField("String", "INITIAL_DESTINATION", quotedBuildConfigValue("dashboard"))
-        buildConfigField("String", "PRIMARY_CATALOG", quotedBuildConfigValue("service"))
-        buildConfigField("String", "ENABLED_CATALOGS", quotedBuildConfigValue("service,product,project"))
+        buildConfigField("String", "PRIMARY_CATALOG", quotedBuildConfigValue("services"))
+        buildConfigField("String", "ENABLED_CATALOGS", quotedBuildConfigValue("services,products,projects"))
     }
     productFlavors {
         create("oneTasker") {
@@ -34,6 +34,7 @@ android {
             applicationIdSuffix = ".onetasker"
             buildConfigField("String", "BRAND_PROFILE", quotedBuildConfigValue("one_tasker"))
             buildConfigField("String", "PRODUCT_PROFILE", quotedBuildConfigValue("one_tasker"))
+            buildConfigField("String", "PRIMARY_CATALOG", quotedBuildConfigValue("services"))
         }
         create("smartResponsor") {
             dimension = "brand"

@@ -15,7 +15,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import app.mobiling.client.contract.attachment.AttachmentListPayload
 import app.mobiling.client.contract.attachment.AttachmentUploadHandoffRequest
@@ -70,7 +69,6 @@ fun AttachmentMobileScreen(
         modifier = Modifier.fillMaxWidth().padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        Text("Attachment", fontWeight = FontWeight.Bold)
         Text(statusText(loading = loading, error = error, attachmentList = attachmentList))
         attachmentList?.items.orEmpty().forEach { item ->
             ListItem(

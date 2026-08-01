@@ -4,8 +4,8 @@
 param(
     [string]$DeviceSerial,
     [string]$AvdName = "Mobiling_Light_API_34",
-    [string]$PackageName = "app.mobiling.client",
-    [string]$ActivityName = ".MainActivity",
+    [string]$PackageName = "app.mobiling.client.onetasker",
+    [string]$ActivityName = "app.mobiling.client.MainActivity",
     [string]$ScreenshotName = "latest",
     [switch]$SkipBuild,
     [switch]$SkipLaunch
@@ -70,7 +70,7 @@ function Resolve-AdbDeviceSerial {
 $repositoryRoot = Split-Path -Parent $PSScriptRoot
 $androidRoot = Join-Path $repositoryRoot "client/android"
 $gradleWrapper = Join-Path $androidRoot "gradlew.bat"
-$apkPath = Join-Path $androidRoot "app/build/outputs/apk/debug/app-debug.apk"
+$apkPath = Join-Path $androidRoot "app/build/outputs/apk/oneTasker/debug/app-oneTasker-debug.apk"
 $runtimeRoot = Join-Path $repositoryRoot "watchdog/runtime/device"
 $historyRoot = Join-Path $runtimeRoot "history"
 
@@ -101,22 +101,41 @@ if (-not (Test-Path $apkPath)) {
     throw "Debug APK was not found at $apkPath"
 }
 
+if ($PackageName -eq "app.mobiling.client.onetasker") {
+    & adb -s $resolvedSerial uninstall app.mobiling.client 2>$null | Out-Null
+}
+
 & adb -s $resolvedSerial install -r -t $apkPath
 if ($LASTEXITCODE -ne 0) {
     throw "APK installation failed with exit code $LASTEXITCODE."
 }
 
 if (-not $SkipLaunch) {
+    & adb -s $resolvedSerial shell am force-stop $PackageName | Out-Null
+    Start-Sleep -Milliseconds 500
     & adb -s $resolvedSerial shell am start -W -n "$PackageName/$ActivityName"
     if ($LASTEXITCODE -ne 0) {
         throw "Application launch command failed with exit code $LASTEXITCODE."
     }
 }
 
-Start-Sleep -Milliseconds 500
+$foregroundDeadline = (Get-Date).AddSeconds(35)
+$foregroundReady = $false
+do {
+    Start-Sleep -Milliseconds 500
+    $focusedWindow = ((& adb -s $resolvedSerial shell dumpsys activity activities 2>$null | Select-String "mResumedActivity|topResumedActivity|ResumedActivity") | Out-String)
+    if ($focusedWindow -match [regex]::Escape($PackageName)) {
+        $foregroundReady = $true
+        break
+    }
+} while ((Get-Date) -lt $foregroundDeadline)
+
 $processId = ((& adb -s $resolvedSerial shell pidof $PackageName) | Out-String).Trim()
 if ([string]::IsNullOrWhiteSpace($processId)) {
     throw "Application process '$PackageName' is not running after installation and launch."
+}
+if (-not $foregroundReady) {
+    throw "Application '$PackageName' did not reach the foreground within 35 seconds."
 }
 
 New-Item -ItemType Directory -Force -Path $runtimeRoot | Out-Null
@@ -138,6 +157,13 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 Copy-Item -Force -Path $latestScreenshot -Destination $historyScreenshot
+
+$uiDumpDevicePath = "/sdcard/window_dump.xml"
+$latestUiDump = Join-Path $runtimeRoot "current-ui.xml"
+& adb -s $resolvedSerial shell uiautomator dump $uiDumpDevicePath | Out-Null
+if ($LASTEXITCODE -eq 0) {
+    & adb -s $resolvedSerial pull $uiDumpDevicePath $latestUiDump | Out-Null
+}
 
 $result = [ordered]@{
     ok = $true

@@ -9,13 +9,6 @@ struct AccessWelcomeView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
-                Text("SmartResponsor")
-                    .font(.largeTitle.weight(.semibold))
-                Text("Business access for vendor, catalog, order, and message workflows.")
-                    .font(.title3)
-                Text("Access is required to open the business workspace.")
-                    .foregroundStyle(.secondary)
-
                 LazyVGrid(columns: [GridItem(.adaptive(minimum: 96), spacing: 8)], alignment: .leading, spacing: 8) {
                     ForEach(businessAreas, id: \.self) { area in
                         Text(area)
@@ -28,18 +21,6 @@ struct AccessWelcomeView: View {
                             )
                     }
                 }
-
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Guest entry")
-                        .font(.headline)
-                    Text("Sign in to continue or create access for a new workspace account.")
-                        .foregroundStyle(.secondary)
-                }
-                .padding(16)
-                .background(
-                    RoundedRectangle(cornerRadius: 16, style: .continuous)
-                        .fill(Color(.systemBackground))
-                )
 
                 Button("Sign in", action: onSignIn)
                     .buttonStyle(.borderedProminent)

@@ -16,14 +16,6 @@ public struct MobileAttachmentView: View {
 
     public var body: some View {
         List {
-            Section {
-                Text("Attachment")
-                    .font(.headline)
-                Text("Vendor-owned attachment links from Attaching.")
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-            }
-
             if isLoading {
                 Section {
                     Text("Loading attachment...")
