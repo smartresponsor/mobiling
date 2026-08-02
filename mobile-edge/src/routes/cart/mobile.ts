@@ -136,7 +136,7 @@ export default async function route(app: FastifyInstance): Promise<void> {
     const result = await cartingApiClient.getCurrentCart(forwardedHeaders(request as { headers: Record<string, unknown> }));
 
     if (result.status < 200 || result.status >= 300) {
-      return reply.code(result.status).send(normalizeErrorPayload(result.body));
+      return reply.code(result.status as any).send(normalizeErrorPayload(result.body));
     }
 
     return reply.code(200).send(normalizeCart(result.body));
@@ -146,7 +146,7 @@ export default async function route(app: FastifyInstance): Promise<void> {
     const result = await cartingApiClient.addItem(request.body, forwardedHeaders(request as { headers: Record<string, unknown> }));
 
     if (result.status < 200 || result.status >= 300) {
-      return reply.code(result.status).send(normalizeErrorPayload(result.body));
+      return reply.code(result.status as any).send(normalizeErrorPayload(result.body));
     }
 
     return reply.code(201 === result.status ? 201 : 200).send(normalizeCart(result.body));
@@ -156,7 +156,7 @@ export default async function route(app: FastifyInstance): Promise<void> {
     const result = await cartingApiClient.prepareCheckoutHandoff(forwardedHeaders(request as { headers: Record<string, unknown> }));
 
     if (result.status < 200 || result.status >= 300) {
-      return reply.code(result.status).send(normalizeErrorPayload(result.body));
+      return reply.code(result.status as any).send(normalizeErrorPayload(result.body));
     }
 
     return reply.code(201 === result.status ? 201 : 200).send(normalizeCheckoutHandoff(result.body));

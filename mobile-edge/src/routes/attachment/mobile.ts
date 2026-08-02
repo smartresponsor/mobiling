@@ -205,7 +205,7 @@ export default async function route(app: FastifyInstance): Promise<void> {
     );
 
     if (result.status < 200 || result.status >= 300) {
-      return reply.code(result.status).send(normalizeErrorPayload(result.body));
+      return reply.code(result.status as any).send(normalizeErrorPayload(result.body));
     }
 
     return reply.code(200).send(normalizeAttachmentList(result.body));
@@ -218,7 +218,7 @@ export default async function route(app: FastifyInstance): Promise<void> {
     );
 
     if (result.status < 200 || result.status >= 300) {
-      return reply.code(result.status).send(normalizeErrorPayload(result.body));
+      return reply.code(result.status as any).send(normalizeErrorPayload(result.body));
     }
 
     return reply.code(201 === result.status ? 201 : 200).send(normalizeAttachmentLink(result.body));
@@ -231,7 +231,7 @@ export default async function route(app: FastifyInstance): Promise<void> {
     );
 
     if (result.status < 200 || result.status >= 300) {
-      return reply.code(result.status).send(normalizeErrorPayload(result.body));
+      return reply.code(result.status as any).send(normalizeErrorPayload(result.body));
     }
 
     return reply.code(200).send(normalizeAttachmentDetach(result.body, request.body));

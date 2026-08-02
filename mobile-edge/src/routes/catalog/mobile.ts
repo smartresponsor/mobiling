@@ -176,7 +176,7 @@ export default async function route(app: FastifyInstance): Promise<void> {
     const result = await catalogingApiClient.get(`/api/catalog/${encodeURIComponent(catalogCode)}/category/tree`, forwardedHeaders(request as { headers: Record<string, unknown> }));
 
     if (result.status < 200 || result.status >= 300) {
-      return reply.code(result.status).send(normalizeErrorPayload(result.body));
+      return reply.code(result.status as any).send(normalizeErrorPayload(result.body));
     }
 
     const normalized = normalizeCatalogList(result.body);
@@ -201,7 +201,7 @@ export default async function route(app: FastifyInstance): Promise<void> {
     const result = await catalogingApiClient.get(`/api/catalog/category/${catalogNodeId}`, forwardedHeaders(request as { headers: Record<string, unknown> }));
 
     if (result.status < 200 || result.status >= 300) {
-      return reply.code(result.status).send(normalizeErrorPayload(result.body));
+      return reply.code(result.status as any).send(normalizeErrorPayload(result.body));
     }
 
     return reply.code(200).send(normalizeCatalogDetail(result.body));
@@ -211,7 +211,7 @@ export default async function route(app: FastifyInstance): Promise<void> {
     const result = await catalogingApiClient.get(`/api/catalog/category/search${querySuffix(request.query)}`, forwardedHeaders(request as { headers: Record<string, unknown> }));
 
     if (result.status < 200 || result.status >= 300) {
-      return reply.code(result.status).send(normalizeErrorPayload(result.body));
+      return reply.code(result.status as any).send(normalizeErrorPayload(result.body));
     }
 
     return reply.code(200).send({ query: stringValue(recordValue(request.query).q), ...normalizeCatalogList(result.body) });
@@ -223,7 +223,7 @@ export default async function route(app: FastifyInstance): Promise<void> {
     const result = await catalogingApiClient.post(`/api/catalog/category/move/${catalogNodeId}`, request.body, forwardedHeaders(request as { headers: Record<string, unknown> }));
 
     if (result.status < 200 || result.status >= 300) {
-      return reply.code(result.status).send(normalizeErrorPayload(result.body));
+      return reply.code(result.status as any).send(normalizeErrorPayload(result.body));
     }
 
     return reply.code(200).send(normalizeCatalogMutation(result.body, "moved", stringValue(params.catalogNodeId)));
@@ -235,7 +235,7 @@ export default async function route(app: FastifyInstance): Promise<void> {
     const result = await catalogingApiClient.post(`/api/catalog/category/publish/${catalogNodeId}`, request.body, forwardedHeaders(request as { headers: Record<string, unknown> }));
 
     if (result.status < 200 || result.status >= 300) {
-      return reply.code(result.status).send(normalizeErrorPayload(result.body));
+      return reply.code(result.status as any).send(normalizeErrorPayload(result.body));
     }
 
     return reply.code(200).send(normalizeCatalogMutation(result.body, "published", stringValue(params.catalogNodeId)));
@@ -245,7 +245,7 @@ export default async function route(app: FastifyInstance): Promise<void> {
     const result = await catalogingApiClient.post("/api/catalog/category/attachment", request.body, forwardedHeaders(request as { headers: Record<string, unknown> }));
 
     if (result.status < 200 || result.status >= 300) {
-      return reply.code(result.status).send(normalizeErrorPayload(result.body));
+      return reply.code(result.status as any).send(normalizeErrorPayload(result.body));
     }
 
     return reply.code(201 === result.status ? 201 : 200).send(normalizeCatalogMutation(result.body, "linked"));
@@ -257,7 +257,7 @@ export default async function route(app: FastifyInstance): Promise<void> {
     const result = await catalogingApiClient.delete(`/api/catalog/category/attachment/${attachmentId}`, forwardedHeaders(request as { headers: Record<string, unknown> }));
 
     if (result.status < 200 || result.status >= 300) {
-      return reply.code(result.status).send(normalizeErrorPayload(result.body));
+      return reply.code(result.status as any).send(normalizeErrorPayload(result.body));
     }
 
     return reply.code(200).send(normalizeCatalogMutation(result.body, "detached", null, stringValue(body.attachmentId ?? body.attachment_id)));
@@ -267,7 +267,7 @@ export default async function route(app: FastifyInstance): Promise<void> {
     const result = await catalogingApiClient.post("/api/catalog/category/virtual/preview", request.body, forwardedHeaders(request as { headers: Record<string, unknown> }));
 
     if (result.status < 200 || result.status >= 300) {
-      return reply.code(result.status).send(normalizeErrorPayload(result.body));
+      return reply.code(result.status as any).send(normalizeErrorPayload(result.body));
     }
 
     return reply.code(200).send(normalizeCatalogMutation(result.body, "previewed"));
@@ -279,7 +279,7 @@ export default async function route(app: FastifyInstance): Promise<void> {
     const result = await catalogingApiClient.post(`/api/catalog/category/virtual/apply/${catalogNodeId}`, request.body, forwardedHeaders(request as { headers: Record<string, unknown> }));
 
     if (result.status < 200 || result.status >= 300) {
-      return reply.code(result.status).send(normalizeErrorPayload(result.body));
+      return reply.code(result.status as any).send(normalizeErrorPayload(result.body));
     }
 
     return reply.code(200).send(normalizeCatalogMutation(result.body, "applied", stringValue(params.catalogNodeId)));

@@ -63,6 +63,6 @@ export default async function route(app: FastifyInstance): Promise<void> {
       return reply.code(200).send(result.body);
     }
 
-    return reply.code(result.status).send(normalizeErrorPayload(result.body));
+    return reply.code(result.status as any).send(normalizeErrorPayload(result.body));
   });
 }

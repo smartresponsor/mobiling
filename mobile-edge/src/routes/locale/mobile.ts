@@ -71,7 +71,7 @@ export default async function routeMobileLocale(app: FastifyInstance): Promise<v
       return reply.code(200).send(result.body);
     }
 
-    return reply.code(result.status).send(normalizeErrorPayload(result.body));
+    return reply.code(result.status as any).send(normalizeErrorPayload(result.body));
   });
 
   app.get("/locale/:code/fallback", { schema: schemas.fallback }, async (request, reply) => {
@@ -90,7 +90,7 @@ export default async function routeMobileLocale(app: FastifyInstance): Promise<v
       return reply.code(200).send(normalizeFallbackPayload(result.body));
     }
 
-    return reply.code(result.status).send(normalizeErrorPayload(result.body));
+    return reply.code(result.status as any).send(normalizeErrorPayload(result.body));
   });
 
   app.get("/locale/translation/message/resolve", { schema: schemas.message }, async (request, reply) => {
@@ -114,7 +114,7 @@ export default async function routeMobileLocale(app: FastifyInstance): Promise<v
       return reply.code(200).send(result.body);
     }
 
-    return reply.code(result.status).send(normalizeErrorPayload(result.body));
+    return reply.code(result.status as any).send(normalizeErrorPayload(result.body));
   });
 }
 function normalizeFallbackPayload(body: unknown): unknown {

@@ -92,7 +92,7 @@ export default async function route(app: FastifyInstance): Promise<void> {
     );
 
     if (result.status < 200 || result.status >= 300) {
-      return reply.code(result.status).send(normalizeErrorPayload(result.body));
+      return reply.code(result.status as any).send(normalizeErrorPayload(result.body));
     }
 
     const root = summaryPayload(result.body);

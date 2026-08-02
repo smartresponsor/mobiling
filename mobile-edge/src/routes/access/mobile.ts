@@ -270,7 +270,7 @@ export default async function route(app: FastifyInstance): Promise<void> {
   app.post("/access/signin", { schema: schemas.signin }, async (request, reply) => {
     const result = await accessingApiClient.signIn(request.body as { email: string; password: string }, forwardedHeaders(request as { headers: Record<string, unknown> }));
     applySessionTransport(reply, result.responseCookie);
-    return reply.code(result.status).send(proxyPayload(result.status, result.body));
+    return reply.code(result.status as any).send(proxyPayload(result.status, result.body));
   });
 
   app.post("/access/register", { schema: schemas.register }, async (request, reply) => {
@@ -285,25 +285,25 @@ export default async function route(app: FastifyInstance): Promise<void> {
     );
 
     applySessionTransport(reply, result.responseCookie);
-    return reply.code(result.status).send(proxyPayload(result.status, result.body));
+    return reply.code(result.status as any).send(proxyPayload(result.status, result.body));
   });
 
   app.post("/access/logout", { schema: schemas.logout }, async (request, reply) => {
     const result = await accessingApiClient.logout(forwardedHeaders(request as { headers: Record<string, unknown> }));
     applySessionTransport(reply, result.responseCookie);
-    return reply.code(result.status).send(proxyPayload(result.status, result.body));
+    return reply.code(result.status as any).send(proxyPayload(result.status, result.body));
   });
 
   app.get("/access/session", { schema: schemas.session }, async (request, reply) => {
     const result = await accessingApiClient.session(forwardedHeaders(request as { headers: Record<string, unknown> }));
     applySessionTransport(reply, result.responseCookie);
-    return reply.code(result.status).send(proxyPayload(result.status, result.body));
+    return reply.code(result.status as any).send(proxyPayload(result.status, result.body));
   });
 
   app.post("/access/verification/resend", { schema: schemas.verificationResend }, async (request, reply) => {
     const result = await accessingApiClient.resendVerification(forwardedHeaders(request as { headers: Record<string, unknown> }));
     applySessionTransport(reply, result.responseCookie);
-    return reply.code(result.status).send(proxyPayload(result.status, result.body));
+    return reply.code(result.status as any).send(proxyPayload(result.status, result.body));
   });
 
   app.post("/access/verification/confirm", { schema: schemas.verificationConfirm }, async (request, reply) => {
@@ -314,13 +314,13 @@ export default async function route(app: FastifyInstance): Promise<void> {
     );
 
     applySessionTransport(reply, result.responseCookie);
-    return reply.code(result.status).send(proxyPayload(result.status, result.body));
+    return reply.code(result.status as any).send(proxyPayload(result.status, result.body));
   });
 
   app.post("/access/second-factor/challenge", { schema: schemas.secondFactorChallenge }, async (request, reply) => {
     const result = await accessingApiClient.challengeSecondFactor(forwardedHeaders(request as { headers: Record<string, unknown> }));
     applySessionTransport(reply, result.responseCookie);
-    return reply.code(result.status).send(proxyPayload(result.status, result.body));
+    return reply.code(result.status as any).send(proxyPayload(result.status, result.body));
   });
 
   app.post("/access/second-factor/verify", { schema: schemas.secondFactorVerify }, async (request, reply) => {
@@ -331,7 +331,7 @@ export default async function route(app: FastifyInstance): Promise<void> {
     );
 
     applySessionTransport(reply, result.responseCookie);
-    return reply.code(result.status).send(proxyPayload(result.status, result.body));
+    return reply.code(result.status as any).send(proxyPayload(result.status, result.body));
   });
 
   app.post("/access/recovery/request", { schema: schemas.recoveryRequest }, async (request, reply) => {
@@ -342,7 +342,7 @@ export default async function route(app: FastifyInstance): Promise<void> {
     );
 
     applySessionTransport(reply, result.responseCookie);
-    return reply.code(result.status).send(proxyPayload(result.status, result.body));
+    return reply.code(result.status as any).send(proxyPayload(result.status, result.body));
   });
 
   app.post("/access/recovery/reset", { schema: schemas.recoveryReset }, async (request, reply) => {
@@ -353,6 +353,6 @@ export default async function route(app: FastifyInstance): Promise<void> {
     );
 
     applySessionTransport(reply, result.responseCookie);
-    return reply.code(result.status).send(proxyPayload(result.status, result.body));
+    return reply.code(result.status as any).send(proxyPayload(result.status, result.body));
   });
 }

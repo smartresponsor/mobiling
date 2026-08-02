@@ -83,7 +83,7 @@ export default async function route(app: FastifyInstance): Promise<void> {
     const result = await vendoringApiClient.getPayout(vendorId, forwardedHeaders(request as { headers: Record<string, unknown> }));
 
     if (result.status < 200 || result.status >= 300) {
-      return reply.code(result.status).send(normalizeErrorPayload(result.body));
+      return reply.code(result.status as any).send(normalizeErrorPayload(result.body));
     }
 
     const root = payoutPayload(result.body);
