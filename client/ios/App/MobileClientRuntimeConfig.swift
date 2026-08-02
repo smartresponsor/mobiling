@@ -14,6 +14,11 @@ enum MobileClientRuntimeConfig {
             primaryCatalog: setting("MOBILE_PRIMARY_CATALOG", fallback: "services"),
             enabledCatalogs: Set(setting("MOBILE_ENABLED_CATALOGS", fallback: "services,products,projects").split(separator: ",").map { $0.trimmingCharacters(in: .whitespaces) })
         ),
+        retail: RetailPolicy(
+            availableKinds: setting("MOBILE_AVAILABLE_RETAIL_KINDS", fallback: "service,goods,project")
+                .split(separator: ",")
+                .compactMap { RetailKind(rawValue: $0.trimmingCharacters(in: .whitespaces)) }
+        ),
         textResolver: MobileTextResolver(localText: [
             MobileTextKey.dashboard.rawValue: String(localized: "navigation.dashboard", defaultValue: "Dashboard"),
             MobileTextKey.catalog.rawValue: String(localized: "navigation.catalog", defaultValue: "Catalog"),

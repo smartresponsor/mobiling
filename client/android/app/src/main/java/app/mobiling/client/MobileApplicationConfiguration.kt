@@ -17,6 +17,24 @@ data class CatalogPolicy(val primaryCatalog: String, val enabledCatalogs: Set<St
     fun isPrimaryCatalogEnabled(): Boolean = isCatalogEnabled(primaryCatalog)
 }
 
+enum class RetailKind(val code: String) {
+    Task("task"),
+    Service("service"),
+    Goods("goods"),
+    Project("project");
+
+    companion object {
+        fun fromCode(code: String): RetailKind? = entries.firstOrNull { it.code == code.trim().lowercase() }
+    }
+}
+
+data class RetailPolicy(val availableKinds: List<RetailKind>) {
+    init { require(availableKinds.isNotEmpty()) { "At least one retail kind must be available." } }
+
+    val defaultKind: RetailKind get() = availableKinds.first()
+    fun isAvailable(kind: RetailKind): Boolean = kind in availableKinds
+}
+
 enum class MobileTextKey(val semanticKey: String) {
     Dashboard("navigation.dashboard"),
     Catalog("navigation.catalog"),
@@ -43,6 +61,7 @@ data class MobileApplicationConfiguration(
     val environment: EnvironmentProfile,
     val initialDestination: InitialDestinationPolicy,
     val catalog: CatalogPolicy,
+    val retail: RetailPolicy,
     val textResolver: MobileTextResolver,
 )
 
@@ -55,6 +74,12 @@ object MobileApplicationConfigurationFactory {
         catalog = CatalogPolicy(
             primaryCatalog = BuildConfig.PRIMARY_CATALOG,
             enabledCatalogs = BuildConfig.ENABLED_CATALOGS.split(',').map(String::trim).filter(String::isNotBlank).toSet(),
+        ),
+        retail = RetailPolicy(
+            availableKinds = BuildConfig.AVAILABLE_RETAIL_KINDS
+                .split(',')
+                .mapNotNull(RetailKind::fromCode)
+                .distinct(),
         ),
         textResolver = MobileTextResolver(localText),
     )

@@ -27,6 +27,7 @@ android {
         buildConfigField("String", "INITIAL_DESTINATION", quotedBuildConfigValue("dashboard"))
         buildConfigField("String", "PRIMARY_CATALOG", quotedBuildConfigValue("services"))
         buildConfigField("String", "ENABLED_CATALOGS", quotedBuildConfigValue("services,products,projects"))
+        buildConfigField("String", "AVAILABLE_RETAIL_KINDS", quotedBuildConfigValue("service,goods,project"))
     }
     productFlavors {
         create("oneTasker") {
@@ -35,12 +36,14 @@ android {
             buildConfigField("String", "BRAND_PROFILE", quotedBuildConfigValue("one_tasker"))
             buildConfigField("String", "PRODUCT_PROFILE", quotedBuildConfigValue("one_tasker"))
             buildConfigField("String", "PRIMARY_CATALOG", quotedBuildConfigValue("services"))
+            buildConfigField("String", "AVAILABLE_RETAIL_KINDS", quotedBuildConfigValue("task,service"))
         }
         create("smartResponsor") {
             dimension = "brand"
             applicationIdSuffix = ".smartresponsor"
             buildConfigField("String", "BRAND_PROFILE", quotedBuildConfigValue("smart_responsor"))
             buildConfigField("String", "PRODUCT_PROFILE", quotedBuildConfigValue("platform"))
+            buildConfigField("String", "AVAILABLE_RETAIL_KINDS", quotedBuildConfigValue("service,goods,project"))
         }
     }
     buildTypes {

@@ -29,6 +29,23 @@ public struct CatalogPolicy: Equatable {
     public func isCatalogEnabled(_ catalog: String) -> Bool { enabledCatalogs.contains(catalog) }
     public var isPrimaryCatalogEnabled: Bool { isCatalogEnabled(primaryCatalog) }
 }
+
+public enum RetailKind: String, CaseIterable, Equatable {
+    case task
+    case service
+    case goods
+    case project
+}
+
+public struct RetailPolicy: Equatable {
+    public let availableKinds: [RetailKind]
+    public init(availableKinds: [RetailKind]) {
+        precondition(!availableKinds.isEmpty, "At least one retail kind must be available.")
+        self.availableKinds = availableKinds
+    }
+    public var defaultKind: RetailKind { availableKinds[0] }
+    public func isAvailable(_ kind: RetailKind) -> Bool { availableKinds.contains(kind) }
+}
 public enum MobileTextKey: String, CaseIterable {
     case dashboard = "navigation.dashboard"
     case catalog = "navigation.catalog"
@@ -61,13 +78,15 @@ public struct MobileApplicationConfiguration {
     public let environment: EnvironmentProfile
     public let initialDestination: InitialDestinationPolicy
     public let catalog: CatalogPolicy
+    public let retail: RetailPolicy
     public let textResolver: MobileTextResolver
-    public init(product: ProductProfile, brand: BrandProfile, environment: EnvironmentProfile, initialDestination: InitialDestinationPolicy, catalog: CatalogPolicy, textResolver: MobileTextResolver) {
+    public init(product: ProductProfile, brand: BrandProfile, environment: EnvironmentProfile, initialDestination: InitialDestinationPolicy, catalog: CatalogPolicy, retail: RetailPolicy, textResolver: MobileTextResolver) {
         self.product = product
         self.brand = brand
         self.environment = environment
         self.initialDestination = initialDestination
         self.catalog = catalog
+        self.retail = retail
         self.textResolver = textResolver
     }
 }

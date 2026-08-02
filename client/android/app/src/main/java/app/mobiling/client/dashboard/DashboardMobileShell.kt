@@ -57,6 +57,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import app.mobiling.client.RetailKind
 import app.mobiling.client.attachment.AttachmentFeatureBridge
 import app.mobiling.client.attachment.AttachmentMobileScreen
 import app.mobiling.client.cart.CartFeatureBridge
@@ -108,6 +109,7 @@ fun DashboardMobileShell(
     vendorTransactionGateway: VendorTransactionGateway? = null,
     initialRoute: String = "dashboard",
     catalogEnabled: Boolean = true,
+    availableRetailKinds: List<RetailKind> = RetailKind.entries,
     navigationLabelResolver: (route: String?, key: String, backendLabel: String) -> String = { _, _, label -> label },
     onSignOut: () -> Unit,
 ) {
@@ -115,7 +117,7 @@ fun DashboardMobileShell(
     var navigationOpen by remember { mutableStateOf(false) }
     var accountOpen by remember { mutableStateOf(false) }
     var newChooserOpen by remember { mutableStateOf(false) }
-    var selectedProductKind by remember { mutableStateOf("task") }
+    var selectedProductKind by remember(availableRetailKinds) { mutableStateOf(availableRetailKinds.first().code) }
     var shell by remember { mutableStateOf(localizeShell(fallbackShell(), navigationLabelResolver)) }
 
     LaunchedEffect(navigationShellGateway) {
@@ -203,6 +205,7 @@ fun DashboardMobileShell(
         DashboardContent(
             selectedRoute = selectedRoute,
             selectedProductKind = selectedProductKind,
+            availableRetailKinds = availableRetailKinds,
             shell = shell,
             productGateway = productGateway,
             orderGateway = orderGateway,
@@ -270,25 +273,16 @@ fun DashboardMobileShell(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
-                NewChoice("Task", "Post work you need someone to complete.", Icons.Default.ReceiptLong) {
-                    selectedProductKind = "task"
-                    selectedRoute = "vendor/retail/new"
-                    newChooserOpen = false
-                }
-                NewChoice("Service", "Offer your skills or professional service.", Icons.Default.Storefront) {
-                    selectedProductKind = "service"
-                    selectedRoute = "vendor/retail/new"
-                    newChooserOpen = false
-                }
-                NewChoice("Product", "Sell a physical or digital item.", Icons.Default.Inventory2) {
-                    selectedProductKind = "goods"
-                    selectedRoute = "vendor/retail/new"
-                    newChooserOpen = false
-                }
-                NewChoice("Project", "Publish a project to the marketplace.", Icons.Default.Dashboard) {
-                    selectedProductKind = "project"
-                    selectedRoute = "vendor/retail/new"
-                    newChooserOpen = false
+                availableRetailKinds.forEach { kind ->
+                    NewChoice(
+                        title = retailKindLabel(kind.code),
+                        description = retailKindDescription(kind),
+                        icon = retailKindIcon(kind),
+                    ) {
+                        selectedProductKind = kind.code
+                        selectedRoute = "vendor/retail/new"
+                        newChooserOpen = false
+                    }
                 }
                 Spacer(Modifier.height(16.dp))
             }
@@ -300,6 +294,7 @@ fun DashboardMobileShell(
 private fun DashboardContent(
     selectedRoute: String,
     selectedProductKind: String,
+    availableRetailKinds: List<RetailKind>,
     shell: NavigationMobileShellScreenContract,
     productGateway: ProductGateway?,
     orderGateway: OrderGateway?,
@@ -408,6 +403,7 @@ private fun DashboardContent(
                                 "kind" to selectedProductKind,
                                 "currency" to "USD",
                             ),
+                            availableRetailKinds = availableRetailKinds,
                         )
                     }
                     return
@@ -701,6 +697,20 @@ private fun retailKindLabel(kind: String): String = when (kind) {
     "goods" -> "Product"
     "project" -> "Project"
     else -> "Listing"
+}
+
+private fun retailKindDescription(kind: RetailKind): String = when (kind) {
+    RetailKind.Task -> "Post work you need someone to complete."
+    RetailKind.Service -> "Offer your skills or professional service."
+    RetailKind.Goods -> "Sell a physical or digital item."
+    RetailKind.Project -> "Publish a project to the marketplace."
+}
+
+private fun retailKindIcon(kind: RetailKind): ImageVector = when (kind) {
+    RetailKind.Task -> Icons.Default.ReceiptLong
+    RetailKind.Service -> Icons.Default.Storefront
+    RetailKind.Goods -> Icons.Default.Inventory2
+    RetailKind.Project -> Icons.Default.Dashboard
 }
 
 private fun isHandledRoute(route: String?): Boolean = MobileRouteResolver.isCurrentlyRenderable(route)

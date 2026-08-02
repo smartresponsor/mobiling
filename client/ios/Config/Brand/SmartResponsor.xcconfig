@@ -1,4 +1,5 @@
 #include "../Base.xcconfig"
 MOBILE_PRODUCT_PROFILE = platform
 MOBILE_BRAND_PROFILE = smart_responsor
+MOBILE_AVAILABLE_RETAIL_KINDS = service,goods,project
 PRODUCT_DISPLAY_NAME = SmartResponsor

@@ -14,9 +14,10 @@ public struct MobilingAppShell: View {
     private let vendorCrudGateway: VendorCrudGateway?
     private let initialRoute: String
     private let catalogEnabled: Bool
+    private let availableRetailKinds: [RetailKind]
     private let navigationLabelResolver: (String?, String, String) -> String
 
-    public init(authFeatureBridge: AuthFeatureBridge? = nil, attachmentFeatureBridge: AttachmentFeatureBridge? = nil, navigationShellGateway: NavigationShellGateway? = nil, vendorProfileGateway: VendorProfileGateway? = nil, vendorSummaryGateway: VendorSummaryGateway? = nil, vendorStatementGateway: VendorStatementGateway? = nil, vendorPayoutGateway: VendorPayoutGateway? = nil, vendorTransactionGateway: VendorTransactionGateway? = nil, vendorCrudGateway: VendorCrudGateway? = nil, initialRoute: String = "dashboard", catalogEnabled: Bool = true, navigationLabelResolver: @escaping (String?, String, String) -> String = { _, _, label in label }) {
+    public init(authFeatureBridge: AuthFeatureBridge? = nil, attachmentFeatureBridge: AttachmentFeatureBridge? = nil, navigationShellGateway: NavigationShellGateway? = nil, vendorProfileGateway: VendorProfileGateway? = nil, vendorSummaryGateway: VendorSummaryGateway? = nil, vendorStatementGateway: VendorStatementGateway? = nil, vendorPayoutGateway: VendorPayoutGateway? = nil, vendorTransactionGateway: VendorTransactionGateway? = nil, vendorCrudGateway: VendorCrudGateway? = nil, initialRoute: String = "dashboard", catalogEnabled: Bool = true, availableRetailKinds: [RetailKind] = RetailKind.allCases, navigationLabelResolver: @escaping (String?, String, String) -> String = { _, _, label in label }) {
         self.authFeatureBridge = authFeatureBridge
         self.attachmentFeatureBridge = attachmentFeatureBridge
         self.navigationShellGateway = navigationShellGateway
@@ -28,6 +29,7 @@ public struct MobilingAppShell: View {
         self.vendorCrudGateway = vendorCrudGateway
         self.initialRoute = initialRoute
         self.catalogEnabled = catalogEnabled
+        self.availableRetailKinds = availableRetailKinds
         self.navigationLabelResolver = navigationLabelResolver
     }
 
@@ -47,6 +49,7 @@ public struct MobilingAppShell: View {
                     vendorCrudGateway: vendorCrudGateway,
                     initialRoute: initialRoute,
                     catalogEnabled: catalogEnabled,
+                    availableRetailKinds: availableRetailKinds,
                     navigationLabelResolver: navigationLabelResolver,
                     onSignOut: { clearAccessSession() }
                 )

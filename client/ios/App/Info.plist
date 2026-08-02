@@ -9,6 +9,7 @@
   <key>MOBILE_INITIAL_DESTINATION</key><string>$(MOBILE_INITIAL_DESTINATION)</string>
   <key>MOBILE_PRIMARY_CATALOG</key><string>$(MOBILE_PRIMARY_CATALOG)</string>
   <key>MOBILE_ENABLED_CATALOGS</key><string>$(MOBILE_ENABLED_CATALOGS)</string>
+  <key>MOBILE_AVAILABLE_RETAIL_KINDS</key><string>$(MOBILE_AVAILABLE_RETAIL_KINDS)</string>
   <key>BGTaskSchedulerPermittedIdentifiers</key>
   <array>
     <string>dev.smartresponsor.mobile.refresh</string>

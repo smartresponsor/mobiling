@@ -22,20 +22,24 @@ public struct VendorNewCrudView: View {
     let fields: [VendorNewField]
     let gateway: VendorCrudGateway?
     let onRouteSelected: (String) -> Void
+    let availableRetailKinds: [RetailKind]
 
     @State private var values: [String: String]
     @State private var fieldErrors: [String: String] = [:]
     @State private var submitError: String?
     @State private var saving = false
 
-    public init(singular: String, resource: String, listRoute: String, fields: [VendorNewField], gateway: VendorCrudGateway?, onRouteSelected: @escaping (String) -> Void) {
+    public init(singular: String, resource: String, listRoute: String, fields: [VendorNewField], gateway: VendorCrudGateway?, onRouteSelected: @escaping (String) -> Void, initialValues: [String: String] = [:], availableRetailKinds: [RetailKind] = RetailKind.allCases) {
         self.singular = singular
         self.resource = resource
         self.listRoute = listRoute
         self.fields = fields
         self.gateway = gateway
         self.onRouteSelected = onRouteSelected
-        _values = State(initialValue: fields.reduce(into: [:]) { $0[$1.key] = "" })
+        self.availableRetailKinds = availableRetailKinds
+        _values = State(initialValue: fields.reduce(into: initialValues) { values, field in
+            if values[field.key] == nil { values[field.key] = "" }
+        })
     }
 
     public var body: some View {
@@ -43,8 +47,17 @@ public struct VendorNewCrudView: View {
             Section("Details") {
                 ForEach(fields, id: \.key) { field in
                     VStack(alignment: .leading, spacing: 4) {
-                        TextField(field.label + (field.required ? " *" : ""), text: binding(field.key), axis: field.key == "description" ? .vertical : .horizontal)
-                            .keyboardType(field.numeric ? .decimalPad : .default)
+                        if field.key == "kind" {
+                            Picker("Listing type", selection: binding(field.key)) {
+                                ForEach(availableRetailKinds, id: \.rawValue) { kind in
+                                    Text(retailKindOptionLabel(kind)).tag(kind.rawValue)
+                                }
+                            }
+                            .pickerStyle(.inline)
+                        } else {
+                            TextField(field.label + (field.required ? " *" : ""), text: binding(field.key), axis: field.key == "description" ? .vertical : .horizontal)
+                                .keyboardType(field.numeric ? .decimalPad : .default)
+                        }
                         if let message = fieldErrors[field.key] {
                             Text(message).font(.caption).foregroundStyle(.red)
                         }
@@ -61,6 +74,15 @@ public struct VendorNewCrudView: View {
             }
         }
         .navigationTitle("New \(singular)")
+    }
+
+    private func retailKindOptionLabel(_ kind: RetailKind) -> String {
+        switch kind {
+        case .task: return "Task — I need something done"
+        case .service: return "Service — I offer my skills"
+        case .goods: return "Product — I am selling an item"
+        case .project: return "Project — I am publishing a project"
+        }
     }
 
     private func binding(_ key: String) -> Binding<String> {
@@ -343,9 +365,14 @@ public struct ProjectNewWizardView: View {
     }
 }
 
-public let ProductNewFields = [
-    VendorNewField("title", "Title", required: true), VendorNewField("description", "Description"),
-    VendorNewField("price", "Price", numeric: true), VendorNewField("status", "Status"),
+public let RetailNewFields = [
+    VendorNewField("kind", "Listing type", required: true),
+    VendorNewField("categoryId", "Category ID", required: true),
+    VendorNewField("title", "Title", required: true),
+    VendorNewField("description", "Description"),
+    VendorNewField("amountMinor", "Budget / price in cents", numeric: true),
+    VendorNewField("currency", "Currency", required: true),
+    VendorNewField("location", "Location"),
 ]
 public let OrderNewFields = [
     VendorNewField("reference", "Reference", required: true), VendorNewField("status", "Status"), VendorNewField("total", "Total", numeric: true),

@@ -28,6 +28,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.viewinterop.AndroidView
 import org.json.JSONObject
 import androidx.compose.ui.unit.dp
+import app.mobiling.client.RetailKind
 import kotlinx.coroutines.launch
 
 data class VendorNewField(
@@ -37,11 +38,11 @@ data class VendorNewField(
     val numeric: Boolean = false,
 )
 
-private val ProductKindChoices = listOf(
-    "task" to "Task — I need something done",
-    "service" to "Service — I offer my skills",
-    "goods" to "Product — I am selling an item",
-    "project" to "Project — I am publishing a project",
+private val ProductKindChoices = mapOf(
+    RetailKind.Task to "Task — I need something done",
+    RetailKind.Service to "Service — I offer my skills",
+    RetailKind.Goods to "Product — I am selling an item",
+    RetailKind.Project to "Project — I am publishing a project",
 )
 
 @Composable
@@ -94,6 +95,7 @@ fun VendorNewMobileScreen(
     onCreate: suspend (Map<String, String>) -> Unit,
     onRouteSelected: (String) -> Unit,
     initialValues: Map<String, String> = emptyMap(),
+    availableRetailKinds: List<RetailKind> = RetailKind.entries,
 ) {
     val scope = rememberCoroutineScope()
     var values by remember(fields, initialValues) {
@@ -124,12 +126,13 @@ fun VendorNewMobileScreen(
                 if (field.key == "kind") {
                     Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
                         Text("Listing type *", fontWeight = FontWeight.SemiBold)
-                        ProductKindChoices.forEach { (value, label) ->
+                        availableRetailKinds.forEach { kind ->
+                            val label = ProductKindChoices.getValue(kind)
                             Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
                                 RadioButton(
-                                    selected = values["kind"] == value,
+                                    selected = values["kind"] == kind.code,
                                     onClick = {
-                                        values = values + ("kind" to value)
+                                        values = values + ("kind" to kind.code)
                                         fieldErrors = fieldErrors - "kind"
                                     },
                                 )

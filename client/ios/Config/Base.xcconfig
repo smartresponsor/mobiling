@@ -3,3 +3,4 @@ MOBILE_EDGE_BASE_URL = http:/$()/localhost:8080
 MOBILE_INITIAL_DESTINATION = dashboard
 MOBILE_PRIMARY_CATALOG = services
 MOBILE_ENABLED_CATALOGS = services,products,projects
+MOBILE_AVAILABLE_RETAIL_KINDS = service,goods,project

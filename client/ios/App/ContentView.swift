@@ -20,6 +20,7 @@ struct ContentView: View {
                 isRenderable: MobileRouteResolver.isCurrentlyRenderable
             ),
             catalogEnabled: graph.composition.configuration.catalog.isPrimaryCatalogEnabled,
+            availableRetailKinds: graph.composition.configuration.retail.availableKinds,
             navigationLabelResolver: graph.composition.configuration.textResolver.resolveNavigation
         )
     }

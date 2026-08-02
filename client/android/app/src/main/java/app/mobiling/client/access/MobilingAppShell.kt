@@ -15,6 +15,7 @@ import app.mobiling.client.auth.AccessAuthFeatureBridge
 import app.mobiling.client.catalog.CatalogFeatureBridge
 import app.mobiling.client.contract.auth.session.AccessAuthSessionPayload
 import app.mobiling.client.cart.CartFeatureBridge
+import app.mobiling.client.RetailKind
 import app.mobiling.client.dashboard.DashboardMobileShell
 import app.mobiling.client.data.navigation.shell.NavigationShellGateway
 import app.mobiling.client.data.order.OrderGateway
@@ -44,6 +45,7 @@ fun MobilingAppShell(
     vendorTransactionGateway: VendorTransactionGateway? = null,
     initialRoute: String = "dashboard",
     catalogEnabled: Boolean = true,
+    availableRetailKinds: List<RetailKind> = RetailKind.entries,
     navigationLabelResolver: (route: String?, key: String, backendLabel: String) -> String = { _, _, label -> label },
     authenticatedContent: (@Composable (vendorId: String?, onSignOut: () -> Unit) -> Unit)? = null,
 ) {
@@ -102,6 +104,7 @@ fun MobilingAppShell(
                         vendorTransactionGateway = vendorTransactionGateway,
                         initialRoute = initialRoute,
                         catalogEnabled = catalogEnabled,
+                        availableRetailKinds = availableRetailKinds,
                         navigationLabelResolver = navigationLabelResolver,
                         onSignOut = { clearAccessSession() },
                     )

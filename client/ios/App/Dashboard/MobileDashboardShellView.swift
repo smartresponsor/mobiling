@@ -13,6 +13,7 @@ public struct MobileDashboardShellView: View {
     private let vendorCrudGateway: VendorCrudGateway?
     private let initialRoute: String
     private let catalogEnabled: Bool
+    private let availableRetailKinds: [RetailKind]
     private let navigationLabelResolver: (String?, String, String) -> String
     private let onSignOut: () -> Void
 
@@ -21,9 +22,10 @@ public struct MobileDashboardShellView: View {
     @State private var navigationOpen: Bool = false
     @State private var accountOpen: Bool = false
     @State private var newChooserOpen: Bool = false
+    @State private var selectedRetailKind: RetailKind
     @State private var shell: MobileNavigationShellScreenContract = MobileDashboardShellView.fallbackShell()
 
-    public init(navigationShellGateway: NavigationShellGateway? = nil, attachmentFeatureBridge: AttachmentFeatureBridge? = nil, catalogFeatureBridge: CatalogFeatureBridge? = nil, vendorId: String? = nil, vendorProfileGateway: VendorProfileGateway? = nil, vendorSummaryGateway: VendorSummaryGateway? = nil, vendorStatementGateway: VendorStatementGateway? = nil, vendorPayoutGateway: VendorPayoutGateway? = nil, vendorTransactionGateway: VendorTransactionGateway? = nil, vendorCrudGateway: VendorCrudGateway? = nil, initialRoute: String = "dashboard", catalogEnabled: Bool = true, navigationLabelResolver: @escaping (String?, String, String) -> String = { _, _, label in label }, onSignOut: @escaping () -> Void) {
+    public init(navigationShellGateway: NavigationShellGateway? = nil, attachmentFeatureBridge: AttachmentFeatureBridge? = nil, catalogFeatureBridge: CatalogFeatureBridge? = nil, vendorId: String? = nil, vendorProfileGateway: VendorProfileGateway? = nil, vendorSummaryGateway: VendorSummaryGateway? = nil, vendorStatementGateway: VendorStatementGateway? = nil, vendorPayoutGateway: VendorPayoutGateway? = nil, vendorTransactionGateway: VendorTransactionGateway? = nil, vendorCrudGateway: VendorCrudGateway? = nil, initialRoute: String = "dashboard", catalogEnabled: Bool = true, availableRetailKinds: [RetailKind] = RetailKind.allCases, navigationLabelResolver: @escaping (String?, String, String) -> String = { _, _, label in label }, onSignOut: @escaping () -> Void) {
         self.navigationShellGateway = navigationShellGateway
         self.attachmentFeatureBridge = attachmentFeatureBridge
         self.catalogFeatureBridge = catalogFeatureBridge
@@ -36,8 +38,10 @@ public struct MobileDashboardShellView: View {
         self.vendorCrudGateway = vendorCrudGateway
         self.initialRoute = initialRoute
         self.catalogEnabled = catalogEnabled
+        self.availableRetailKinds = availableRetailKinds
         self.navigationLabelResolver = navigationLabelResolver
         self._selectedRoute = State(initialValue: initialRoute)
+        self._selectedRetailKind = State(initialValue: availableRetailKinds[0])
         self.onSignOut = onSignOut
     }
 
@@ -70,7 +74,16 @@ public struct MobileDashboardShellView: View {
                     MobileAttachmentView(vendorId: vendorId, attachmentFeatureBridge: attachmentFeatureBridge)
                         .toolbar { accountToolbar }
                 } else if vendorContentRoute == "vendor/retail/new" {
-                    VendorNewCrudView(singular: "Product", resource: "retail", listRoute: "vendor/retail", fields: ProductNewFields, gateway: vendorCrudGateway, onRouteSelected: { vendorContentRoute = $0 })
+                    VendorNewCrudView(
+                        singular: retailKindLabel(selectedRetailKind),
+                        resource: "retail",
+                        listRoute: "vendor/retail",
+                        fields: RetailNewFields,
+                        gateway: vendorCrudGateway,
+                        onRouteSelected: { vendorContentRoute = $0 },
+                        initialValues: ["kind": selectedRetailKind.rawValue, "currency": "USD"],
+                        availableRetailKinds: availableRetailKinds
+                    )
                         .toolbar { accountToolbar }
                 } else if vendorContentRoute == "vendor/order/new" {
                     VendorNewCrudView(singular: "Order", resource: "order", listRoute: "vendor/order", fields: OrderNewFields, gateway: vendorCrudGateway, onRouteSelected: { vendorContentRoute = $0 })
@@ -121,17 +134,12 @@ public struct MobileDashboardShellView: View {
             }
         }
         .confirmationDialog("New", isPresented: $newChooserOpen, titleVisibility: .visible) {
-            Button("Product") {
-                vendorContentRoute = "vendor/retail/new"
-                selectedRoute = "vendor"
-            }
-            Button("Order") {
-                vendorContentRoute = "vendor/order/new"
-                selectedRoute = "vendor"
-            }
-            Button("Project") {
-                vendorContentRoute = "vendor/project/new"
-                selectedRoute = "vendor"
+            ForEach(availableRetailKinds, id: \.rawValue) { kind in
+                Button(retailKindLabel(kind)) {
+                    selectedRetailKind = kind
+                    vendorContentRoute = "vendor/retail/new"
+                    selectedRoute = "vendor"
+                }
             }
             Button("Cancel", role: .cancel) {}
         } message: {
@@ -317,6 +325,15 @@ public struct MobileDashboardShellView: View {
         case "payout": return "dollarsign.circle"
         case "receipt": return "list.bullet.rectangle"
         default: return "house"
+        }
+    }
+
+    private func retailKindLabel(_ kind: RetailKind) -> String {
+        switch kind {
+        case .task: return "Task"
+        case .service: return "Service"
+        case .goods: return "Product"
+        case .project: return "Project"
         }
     }
 
