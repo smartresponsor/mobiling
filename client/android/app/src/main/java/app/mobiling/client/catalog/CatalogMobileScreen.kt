@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.weight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -24,10 +25,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import app.mobiling.client.contract.catalog.browse.CatalogListNodeQuery
 import app.mobiling.client.contract.catalog.browse.CatalogNodeSummary
+import coil.compose.AsyncImage
 
 @Composable
 fun CatalogMobileScreen(catalogFeatureBridge: CatalogFeatureBridge?) {
@@ -160,7 +164,7 @@ private fun CatalogNodeCard(node: CatalogNodeSummary, onClick: () -> Unit) {
             horizontalArrangement = Arrangement.spacedBy(14.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(catalogSymbol(node), style = MaterialTheme.typography.headlineMedium)
+            CatalogNodeVisual(node)
             Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
                 Text(node.title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
                 Text(
@@ -178,6 +182,30 @@ private fun CatalogNodeCard(node: CatalogNodeSummary, onClick: () -> Unit) {
                 Text("›", style = MaterialTheme.typography.headlineSmall)
             }
         }
+    }
+}
+
+@Composable
+private fun CatalogNodeVisual(node: CatalogNodeSummary) {
+    val imageUrl = node.imageUrl?.trim()?.takeIf {
+        it.startsWith("https://") || it.startsWith("http://")
+    }
+
+    if (imageUrl != null) {
+        AsyncImage(
+            model = imageUrl,
+            contentDescription = node.title,
+            modifier = Modifier
+                .size(64.dp)
+                .clip(RoundedCornerShape(14.dp)),
+            contentScale = ContentScale.Crop,
+        )
+    } else {
+        Text(
+            catalogSymbol(node),
+            style = MaterialTheme.typography.headlineMedium,
+            modifier = Modifier.size(64.dp),
+        )
     }
 }
 
