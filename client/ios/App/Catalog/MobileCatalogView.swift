@@ -94,9 +94,7 @@ public struct MobileCatalogView: View {
             navigationStack.append(node)
         } label: {
             HStack(spacing: 14) {
-                Text(catalogSymbol(node))
-                    .font(.largeTitle)
-                    .frame(width: 48, height: 48)
+                catalogMedia(node)
 
                 VStack(alignment: .leading, spacing: 4) {
                     Text(node.title)
@@ -130,6 +128,39 @@ public struct MobileCatalogView: View {
         }
         .buttonStyle(.plain)
         .disabled(node.childCount == 0)
+    }
+
+    @ViewBuilder
+    private func catalogMedia(_ node: CatalogNodeSummary) -> some View {
+        if let imageUrl = node.imageUrl,
+           let url = URL(string: imageUrl),
+           let scheme = url.scheme?.lowercased(),
+           scheme == "https" || scheme == "http" {
+            AsyncImage(url: url) { phase in
+                switch phase {
+                case .success(let image):
+                    image
+                        .resizable()
+                        .scaledToFill()
+                case .empty:
+                    ProgressView()
+                default:
+                    catalogFallback(node)
+                }
+            }
+            .frame(width: 64, height: 64)
+            .background(.quaternary)
+            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+        } else {
+            catalogFallback(node)
+        }
+    }
+
+    private func catalogFallback(_ node: CatalogNodeSummary) -> some View {
+        Text(catalogSymbol(node))
+            .font(.largeTitle)
+            .frame(width: 64, height: 64)
+            .background(.quaternary, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
     }
 
     private func messageState(
