@@ -87,21 +87,33 @@ function catalogItems(root: Record<string, unknown>): unknown[] {
 
 function normalizeCatalogNode(value: unknown): Record<string, unknown> {
   const item = recordValue(value);
+  const media = recordValue(item.media ?? item.image ?? item.icon);
 
   return {
     nodeId: stringValue(item.nodeId ?? item.catalogNodeId ?? item.categoryId ?? item.id) ?? "catalog-node-unavailable",
-    parentNodeId: stringValue(item.parentNodeId ?? item.parentId),
-    title: stringValue(item.title ?? item.name ?? item.label) ?? "Untitled catalog node",
+    parentNodeId: stringValue(item.parentNodeId ?? item.parentId ?? item.parent_id),
+    title: stringValue(item.title ?? item.name ?? item.nameEntity ?? item.label) ?? "Untitled catalog node",
     slug: stringValue(item.slug),
-    childCount: integerValue(item.childCount ?? item.childrenCount, 0),
+    imageUrl: stringValue(
+      item.imageUrl
+      ?? item.iconUrl
+      ?? item.icon_url
+      ?? item.thumbnailUrl
+      ?? item.thumbnail_url
+      ?? media.url
+      ?? media.imageUrl
+      ?? media.iconUrl,
+    ),
+    childCount: integerValue(item.childCount ?? item.childrenCount ?? (Array.isArray(item.children) ? item.children.length : 0), 0),
     productCount: integerValue(item.productCount, 0),
   };
 }
 
 function normalizeCatalogList(body: unknown): Record<string, unknown> {
   const root = catalogRoot(body);
+  const source = Array.isArray(root) ? root : catalogItems(root);
 
-  return { nodes: catalogItems(root).map(normalizeCatalogNode), payload: root };
+  return { nodes: source.map(normalizeCatalogNode), payload: root };
 }
 
 function normalizeCatalogDetail(body: unknown): Record<string, unknown> {
