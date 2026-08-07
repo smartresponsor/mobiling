@@ -14,6 +14,10 @@ const catalogNodeSummaryPayload = {
     nodeId: stringField(1),
     title: stringField(1),
     parentNodeId: nullableStringField(1),
+    slug: nullableStringField(1),
+    imageUrl: nullableStringField(1),
+    childCount: { type: "integer", minimum: 0 },
+    productCount: { anyOf: [{ type: "integer", minimum: 0 }, { type: "null" }] },
   },
 } as const;
 
