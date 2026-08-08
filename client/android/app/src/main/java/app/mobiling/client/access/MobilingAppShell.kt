@@ -1,15 +1,17 @@
 package app.mobiling.client.access
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import app.mobiling.client.attachment.AttachmentFeatureBridge
 import app.mobiling.client.auth.AccessAuthFeatureBridge
 import app.mobiling.client.catalog.CatalogFeatureBridge
@@ -26,6 +28,7 @@ import app.mobiling.client.data.vendor.profile.VendorProfileGateway
 import app.mobiling.client.data.vendor.statement.VendorStatementGateway
 import app.mobiling.client.data.vendor.summary.VendorSummaryGateway
 import app.mobiling.client.data.vendor.transaction.VendorTransactionGateway
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
@@ -49,9 +52,13 @@ fun MobilingAppShell(
     navigationLabelResolver: (route: String?, key: String, backendLabel: String) -> String = { _, _, label -> label },
     authenticatedContent: (@Composable (vendorId: String?, onSignOut: () -> Unit) -> Unit)? = null,
 ) {
-    var currentScreen by rememberSaveable { mutableStateOf(AccessScreen.Welcome) }
-    var activeVendorId by rememberSaveable { mutableStateOf<String?>(null) }
+    var currentScreen by remember { mutableStateOf(AccessScreen.Welcome) }
+    var activeVendorId by remember { mutableStateOf<String?>(null) }
     val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
+    val motionEnabled = remember(context) { oneTaskerMotionEnabled(context) }
+    var launchSplashMounted by remember { mutableStateOf(true) }
+    var launchSplashVisible by remember { mutableStateOf(true) }
 
     fun applyAccessSession(payload: AccessAuthSessionPayload) {
         activeVendorId = payload.vendorId
@@ -82,8 +89,16 @@ fun MobilingAppShell(
         }
     }
 
+    LaunchedEffect(motionEnabled) {
+        delay(if (motionEnabled) 1760 else 360)
+        launchSplashVisible = false
+        delay(if (motionEnabled) 320 else 120)
+        launchSplashMounted = false
+    }
+
     Surface(Modifier.fillMaxSize()) {
-        when (currentScreen) {
+        Box(Modifier.fillMaxSize()) {
+            when (currentScreen) {
             AccessScreen.Dashboard -> {
                 if (authenticatedContent != null) {
                     authenticatedContent(activeVendorId) { clearAccessSession() }
@@ -156,6 +171,11 @@ fun MobilingAppShell(
                 onResetRecovery = { request -> accessAuthFeatureBridge?.resetRecovery(request) },
                 onAccessSession = { payload -> applyAccessSession(payload) },
             )
+            }
+
+            if (launchSplashMounted) {
+                OneTaskerLaunchSplash(visible = launchSplashVisible)
+            }
         }
     }
 }

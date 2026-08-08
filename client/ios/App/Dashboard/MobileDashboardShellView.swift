@@ -25,7 +25,7 @@ public struct MobileDashboardShellView: View {
     @State private var selectedRetailKind: RetailKind
     @State private var shell: MobileNavigationShellScreenContract = MobileDashboardShellView.fallbackShell()
 
-    public init(navigationShellGateway: NavigationShellGateway? = nil, attachmentFeatureBridge: AttachmentFeatureBridge? = nil, catalogFeatureBridge: CatalogFeatureBridge? = nil, vendorId: String? = nil, vendorProfileGateway: VendorProfileGateway? = nil, vendorSummaryGateway: VendorSummaryGateway? = nil, vendorStatementGateway: VendorStatementGateway? = nil, vendorPayoutGateway: VendorPayoutGateway? = nil, vendorTransactionGateway: VendorTransactionGateway? = nil, vendorCrudGateway: VendorCrudGateway? = nil, initialRoute: String = "dashboard", catalogEnabled: Bool = true, availableRetailKinds: [RetailKind] = RetailKind.allCases, navigationLabelResolver: @escaping (String?, String, String) -> String = { _, _, label in label }, onSignOut: @escaping () -> Void) {
+    public init(navigationShellGateway: NavigationShellGateway? = nil, attachmentFeatureBridge: AttachmentFeatureBridge? = nil, catalogFeatureBridge: CatalogFeatureBridge? = nil, vendorId: String? = nil, vendorProfileGateway: VendorProfileGateway? = nil, vendorSummaryGateway: VendorSummaryGateway? = nil, vendorStatementGateway: VendorStatementGateway? = nil, vendorPayoutGateway: VendorPayoutGateway? = nil, vendorTransactionGateway: VendorTransactionGateway? = nil, vendorCrudGateway: VendorCrudGateway? = nil, initialRoute: String = "vendor/project", catalogEnabled: Bool = true, availableRetailKinds: [RetailKind] = RetailKind.allCases, navigationLabelResolver: @escaping (String?, String, String) -> String = { _, _, label in label }, onSignOut: @escaping () -> Void) {
         self.navigationShellGateway = navigationShellGateway
         self.attachmentFeatureBridge = attachmentFeatureBridge
         self.catalogFeatureBridge = catalogFeatureBridge
@@ -40,7 +40,7 @@ public struct MobileDashboardShellView: View {
         self.catalogEnabled = catalogEnabled
         self.availableRetailKinds = availableRetailKinds
         self.navigationLabelResolver = navigationLabelResolver
-        self._selectedRoute = State(initialValue: initialRoute)
+        self._selectedRoute = State(initialValue: MobileDashboardShellView.initialBottomRoute(initialRoute))
         self._selectedRetailKind = State(initialValue: availableRetailKinds[0])
         self.onSignOut = onSignOut
     }
@@ -48,32 +48,21 @@ public struct MobileDashboardShellView: View {
     public var body: some View {
         TabView(selection: $selectedRoute) {
             NavigationView {
-                content(title: "Dashboard", items: shell.bottomPrimary)
+                VendorOwnedCrudView(title: "Tasks", resource: "project", routeRoot: "vendor/project", selectedId: selectedIdentity(routeRoot: "vendor/project"), gateway: vendorCrudGateway, onRouteSelected: { vendorContentRoute = $0 })
                     .toolbar { accountToolbar }
             }
-            .tabItem { Label(navigationLabelResolver("dashboard", "dashboard", "Dashboard"), systemImage: "house") }
-            .tag("dashboard")
+            .tabItem { Label(navigationLabelResolver("vendor/project", "tasks", "Tasks"), systemImage: "list.bullet.rectangle") }
+            .tag("vendor/project")
 
             NavigationView {
-                if vendorContentRoute == "vendor/profile" {
-                    MobileVendorProfileView(vendorId: vendorId, vendorProfileGateway: vendorProfileGateway)
-                        .toolbar { accountToolbar }
-                } else if vendorContentRoute == "vendor/summary" {
-                    MobileVendorSummaryView(vendorId: vendorId, vendorSummaryGateway: vendorSummaryGateway)
-                        .toolbar { accountToolbar }
-                } else if vendorContentRoute == "vendor/statement" {
-                    MobileVendorStatementView(vendorId: vendorId, vendorStatementGateway: vendorStatementGateway)
-                        .toolbar { accountToolbar }
-                } else if vendorContentRoute == "vendor/payout" {
-                    MobileVendorPayoutView(vendorId: vendorId, vendorPayoutGateway: vendorPayoutGateway)
-                        .toolbar { accountToolbar }
-                } else if vendorContentRoute == "vendor/transaction" {
-                    MobileVendorTransactionView(vendorId: vendorId, vendorTransactionGateway: vendorTransactionGateway)
-                        .toolbar { accountToolbar }
-                } else if vendorContentRoute == "attachment" || vendorContentRoute == "vendor/attachment" {
-                    MobileAttachmentView(vendorId: vendorId, attachmentFeatureBridge: attachmentFeatureBridge)
-                        .toolbar { accountToolbar }
-                } else if vendorContentRoute == "vendor/retail/new" {
+                comingSoon(title: "Messages", systemImage: "message", description: "Task and customer conversations will appear here.")
+                    .toolbar { accountToolbar }
+            }
+            .tabItem { Label(navigationLabelResolver("message", "message", "Messages"), systemImage: "message") }
+            .tag("message")
+
+            NavigationView {
+                if vendorContentRoute == "vendor/retail/new" {
                     VendorNewCrudView(
                         singular: retailKindLabel(selectedRetailKind),
                         resource: "retail",
@@ -84,41 +73,28 @@ public struct MobileDashboardShellView: View {
                         initialValues: ["kind": selectedRetailKind.rawValue, "currency": "USD"],
                         availableRetailKinds: availableRetailKinds
                     )
-                        .toolbar { accountToolbar }
-                } else if vendorContentRoute == "vendor/order/new" {
-                    VendorNewCrudView(singular: "Order", resource: "order", listRoute: "vendor/order", fields: OrderNewFields, gateway: vendorCrudGateway, onRouteSelected: { vendorContentRoute = $0 })
-                        .toolbar { accountToolbar }
-                } else if vendorContentRoute == "vendor/project/new" {
-                    ProjectNewWizardView(gateway: vendorCrudGateway, onRouteSelected: { vendorContentRoute = $0 })
-                        .toolbar { accountToolbar }
-                } else if vendorContentRoute == "vendor/retail" || vendorContentRoute.hasPrefix("vendor/retail/") {
-                    VendorOwnedCrudView(title: "Products", resource: "retail", routeRoot: "vendor/retail", selectedId: selectedIdentity(routeRoot: "vendor/retail"), gateway: vendorCrudGateway, onRouteSelected: { vendorContentRoute = $0 })
-                        .toolbar { accountToolbar }
-                } else if vendorContentRoute == "vendor/order" || vendorContentRoute.hasPrefix("vendor/order/") {
-                    VendorOwnedCrudView(title: "Orders", resource: "order", routeRoot: "vendor/order", selectedId: selectedIdentity(routeRoot: "vendor/order"), gateway: vendorCrudGateway, onRouteSelected: { vendorContentRoute = $0 })
-                        .toolbar { accountToolbar }
-                } else if vendorContentRoute == "vendor/project" || vendorContentRoute.hasPrefix("vendor/project/") {
-                    VendorOwnedCrudView(title: "Projects", resource: "project", routeRoot: "vendor/project", selectedId: selectedIdentity(routeRoot: "vendor/project"), gateway: vendorCrudGateway, onRouteSelected: { vendorContentRoute = $0 })
-                        .toolbar { accountToolbar }
+                    .toolbar { accountToolbar }
                 } else {
-                    content(title: "Vendor", items: vendorContentRoute == "vendor" ? shell.vendorContext : [])
+                    VendorOwnedCrudView(title: "Services", resource: "retail", routeRoot: "vendor/retail", selectedId: selectedIdentity(routeRoot: "vendor/retail"), gateway: vendorCrudGateway, onRouteSelected: { vendorContentRoute = $0 })
                         .toolbar { accountToolbar }
                 }
             }
-            .tabItem { Label(navigationLabelResolver("vendor", "vendor", "Vendor"), systemImage: "storefront") }
-            .tag("vendor")
+            .tabItem { Label(navigationLabelResolver("vendor/retail", "services", "Services"), systemImage: "storefront") }
+            .tag("vendor/retail")
 
             NavigationView {
-                if selectedRoute == "catalog" {
-                    MobileCatalogView(catalogFeatureBridge: catalogFeatureBridge)
-                        .toolbar { accountToolbar }
-                } else {
-                    content(title: "More", items: shell.moreDrawer)
-                        .toolbar { accountToolbar }
-                }
+                comingSoon(title: "Notifications", systemImage: "bell", description: "Important 1Tasker updates will appear here.")
+                    .toolbar { accountToolbar }
             }
-            .tabItem { Label("More", systemImage: "line.3.horizontal") }
-            .tag("more")
+            .tabItem { Label(navigationLabelResolver("notification", "notification", "Notifications"), systemImage: "bell") }
+            .tag("notification")
+
+            NavigationView {
+                MobileVendorProfileView(vendorId: vendorId, vendorProfileGateway: vendorProfileGateway, attachmentFeatureBridge: attachmentFeatureBridge)
+                    .toolbar { accountToolbar }
+            }
+            .tabItem { Label(navigationLabelResolver("vendor/page", "profile", "Profile"), systemImage: "person.crop.circle") }
+            .tag("vendor/page")
         }
         .tint(Color(red: 51 / 255, green: 51 / 255, blue: 51 / 255))
         .sheet(isPresented: $navigationOpen) {
@@ -138,7 +114,7 @@ public struct MobileDashboardShellView: View {
                 Button(retailKindLabel(kind)) {
                     selectedRetailKind = kind
                     vendorContentRoute = "vendor/retail/new"
-                    selectedRoute = "vendor"
+                    selectedRoute = "vendor/retail"
                 }
             }
             Button("Cancel", role: .cancel) {}
@@ -170,7 +146,7 @@ public struct MobileDashboardShellView: View {
             }
             .accessibilityLabel("Open navigation")
         }
-        if selectedRoute == "vendor" || vendorContentRoute.hasPrefix("vendor/") {
+        if selectedRoute == "vendor/retail" {
             ToolbarItem(placement: .navigationBarTrailing) {
                 Button { newChooserOpen = true } label: { Image(systemName: "plus") }
                     .accessibilityLabel("New")
@@ -179,6 +155,32 @@ public struct MobileDashboardShellView: View {
         ToolbarItem(placement: .navigationBarTrailing) {
             Button("Account") { accountOpen = true }
         }
+    }
+
+    private static func initialBottomRoute(_ route: String) -> String {
+        switch MobileRouteResolver.normalizeRoute(route) {
+        case "message", "notification", "vendor/page", "vendor/retail", "vendor/project": return MobileRouteResolver.normalizeRoute(route)
+        default: return "vendor/project"
+        }
+    }
+
+    private func comingSoon(title: String, systemImage: String, description: String) -> some View {
+        List {
+            Section {
+                VStack(alignment: .leading, spacing: 12) {
+                    Image(systemName: systemImage)
+                        .font(.system(size: 34, weight: .semibold))
+                        .foregroundStyle(.secondary)
+                    Text(title)
+                        .font(.headline)
+                    Text(description)
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
+                .padding(.vertical, 18)
+            }
+        }
+        .navigationTitle(title)
     }
 
     private func content(title: String, items: [MobileNavigationItemPayload]) -> some View {
@@ -258,7 +260,7 @@ public struct MobileDashboardShellView: View {
                 .foregroundColor(item.enabled ? Color(red: 51 / 255, green: 51 / 255, blue: 51 / 255) : .secondary)
                 .frame(width: 24)
 
-            Text(navigationLabelResolver(item.route, item.key, item.label))
+            Text(displayLabel(for: item))
 
             Spacer()
 
@@ -295,19 +297,39 @@ public struct MobileDashboardShellView: View {
             return
         }
 
-        if route.hasPrefix("vendor/") {
-            vendorContentRoute = route
-            selectedRoute = "vendor"
+        if route == "vendor" || route == "vendor/page" {
+            vendorContentRoute = "vendor/page"
+            selectedRoute = "vendor/page"
             accountOpen = false
             return
         }
 
-        if route == "vendor" {
-            vendorContentRoute = "vendor"
+        if route == "vendor/project" || route.hasPrefix("vendor/project/") {
+            vendorContentRoute = route
+            selectedRoute = "vendor/project"
+            accountOpen = false
+            return
+        }
+
+        if route == "vendor/retail" || route.hasPrefix("vendor/retail/") {
+            vendorContentRoute = route
+            selectedRoute = "vendor/retail"
+            accountOpen = false
+            return
+        }
+
+        if route == "message" || route == "notification" {
+            selectedRoute = route
+            accountOpen = false
+            return
         }
 
         selectedRoute = route
         accountOpen = false
+    }
+
+    private func displayLabel(for item: MobileNavigationItemPayload) -> String {
+        navigationLabelResolver(MobileRouteResolver.normalizeRoute(item.route), item.key, item.label)
     }
 
     private func systemImage(for item: MobileNavigationItemPayload) -> String {
@@ -324,6 +346,8 @@ public struct MobileDashboardShellView: View {
         case "statement": return "doc.text"
         case "payout": return "dollarsign.circle"
         case "receipt": return "list.bullet.rectangle"
+        case "tasks": return "list.bullet.rectangle"
+        case "notification": return "bell"
         default: return "house"
         }
     }
@@ -344,12 +368,14 @@ public struct MobileDashboardShellView: View {
     private static func fallbackShell() -> MobileNavigationShellScreenContract {
         MobileNavigationShellScreenContract(
             bottomPrimary: [
-                item("dashboard", "Dashboard", "dashboard", true, "dashboard"),
-                item("vendor", "Vendor", "store", true, "vendor"),
-                item("more", "More", "menu", true, "more"),
+                item("tasks", "Tasks", "tasks", true, "vendor/project"),
+                item("message", "Messages", "message", true, "message"),
+                item("services", "Services", "store", true, "vendor/retail"),
+                item("notification", "Notifications", "notification", true, "notification"),
+                item("vendor_page", "Profile", "person", true, "vendor/page"),
             ],
             accountQuick: [
-                item("vendor_profile", "My Profile", "person", true, "vendor/profile"),
+                item("vendor_page", "Profile", "person", true, "vendor/page"),
                 item("access_password", "Change Password", "key", false, "access/password"),
                 item("access_verification", "Verification", "key", false, "access/verification"),
                 item("vendor_attachment", "My Attachment", "attachment", true, "attachment"),
@@ -357,22 +383,25 @@ public struct MobileDashboardShellView: View {
             ],
             moreDrawer: [
                 item("dashboard", "Dashboard", "dashboard", true, "dashboard"),
-                item("vendor", "Vendor", "store", true, "vendor"),
+                item("tasks", "Tasks", "tasks", true, "vendor/project"),
+                item("message", "Messages", "message", true, "message"),
+                item("services", "Services", "store", true, "vendor/retail"),
+                item("notification", "Notifications", "notification", true, "notification"),
+                item("vendor_page", "Profile", "person", true, "vendor/page"),
                 item("catalog", "Catalog", "catalog", false, "catalog"),
-                item("message", "Message", "message", false, "message"),
                 item("attachment", "Attachment", "attachment", true, "attachment"),
             ],
             vendorContext: [
-                item("vendor_overview", "My Vendor", "store", true, "vendor"),
-                item("vendor_profile", "My Profile", "person", true, "vendor/profile"),
+                item("vendor_overview", "Profile Overview", "person", true, "vendor"),
+                item("vendor_page", "Profile", "person", true, "vendor/page"),
                 item("vendor_summary", "Summary", "summary", true, "vendor/summary"),
                 item("vendor_statement", "Statement", "statement", true, "vendor/statement"),
                 item("vendor_payout", "Payout", "payout", true, "vendor/payout"),
                 item("vendor_transaction", "Transaction", "receipt", true, "vendor/transaction"),
                 item("vendor_attachment", "My Attachment", "attachment", true, "attachment"),
-                item("vendor_product", "Products", "catalog", true, "vendor/retail"),
+                item("vendor_product", "Services", "catalog", true, "vendor/retail"),
                 item("vendor_order", "Orders", "statement", true, "vendor/order"),
-                item("vendor_project", "Projects", "summary", true, "vendor/project"),
+                item("vendor_project", "Tasks", "tasks", true, "vendor/project"),
             ]
         )
     }

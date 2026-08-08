@@ -25,6 +25,7 @@ import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.Payments
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.ReceiptLong
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Storefront
 import androidx.compose.material.icons.filled.VpnKey
@@ -107,7 +108,7 @@ fun DashboardMobileShell(
     vendorStatementGateway: VendorStatementGateway? = null,
     vendorPayoutGateway: VendorPayoutGateway? = null,
     vendorTransactionGateway: VendorTransactionGateway? = null,
-    initialRoute: String = "dashboard",
+    initialRoute: String = "vendor/project",
     catalogEnabled: Boolean = true,
     availableRetailKinds: List<RetailKind> = RetailKind.entries,
     navigationLabelResolver: (route: String?, key: String, backendLabel: String) -> String = { _, _, label -> label },
@@ -181,7 +182,7 @@ fun DashboardMobileShell(
                                 contentDescription = item.label,
                             )
                         },
-                        label = { Text(navigationLabelResolver(item.route, item.key, item.label)) },
+                        label = { Text(item.label) },
                         enabled = item.enabled,
                         colors = NavigationBarItemDefaults.colors(
                             selectedIconColor = MaterialTheme.colorScheme.onSurface,
@@ -340,9 +341,9 @@ private fun DashboardContent(
             }
             return
         }
-        "vendor/profile" -> {
+        "vendor/page" -> {
             Box(Modifier.fillMaxSize().padding(padding)) {
-                VendorMobileProfileScreen(vendorId = vendorId, vendorProfileGateway = vendorProfileGateway)
+                VendorMobileProfileScreen(vendorId = vendorId, vendorProfileGateway = vendorProfileGateway, attachmentFeatureBridge = attachmentFeatureBridge)
             }
             return
         }
@@ -458,8 +459,8 @@ private fun DashboardContent(
                     item.route?.let(onRouteSelected)
                 })
             }
-            "vendor/profile" -> item {
-                VendorMobileProfileScreen(vendorId = vendorId, vendorProfileGateway = vendorProfileGateway)
+            "vendor/page" -> item {
+                VendorMobileProfileScreen(vendorId = vendorId, vendorProfileGateway = vendorProfileGateway, attachmentFeatureBridge = attachmentFeatureBridge)
             }
             "vendor/summary" -> item {
                 VendorMobileSummaryScreen(vendorId = vendorId, vendorSummaryGateway = vendorSummaryGateway)
@@ -472,6 +473,12 @@ private fun DashboardContent(
             }
             "vendor/transaction" -> item {
                 VendorMobileTransactionScreen(vendorId = vendorId, vendorTransactionGateway = vendorTransactionGateway)
+            }
+            "message" -> item {
+                EmptyMobileState(title = "Messages", description = "Task and customer conversations will appear here.")
+            }
+            "notification" -> item {
+                EmptyMobileState(title = "Notifications", description = "Important 1Tasker updates will appear here.")
             }
             "more" -> item {
                 ShellSection(title = "More", items = shell.moreDrawer, onItemClick = { item ->
@@ -503,6 +510,17 @@ private fun NewChoice(title: String, description: String, icon: ImageVector, onC
                 Text(description, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
+    }
+}
+
+@Composable
+private fun EmptyMobileState(title: String, description: String) {
+    Column(
+        modifier = Modifier.fillMaxWidth().padding(vertical = 24.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Text(title, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
+        Text(description, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
 
@@ -546,7 +564,7 @@ private fun ShellSection(
                         )
                     }
                     Text(
-                        text = navigationLabelResolver(item.route, item.key, item.label),
+                        text = item.label,
                         modifier = Modifier.weight(1f),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.SemiBold,
@@ -574,6 +592,8 @@ private fun iconFor(item: NavigationMobileItemPayload): ImageVector = when (item
     "payout" -> Icons.Default.Payments
     "receipt" -> Icons.Default.ReceiptLong
     "menu" -> Icons.Default.MoreHoriz
+    "tasks" -> Icons.Default.ReceiptLong
+    "notification" -> Icons.Default.Notifications
     else -> Icons.Default.Dashboard
 }
 
@@ -581,26 +601,30 @@ private fun itemDescription(item: NavigationMobileItemPayload): String = when (i
     "dashboard" -> "Overview of your active workspace."
     "cart" -> "Review selected products and checkout activity."
     "vendor" -> "Open vendor tools and business information."
-    "vendor/profile" -> "Review your public vendor identity and completion."
+    "vendor/page" -> "Review your 1Tasker profile identity and completion."
     "vendor/summary" -> "See the current vendor status at a glance."
     "vendor/statement" -> "Review statement totals and status."
     "vendor/payout" -> "Track available and pending payout amounts."
     "vendor/transaction" -> "Review recent vendor transactions."
     "attachment" -> "Manage files linked to your vendor workspace."
     "catalog" -> "Browse and manage catalog capabilities."
-    "message" -> "Open business conversations and threads."
+    "vendor/project" -> "Review active tasks and jobs."
+    "vendor/retail" -> "Manage your published services."
+    "message" -> "Open task and customer conversations."
+    "notification" -> "Review important 1Tasker updates."
     else -> item.badge ?: item.route ?: item.key
 }
 
 private fun fallbackShell(): NavigationMobileShellScreenContract = NavigationMobileShellScreenContract(
     bottomPrimary = listOf(
-        item("dashboard", "Dashboard", "dashboard", true, "dashboard"),
-        item("cart", "Cart", "cart", true, "cart"),
-        item("vendor", "Vendor", "store", true, "vendor"),
-        item("more", "More", "menu", true, "more"),
+        item("tasks", "Tasks", "tasks", true, "vendor/project"),
+        item("message", "Messages", "message", true, "message"),
+        item("services", "Services", "store", true, "vendor/retail"),
+        item("notification", "Notifications", "notification", true, "notification"),
+        item("profile", "Profile", "person", true, "vendor/page"),
     ),
     accountQuick = listOf(
-        item("vendor_profile", "My Profile", "person", true, "vendor/profile"),
+        item("vendor_page", "Profile", "person", true, "vendor/page"),
         item("access_password", "Change Password", "key", false, "access/password"),
         item("access_verification", "Verification", "key", false, "access/verification"),
         item("vendor_attachment", "My Attachment", "attachment", true, "attachment"),
@@ -608,25 +632,28 @@ private fun fallbackShell(): NavigationMobileShellScreenContract = NavigationMob
     ),
     moreDrawer = listOf(
         item("dashboard", "Dashboard", "dashboard", true, "dashboard"),
-        item("cart", "Cart", "cart", true, "cart"),
-        item("vendor", "Vendor", "store", true, "vendor"),
+        item("tasks", "Tasks", "tasks", true, "vendor/project"),
+        item("message", "Messages", "message", true, "message"),
+        item("services", "Services", "store", true, "vendor/retail"),
+        item("notification", "Notifications", "notification", true, "notification"),
+        item("vendor_page", "Profile", "person", true, "vendor/page"),
         item("catalog", "Catalog", "catalog", false, "catalog"),
-        item("message", "Message", "message", false, "message"),
         item("attachment", "Attachment", "attachment", true, "attachment"),
     ),
     vendorContext = listOf(
-        item("vendor_overview", "My Vendor", "store", true, "vendor"),
-        item("vendor_profile", "My Profile", "person", true, "vendor/profile"),
+        item("vendor_overview", "Profile Overview", "person", true, "vendor"),
+        item("vendor_page", "Profile", "person", true, "vendor/page"),
         item("vendor_summary", "Summary", "summary", true, "vendor/summary"),
         item("vendor_statement", "Statement", "statement", true, "vendor/statement"),
         item("vendor_payout", "Payout", "payout", true, "vendor/payout"),
         item("vendor_transaction", "Transaction", "receipt", true, "vendor/transaction"),
         item("vendor_attachment", "My Attachment", "attachment", true, "attachment"),
-        item("vendor_product", "Products", "catalog", true, "vendor/retail"),
+        item("vendor_product", "Services", "catalog", true, "vendor/retail"),
         item("vendor_order", "Orders", "statement", true, "vendor/order"),
-        item("vendor_project", "Projects", "summary", true, "vendor/project"),
+        item("vendor_project", "Tasks", "tasks", true, "vendor/project"),
     ),
 )
+
 
 private fun item(
     key: String,
@@ -657,7 +684,10 @@ private fun localizeShell(
     resolver: (route: String?, key: String, backendLabel: String) -> String,
 ): NavigationMobileShellScreenContract {
     fun localize(items: List<NavigationMobileItemPayload>): List<NavigationMobileItemPayload> =
-        items.map { item -> item.copy(label = resolver(item.route, item.key, item.label)) }
+        items.map { item ->
+            val route = MobileRouteResolver.normalizeRoute(item.route)
+            item.copy(label = resolver(route, item.key, item.label), route = route.ifBlank { item.route })
+        }
 
     return shell.copy(
         bottomPrimary = localize(shell.bottomPrimary),
@@ -671,20 +701,22 @@ private fun routeTitle(route: String, retailKind: String): String = when {
     route == "dashboard" -> "Dashboard"
     route == "cart" -> "Cart"
     route == "catalog" -> "Catalog"
-    route == "vendor" -> "Vendor"
+    route == "vendor" -> "Profile"
     route == "more" -> "More"
     route == "attachment" || route == "vendor/attachment" -> "Attachment"
-    route == "vendor/profile" -> "Profile"
+    route == "vendor/page" -> "Profile"
     route == "vendor/summary" -> "Summary"
     route == "vendor/statement" -> "Statement"
     route == "vendor/payout" -> "Payout"
     route == "vendor/transaction" -> "Transactions"
+    route == "message" -> "Messages"
+    route == "notification" -> "Notifications"
     route == "vendor/retail/new" -> "New ${retailKindLabel(retailKind)}"
     route == "vendor/order/new" -> "New Order"
     route == "vendor/project/new" -> "New Project"
-    route == "vendor/retail" -> "Products"
+    route == "vendor/retail" -> "Services"
     route == "vendor/order" -> "Orders"
-    route == "vendor/project" -> "Projects"
+    route == "vendor/project" -> "Tasks"
     route.startsWith("vendor/retail/") -> "Product"
     route.startsWith("vendor/order/") -> "Order"
     route.startsWith("vendor/project/") -> "Project"

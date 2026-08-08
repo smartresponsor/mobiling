@@ -1,8 +1,12 @@
 import SwiftUI
 
 public struct MobilingAppShell: View {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var currentScreen: AccessScreen = .welcome
     @State private var activeVendorId: String?
+    @State private var launchSplashMounted: Bool = true
+    @State private var launchSplashVisible: Bool = true
+    @State private var launchSplashDismissScheduled: Bool = false
     private let authFeatureBridge: AuthFeatureBridge?
     private let attachmentFeatureBridge: AttachmentFeatureBridge?
     private let navigationShellGateway: NavigationShellGateway?
@@ -34,8 +38,9 @@ public struct MobilingAppShell: View {
     }
 
     public var body: some View {
-        Group {
-            switch currentScreen {
+        ZStack {
+            Group {
+                switch currentScreen {
             case .dashboard:
                 MobileDashboardShellView(
                     navigationShellGateway: navigationShellGateway,
@@ -117,8 +122,15 @@ public struct MobilingAppShell: View {
                     },
                     onAccessSession: { payload in applyAccessSession(payload) }
                 )
+                }
+            }
+
+            if launchSplashMounted {
+                OneTaskerLaunchSplashView(isVisible: launchSplashVisible)
+                    .zIndex(10)
             }
         }
+        .onAppear { scheduleLaunchSplashDismiss() }
         .task {
             guard let authFeatureBridge else {
                 return
@@ -145,6 +157,26 @@ public struct MobilingAppShell: View {
 
             activeVendorId = nil
             currentScreen = .welcome
+        }
+    }
+
+    private func scheduleLaunchSplashDismiss() {
+        guard !launchSplashDismissScheduled else {
+            return
+        }
+
+        launchSplashDismissScheduled = true
+        Task { @MainActor in
+            let holdNanoseconds: UInt64 = reduceMotion ? 360_000_000 : 1_760_000_000
+            let fadeNanoseconds: UInt64 = reduceMotion ? 120_000_000 : 320_000_000
+
+            try? await Task.sleep(nanoseconds: holdNanoseconds)
+            withAnimation(.easeOut(duration: reduceMotion ? 0.08 : 0.28)) {
+                launchSplashVisible = false
+            }
+
+            try? await Task.sleep(nanoseconds: fadeNanoseconds)
+            launchSplashMounted = false
         }
     }
 }
