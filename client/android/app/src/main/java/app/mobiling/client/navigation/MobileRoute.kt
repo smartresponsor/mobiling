@@ -19,7 +19,7 @@ sealed class MobileRoute(open val routePath: String) {
 
     sealed class Vendor(routePath: String) : MobileRoute(routePath) {
         object Overview : Vendor("vendor")
-        object Profile : Vendor("vendor/profile")
+        object Profile : Vendor("vendor/page")
         object Summary : Vendor("vendor/summary")
         object Statement : Vendor("vendor/statement")
         object Payout : Vendor("vendor/payout")
@@ -38,6 +38,8 @@ sealed class MobileRoute(open val routePath: String) {
         object Inbox : Message("message")
         data class Thread(val threadId: String) : Message("message/thread/$threadId")
     }
+
+    object Notification : MobileRoute("notification")
 
     sealed class Attachment(routePath: String) : MobileRoute(routePath) {
         object Root : Attachment("attachment")

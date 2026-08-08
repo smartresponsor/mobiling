@@ -29,11 +29,15 @@ class MobileApplicationConfigurationTest {
         val resolver = MobileTextResolver(
             mapOf(
                 MobileTextKey.Dashboard.semanticKey to "Local dashboard",
-                MobileTextKey.Vendor.semanticKey to "Local vendor",
+                MobileTextKey.Tasks.semanticKey to "Local tasks",
+                MobileTextKey.Services.semanticKey to "Local services",
+                MobileTextKey.Profile.semanticKey to "Local profile",
             ),
         )
         assertEquals("Local dashboard", resolver.resolveNavigation("dashboard", "dashboard", "Backend dashboard"))
-        assertEquals("Local vendor", resolver.resolveNavigation("vendor/profile", "vendor_profile", "Backend vendor"))
+        assertEquals("Local tasks", resolver.resolveNavigation("vendor/project", "tasks", "Backend vendor"))
+        assertEquals("Local services", resolver.resolveNavigation("vendor/retail", "services", "Backend vendor"))
+        assertEquals("Local profile", resolver.resolveNavigation("vendor/page", "vendor_page", "Backend vendor"))
         assertEquals("Backend attachment", resolver.resolveNavigation("attachment", "attachment", "Backend attachment"))
     }
 

@@ -22,7 +22,11 @@ enum MobileClientRuntimeConfig {
         textResolver: MobileTextResolver(localText: [
             MobileTextKey.dashboard.rawValue: String(localized: "navigation.dashboard", defaultValue: "Dashboard"),
             MobileTextKey.catalog.rawValue: String(localized: "navigation.catalog", defaultValue: "Catalog"),
-            MobileTextKey.message.rawValue: String(localized: "navigation.message", defaultValue: "Message"),
+            MobileTextKey.message.rawValue: String(localized: "navigation.message", defaultValue: "Messages"),
+            MobileTextKey.notification.rawValue: String(localized: "navigation.notification", defaultValue: "Notifications"),
+            MobileTextKey.tasks.rawValue: String(localized: "navigation.tasks", defaultValue: "Tasks"),
+            MobileTextKey.services.rawValue: String(localized: "navigation.services", defaultValue: "Services"),
+            MobileTextKey.profile.rawValue: String(localized: "navigation.profile", defaultValue: "Profile"),
             MobileTextKey.vendor.rawValue: String(localized: "navigation.vendor", defaultValue: "Vendor"),
         ])
     )

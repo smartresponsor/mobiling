@@ -50,6 +50,10 @@ public enum MobileTextKey: String, CaseIterable {
     case dashboard = "navigation.dashboard"
     case catalog = "navigation.catalog"
     case message = "navigation.message"
+    case notification = "navigation.notification"
+    case tasks = "navigation.tasks"
+    case services = "navigation.services"
+    case profile = "navigation.profile"
     case vendor = "navigation.vendor"
 
     var navigationRoot: String { String(rawValue.split(separator: ".").last ?? "") }
@@ -62,13 +66,32 @@ public struct MobileTextResolver {
         return value
     }
     public func resolveNavigation(route: String?, key: String, backendLabel: String) -> String {
-        let routeRoot = route?
+        let normalizedRoute = route?
+            .trimmingCharacters(in: .whitespacesAndNewlines)
             .split(separator: "/", omittingEmptySubsequences: true)
-            .first
-            .map(String.init)
-        let keyRoot = key.split(separator: "_", omittingEmptySubsequences: true).first.map(String.init)
-        let root = routeRoot ?? keyRoot
-        let semanticKey = MobileTextKey.allCases.first { $0.navigationRoot == root }?.rawValue
+            .joined(separator: "/") ?? ""
+        let normalizedKey = key.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+
+        let semanticKey: String? = {
+            switch (normalizedRoute, normalizedKey) {
+            case ("vendor/project", _), (_, "tasks"), (_, "vendor_project"):
+                return MobileTextKey.tasks.rawValue
+            case ("vendor/retail", _), (_, "services"), (_, "vendor_product"):
+                return MobileTextKey.services.rawValue
+            case ("vendor/page", _), ("vendor/profile", _), (_, "profile"), (_, "vendor_page"), (_, "vendor_profile"):
+                return MobileTextKey.profile.rawValue
+            case ("message", _), (_, "message"):
+                return MobileTextKey.message.rawValue
+            case ("notification", _), (_, "notification"):
+                return MobileTextKey.notification.rawValue
+            default:
+                let routeRoot = normalizedRoute.split(separator: "/", omittingEmptySubsequences: true).first.map(String.init)
+                let keyRoot = normalizedKey.split(separator: "_", omittingEmptySubsequences: true).first.map(String.init)
+                guard let root = routeRoot ?? keyRoot else { return nil }
+                return MobileTextKey.allCases.first { $0.navigationRoot == root }?.rawValue
+            }
+        }()
+
         return resolve(semanticKey: semanticKey, backendLabel: backendLabel)
     }
 }

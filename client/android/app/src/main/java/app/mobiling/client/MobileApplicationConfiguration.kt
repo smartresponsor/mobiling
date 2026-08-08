@@ -39,6 +39,10 @@ enum class MobileTextKey(val semanticKey: String) {
     Dashboard("navigation.dashboard"),
     Catalog("navigation.catalog"),
     Message("navigation.message"),
+    Notification("navigation.notification"),
+    Tasks("navigation.tasks"),
+    Services("navigation.services"),
+    Profile("navigation.profile"),
     Vendor("navigation.vendor"),
 }
 
@@ -50,8 +54,20 @@ class MobileTextResolver(private val localText: Map<String, String>) {
         resolve(navigationSemanticKey(route, key), backendLabel)
 
     private fun navigationSemanticKey(route: String?, key: String): String? {
-        val root = route?.trim('/')?.substringBefore('/')?.takeIf(String::isNotBlank) ?: key.substringBefore('_')
-        return MobileTextKey.entries.firstOrNull { it.name.equals(root, ignoreCase = true) }?.semanticKey
+        val normalizedRoute = route?.trim()?.trim('/')?.replace(Regex("/{2,}"), "/").orEmpty()
+        val normalizedKey = key.trim().lowercase()
+
+        return when {
+            normalizedRoute == "vendor/project" || normalizedKey in setOf("tasks", "vendor_project") -> MobileTextKey.Tasks.semanticKey
+            normalizedRoute == "vendor/retail" || normalizedKey in setOf("services", "vendor_product") -> MobileTextKey.Services.semanticKey
+            normalizedRoute == "vendor/page" || normalizedRoute == "vendor/profile" || normalizedKey in setOf("profile", "vendor_page", "vendor_profile") -> MobileTextKey.Profile.semanticKey
+            normalizedRoute == "message" || normalizedKey == "message" -> MobileTextKey.Message.semanticKey
+            normalizedRoute == "notification" || normalizedKey == "notification" -> MobileTextKey.Notification.semanticKey
+            else -> {
+                val root = normalizedRoute.substringBefore('/').takeIf(String::isNotBlank) ?: normalizedKey.substringBefore('_')
+                MobileTextKey.entries.firstOrNull { it.name.equals(root, ignoreCase = true) }?.semanticKey
+            }
+        }
     }
 }
 

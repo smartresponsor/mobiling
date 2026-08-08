@@ -24,6 +24,7 @@ public enum MobileRoute: Sendable, Equatable {
     case catalogSearch(searchText: String?)
     case message
     case messageThread(threadId: String)
+    case notification
     case attachment
     case attachmentDetail(attachmentId: String)
     case cart

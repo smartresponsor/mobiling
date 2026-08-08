@@ -17,7 +17,7 @@ public enum MobileRouteResolver {
         case "access/password": return .accessPassword
         case "access/sign-out": return .accessSignOut
         case "vendor": return .vendor
-        case "vendor/profile": return .vendorProfile
+        case "vendor/page": return .vendorProfile
         case "vendor/summary": return .vendorSummary
         case "vendor/statement": return .vendorStatement
         case "vendor/payout": return .vendorPayout
@@ -27,6 +27,7 @@ public enum MobileRouteResolver {
         case "catalog/browse": return .catalogBrowse
         case "catalog/search": return .catalogSearch(searchText: query["q"] ?? query["searchText"])
         case "message": return .message
+        case "notification": return .notification
         case "attachment": return .attachment
         case "cart": return .cart
         case "cart/checkout": return .cartCheckout
@@ -77,6 +78,8 @@ public enum MobileRouteResolver {
              .vendorProject,
              .vendorProjectNew,
              .vendorProjectDetail,
+             .message,
+             .notification,
              .catalog,
              .attachment:
             return true
@@ -86,10 +89,12 @@ public enum MobileRouteResolver {
     }
 
     public static func normalizeRoute(_ rawRoute: String?) -> String {
-        (rawRoute ?? "")
+        let normalized = (rawRoute ?? "")
             .trimmingCharacters(in: .whitespacesAndNewlines)
             .split(separator: "/", omittingEmptySubsequences: true)
             .joined(separator: "/")
+
+        return normalized == "vendor/profile" ? "vendor/page" : normalized
     }
 
     private static func resolveSegmentedRoute(_ segments: [String]) -> MobileRoute? {

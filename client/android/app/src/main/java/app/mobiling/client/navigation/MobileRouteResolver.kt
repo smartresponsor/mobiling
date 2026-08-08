@@ -19,7 +19,7 @@ object MobileRouteResolver {
             route == "access/password" -> MobileRoute.Access.Password
             route == "access/sign-out" -> MobileRoute.Access.SignOut
             route == "vendor" -> MobileRoute.Vendor.Overview
-            route == "vendor/profile" -> MobileRoute.Vendor.Profile
+            route == "vendor/page" -> MobileRoute.Vendor.Profile
             route == "vendor/summary" -> MobileRoute.Vendor.Summary
             route == "vendor/statement" -> MobileRoute.Vendor.Statement
             route == "vendor/payout" -> MobileRoute.Vendor.Payout
@@ -31,6 +31,7 @@ object MobileRouteResolver {
             segments.size == 3 && segments[0] == "catalog" && segments[1] == "node" -> MobileRoute.Catalog.Node(segments[2])
             route == "message" -> MobileRoute.Message.Inbox
             segments.size == 3 && segments[0] == "message" && segments[1] == "thread" -> MobileRoute.Message.Thread(segments[2])
+            route == "notification" -> MobileRoute.Notification
             route == "attachment" -> MobileRoute.Attachment.Root
             segments.size == 2 && segments[0] == "attachment" -> MobileRoute.Attachment.Detail(segments[1])
             route == "cart" -> MobileRoute.Cart.Current
@@ -70,6 +71,8 @@ object MobileRouteResolver {
         MobileRoute.Vendor.Payout,
         MobileRoute.Vendor.Transaction,
         MobileRoute.Vendor.Attachment,
+        MobileRoute.Message.Inbox,
+        MobileRoute.Notification,
         MobileRoute.Product.Listing,
         MobileRoute.Product.New,
         is MobileRoute.Product.Detail,
@@ -88,9 +91,13 @@ object MobileRouteResolver {
         else -> false
     }
 
-    fun normalizeRoute(rawRoute: String?): String = rawRoute
-        ?.trim()
-        .orEmpty()
-        .trim('/')
-        .replace(Regex("/{2,}"), "/")
+    fun normalizeRoute(rawRoute: String?): String {
+        val normalized = rawRoute
+            ?.trim()
+            .orEmpty()
+            .trim('/')
+            .replace(Regex("/{2,}"), "/")
+
+        return if (normalized == "vendor/profile") "vendor/page" else normalized
+    }
 }
