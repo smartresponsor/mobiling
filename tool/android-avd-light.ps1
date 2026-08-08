@@ -228,12 +228,54 @@ function Start-LightAvd {
         throw "AVD '$AvdName' does not exist. Run with -Action Create first."
     }
 
+    $staleEmulators = @(Get-Process -ErrorAction SilentlyContinue | Where-Object { $_.ProcessName -in @('emulator', 'qemu-system-x86_64') })
+    foreach ($process in $staleEmulators) {
+        try { Stop-Process -Id $process.Id -Force -ErrorAction Stop } catch { }
+    }
+    Start-Sleep -Seconds 2
+    & $adb kill-server | Out-Null
+    Start-Sleep -Seconds 1
+    & $adb start-server | Out-Null
+    Start-Sleep -Seconds 1
+
     Start-Process -FilePath $emulator -ArgumentList @("@$AvdName", '-gpu', 'host', '-scale', '1.0', '-use-keycode-forwarding', '-no-snapshot-load', '-no-boot-anim', '-netdelay', 'none', '-netspeed', 'full') -WorkingDirectory (Split-Path $emulator)
 
-    Start-Sleep -Seconds 5
+    $deadline = (Get-Date).AddMinutes(3)
+    $serial = $null
+    do {
+        Start-Sleep -Seconds 2
+        $ready = @(
+            & $adb devices |
+                Select-Object -Skip 1 |
+                Where-Object { $_ -match "\tdevice$" } |
+                ForEach-Object { ($_ -split "\s+")[0] }
+        )
+        foreach ($candidate in ($ready | Where-Object { $_ -like 'emulator-*' })) {
+            $runningAvdName = ((& $adb -s $candidate emu avd name 2>$null | Select-Object -First 1) | Out-String).Trim()
+            if ($runningAvdName -eq $AvdName) {
+                $serial = $candidate
+                break
+            }
+        }
+    } while ($null -eq $serial -and (Get-Date) -lt $deadline)
+
+    if ($null -eq $serial) {
+        throw "AVD '$AvdName' did not become an online adb device within 3 minutes."
+    }
+
+    do {
+        Start-Sleep -Seconds 2
+        $bootCompleted = ((& $adb -s $serial shell getprop sys.boot_completed 2>$null) | Out-String).Trim()
+    } while ($bootCompleted -ne '1' -and (Get-Date) -lt $deadline)
+
+    if ($bootCompleted -ne '1') {
+        throw "AVD '$AvdName' did not complete Android boot within 3 minutes."
+    }
+
     Restore-EmulatorWindowPlacement
     $shell = New-Object -ComObject WScript.Shell
     [void] $shell.AppActivate($AvdName)
+    Write-Host "AVD '$AvdName' is online as $serial and Android boot is complete."
 }
 
 function Resolve-AvdSerial {

@@ -8,7 +8,9 @@ param(
     [string]$ActivityName = "app.mobiling.client.MainActivity",
     [string]$ScreenshotName = "latest",
     [switch]$SkipBuild,
-    [switch]$SkipLaunch
+    [switch]$SkipLaunch,
+    [switch]$ResetAppData,
+    [switch]$DisableDeviceAnimations
 )
 
 Set-StrictMode -Version Latest
@@ -67,10 +69,39 @@ function Resolve-AdbDeviceSerial {
     throw "Multiple Android devices are ready. Pass -DeviceSerial. Available: $($available -join ', ')"
 }
 
+function Dismiss-SystemUiAnrIfPresent {
+    param([string]$Serial)
+
+    $devicePath = "/sdcard/mobiling-window-dump.xml"
+    $safeSerial = $Serial -replace "[^a-zA-Z0-9._-]", "-"
+    $hostPath = Join-Path $env:TEMP "mobiling-window-dump-$safeSerial.xml"
+
+    cmd.exe /c "adb -s $Serial shell uiautomator dump $devicePath >nul 2>nul"
+    if ($LASTEXITCODE -ne 0) {
+        return
+    }
+
+    cmd.exe /c "adb -s $Serial pull $devicePath `"$hostPath`" >nul 2>nul"
+    if ($LASTEXITCODE -ne 0 -or -not (Test-Path $hostPath)) {
+        return
+    }
+
+    $dump = Get-Content $hostPath -Raw
+    if ($dump -match "System UI isn(&apos;|')t responding" -or $dump -match "android:id/aerr_wait") {
+        # The light AVD can show a platform ANR while boot settles. Select Wait before install/launch.
+        & adb -s $Serial shell input tap 540 1128 2>$null | Out-Null
+        Start-Sleep -Seconds 2
+    }
+}
+
 $repositoryRoot = Split-Path -Parent $PSScriptRoot
 $androidRoot = Join-Path $repositoryRoot "client/android"
 $gradleWrapper = Join-Path $androidRoot "gradlew.bat"
-$apkPath = Join-Path $androidRoot "app/build/outputs/apk/oneTasker/debug/app-oneTasker-debug.apk"
+$apkPath = switch ($PackageName) {
+    "app.mobiling.client.smartresponsor" { Join-Path $androidRoot "app/build/outputs/apk/smartResponsor/debug/app-smartResponsor-debug.apk" }
+    "app.mobiling.client.onetasker" { Join-Path $androidRoot "app/build/outputs/apk/oneTasker/debug/app-oneTasker-debug.apk" }
+    default { throw "Unsupported Android package '$PackageName'." }
+}
 $runtimeRoot = Join-Path $repositoryRoot "watchdog/runtime/device"
 $historyRoot = Join-Path $runtimeRoot "history"
 
@@ -80,9 +111,17 @@ if (-not (Test-Path $gradleWrapper)) {
 
 $resolvedSerial = Resolve-AdbDeviceSerial -RequestedSerial $DeviceSerial -RequestedAvdName $AvdName
 & adb -s $resolvedSerial wait-for-device
-& adb -s $resolvedSerial shell settings put global window_animation_scale 0
-& adb -s $resolvedSerial shell settings put global transition_animation_scale 0
-& adb -s $resolvedSerial shell settings put global animator_duration_scale 0
+if ($DisableDeviceAnimations) {
+    & adb -s $resolvedSerial shell settings put global window_animation_scale 0
+    & adb -s $resolvedSerial shell settings put global transition_animation_scale 0
+    & adb -s $resolvedSerial shell settings put global animator_duration_scale 0
+} else {
+    & adb -s $resolvedSerial shell settings put global window_animation_scale 1
+    & adb -s $resolvedSerial shell settings put global transition_animation_scale 1
+    & adb -s $resolvedSerial shell settings put global animator_duration_scale 1
+}
+Start-Sleep -Seconds 2
+Dismiss-SystemUiAnrIfPresent -Serial $resolvedSerial
 
 if (-not $SkipBuild) {
     Push-Location $androidRoot
@@ -101,10 +140,11 @@ if (-not (Test-Path $apkPath)) {
     throw "Debug APK was not found at $apkPath"
 }
 
-if ($PackageName -eq "app.mobiling.client.onetasker") {
-    & adb -s $resolvedSerial uninstall app.mobiling.client 2>$null | Out-Null
+if ($ResetAppData) {
+    & adb -s $resolvedSerial uninstall $PackageName 2>$null | Out-Null
 }
 
+Dismiss-SystemUiAnrIfPresent -Serial $resolvedSerial
 & adb -s $resolvedSerial install -r -t $apkPath
 if ($LASTEXITCODE -ne 0) {
     throw "APK installation failed with exit code $LASTEXITCODE."
