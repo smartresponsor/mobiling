@@ -131,7 +131,7 @@ fun VendorMobileOverviewScreen(
 
         item {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                VendorOverviewAction("My Profile", "Complete and review your public vendor identity.", Icons.Default.Person, "vendor/profile", onRouteSelected)
+                VendorOverviewAction("Profile", "Complete and review your 1Tasker profile.", Icons.Default.Person, "vendor/page", onRouteSelected)
                 VendorOverviewAction("Summary", "Open the detailed vendor status and readiness view.", Icons.Default.Dashboard, "vendor/summary", onRouteSelected)
                 VendorOverviewAction("Statement", "Review vendor statement totals and status.", Icons.Default.ReceiptLong, "vendor/statement", onRouteSelected)
                 VendorOverviewAction("Payout", "Review available and pending payout amounts.", Icons.Default.Payments, "vendor/payout", onRouteSelected)

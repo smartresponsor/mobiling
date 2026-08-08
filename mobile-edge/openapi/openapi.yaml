@@ -819,7 +819,7 @@ components:
     MobileVendorProfilePayload:
       type: object
       additionalProperties: false
-      required: [vendorId, displayName, brandName, status, completionPercent, readyForPublishing, nextAction, avatarUrl, coverUrl, about, website, publicationStatus]
+      required: [vendorId, displayName, brandName, status, completionPercent, readyForPublishing, nextAction, avatarUrl, avatarAttachmentId, coverUrl, coverAttachmentId, canEditProfileMedia, about, website, publicationStatus]
       properties:
         vendorId: { type: string, minLength: 1 }
         displayName: { anyOf: [{ type: string, minLength: 1 }, { type: 'null' }] }
@@ -829,7 +829,10 @@ components:
         readyForPublishing: { type: boolean }
         nextAction: { anyOf: [{ type: string, minLength: 1 }, { type: 'null' }] }
         avatarUrl: { anyOf: [{ type: string, minLength: 1 }, { type: 'null' }] }
+        avatarAttachmentId: { anyOf: [{ type: string, minLength: 1 }, { type: 'null' }] }
         coverUrl: { anyOf: [{ type: string, minLength: 1 }, { type: 'null' }] }
+        coverAttachmentId: { anyOf: [{ type: string, minLength: 1 }, { type: 'null' }] }
+        canEditProfileMedia: { type: boolean }
         about: { anyOf: [{ type: string, minLength: 1 }, { type: 'null' }] }
         website: { anyOf: [{ type: string, minLength: 1 }, { type: 'null' }] }
         publicationStatus: { anyOf: [{ type: string, minLength: 1 }, { type: 'null' }] }

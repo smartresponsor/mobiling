@@ -7,7 +7,10 @@ public struct MobileAttachmentView: View {
     @State private var attachmentList: AttachmentListPayload?
     @State private var errorMessage: String?
     @State private var isLoading: Bool = false
-    @State private var handoffText: String?
+    @State private var category: AttachmentCategory = .all
+    @State private var selectedItem: AttachmentItemPayload?
+
+    private let columns = [GridItem(.adaptive(minimum: 150), spacing: 12)]
 
     public init(vendorId: String?, attachmentFeatureBridge: AttachmentFeatureBridge?) {
         self.vendorId = vendorId
@@ -27,29 +30,34 @@ public struct MobileAttachmentView: View {
                     Text(errorMessage)
                 }
             } else if let attachmentList {
-                Section("Owner") {
-                    field("Owner type", attachmentList.ownerType)
-                    field("Owner ID", attachmentList.ownerId)
-                    field("Count", String(attachmentList.count))
-                    field("Payload", attachmentList.payloadText)
+                Section {
+                    Text("\(attachmentList.count) attachments")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 8) {
+                            ForEach(AttachmentCategory.allCases) { option in
+                                Button(option.label) { category = option }
+                                    .buttonStyle(.bordered)
+                                    .tint(category == option ? .accentColor : .secondary)
+                            }
+                        }
+                    }
                 }
 
-                if attachmentList.items.isEmpty {
+                let visibleItems = attachmentList.items.filter(category.matches)
+                if visibleItems.isEmpty {
                     Section {
-                        Text("No attachment yet.")
+                        ContentUnavailableView("No \(category.label.lowercased()) attachments", systemImage: "paperclip")
                     }
                 } else {
                     Section("Files") {
-                        ForEach(attachmentList.items) { item in
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text("\(item.type ?? "attachment"): \(item.attachmentId)")
-                                    .font(.subheadline)
-                                    .fontWeight(.semibold)
-                                field("MIME", item.mimeType)
-                                field("Download URL", item.downloadUrl)
-                                field("Payload", item.payloadText)
+                        LazyVGrid(columns: columns, spacing: 12) {
+                            ForEach(visibleItems) { item in
+                                attachmentCard(item)
+                                    .onTapGesture { selectedItem = item }
                             }
-                            .padding(.vertical, 4)
                         }
                     }
                 }
@@ -60,17 +68,8 @@ public struct MobileAttachmentView: View {
             }
 
             Section {
-                if let handoffText {
-                    Text(handoffText)
-                }
                 Button("Refresh") {
                     Task { await load() }
-                }
-                Button("Prepare Upload") {
-                    Task { await prepareUpload() }
-                }
-                Button("Prepare File") {
-                    Task { await prepareFile() }
                 }
             }
         }
@@ -78,16 +77,65 @@ public struct MobileAttachmentView: View {
         .task(id: vendorId ?? "") {
             await load()
         }
+        .sheet(item: $selectedItem) { item in
+            NavigationStack {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 16) {
+                        if item.type == "media", item.mediaKind == "image", let url = item.downloadUrl.flatMap(URL.init(string:)) {
+                            AsyncImage(url: url) { phase in
+                                switch phase {
+                                case .success(let image): image.resizable().scaledToFit()
+                                case .failure: ContentUnavailableView("Preview unavailable", systemImage: "photo")
+                                default: ProgressView()
+                                }
+                            }
+                            .frame(maxWidth: .infinity, minHeight: 260)
+                        }
+                        Text(item.displayName).font(.title2.bold())
+                        Text(item.categoryLabel).foregroundStyle(.secondary)
+                        if let mimeType = item.mimeType { Text(mimeType).font(.caption) }
+                        if item.size > 0 { Text(ByteCountFormatter.string(fromByteCount: item.size, countStyle: .file)).font(.caption) }
+                    }
+                    .padding(16)
+                }
+                .navigationTitle("Attachment")
+                .toolbar {
+                    ToolbarItem(placement: .confirmationAction) {
+                        Button("Close") { selectedItem = nil }
+                    }
+                }
+            }
+        }
     }
 
     @ViewBuilder
-    private func field(_ label: String, _ value: String?) -> some View {
-        VStack(alignment: .leading, spacing: 2) {
-            Text(label)
-                .font(.caption)
-                .foregroundColor(.secondary)
-            Text(value?.isEmpty == false ? value! : "—")
+    private func attachmentCard(_ item: AttachmentItemPayload) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            if item.type == "media", item.mediaKind == "image", let url = item.downloadUrl.flatMap(URL.init(string:)) {
+                AsyncImage(url: url) { phase in
+                    switch phase {
+                    case .success(let image): image.resizable().scaledToFill()
+                    case .failure: Image(systemName: "photo").font(.largeTitle)
+                    default: ProgressView()
+                    }
+                }
+                .frame(maxWidth: .infinity, minHeight: 120, maxHeight: 120)
+                .clipped()
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+            } else {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 12).fill(.quaternary)
+                    Image(systemName: item.type == "document" ? "doc.fill" : "paperclip").font(.largeTitle)
+                }
+                .frame(height: 120)
+            }
+            Text(item.displayName).font(.subheadline.weight(.semibold)).lineLimit(2)
+            Text(item.categoryLabel).font(.caption).foregroundStyle(.secondary)
+            if item.isPrimary { Text("Primary").font(.caption2.weight(.semibold)) }
         }
+        .padding(10)
+        .background(.background, in: RoundedRectangle(cornerRadius: 14))
+        .overlay(RoundedRectangle(cornerRadius: 14).stroke(.quaternary))
     }
 
     private func load() async {
@@ -114,35 +162,54 @@ public struct MobileAttachmentView: View {
         }
     }
 
-    private func prepareUpload() async {
-        guard let activeVendorId = vendorId?.trimmingCharacters(in: .whitespacesAndNewlines), !activeVendorId.isEmpty,
-              let attachmentFeatureBridge else {
-            handoffText = "Upload handoff requires an active attachment bridge and vendor session."
-            return
-        }
+}
 
-        do {
-            let handoff = try await attachmentFeatureBridge.uploadHandoff(
-                request: AttachmentUploadHandoffRequest(ownerType: "vendor", ownerId: activeVendorId, context: nil, slot: nil, isPrimary: false, title: nil, description: nil, altText: nil)
-            )
-            handoffText = "Upload handoff: \(handoff.method) \(handoff.uploadUrl) field=\(handoff.fieldName) mode=\(handoff.handoffMode)"
-        } catch {
-            handoffText = error.localizedDescription
+private enum AttachmentCategory: String, CaseIterable, Identifiable {
+    case all, media, documents, images, avatars, covers, otherImages, pdf, spreadsheets
+
+    var id: String { rawValue }
+
+    var label: String {
+        switch self {
+        case .all: "All"
+        case .media: "Media"
+        case .documents: "Documents"
+        case .images: "Images"
+        case .avatars: "Avatars"
+        case .covers: "Covers"
+        case .otherImages: "Other images"
+        case .pdf: "PDF"
+        case .spreadsheets: "Spreadsheets"
         }
     }
 
-    private func prepareFile() async {
-        guard let attachmentId = attachmentList?.items.first?.attachmentId, !attachmentId.isEmpty,
-              let attachmentFeatureBridge else {
-            handoffText = "File handoff requires at least one attachment."
-            return
+    func matches(_ item: AttachmentItemPayload) -> Bool {
+        switch self {
+        case .all: true
+        case .media: item.type == "media"
+        case .documents: item.type == "document"
+        case .images: item.type == "media" && item.mediaKind == "image"
+        case .avatars: item.type == "media" && item.mediaKind == "image" && item.context == "profile" && item.slot == "avatar"
+        case .covers: item.type == "media" && item.mediaKind == "image" && item.context == "profile" && item.slot == "cover"
+        case .otherImages: item.type == "media" && item.mediaKind == "image" && !(item.context == "profile" && ["avatar", "cover"].contains(item.slot ?? ""))
+        case .pdf: item.type == "document" && item.documentKind == "pdf"
+        case .spreadsheets: item.type == "document" && item.documentKind == "spreadsheet"
         }
+    }
+}
 
-        do {
-            let handoff = try await attachmentFeatureBridge.fileHandoff(attachmentId: attachmentId)
-            handoffText = "File handoff: \(handoff.downloadUrl) mode=\(handoff.handoffMode)"
-        } catch {
-            handoffText = error.localizedDescription
-        }
+private extension AttachmentItemPayload {
+    var displayName: String {
+        if let title, !title.isEmpty { return title }
+        if let originalName, !originalName.isEmpty { return originalName }
+        return "Attachment \(attachmentId)"
+    }
+
+    var categoryLabel: String {
+        if context == "profile", slot == "avatar" { return "Profile avatar" }
+        if context == "profile", slot == "cover" { return "Profile cover" }
+        if type == "document" { return documentKind?.replacingOccurrences(of: "_", with: " ").capitalized ?? "Document" }
+        if type == "media" { return mediaKind?.capitalized ?? "Media" }
+        return "Attachment"
     }
 }

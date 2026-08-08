@@ -11,7 +11,10 @@ public struct MobileVendorProfileScreenContract: Sendable {
     public let about: String?
     public let website: String?
     public let avatarUrl: String?
+    public let avatarAttachmentId: String?
     public let coverUrl: String?
+    public let coverAttachmentId: String?
+    public let canEditProfileMedia: Bool
     public let publicationStatus: String?
 
     public init(payload: MobileVendorProfilePayload) {
@@ -25,7 +28,10 @@ public struct MobileVendorProfileScreenContract: Sendable {
         about = payload.about
         website = payload.website
         avatarUrl = payload.avatarUrl
+        avatarAttachmentId = payload.avatarAttachmentId
         coverUrl = payload.coverUrl
+        coverAttachmentId = payload.coverAttachmentId
+        canEditProfileMedia = payload.canEditProfileMedia
         publicationStatus = payload.publicationStatus
     }
 }

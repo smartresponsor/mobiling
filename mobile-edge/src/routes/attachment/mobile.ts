@@ -98,12 +98,28 @@ function attachmentRoot(body: unknown): Record<string, unknown> {
 
 function normalizeAttachmentItem(value: unknown): Record<string, unknown> {
   const item = recordValue(value);
+  const attachmentId = stringValue(item.attachmentId ?? item.id) ?? "attachment-unavailable";
 
   return {
-    attachmentId: stringValue(item.attachmentId ?? item.id) ?? "attachment-unavailable",
+    attachmentId,
     type: stringValue(item.type) ?? "file",
+    mediaKind: stringValue(item.mediaKind),
+    documentKind: stringValue(item.documentKind),
+    originalName: stringValue(item.originalName),
+    title: stringValue(item.title),
     mimeType: stringValue(item.mimeType),
-    downloadUrl: stringValue(item.downloadUrl),
+    extension: stringValue(item.extension),
+    size: integerValue(item.size, 0),
+    width: null === item.width || undefined === item.width ? null : integerValue(item.width, 0),
+    height: null === item.height || undefined === item.height ? null : integerValue(item.height, 0),
+    durationMs: null === item.durationMs || undefined === item.durationMs ? null : integerValue(item.durationMs, 0),
+    pageCount: null === item.pageCount || undefined === item.pageCount ? null : integerValue(item.pageCount, 0),
+    context: stringValue(item.context),
+    slot: stringValue(item.slot),
+    isPrimary: booleanValue(item.isPrimary, false),
+    position: integerValue(item.position, 0),
+    createdAt: stringValue(item.createdAt),
+    downloadUrl: attachingApiClient.attachmentFileUrl(attachmentId) ?? stringValue(item.downloadUrl),
     payload: item,
   };
 }

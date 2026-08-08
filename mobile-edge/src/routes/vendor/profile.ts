@@ -2,6 +2,7 @@ import type { FastifyInstance } from "fastify";
 import { mobileAccessErrorPayload } from "../../contract/access/error.js";
 import { mobileVendorProfilePayload } from "../../contract/vendor/profile.js";
 import { VendoringApiClient, type VendoringApiErrorPayload } from "../../client/vendoring/vendoringApiClient.js";
+import { ENV } from "../../env.js";
 
 const vendoringApiClient = new VendoringApiClient();
 
@@ -14,7 +15,10 @@ interface MobileVendorProfilePayload {
   readyForPublishing: boolean;
   nextAction: string | null;
   avatarUrl: string | null;
+  avatarAttachmentId: string | null;
   coverUrl: string | null;
+  coverAttachmentId: string | null;
+  canEditProfileMedia: boolean;
   about: string | null;
   website: string | null;
   publicationStatus: string | null;
@@ -76,6 +80,18 @@ function nestedString(source: Record<string, unknown>, field: string): string | 
   return stringValue(source[field]);
 }
 
+function absoluteVendoringUrl(value: string | null): string | null {
+  if (null === value) {
+    return null;
+  }
+
+  try {
+    return new URL(value, ENV.VENDORING_API_BASE_URL.replace(/\/$/, "") + "/").toString();
+  } catch {
+    return value;
+  }
+}
+
 function normalizeProfile(vendorId: string, body: unknown): MobileVendorProfilePayload {
   const unwrappedBody = profilePayload(body);
   const root = isRecord(unwrappedBody) ? unwrappedBody : {};
@@ -94,8 +110,11 @@ function normalizeProfile(vendorId: string, body: unknown): MobileVendorProfileP
     completionPercent: null === completion ? 0 : Math.max(0, Math.min(100, Math.round(completion))),
     readyForPublishing: true === root.readyForPublishing,
     nextAction: stringValue(root.nextAction),
-    avatarUrl: nestedString(avatar, "url"),
-    coverUrl: nestedString(cover, "url"),
+    avatarUrl: absoluteVendoringUrl(nestedString(avatar, "url")),
+    avatarAttachmentId: nestedString(avatar, "attachmentId") ?? nestedString(avatar, "id"),
+    coverUrl: absoluteVendoringUrl(nestedString(cover, "url")),
+    coverAttachmentId: nestedString(cover, "attachmentId") ?? nestedString(cover, "id"),
+    canEditProfileMedia: true,
     about: nestedString(publicProfile, "about") ?? nestedString(profile, "about"),
     website: nestedString(publicProfile, "website") ?? nestedString(profile, "website"),
     publicationStatus: nestedString(publication, "status") ?? nestedString(publicProfile, "status"),

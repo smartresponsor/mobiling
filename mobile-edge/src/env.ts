@@ -7,6 +7,10 @@ const boolean = (name: string, fallback: boolean): boolean =>
 const list = (name: string, fallback = ""): string[] =>
   (process.env[name] || fallback).split(",").map((value) => value.trim()).filter(Boolean);
 
+const localSymfonyApiBaseUrl =
+  process.env.LOCAL_SYMFONY_API_BASE_URL
+  || ((process.env.NODE_ENV || "development") === "production" ? "" : "http://127.0.0.1:8000");
+
 export const ENV = {
   NODE_ENV: process.env.NODE_ENV || "development",
   PORT: integer("PORT", 8080),
@@ -29,21 +33,21 @@ export const ENV = {
   CONFIG_KEY_ID: process.env.CONFIG_KEY_ID || "k1",
   ANALYTIC_SECRET: process.env.ANALYTIC_SECRET || "dev-analytic",
   RATE_MOBILE_RPM: integer("RATE_MOBILE_RPM", 120),
-  ACCESSING_API_BASE_URL: process.env.ACCESSING_API_BASE_URL || "",
-  ACCESSING_API_TIMEOUT_MS: integer("ACCESSING_API_TIMEOUT_MS", 3000),
-  VENDORING_API_BASE_URL: process.env.VENDORING_API_BASE_URL || "",
-  VENDORING_API_TIMEOUT_MS: integer("VENDORING_API_TIMEOUT_MS", 3000),
-  CRUDING_API_BASE_URL: process.env.CRUDING_API_BASE_URL || process.env.VENDORING_API_BASE_URL || "",
+  ACCESSING_API_BASE_URL: process.env.ACCESSING_API_BASE_URL || localSymfonyApiBaseUrl,
+  ACCESSING_API_TIMEOUT_MS: integer("ACCESSING_API_TIMEOUT_MS", 10000),
+  VENDORING_API_BASE_URL: process.env.VENDORING_API_BASE_URL || localSymfonyApiBaseUrl,
+  VENDORING_API_TIMEOUT_MS: integer("VENDORING_API_TIMEOUT_MS", 30000),
+  CRUDING_API_BASE_URL: process.env.CRUDING_API_BASE_URL || process.env.VENDORING_API_BASE_URL || localSymfonyApiBaseUrl,
   CRUDING_API_TIMEOUT_MS: integer("CRUDING_API_TIMEOUT_MS", 10000),
-  NAVIGATING_API_BASE_URL: process.env.NAVIGATING_API_BASE_URL || "",
+  NAVIGATING_API_BASE_URL: process.env.NAVIGATING_API_BASE_URL || localSymfonyApiBaseUrl,
   NAVIGATING_API_TIMEOUT_MS: integer("NAVIGATING_API_TIMEOUT_MS", 3000),
-  CARTING_API_BASE_URL: process.env.CARTING_API_BASE_URL || "",
+  CARTING_API_BASE_URL: process.env.CARTING_API_BASE_URL || localSymfonyApiBaseUrl,
   CARTING_API_TIMEOUT_MS: integer("CARTING_API_TIMEOUT_MS", 3000),
-  CATALOGING_API_BASE_URL: process.env.CATALOGING_API_BASE_URL || "",
+  CATALOGING_API_BASE_URL: process.env.CATALOGING_API_BASE_URL || localSymfonyApiBaseUrl,
   CATALOGING_API_TIMEOUT_MS: integer("CATALOGING_API_TIMEOUT_MS", 3000),
-  ATTACHING_API_BASE_URL: process.env.ATTACHING_API_BASE_URL || "",
+  ATTACHING_API_BASE_URL: process.env.ATTACHING_API_BASE_URL || localSymfonyApiBaseUrl,
   ATTACHING_API_TIMEOUT_MS: integer("ATTACHING_API_TIMEOUT_MS", 3000),
-  LOCALIZING_API_BASE_URL: process.env.LOCALIZING_API_BASE_URL || "",
+  LOCALIZING_API_BASE_URL: process.env.LOCALIZING_API_BASE_URL || localSymfonyApiBaseUrl,
   LOCALIZING_API_TIMEOUT_MS: integer("LOCALIZING_API_TIMEOUT_MS", 3000),
   CORE_COMMERCE_URL: process.env.CORE_COMMERCE_URL || "http://localhost:9000",
   CORE_AUTH: process.env.CORE_AUTH || "",
