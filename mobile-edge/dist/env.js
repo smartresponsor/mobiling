@@ -41,6 +41,8 @@ export const ENV = {
     ATTACHING_API_TIMEOUT_MS: integer("ATTACHING_API_TIMEOUT_MS", 3000),
     LOCALIZING_API_BASE_URL: process.env.LOCALIZING_API_BASE_URL || localSymfonyApiBaseUrl,
     LOCALIZING_API_TIMEOUT_MS: integer("LOCALIZING_API_TIMEOUT_MS", 3000),
+    MESSAGING_API_BASE_URL: process.env.MESSAGING_API_BASE_URL || localSymfonyApiBaseUrl,
+    MESSAGING_API_TIMEOUT_MS: integer("MESSAGING_API_TIMEOUT_MS", 10000),
     CORE_COMMERCE_URL: process.env.CORE_COMMERCE_URL || "http://localhost:9000",
     CORE_AUTH: process.env.CORE_AUTH || "",
     CORE_TIMEOUT_MS: integer("CORE_TIMEOUT_MS", 3000),
@@ -76,6 +78,7 @@ export function assertRuntimeEnv() {
         ["CARTING_API_BASE_URL", ENV.CARTING_API_BASE_URL, ""],
         ["CATALOGING_API_BASE_URL", ENV.CATALOGING_API_BASE_URL, ""],
         ["ATTACHING_API_BASE_URL", ENV.ATTACHING_API_BASE_URL, ""],
+        ["MESSAGING_API_BASE_URL", ENV.MESSAGING_API_BASE_URL, ""],
     ].filter(([, value, forbidden]) => value === forbidden).map(([name]) => name);
     if (invalid.length > 0) {
         throw new Error(`Unsafe production configuration: ${invalid.join(", ")}`);

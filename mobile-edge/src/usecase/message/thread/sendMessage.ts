@@ -3,11 +3,5 @@ import type { SendMessageBody } from '../../../contract/message/thread/SendMessa
 
 // Marketing America Corp. Oleksandr Tishchenko
 export async function sendMessage(body: SendMessageBody): Promise<MessageItem> {
-  return {
-    messageId: 'stub-message-id',
-    threadId: body.threadId,
-    body: body.body,
-    senderId: 'stub-sender-id',
-    sentAtIso8601: new Date(0).toISOString(),
-  };
+  throw new Error(`Message send is served by the mobile-edge Messaging route for thread ${body.threadId}.`);
 }
