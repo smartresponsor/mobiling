@@ -1,6 +1,7 @@
 import { mobileAccessErrorPayload } from "../../contract/access/error.js";
 import { mobileVendorProfilePayload } from "../../contract/vendor/profile.js";
 import { VendoringApiClient } from "../../client/vendoring/vendoringApiClient.js";
+import { ENV } from "../../env.js";
 const vendoringApiClient = new VendoringApiClient();
 function forwardedHeaders(request) {
     const headers = {};
@@ -43,6 +44,17 @@ function nestedRecord(source, field) {
 function nestedString(source, field) {
     return stringValue(source[field]);
 }
+function absoluteVendoringUrl(value) {
+    if (null === value) {
+        return null;
+    }
+    try {
+        return new URL(value, ENV.VENDORING_API_BASE_URL.replace(/\/$/, "") + "/").toString();
+    }
+    catch {
+        return value;
+    }
+}
 function normalizeProfile(vendorId, body) {
     const unwrappedBody = profilePayload(body);
     const root = isRecord(unwrappedBody) ? unwrappedBody : {};
@@ -60,8 +72,11 @@ function normalizeProfile(vendorId, body) {
         completionPercent: null === completion ? 0 : Math.max(0, Math.min(100, Math.round(completion))),
         readyForPublishing: true === root.readyForPublishing,
         nextAction: stringValue(root.nextAction),
-        avatarUrl: nestedString(avatar, "url"),
-        coverUrl: nestedString(cover, "url"),
+        avatarUrl: absoluteVendoringUrl(nestedString(avatar, "url")),
+        avatarAttachmentId: nestedString(avatar, "attachmentId") ?? nestedString(avatar, "id"),
+        coverUrl: absoluteVendoringUrl(nestedString(cover, "url")),
+        coverAttachmentId: nestedString(cover, "attachmentId") ?? nestedString(cover, "id"),
+        canEditProfileMedia: true,
         about: nestedString(publicProfile, "about") ?? nestedString(profile, "about"),
         website: nestedString(publicProfile, "website") ?? nestedString(profile, "website"),
         publicationStatus: nestedString(publication, "status") ?? nestedString(publicProfile, "status"),
