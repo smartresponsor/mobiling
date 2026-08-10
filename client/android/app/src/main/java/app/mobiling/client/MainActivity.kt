@@ -35,6 +35,7 @@ class MainActivity : ComponentActivity() {
                         attachmentFeatureBridge = graph.attachmentFeatureBridge,
                         catalogFeatureBridge = graph.catalogFeatureBridge,
                         navigationShellGateway = graph.navigationShellGateway,
+                        messageFeatureBridge = graph.messageFeatureBridge,
                         productGateway = graph.productGateway,
                         orderGateway = graph.orderGateway,
                         projectGateway = graph.projectGateway,

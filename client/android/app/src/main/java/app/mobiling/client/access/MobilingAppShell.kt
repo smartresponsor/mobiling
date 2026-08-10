@@ -20,6 +20,7 @@ import app.mobiling.client.cart.CartFeatureBridge
 import app.mobiling.client.RetailKind
 import app.mobiling.client.dashboard.DashboardMobileShell
 import app.mobiling.client.data.navigation.shell.NavigationShellGateway
+import app.mobiling.client.message.MessageFeatureBridge
 import app.mobiling.client.data.order.OrderGateway
 import app.mobiling.client.data.product.ProductGateway
 import app.mobiling.client.data.project.ProjectGateway
@@ -38,6 +39,7 @@ fun MobilingAppShell(
     attachmentFeatureBridge: AttachmentFeatureBridge? = null,
     catalogFeatureBridge: CatalogFeatureBridge? = null,
     navigationShellGateway: NavigationShellGateway? = null,
+    messageFeatureBridge: MessageFeatureBridge? = null,
     productGateway: ProductGateway? = null,
     orderGateway: OrderGateway? = null,
     projectGateway: ProjectGateway? = null,
@@ -105,6 +107,7 @@ fun MobilingAppShell(
                 } else {
                     DashboardMobileShell(
                         navigationShellGateway = navigationShellGateway,
+                        messageFeatureBridge = messageFeatureBridge,
                         productGateway = productGateway,
                         orderGateway = orderGateway,
                         projectGateway = projectGateway,

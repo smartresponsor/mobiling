@@ -91,11 +91,14 @@ import app.mobiling.client.vendor.VendorNewMobileScreen
 import app.mobiling.client.vendor.RetailNewFields
 import app.mobiling.client.vendor.OrderNewFields
 import app.mobiling.client.vendor.ProjectNewMobileScreen
+import app.mobiling.client.message.MessageFeatureBridge
+import app.mobiling.client.message.MessageMobileScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DashboardMobileShell(
     navigationShellGateway: NavigationShellGateway?,
+    messageFeatureBridge: MessageFeatureBridge? = null,
     productGateway: ProductGateway? = null,
     orderGateway: OrderGateway? = null,
     projectGateway: ProjectGateway? = null,
@@ -208,6 +211,7 @@ fun DashboardMobileShell(
             selectedProductKind = selectedProductKind,
             availableRetailKinds = availableRetailKinds,
             shell = shell,
+            messageFeatureBridge = messageFeatureBridge,
             productGateway = productGateway,
             orderGateway = orderGateway,
             projectGateway = projectGateway,
@@ -297,6 +301,7 @@ private fun DashboardContent(
     selectedProductKind: String,
     availableRetailKinds: List<RetailKind>,
     shell: NavigationMobileShellScreenContract,
+    messageFeatureBridge: MessageFeatureBridge?,
     productGateway: ProductGateway?,
     orderGateway: OrderGateway?,
     projectGateway: ProjectGateway?,
@@ -328,6 +333,12 @@ private fun DashboardContent(
         "catalog" -> {
             Box(Modifier.fillMaxSize().padding(padding)) {
                 CatalogMobileScreen(catalogFeatureBridge = catalogFeatureBridge)
+            }
+            return
+        }
+        "message" -> {
+            Box(Modifier.fillMaxSize().padding(padding)) {
+                MessageMobileScreen(messageFeatureBridge = messageFeatureBridge)
             }
             return
         }
@@ -473,9 +484,6 @@ private fun DashboardContent(
             }
             "vendor/transaction" -> item {
                 VendorMobileTransactionScreen(vendorId = vendorId, vendorTransactionGateway = vendorTransactionGateway)
-            }
-            "message" -> item {
-                EmptyMobileState(title = "Messages", description = "Task and customer conversations will appear here.")
             }
             "notification" -> item {
                 EmptyMobileState(title = "Notifications", description = "Important 1Tasker updates will appear here.")
