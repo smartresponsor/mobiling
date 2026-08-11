@@ -1,6 +1,8 @@
 package app.mobiling.client.data.order
 
 import app.mobiling.client.contract.order.OrderMobileItemPayload
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -23,7 +25,7 @@ class OrderHttpGateway(private val baseUrl: String, private val client: OkHttpCl
     override suspend fun updateOrder(orderId: String, fields: Map<String, String>) { request("PATCH", orderId, fields) }
     override suspend fun deleteOrder(orderId: String) { request("DELETE", orderId, null) }
 
-    private fun request(method: String, identity: String?, fields: Map<String, String>?): JSONObject {
+    private suspend fun request(method: String, identity: String?, fields: Map<String, String>?): JSONObject = withContext(Dispatchers.IO) {
         val url = baseUrl.trimEnd('/') + "/my/order" + (identity?.let { "/$it" } ?: "")
         val payload = fields?.let { JSONObject(it).toString().toRequestBody("application/json".toMediaType()) }
         val builder = Request.Builder().url(url).header("Accept", "application/json")
@@ -36,7 +38,7 @@ class OrderHttpGateway(private val baseUrl: String, private val client: OkHttpCl
         client.newCall(builder.build()).execute().use { response ->
             val body = response.body?.string().orEmpty()
             if (!response.isSuccessful) throw IllegalStateException(JSONObject(body.ifBlank { "{}" }).optString("message", "Order CRUD request failed with HTTP ${response.code}."))
-            return JSONObject(body.ifBlank { "{}" })
+            JSONObject(body.ifBlank { "{}" })
         }
     }
 }

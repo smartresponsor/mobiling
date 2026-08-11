@@ -19,30 +19,33 @@ import app.mobiling.client.data.vendor.statement.VendorHttpStatementGateway
 import app.mobiling.client.data.vendor.summary.VendorHttpSummaryGateway
 import app.mobiling.client.data.vendor.transaction.VendorHttpTransactionGateway
 import app.mobiling.client.message.MessageFeatureBridge
+import okhttp3.OkHttpClient
 
 class MobileApplicationGraph private constructor(val composition: MobileApplicationComposition) {
     private val baseUrl = composition.mobileEdgeBaseUrl
-    private val cartGateway = CartHttpGateway(baseUrl)
-    private val attachmentGateway = AttachmentHttpGateway(baseUrl)
+    private val httpClient = OkHttpClient()
+    private val cartGateway = CartHttpGateway(baseUrl, httpClient)
+    private val attachmentGateway = AttachmentHttpGateway(baseUrl, httpClient)
     private val catalogGateway = CatalogHttpGateway(
         baseUrl,
         composition.configuration.catalog.primaryCatalog,
+        httpClient,
     )
 
-    val accessAuthFeatureBridge = AccessAuthFeatureBridge(AccessHttpAuthSessionGateway(baseUrl))
+    val accessAuthFeatureBridge = AccessAuthFeatureBridge(AccessHttpAuthSessionGateway(baseUrl, httpClient))
     val cartFeatureBridge = CartFeatureBridge(cartGateway, cartGateway, cartGateway)
     val attachmentFeatureBridge = AttachmentFeatureBridge(attachmentGateway, attachmentGateway)
     val catalogFeatureBridge = CatalogFeatureBridge(catalogGateway, catalogGateway)
-    val navigationShellGateway = NavigationHttpShellGateway(baseUrl)
-    val messageFeatureBridge = MessageFeatureBridge(MessageHttpThreadGateway(baseUrl))
-    val productGateway = ProductHttpGateway(baseUrl)
-    val orderGateway = OrderHttpGateway(baseUrl)
-    val projectGateway = ProjectHttpGateway(baseUrl)
-    val vendorProfileGateway = VendorHttpProfileGateway(baseUrl)
-    val vendorSummaryGateway = VendorHttpSummaryGateway(baseUrl)
-    val vendorStatementGateway = VendorHttpStatementGateway(baseUrl)
-    val vendorPayoutGateway = VendorHttpPayoutGateway(baseUrl)
-    val vendorTransactionGateway = VendorHttpTransactionGateway(baseUrl)
+    val navigationShellGateway = NavigationHttpShellGateway(baseUrl, httpClient)
+    val messageFeatureBridge = MessageFeatureBridge(MessageHttpThreadGateway(baseUrl, httpClient))
+    val productGateway = ProductHttpGateway(baseUrl, httpClient)
+    val orderGateway = OrderHttpGateway(baseUrl, httpClient)
+    val projectGateway = ProjectHttpGateway(baseUrl, httpClient)
+    val vendorProfileGateway = VendorHttpProfileGateway(baseUrl, httpClient)
+    val vendorSummaryGateway = VendorHttpSummaryGateway(baseUrl, httpClient)
+    val vendorStatementGateway = VendorHttpStatementGateway(baseUrl, httpClient)
+    val vendorPayoutGateway = VendorHttpPayoutGateway(baseUrl, httpClient)
+    val vendorTransactionGateway = VendorHttpTransactionGateway(baseUrl, httpClient)
 
     companion object {
         fun current(composition: MobileApplicationComposition = MobileApplicationComposer.current()) =
