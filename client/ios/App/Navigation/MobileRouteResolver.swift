@@ -16,6 +16,10 @@ public enum MobileRouteResolver {
         case "access/verification": return .accessVerification
         case "access/password": return .accessPassword
         case "access/sign-out": return .accessSignOut
+        case "wallet": return .wallet
+        case "wallet/transaction": return .walletTransaction
+        case "wallet/funding": return .walletFunding
+        case "wallet/withdrawal": return .walletWithdrawal
         case "vendor": return .vendor
         case "vendor/page": return .vendorProfile
         case "vendor/summary": return .vendorSummary
@@ -58,6 +62,10 @@ public enum MobileRouteResolver {
         switch resolve(rawRoute) {
         case .dashboard,
              .more,
+             .wallet,
+             .walletTransaction,
+             .walletFunding,
+             .walletWithdrawal,
              .vendor,
              .vendorProfile,
              .vendorSummary,

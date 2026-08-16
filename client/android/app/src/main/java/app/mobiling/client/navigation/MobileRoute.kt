@@ -17,6 +17,13 @@ sealed class MobileRoute(open val routePath: String) {
     object Dashboard : MobileRoute("dashboard")
     object More : MobileRoute("more")
 
+    sealed class Wallet(routePath: String) : MobileRoute(routePath) {
+        object Overview : Wallet("wallet")
+        object Transaction : Wallet("wallet/transaction")
+        object Funding : Wallet("wallet/funding")
+        object Withdrawal : Wallet("wallet/withdrawal")
+    }
+
     sealed class Vendor(routePath: String) : MobileRoute(routePath) {
         object Overview : Vendor("vendor")
         object Profile : Vendor("vendor/page")

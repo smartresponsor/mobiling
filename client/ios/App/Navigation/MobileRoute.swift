@@ -11,6 +11,10 @@ public enum MobileRoute: Sendable, Equatable {
     case accessSignOut
     case dashboard
     case more
+    case wallet
+    case walletTransaction
+    case walletFunding
+    case walletWithdrawal
     case vendor
     case vendorProfile
     case vendorSummary

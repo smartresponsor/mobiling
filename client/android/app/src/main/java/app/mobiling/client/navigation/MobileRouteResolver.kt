@@ -18,6 +18,10 @@ object MobileRouteResolver {
             route == "access/verification" -> MobileRoute.Access.Verification
             route == "access/password" -> MobileRoute.Access.Password
             route == "access/sign-out" -> MobileRoute.Access.SignOut
+            route == "wallet" -> MobileRoute.Wallet.Overview
+            route == "wallet/transaction" -> MobileRoute.Wallet.Transaction
+            route == "wallet/funding" -> MobileRoute.Wallet.Funding
+            route == "wallet/withdrawal" -> MobileRoute.Wallet.Withdrawal
             route == "vendor" -> MobileRoute.Vendor.Overview
             route == "vendor/page" -> MobileRoute.Vendor.Profile
             route == "vendor/summary" -> MobileRoute.Vendor.Summary
@@ -64,6 +68,10 @@ object MobileRouteResolver {
     fun isCurrentlyRenderable(rawRoute: String?): Boolean = when (resolve(rawRoute)) {
         MobileRoute.Dashboard,
         MobileRoute.More,
+        MobileRoute.Wallet.Overview,
+        MobileRoute.Wallet.Transaction,
+        MobileRoute.Wallet.Funding,
+        MobileRoute.Wallet.Withdrawal,
         MobileRoute.Vendor.Overview,
         MobileRoute.Vendor.Profile,
         MobileRoute.Vendor.Summary,

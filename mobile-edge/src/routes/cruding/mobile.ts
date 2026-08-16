@@ -2,7 +2,7 @@ import type { FastifyInstance } from "fastify";
 import { CrudingApiClient } from "../../client/cruding/crudingApiClient.js";
 
 const client = new CrudingApiClient();
-const allowed = new Set(["retail", "order", "project"]);
+const allowed = new Set(["retail", "order", "project", "wallet", "account", "reservation", "funding", "withdrawal", "payment-instrument"]);
 
 function forwarded(headers: Record<string, unknown>): Record<string, string> {
   const result: Record<string, string> = {};
