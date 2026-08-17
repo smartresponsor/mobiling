@@ -164,8 +164,8 @@ function New-LightAvd {
         throw "AVD was created but config.ini was not found: $configPath"
     }
 
-    Set-ConfigValue 'hw.cpu.ncore' '2'
-    Set-ConfigValue 'hw.ramSize' '4096'
+    Set-ConfigValue 'hw.cpu.ncore' '8'
+    Set-ConfigValue 'hw.ramSize' '8192'
     Set-ConfigValue 'vm.heapSize' '256'
     Set-ConfigValue 'hw.gpu.enabled' 'yes'
     Set-ConfigValue 'hw.gpu.mode' 'host'
@@ -208,7 +208,8 @@ function Retune-LightAvd {
         }
     }
 
-    Set-ConfigValue 'hw.ramSize' '4096'
+    Set-ConfigValue 'hw.cpu.ncore' '8'
+    Set-ConfigValue 'hw.ramSize' '8192'
     Set-ConfigValue 'hw.keyboard' 'yes'
     Set-ConfigValue 'hw.keyboard.lid' 'no'
     Set-ConfigValue 'hw.dPad' 'yes'
@@ -219,7 +220,7 @@ function Retune-LightAvd {
     Set-ConfigValue 'showDeviceFrame' 'no'
     Set-ConfigValue 'skin.dynamic' 'yes'
 
-    Write-Host "Retuned '$AvdName' to 1080x1920 portrait at density 320 with 4 GB RAM and physical keyboard input enabled."
+    Write-Host "Retuned '$AvdName' to 1080x1920 portrait at density 320 with 8 vCPU, 8 GB RAM, and physical keyboard input enabled."
 }
 
 function Start-LightAvd {

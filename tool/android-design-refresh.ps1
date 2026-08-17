@@ -8,6 +8,7 @@ param(
     [string]$ActivityName = "app.mobiling.client.MainActivity",
     [string]$ScreenshotName = "latest",
     [switch]$SkipBuild,
+    [switch]$CleanBuild,
     [switch]$SkipLaunch,
     [switch]$ResetAppData,
     [switch]$DisableDeviceAnimations
@@ -126,6 +127,13 @@ Dismiss-SystemUiAnrIfPresent -Serial $resolvedSerial
 if (-not $SkipBuild) {
     Push-Location $androidRoot
     try {
+        if ($CleanBuild) {
+            & $gradleWrapper --stop | Out-Null
+            & $gradleWrapper clean --console=plain --stacktrace --no-daemon
+            if ($LASTEXITCODE -ne 0) {
+                throw "Gradle clean failed with exit code $LASTEXITCODE."
+            }
+        }
         & $gradleWrapper :app:assembleDebug --console=plain --stacktrace --no-daemon
         if ($LASTEXITCODE -ne 0) {
             throw "Debug APK build failed with exit code $LASTEXITCODE."
@@ -145,6 +153,13 @@ if ($ResetAppData) {
 }
 
 Dismiss-SystemUiAnrIfPresent -Serial $resolvedSerial
+$siblingPackage = switch ($PackageName) {
+    "app.mobiling.client.onetasker" { "app.mobiling.client.smartresponsor" }
+    "app.mobiling.client.smartresponsor" { "app.mobiling.client.onetasker" }
+}
+if (-not [string]::IsNullOrWhiteSpace($siblingPackage)) {
+    & adb -s $resolvedSerial uninstall $siblingPackage 2>$null | Out-Null
+}
 & adb -s $resolvedSerial install -r -t $apkPath
 if ($LASTEXITCODE -ne 0) {
     throw "APK installation failed with exit code $LASTEXITCODE."
