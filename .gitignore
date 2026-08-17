@@ -3,6 +3,7 @@
 build/
 **/build/
 local.properties
+**/google-services.json
 *.apk
 !dist/Mobiling-debug.apk
 *.aab
