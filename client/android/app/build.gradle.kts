@@ -1,6 +1,6 @@
 import java.util.Properties
 
-plugins { id("com.android.application"); id("org.jetbrains.kotlin.android"); id("org.jetbrains.kotlin.kapt") }
+plugins { id("com.android.application"); id("org.jetbrains.kotlin.plugin.compose") }
 
 val localProperties = Properties().apply {
     val file = rootProject.file("local.properties")
@@ -25,6 +25,7 @@ android {
         buildConfigField("String", "ENVIRONMENT_PROFILE", quotedBuildConfigValue("local"))
         buildConfigField("String", "MOBILE_EDGE_BASE_URL", quotedBuildConfigValue("http://10.0.2.2:8080"))
         buildConfigField("String", "INITIAL_DESTINATION", quotedBuildConfigValue("vendor/project"))
+        buildConfigField("String", "PUBLIC_INITIAL_DESTINATION", quotedBuildConfigValue("home"))
         buildConfigField("String", "PRIMARY_CATALOG", quotedBuildConfigValue("services"))
         buildConfigField("String", "ENABLED_CATALOGS", quotedBuildConfigValue("services,products,projects"))
         buildConfigField("String", "AVAILABLE_RETAIL_KINDS", quotedBuildConfigValue("service,goods,project"))
@@ -63,8 +64,6 @@ android {
         compose = true
         buildConfig = true
     }
-    composeOptions { kotlinCompilerExtensionVersion = "1.5.3" }
-
     testOptions {
         execution = "ANDROIDX_TEST_ORCHESTRATOR"
         animationsDisabled = true
@@ -75,9 +74,6 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    kotlinOptions {
-        jvmTarget = "17"
-    }
 }
 dependencies {
     implementation(project(":client-contract")); implementation(project(":client-data")); implementation(project(":client-usecase")); implementation(project(":client-navigation")); implementation(project(":client-ui"))
