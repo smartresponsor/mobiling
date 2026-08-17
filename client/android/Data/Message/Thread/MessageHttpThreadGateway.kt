@@ -70,7 +70,6 @@ class MessageHttpThreadGateway(
         val builder = Request.Builder()
             .url(baseUrl.trimEnd('/') + path)
             .header("Accept", "application/json")
-            .header("x-user-id", "1")
 
         when (method) {
             "POST" -> builder.post((body ?: JSONObject()).toString().toRequestBody(jsonMediaType))

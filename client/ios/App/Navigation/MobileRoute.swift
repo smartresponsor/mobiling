@@ -11,6 +11,7 @@ public enum MobileRoute: Sendable, Equatable {
     case accessSignOut
     case dashboard
     case more
+    case money
     case wallet
     case walletTransaction
     case walletFunding

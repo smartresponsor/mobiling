@@ -9,6 +9,7 @@ public enum MobileRouteResolver {
         switch route {
         case "dashboard": return .dashboard
         case "more": return .more
+        case "money": return .money
         case "access/sign-in": return .accessSignIn
         case "access/register": return .accessRegister
         case "access/recovery/request": return .accessRecoveryRequest
@@ -62,6 +63,7 @@ public enum MobileRouteResolver {
         switch resolve(rawRoute) {
         case .dashboard,
              .more,
+             .money,
              .wallet,
              .walletTransaction,
              .walletFunding,

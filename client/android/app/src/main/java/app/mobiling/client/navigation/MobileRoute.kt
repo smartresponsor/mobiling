@@ -16,6 +16,7 @@ sealed class MobileRoute(open val routePath: String) {
 
     object Dashboard : MobileRoute("dashboard")
     object More : MobileRoute("more")
+    object Money : MobileRoute("money")
 
     sealed class Wallet(routePath: String) : MobileRoute(routePath) {
         object Overview : Wallet("wallet")

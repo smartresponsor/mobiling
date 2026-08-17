@@ -10,6 +10,13 @@ data class InitialDestinationPolicy(val destination: String) {
     }
 }
 
+data class PublicInitialDestinationPolicy(val destination: String) {
+    fun resolvedRoute(isRenderable: (String) -> Boolean): String {
+        val normalized = destination.trim().trim('/').replace(Regex("/{2,}"), "/").lowercase()
+        return normalized.takeIf { it.isNotBlank() && isRenderable(it) } ?: "home"
+    }
+}
+
 data class CatalogPolicy(val primaryCatalog: String, val enabledCatalogs: Set<String>) {
     init { require(primaryCatalog in enabledCatalogs) { "Primary catalog must be enabled." } }
 
@@ -76,6 +83,7 @@ data class MobileApplicationConfiguration(
     val brand: BrandProfile,
     val environment: EnvironmentProfile,
     val initialDestination: InitialDestinationPolicy,
+    val publicInitialDestination: PublicInitialDestinationPolicy,
     val catalog: CatalogPolicy,
     val retail: RetailPolicy,
     val textResolver: MobileTextResolver,
@@ -87,6 +95,7 @@ object MobileApplicationConfigurationFactory {
         brand = BrandProfile(BuildConfig.BRAND_PROFILE),
         environment = EnvironmentProfile(BuildConfig.ENVIRONMENT_PROFILE, BuildConfig.MOBILE_EDGE_BASE_URL),
         initialDestination = InitialDestinationPolicy(BuildConfig.INITIAL_DESTINATION),
+        publicInitialDestination = PublicInitialDestinationPolicy(BuildConfig.PUBLIC_INITIAL_DESTINATION),
         catalog = CatalogPolicy(
             primaryCatalog = BuildConfig.PRIMARY_CATALOG,
             enabledCatalogs = BuildConfig.ENABLED_CATALOGS.split(',').map(String::trim).filter(String::isNotBlank).toSet(),

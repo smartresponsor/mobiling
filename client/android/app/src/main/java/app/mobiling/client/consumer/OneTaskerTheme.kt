@@ -1,9 +1,21 @@
 package app.mobiling.client.consumer
 
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Shapes
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
+import app.mobiling.client.design.OneTaskerDesignTokens
+
+private val OneTaskerShapes = Shapes(
+    extraSmall = RoundedCornerShape(OneTaskerDesignTokens.Spacing.Xs),
+    small = RoundedCornerShape(OneTaskerDesignTokens.Spacing.Sm),
+    medium = RoundedCornerShape(OneTaskerDesignTokens.Spacing.Md),
+    large = RoundedCornerShape(OneTaskerDesignTokens.Spacing.Lg),
+    extraLarge = RoundedCornerShape(28.dp),
+)
 
 private val OneTaskerLightColorScheme = lightColorScheme(
     primary = Color(0xFFF96302),
@@ -37,6 +49,7 @@ fun OneTaskerTheme(
 ) {
     MaterialTheme(
         colorScheme = OneTaskerLightColorScheme,
+        shapes = OneTaskerShapes,
         content = content,
     )
 }

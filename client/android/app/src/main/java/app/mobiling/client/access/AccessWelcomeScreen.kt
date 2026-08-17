@@ -28,14 +28,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -50,24 +45,33 @@ import app.mobiling.client.cart.CartFeatureBridge
 import app.mobiling.client.cart.CartMobileScreen
 import app.mobiling.client.catalog.CatalogFeatureBridge
 import app.mobiling.client.catalog.CatalogMobileScreen
+import app.mobiling.client.navigation.CanonicalBottomNavigation
+import app.mobiling.client.navigation.CanonicalBottomNavigationItem
+import app.mobiling.client.navigation.CanonicalTopAppBar
+import app.mobiling.client.design.OneTaskerDesignTokens
 
-private enum class GuestRoute(val label: String, val icon: ImageVector) {
-    Home("Home", Icons.Default.Home),
-    Catalog("Catalog", Icons.Default.Inventory2),
-    User("Users", Icons.Default.People),
-    Order("Orders", Icons.AutoMirrored.Filled.ReceiptLong),
-    Cart("Cart", Icons.Default.ShoppingCart),
+private enum class GuestRoute(val route: String, val label: String, val icon: ImageVector) {
+    Home("home", "Home", Icons.Default.Home),
+    Catalog("catalog", "Catalog", Icons.Default.Inventory2),
+    User("users", "Users", Icons.Default.People),
+    Order("orders", "Orders", Icons.AutoMirrored.Filled.ReceiptLong),
+    Cart("cart", "Cart", Icons.Default.ShoppingCart);
+
+    companion object {
+        fun fromRoute(route: String): GuestRoute = entries.firstOrNull { it.route == route } ?: Home
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AccessWelcomeScreen(
+    initialRoute: String = "home",
     catalogFeatureBridge: CatalogFeatureBridge? = null,
     cartFeatureBridge: CartFeatureBridge? = null,
     onSignIn: () -> Unit,
     onCreateAccess: () -> Unit,
 ) {
-    var selectedRoute by remember { mutableStateOf(GuestRoute.Home) }
+    var selectedRoute by remember(initialRoute) { mutableStateOf(GuestRoute.fromRoute(initialRoute)) }
     var catalogRootRequest by remember { mutableIntStateOf(0) }
     var navigationOpen by remember { mutableStateOf(false) }
     var accountOpen by remember { mutableStateOf(false) }
@@ -75,35 +79,27 @@ fun AccessWelcomeScreen(
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
-            TopAppBar(
+            CanonicalTopAppBar(
+                title = selectedRoute.label,
                 navigationIcon = {
                     IconButton(onClick = { navigationOpen = true }) {
                         Icon(Icons.Default.Menu, contentDescription = "Open navigation")
                     }
-                },
-                title = {
-                    Text(selectedRoute.label, fontWeight = FontWeight.SemiBold)
                 },
                 actions = {
                     IconButton(onClick = { accountOpen = true }) {
                         Icon(Icons.Default.AccountCircle, contentDescription = "Guest account")
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
-                    actionIconContentColor = MaterialTheme.colorScheme.onPrimary,
-                ),
             )
         },
         bottomBar = {
-            NavigationBar(
-                containerColor = MaterialTheme.colorScheme.surface,
-                tonalElevation = 0.dp,
-            ) {
-                GuestRoute.entries.forEach { route ->
-                    NavigationBarItem(
+            CanonicalBottomNavigation(
+                items = GuestRoute.entries.map { route ->
+                    CanonicalBottomNavigationItem(
+                        key = route.route,
+                        label = route.label,
+                        icon = route.icon,
                         selected = selectedRoute == route,
                         onClick = {
                             if (route == GuestRoute.Catalog && selectedRoute == GuestRoute.Catalog) {
@@ -111,18 +107,9 @@ fun AccessWelcomeScreen(
                             }
                             selectedRoute = route
                         },
-                        icon = { Icon(route.icon, contentDescription = route.label) },
-                        label = { Text(route.label) },
-                        colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = MaterialTheme.colorScheme.onSurface,
-                            selectedTextColor = MaterialTheme.colorScheme.onSurface,
-                            indicatorColor = MaterialTheme.colorScheme.secondaryContainer,
-                            unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                            unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                        ),
                     )
-                }
-            }
+                },
+            )
         },
     ) { padding ->
         GuestRouteContent(
@@ -141,8 +128,8 @@ fun AccessWelcomeScreen(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
+                    .padding(horizontal = OneTaskerDesignTokens.Spacing.Xl, vertical = OneTaskerDesignTokens.Spacing.Sm),
+                verticalArrangement = Arrangement.spacedBy(OneTaskerDesignTokens.Spacing.Md),
             ) {
                 GuestRoute.entries.forEach { route ->
                     ElevatedCard(
@@ -156,8 +143,8 @@ fun AccessWelcomeScreen(
                         ),
                     ) {
                         Row(
-                            modifier = Modifier.fillMaxWidth().padding(16.dp),
-                            horizontalArrangement = Arrangement.spacedBy(16.dp),
+                            modifier = Modifier.fillMaxWidth().padding(OneTaskerDesignTokens.Spacing.Lg),
+                            horizontalArrangement = Arrangement.spacedBy(OneTaskerDesignTokens.Spacing.Lg),
                         ) {
                             Icon(route.icon, contentDescription = null)
                             Text(
@@ -168,7 +155,7 @@ fun AccessWelcomeScreen(
                         }
                     }
                 }
-                Spacer(Modifier.height(24.dp))
+                Spacer(Modifier.height(OneTaskerDesignTokens.Spacing.Xxl))
             }
         }
     }
@@ -176,8 +163,8 @@ fun AccessWelcomeScreen(
     if (accountOpen) {
         ModalBottomSheet(onDismissRequest = { accountOpen = false }) {
             Column(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 12.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.fillMaxWidth().padding(horizontal = OneTaskerDesignTokens.Spacing.Xxl, vertical = OneTaskerDesignTokens.Spacing.Md),
+                verticalArrangement = Arrangement.spacedBy(OneTaskerDesignTokens.Spacing.Md),
             ) {
                 Text("Guest account", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
                 Button(
@@ -219,8 +206,8 @@ private fun GuestRouteContent(
             .fillMaxSize()
             .padding(padding)
             .verticalScroll(rememberScrollState())
-            .padding(20.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
+            .padding(OneTaskerDesignTokens.Spacing.Xl),
+        verticalArrangement = Arrangement.spacedBy(OneTaskerDesignTokens.Spacing.Lg),
     ) {
         when (route) {
             GuestRoute.Home -> {
@@ -246,6 +233,6 @@ private fun GuestRouteContent(
 @Composable
 private fun GuestPlaceholder(description: String) {
     Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
-        Text(description, modifier = Modifier.padding(16.dp))
+        Text(description, modifier = Modifier.padding(OneTaskerDesignTokens.Spacing.Lg))
     }
 }

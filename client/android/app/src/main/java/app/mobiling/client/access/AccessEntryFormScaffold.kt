@@ -21,13 +21,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import app.mobiling.client.design.OneTaskerDesignTokens
+import app.mobiling.client.navigation.CanonicalTopAppBar
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -47,20 +46,13 @@ internal fun AccessFlowShell(
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
-            TopAppBar(
+            CanonicalTopAppBar(
+                title = title,
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
-                title = {
-                    Text(title, fontWeight = FontWeight.SemiBold)
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
-                ),
             )
         },
     ) { shellPadding ->
@@ -69,11 +61,19 @@ internal fun AccessFlowShell(
                 .fillMaxSize()
                 .padding(shellPadding)
                 .verticalScroll(rememberScrollState())
-                .padding(24.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+                .padding(OneTaskerDesignTokens.Spacing.Xxl),
+            verticalArrangement = Arrangement.spacedBy(OneTaskerDesignTokens.Spacing.Lg),
         ) {
             Card(colors = androidx.compose.material3.CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
-                Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                Column(
+                    modifier = Modifier.padding(OneTaskerDesignTokens.Spacing.Lg),
+                    verticalArrangement = Arrangement.spacedBy(OneTaskerDesignTokens.Spacing.Md),
+                ) {
+                    Text(
+                        text = styledSubtitle ?: AnnotatedString(subtitle),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
                     content()
                 }
             }

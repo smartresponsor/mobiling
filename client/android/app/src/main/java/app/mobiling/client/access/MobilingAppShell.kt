@@ -11,7 +11,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import app.mobiling.client.attachment.AttachmentFeatureBridge
 import app.mobiling.client.auth.AccessAuthFeatureBridge
 import app.mobiling.client.catalog.CatalogFeatureBridge
@@ -29,7 +28,6 @@ import app.mobiling.client.data.vendor.profile.VendorProfileGateway
 import app.mobiling.client.data.vendor.statement.VendorStatementGateway
 import app.mobiling.client.data.vendor.summary.VendorSummaryGateway
 import app.mobiling.client.data.vendor.transaction.VendorTransactionGateway
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @Composable
@@ -49,18 +47,17 @@ fun MobilingAppShell(
     vendorPayoutGateway: VendorPayoutGateway? = null,
     vendorTransactionGateway: VendorTransactionGateway? = null,
     initialRoute: String = "dashboard",
+    publicInitialRoute: String = "home",
     catalogEnabled: Boolean = true,
     availableRetailKinds: List<RetailKind> = RetailKind.entries,
     navigationLabelResolver: (route: String?, key: String, backendLabel: String) -> String = { _, _, label -> label },
     authenticatedContent: (@Composable (vendorId: String?, onSignOut: () -> Unit) -> Unit)? = null,
 ) {
-    var currentScreen by remember { mutableStateOf(AccessScreen.Welcome) }
+    var currentScreen by remember(publicInitialRoute) {
+        mutableStateOf(if (publicInitialRoute == "sign-in") AccessScreen.SignIn else AccessScreen.Welcome)
+    }
     var activeVendorId by remember { mutableStateOf<String?>(null) }
     val coroutineScope = rememberCoroutineScope()
-    val context = LocalContext.current
-    val motionEnabled = remember(context) { oneTaskerMotionEnabled(context) }
-    var launchSplashMounted by remember { mutableStateOf(true) }
-    var launchSplashVisible by remember { mutableStateOf(true) }
 
     fun applyAccessSession(payload: AccessAuthSessionPayload) {
         activeVendorId = payload.vendorId
@@ -75,7 +72,7 @@ fun MobilingAppShell(
             }
 
             activeVendorId = null
-            currentScreen = AccessScreen.Welcome
+            currentScreen = if (publicInitialRoute == "sign-in") AccessScreen.SignIn else AccessScreen.Welcome
         }
     }
 
@@ -89,13 +86,6 @@ fun MobilingAppShell(
         if (payload != null) {
             applyAccessSession(payload)
         }
-    }
-
-    LaunchedEffect(motionEnabled) {
-        delay(if (motionEnabled) 1760 else 360)
-        launchSplashVisible = false
-        delay(if (motionEnabled) 320 else 120)
-        launchSplashMounted = false
     }
 
     Surface(Modifier.fillMaxSize()) {
@@ -130,6 +120,7 @@ fun MobilingAppShell(
             }
 
             AccessScreen.Welcome -> AccessWelcomeScreen(
+                initialRoute = publicInitialRoute,
                 catalogFeatureBridge = catalogFeatureBridge,
                 cartFeatureBridge = cartFeatureBridge,
                 onSignIn = { currentScreen = AccessScreen.SignIn },
@@ -174,10 +165,6 @@ fun MobilingAppShell(
                 onResetRecovery = { request -> accessAuthFeatureBridge?.resetRecovery(request) },
                 onAccessSession = { payload -> applyAccessSession(payload) },
             )
-            }
-
-            if (launchSplashMounted) {
-                OneTaskerLaunchSplash(visible = launchSplashVisible)
             }
         }
     }

@@ -2,6 +2,7 @@ import SwiftUI
 
 public struct MobileDashboardShellView: View {
     private let navigationShellGateway: NavigationShellGateway?
+    private let messageFeatureBridge: MessageFeatureBridge?
     private let attachmentFeatureBridge: AttachmentFeatureBridge?
     private let catalogFeatureBridge: CatalogFeatureBridge?
     private let vendorId: String?
@@ -21,12 +22,14 @@ public struct MobileDashboardShellView: View {
     @State private var vendorContentRoute: String = "vendor"
     @State private var navigationOpen: Bool = false
     @State private var accountOpen: Bool = false
+    @State private var moneyOpen: Bool = false
     @State private var newChooserOpen: Bool = false
     @State private var selectedRetailKind: RetailKind
     @State private var shell: MobileNavigationShellScreenContract = MobileDashboardShellView.fallbackShell()
 
-    public init(navigationShellGateway: NavigationShellGateway? = nil, attachmentFeatureBridge: AttachmentFeatureBridge? = nil, catalogFeatureBridge: CatalogFeatureBridge? = nil, vendorId: String? = nil, vendorProfileGateway: VendorProfileGateway? = nil, vendorSummaryGateway: VendorSummaryGateway? = nil, vendorStatementGateway: VendorStatementGateway? = nil, vendorPayoutGateway: VendorPayoutGateway? = nil, vendorTransactionGateway: VendorTransactionGateway? = nil, vendorCrudGateway: VendorCrudGateway? = nil, initialRoute: String = "vendor/project", catalogEnabled: Bool = true, availableRetailKinds: [RetailKind] = RetailKind.allCases, navigationLabelResolver: @escaping (String?, String, String) -> String = { _, _, label in label }, onSignOut: @escaping () -> Void) {
+    public init(navigationShellGateway: NavigationShellGateway? = nil, messageFeatureBridge: MessageFeatureBridge? = nil, attachmentFeatureBridge: AttachmentFeatureBridge? = nil, catalogFeatureBridge: CatalogFeatureBridge? = nil, vendorId: String? = nil, vendorProfileGateway: VendorProfileGateway? = nil, vendorSummaryGateway: VendorSummaryGateway? = nil, vendorStatementGateway: VendorStatementGateway? = nil, vendorPayoutGateway: VendorPayoutGateway? = nil, vendorTransactionGateway: VendorTransactionGateway? = nil, vendorCrudGateway: VendorCrudGateway? = nil, initialRoute: String = "vendor/project", catalogEnabled: Bool = true, availableRetailKinds: [RetailKind] = RetailKind.allCases, navigationLabelResolver: @escaping (String?, String, String) -> String = { _, _, label in label }, onSignOut: @escaping () -> Void) {
         self.navigationShellGateway = navigationShellGateway
+        self.messageFeatureBridge = messageFeatureBridge
         self.attachmentFeatureBridge = attachmentFeatureBridge
         self.catalogFeatureBridge = catalogFeatureBridge
         self.vendorId = vendorId
@@ -55,7 +58,7 @@ public struct MobileDashboardShellView: View {
             .tag("vendor/project")
 
             NavigationView {
-                comingSoon(title: "Messages", systemImage: "message", description: "Task and customer conversations will appear here.")
+                MessageMobileScreen(messageFeatureBridge: messageFeatureBridge)
                     .toolbar { accountToolbar }
             }
             .tabItem { Label(navigationLabelResolver("message", "message", "Messages"), systemImage: "message") }
@@ -107,6 +110,11 @@ public struct MobileDashboardShellView: View {
             menuSheet(items: shell.accountQuick) { item in
                 handle(item)
                 accountOpen = false
+            }
+        }
+        .sheet(isPresented: $moneyOpen) {
+            NavigationView {
+                moneyView
             }
         }
         .confirmationDialog("New", isPresented: $newChooserOpen, titleVisibility: .visible) {
@@ -162,6 +170,37 @@ public struct MobileDashboardShellView: View {
         case "message", "notification", "vendor/page", "vendor/retail", "vendor/project": return MobileRouteResolver.normalizeRoute(route)
         default: return "vendor/project"
         }
+    }
+
+    private var moneyView: some View {
+        List {
+            Section {
+                moneyRow("Cart", systemImage: "cart", description: "Review items before checkout.", enabled: true)
+                moneyRow("Wallet", systemImage: "wallet.pass", description: "Balances, reservations and wallet activity.", enabled: true)
+                moneyRow("Billing", systemImage: "doc.text", description: "Bills, invoices and billing history.", enabled: false)
+                moneyRow("Payments", systemImage: "creditcard", description: "Payment activity and payment methods.", enabled: false)
+                moneyRow("Finance", systemImage: "chart.bar", description: "Financial summaries and reporting.", enabled: false)
+            }
+        }
+        .navigationTitle("Money")
+    }
+
+    private func moneyRow(_ title: String, systemImage: String, description: String, enabled: Bool) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: systemImage)
+                .frame(width: 24)
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title).font(.headline)
+                Text(description).font(.footnote).foregroundStyle(.secondary)
+            }
+            Spacer()
+            if !enabled {
+                Text("Coming soon")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .opacity(enabled ? 1.0 : 0.55)
     }
 
     private func comingSoon(title: String, systemImage: String, description: String) -> some View {
@@ -290,6 +329,12 @@ public struct MobileDashboardShellView: View {
             return
         }
 
+        if route == "money" {
+            moneyOpen = true
+            accountOpen = false
+            return
+        }
+
         if route == "attachment" {
             vendorContentRoute = "attachment"
             selectedRoute = "vendor"
@@ -348,6 +393,7 @@ public struct MobileDashboardShellView: View {
         case "receipt": return "list.bullet.rectangle"
         case "tasks": return "list.bullet.rectangle"
         case "notification": return "bell"
+        case "wallet": return "wallet.pass"
         default: return "house"
         }
     }
@@ -383,6 +429,7 @@ public struct MobileDashboardShellView: View {
             ],
             moreDrawer: [
                 item("dashboard", "Dashboard", "dashboard", true, "dashboard"),
+                item("money", "Money", "wallet", true, "money"),
                 item("tasks", "Tasks", "tasks", true, "vendor/project"),
                 item("message", "Messages", "message", true, "message"),
                 item("services", "Services", "store", true, "vendor/retail"),

@@ -1,6 +1,6 @@
 import { CrudingApiClient } from "../../client/cruding/crudingApiClient.js";
 const client = new CrudingApiClient();
-const allowed = new Set(["retail", "order", "project"]);
+const allowed = new Set(["retail", "order", "project", "wallet", "account", "reservation", "funding", "withdrawal", "payment-instrument"]);
 function forwarded(headers) {
     const result = {};
     for (const key of ["cookie", "authorization"]) {

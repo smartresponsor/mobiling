@@ -5,6 +5,7 @@ struct MobileApplicationGraph {
     let authFeatureBridge: AuthFeatureBridge
     let attachmentFeatureBridge: AttachmentFeatureBridge
     let navigationShellGateway: NavigationShellGateway
+    let messageFeatureBridge: MessageFeatureBridge
     let vendorProfileGateway: VendorProfileGateway
     let vendorSummaryGateway: VendorSummaryGateway
     let vendorStatementGateway: VendorStatementGateway
@@ -21,6 +22,7 @@ struct MobileApplicationGraph {
             authFeatureBridge: AuthFeatureBridge(gateway: HttpAuthSessionGateway(baseUrl: baseUrl)),
             attachmentFeatureBridge: AttachmentFeatureBridge(reader: attachmentGateway, writer: attachmentGateway),
             navigationShellGateway: HttpNavigationShellGateway(baseUrl: baseUrl),
+            messageFeatureBridge: MessageFeatureBridge(gateway: MessageHttpThreadGateway(baseUrl: baseUrl)),
             vendorProfileGateway: HttpVendorProfileGateway(baseUrl: baseUrl),
             vendorSummaryGateway: HttpVendorSummaryGateway(baseUrl: baseUrl),
             vendorStatementGateway: HttpVendorStatementGateway(baseUrl: baseUrl),

@@ -18,6 +18,12 @@ class MobileApplicationConfigurationTest {
     }
 
     @Test
+    fun publicInitialDestinationNormalizesAndFallsBack() {
+        assertEquals("catalog", PublicInitialDestinationPolicy("//CATALOG//").resolvedRoute { it == "catalog" })
+        assertEquals("home", PublicInitialDestinationPolicy("unknown").resolvedRoute { false })
+    }
+
+    @Test
     fun catalogPolicyExposesPrimaryAvailability() {
         val policy = CatalogPolicy("service", setOf("service", "product"))
         assertTrue(policy.isPrimaryCatalogEnabled())

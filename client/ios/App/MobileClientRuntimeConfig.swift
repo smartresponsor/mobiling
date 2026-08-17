@@ -10,6 +10,7 @@ enum MobileClientRuntimeConfig {
             mobileEdgeBaseUrl: setting("MOBILE_EDGE_BASE_URL", fallback: "http://localhost:8080")
         ),
         initialDestination: InitialDestinationPolicy(destination: setting("MOBILE_INITIAL_DESTINATION", fallback: "dashboard")),
+        publicInitialDestination: PublicInitialDestinationPolicy(destination: setting("MOBILE_PUBLIC_INITIAL_DESTINATION", fallback: "home")),
         catalog: CatalogPolicy(
             primaryCatalog: setting("MOBILE_PRIMARY_CATALOG", fallback: "services"),
             enabledCatalogs: Set(setting("MOBILE_ENABLED_CATALOGS", fallback: "services,products,projects").split(separator: ",").map { $0.trimmingCharacters(in: .whitespaces) })

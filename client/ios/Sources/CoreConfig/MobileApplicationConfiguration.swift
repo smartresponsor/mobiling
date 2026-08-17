@@ -18,6 +18,18 @@ public struct InitialDestinationPolicy: Equatable {
         return !normalized.isEmpty && isRenderable(normalized) ? normalized : "dashboard"
     }
 }
+public struct PublicInitialDestinationPolicy: Equatable {
+    public let destination: String
+    public init(destination: String) { self.destination = destination }
+    public func resolvedRoute(isRenderable: (String) -> Bool) -> String {
+        let normalized = destination
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .split(separator: "/", omittingEmptySubsequences: true)
+            .joined(separator: "/")
+            .lowercased()
+        return !normalized.isEmpty && isRenderable(normalized) ? normalized : "home"
+    }
+}
 public struct CatalogPolicy: Equatable {
     public let primaryCatalog: String
     public let enabledCatalogs: Set<String>
@@ -100,14 +112,16 @@ public struct MobileApplicationConfiguration {
     public let brand: BrandProfile
     public let environment: EnvironmentProfile
     public let initialDestination: InitialDestinationPolicy
+    public let publicInitialDestination: PublicInitialDestinationPolicy
     public let catalog: CatalogPolicy
     public let retail: RetailPolicy
     public let textResolver: MobileTextResolver
-    public init(product: ProductProfile, brand: BrandProfile, environment: EnvironmentProfile, initialDestination: InitialDestinationPolicy, catalog: CatalogPolicy, retail: RetailPolicy, textResolver: MobileTextResolver) {
+    public init(product: ProductProfile, brand: BrandProfile, environment: EnvironmentProfile, initialDestination: InitialDestinationPolicy, publicInitialDestination: PublicInitialDestinationPolicy, catalog: CatalogPolicy, retail: RetailPolicy, textResolver: MobileTextResolver) {
         self.product = product
         self.brand = brand
         self.environment = environment
         self.initialDestination = initialDestination
+        self.publicInitialDestination = publicInitialDestination
         self.catalog = catalog
         self.retail = retail
         self.textResolver = textResolver

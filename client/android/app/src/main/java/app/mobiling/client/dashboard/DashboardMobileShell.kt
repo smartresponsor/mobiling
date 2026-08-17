@@ -1,6 +1,5 @@
 package app.mobiling.client.dashboard
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,13 +23,14 @@ import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.Payments
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.ReceiptLong
+import androidx.compose.material.icons.automirrored.filled.ReceiptLong
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Storefront
 import androidx.compose.material.icons.filled.VpnKey
+import androidx.compose.material.icons.filled.Wallet
 import androidx.compose.material.icons.filled.ChatBubbleOutline
-import androidx.compose.material.icons.filled.Logout
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material3.AssistChip
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
@@ -40,14 +40,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -76,6 +71,10 @@ import app.mobiling.client.data.vendor.statement.VendorStatementGateway
 import app.mobiling.client.data.vendor.summary.VendorSummaryGateway
 import app.mobiling.client.data.vendor.transaction.VendorTransactionGateway
 import app.mobiling.client.ui.navigation.shell.NavigationMobileShellScreenContract
+import app.mobiling.client.navigation.CanonicalBottomNavigation
+import app.mobiling.client.navigation.CanonicalBottomNavigationItem
+import app.mobiling.client.navigation.CanonicalTopAppBar
+import app.mobiling.client.design.OneTaskerDesignTokens
 import app.mobiling.client.navigation.MobileRouteResolver
 import app.mobiling.client.usecase.navigation.shell.NavigationLoadShellUseCase
 import app.mobiling.client.vendor.VendorMobileOverviewScreen
@@ -93,6 +92,7 @@ import app.mobiling.client.vendor.OrderNewFields
 import app.mobiling.client.vendor.ProjectNewMobileScreen
 import app.mobiling.client.message.MessageFeatureBridge
 import app.mobiling.client.message.MessageMobileScreen
+import app.mobiling.client.money.MoneyMobileScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -140,63 +140,38 @@ fun DashboardMobileShell(
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
-            TopAppBar(
+            CanonicalTopAppBar(
+                title = routeTitle(selectedRoute, selectedProductKind),
                 navigationIcon = {
                     IconButton(onClick = { navigationOpen = true }) {
                         Icon(Icons.Default.Menu, contentDescription = "Open navigation")
                     }
-                },
-                title = {
-                    Text(
-                        text = routeTitle(selectedRoute, selectedProductKind),
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.SemiBold,
-                    )
                 },
                 actions = {
                     IconButton(onClick = { accountOpen = true }) {
                         Icon(Icons.Default.AccountCircle, contentDescription = "Account")
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
-                    actionIconContentColor = MaterialTheme.colorScheme.onPrimary,
-                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
-                ),
             )
         },
         bottomBar = {
-            NavigationBar(
-                containerColor = MaterialTheme.colorScheme.surface,
-                tonalElevation = 0.dp,
-            ) {
-                shell.bottomPrimary.filter { it.visible }.forEach { item ->
-                    NavigationBarItem(
-                        selected = selectedRoute == item.route,
+            val bottomItems = shell.bottomPrimary.filter { it.visible }
+            CanonicalBottomNavigation(
+                items = bottomItems.map { item ->
+                    CanonicalBottomNavigationItem(
+                        key = item.key,
+                        label = item.label,
+                        icon = iconFor(item),
+                        selected = isBottomNavigationItemSelected(selectedRoute, item.route),
+                        enabled = item.enabled,
                         onClick = {
                             if (item.enabled && isHandledRoute(item.route) && (item.route != "catalog" || catalogEnabled)) {
                                 selectedRoute = item.route ?: item.key
                             }
                         },
-                        icon = {
-                            Icon(
-                                imageVector = iconFor(item),
-                                contentDescription = item.label,
-                            )
-                        },
-                        label = { Text(item.label) },
-                        enabled = item.enabled,
-                        colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = MaterialTheme.colorScheme.onSurface,
-                            selectedTextColor = MaterialTheme.colorScheme.onSurface,
-                            indicatorColor = MaterialTheme.colorScheme.secondaryContainer,
-                            unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                            unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                        ),
                     )
-                }
-            }
+                },
+            )
         },
         floatingActionButton = {
             if (!selectedRoute.endsWith("/new")) {
@@ -237,12 +212,11 @@ fun DashboardMobileShell(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 8.dp),
+                    .padding(horizontal = OneTaskerDesignTokens.Spacing.Xl, vertical = OneTaskerDesignTokens.Spacing.Sm),
             ) {
                 ShellSection(
                     title = "Navigation",
                     items = shell.moreDrawer,
-                    navigationLabelResolver = navigationLabelResolver,
                     onItemClick = { item ->
                         if (item.enabled && isHandledRoute(item.route) && (item.route != "catalog" || catalogEnabled)) {
                             selectedRoute = MobileRouteResolver.normalizeRoute(item.route)
@@ -250,7 +224,7 @@ fun DashboardMobileShell(
                         navigationOpen = false
                     },
                 )
-                Spacer(Modifier.height(24.dp))
+                Spacer(Modifier.height(OneTaskerDesignTokens.Spacing.Xxl))
             }
         }
     }
@@ -275,8 +249,8 @@ fun DashboardMobileShell(
     if (newChooserOpen) {
         ModalBottomSheet(onDismissRequest = { newChooserOpen = false }) {
             Column(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
+                modifier = Modifier.fillMaxWidth().padding(horizontal = OneTaskerDesignTokens.Spacing.Lg, vertical = OneTaskerDesignTokens.Spacing.Sm),
+                verticalArrangement = Arrangement.spacedBy(OneTaskerDesignTokens.Spacing.Md),
             ) {
                 availableRetailKinds.forEach { kind ->
                     NewChoice(
@@ -289,7 +263,7 @@ fun DashboardMobileShell(
                         newChooserOpen = false
                     }
                 }
-                Spacer(Modifier.height(16.dp))
+                Spacer(Modifier.height(OneTaskerDesignTokens.Spacing.Lg))
             }
         }
     }
@@ -318,6 +292,12 @@ private fun DashboardContent(
     padding: PaddingValues,
 ) {
     when (selectedRoute) {
+        "money" -> {
+            Box(Modifier.fillMaxSize().padding(padding)) {
+                MoneyMobileScreen(onRouteSelected = onRouteSelected)
+            }
+            return
+        }
         "attachment", "vendor/attachment" -> {
             Box(Modifier.fillMaxSize().padding(padding)) {
                 AttachmentMobileScreen(vendorId = vendorId, attachmentFeatureBridge = attachmentFeatureBridge)
@@ -452,8 +432,8 @@ private fun DashboardContent(
         modifier = Modifier
             .fillMaxSize()
             .padding(padding),
-        contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+        contentPadding = PaddingValues(OneTaskerDesignTokens.Spacing.Lg),
+        verticalArrangement = Arrangement.spacedBy(OneTaskerDesignTokens.Spacing.Md),
     ) {
         when (selectedRoute) {
             "attachment" -> item {
@@ -503,17 +483,18 @@ private fun DashboardContent(
 @Composable
 private fun NewChoice(title: String, description: String, icon: ImageVector, onClick: () -> Unit) {
     ElevatedCard(
-        modifier = Modifier.fillMaxWidth().clickable(onClick = onClick),
+        onClick = onClick,
+        modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surface),
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            modifier = Modifier.fillMaxWidth().padding(OneTaskerDesignTokens.Spacing.Lg),
+            horizontalArrangement = Arrangement.spacedBy(OneTaskerDesignTokens.Spacing.Lg),
         ) {
             Surface(shape = MaterialTheme.shapes.medium, color = MaterialTheme.colorScheme.primaryContainer) {
-                Icon(icon, contentDescription = null, modifier = Modifier.padding(10.dp).size(24.dp))
+                Icon(icon, contentDescription = null, modifier = Modifier.padding(10.dp))
             }
-            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(OneTaskerDesignTokens.Spacing.Xs)) {
                 Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
                 Text(description, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
@@ -524,8 +505,8 @@ private fun NewChoice(title: String, description: String, icon: ImageVector, onC
 @Composable
 private fun EmptyMobileState(title: String, description: String) {
     Column(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 24.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = Modifier.fillMaxWidth().padding(vertical = OneTaskerDesignTokens.Spacing.Xxl),
+        verticalArrangement = Arrangement.spacedBy(OneTaskerDesignTokens.Spacing.Sm),
     ) {
         Text(title, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
         Text(description, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -536,18 +517,22 @@ private fun EmptyMobileState(title: String, description: String) {
 private fun ShellSection(
     title: String,
     items: List<NavigationMobileItemPayload>,
-    navigationLabelResolver: (route: String?, key: String, backendLabel: String) -> String = { _, _, label -> label },
     onItemClick: (NavigationMobileItemPayload) -> Unit = {},
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+        verticalArrangement = Arrangement.spacedBy(OneTaskerDesignTokens.Spacing.Md),
     ) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.SemiBold,
+        )
         items.filter { it.visible }.forEach { item ->
             ElevatedCard(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable(enabled = item.enabled) { onItemClick(item) },
+                onClick = { onItemClick(item) },
+                enabled = item.enabled,
+                modifier = Modifier.fillMaxWidth(),
                 colors = CardDefaults.elevatedCardColors(
                     containerColor = if (item.enabled) {
                         MaterialTheme.colorScheme.surface
@@ -557,8 +542,8 @@ private fun ShellSection(
                 ),
             ) {
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    modifier = Modifier.fillMaxWidth().padding(OneTaskerDesignTokens.Spacing.Lg),
+                    horizontalArrangement = Arrangement.spacedBy(OneTaskerDesignTokens.Spacing.Lg),
                 ) {
                     Surface(
                         shape = MaterialTheme.shapes.medium,
@@ -567,7 +552,7 @@ private fun ShellSection(
                         Icon(
                             imageVector = iconFor(item),
                             contentDescription = null,
-                            modifier = Modifier.padding(10.dp).size(24.dp),
+                            modifier = Modifier.padding(10.dp),
                             tint = MaterialTheme.colorScheme.onPrimaryContainer,
                         )
                     }
@@ -594,14 +579,15 @@ private fun iconFor(item: NavigationMobileItemPayload): ImageVector = when (item
     "message" -> Icons.Default.ChatBubbleOutline
     "catalog" -> Icons.Default.Inventory2
     "key" -> Icons.Default.VpnKey
-    "logout" -> Icons.Default.Logout
+    "logout" -> Icons.AutoMirrored.Filled.Logout
     "summary" -> Icons.Default.Dashboard
-    "statement" -> Icons.Default.ReceiptLong
+    "statement" -> Icons.AutoMirrored.Filled.ReceiptLong
     "payout" -> Icons.Default.Payments
-    "receipt" -> Icons.Default.ReceiptLong
+    "receipt" -> Icons.AutoMirrored.Filled.ReceiptLong
     "menu" -> Icons.Default.MoreHoriz
-    "tasks" -> Icons.Default.ReceiptLong
+    "tasks" -> Icons.AutoMirrored.Filled.ReceiptLong
     "notification" -> Icons.Default.Notifications
+    "wallet" -> Icons.Default.Wallet
     else -> Icons.Default.Dashboard
 }
 
@@ -640,6 +626,7 @@ private fun fallbackShell(): NavigationMobileShellScreenContract = NavigationMob
     ),
     moreDrawer = listOf(
         item("dashboard", "Dashboard", "dashboard", true, "dashboard"),
+        item("money", "Money", "wallet", true, "money"),
         item("tasks", "Tasks", "tasks", true, "vendor/project"),
         item("message", "Messages", "message", true, "message"),
         item("services", "Services", "store", true, "vendor/retail"),
@@ -711,6 +698,7 @@ private fun routeTitle(route: String, retailKind: String): String = when {
     route == "catalog" -> "Catalog"
     route == "vendor" -> "Profile"
     route == "more" -> "More"
+    route == "money" -> "Money"
     route == "attachment" || route == "vendor/attachment" -> "Attachment"
     route == "vendor/page" -> "Profile"
     route == "vendor/summary" -> "Summary"
@@ -747,13 +735,20 @@ private fun retailKindDescription(kind: RetailKind): String = when (kind) {
 }
 
 private fun retailKindIcon(kind: RetailKind): ImageVector = when (kind) {
-    RetailKind.Task -> Icons.Default.ReceiptLong
+    RetailKind.Task -> Icons.AutoMirrored.Filled.ReceiptLong
     RetailKind.Service -> Icons.Default.Storefront
     RetailKind.Goods -> Icons.Default.Inventory2
     RetailKind.Project -> Icons.Default.Dashboard
 }
 
 private fun isHandledRoute(route: String?): Boolean = MobileRouteResolver.isCurrentlyRenderable(route)
+
+private fun isBottomNavigationItemSelected(selectedRoute: String, itemRoute: String?): Boolean {
+    val route = MobileRouteResolver.normalizeRoute(itemRoute)
+    if (route.isBlank()) return false
+
+    return selectedRoute == route || selectedRoute.startsWith("$route/")
+}
 
 
 

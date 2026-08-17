@@ -1,11 +1,13 @@
 import { request as httpRequest } from "http";
 import { request as httpsRequest } from "https";
 import { mobileAccessErrorPayload } from "../../contract/access/error.js";
+import { AccessingApiClient } from "../../client/accessing/accessingApiClient.js";
 import { ENV } from "../../env.js";
 const unavailablePayload = {
     code: "messaging_api_unavailable",
     message: "Messaging API is unavailable from mobile-edge.",
 };
+const accessingApiClient = new AccessingApiClient();
 function forwardedHeaders(request) {
     const headers = {};
     const cookie = request.headers.cookie;
@@ -23,6 +25,19 @@ function forwardedHeaders(request) {
         headers["x-pow-nonce"] = powNonce.trim();
     if ("string" === typeof powTs && "" !== powTs.trim())
         headers["x-pow-ts"] = powTs.trim();
+    return headers;
+}
+async function resolvedMessagingHeaders(request) {
+    const headers = forwardedHeaders(request);
+    if (headers["x-user-id"])
+        return headers;
+    const session = await accessingApiClient.session(headers);
+    if (session.status < 200 || session.status >= 300 || !isRecord(session.body))
+        return headers;
+    const identity = recordValue(session.body.identity);
+    const userId = stringValue(identity.userId);
+    if (null !== userId)
+        headers["x-user-id"] = userId;
     return headers;
 }
 function isRecord(value) {
@@ -142,8 +157,8 @@ function normalizeMessage(value, fallbackThreadId) {
         messageId: stringValue(item.messageId ?? item.id) ?? "message-unavailable",
         threadId: stringValue(item.threadId ?? item.thread_id) ?? fallbackThreadId,
         body: stringValue(item.body ?? item.content ?? item.text) ?? "",
-        senderId: stringValue(item.senderId ?? item.senderUserId ?? item.sender) ?? "sender-unavailable",
-        sentAtIso8601: stringValue(item.sentAtIso8601 ?? item.createdAt ?? item.sentAt) ?? new Date(0).toISOString(),
+        senderId: stringValue(item.senderId ?? item.senderUserId ?? item.sender ?? item.user_id) ?? "sender-unavailable",
+        sentAtIso8601: stringValue(item.sentAtIso8601 ?? item.createdAt ?? item.created_at ?? item.sentAt) ?? new Date(0).toISOString(),
         payload: item,
     };
 }
@@ -181,7 +196,8 @@ const messageItemPayload = {
 // Marketing America Corp. Oleksandr Tishchenko
 export default async function route(app) {
     app.get("/message/thread", { schema: { response: { 200: threadListPayload, 400: mobileAccessErrorPayload, 403: mobileAccessErrorPayload, 500: mobileAccessErrorPayload, 503: mobileAccessErrorPayload } } }, async (request, reply) => {
-        const result = await messagingRequest("GET", "/api/threads", null, forwardedHeaders(request));
+        const headers = await resolvedMessagingHeaders(request);
+        const result = await messagingRequest("GET", "/api/thread", null, headers);
         if (result.status < 200 || result.status >= 300)
             return reply.code(result.status).send(normalizeErrorPayload(result.body));
         const root = payloadRoot(result.body);
@@ -189,11 +205,12 @@ export default async function route(app) {
         return reply.code(200).send({ items: items.map(normalizeThread), count: integerValue(root.count, items.length), payload: root });
     });
     app.get("/message/thread/:threadId", { schema: { response: { 200: messageListPayload, 400: mobileAccessErrorPayload, 403: mobileAccessErrorPayload, 404: mobileAccessErrorPayload, 500: mobileAccessErrorPayload, 503: mobileAccessErrorPayload } } }, async (request, reply) => {
+        const headers = await resolvedMessagingHeaders(request);
         const threadId = stringValue(recordValue(request.params).threadId);
         if (null === threadId)
             return reply.code(400).send({ code: "thread_id_required", message: "Thread id is required." });
         const search = new URLSearchParams({ limit: "50" });
-        const result = await messagingRequest("GET", `/api/threads/${encodeURIComponent(threadId)}/messages?${search.toString()}`, null, forwardedHeaders(request));
+        const result = await messagingRequest("GET", `/api/thread/message/${encodeURIComponent(threadId)}?${search.toString()}`, null, headers);
         if (result.status < 200 || result.status >= 300)
             return reply.code(result.status).send(normalizeErrorPayload(result.body));
         const root = payloadRoot(result.body);
@@ -203,16 +220,17 @@ export default async function route(app) {
     app.post("/message/thread/:threadId/send", { schema: { body: messageSendRequest, response: { 200: messageItemPayload, 201: messageItemPayload, 400: mobileAccessErrorPayload, 403: mobileAccessErrorPayload, 429: mobileAccessErrorPayload, 500: mobileAccessErrorPayload, 503: mobileAccessErrorPayload } } }, async (request, reply) => {
         const threadId = stringValue(recordValue(request.params).threadId);
         const requestRecord = request;
+        const headers = await resolvedMessagingHeaders(requestRecord);
         const requestBody = recordValue(request.body);
         const body = stringValue(requestBody.body);
-        const userId = stringValue(requestBody.userId) ?? headerString(requestRecord, "x-user-id");
+        const userId = stringValue(requestBody.userId) ?? headers["x-user-id"] ?? null;
         if (null === threadId)
             return reply.code(400).send({ code: "thread_id_required", message: "Thread id is required." });
         if (null === body)
             return reply.code(400).send({ code: "message_body_required", message: "Message body is required." });
         if (null === userId)
             return reply.code(400).send({ code: "user_id_required", message: "User id is required." });
-        const result = await messagingRequest("POST", `/api/threads/${encodeURIComponent(threadId)}/reply`, { userId, text: body }, forwardedHeaders(requestRecord));
+        const result = await messagingRequest("POST", `/api/thread/reply/${encodeURIComponent(threadId)}`, { userId, text: body }, headers);
         if (result.status < 200 || result.status >= 300)
             return reply.code(result.status).send(normalizeErrorPayload(result.body));
         return reply.code(201 === result.status ? 201 : 200).send(normalizeMessage(payloadRoot(result.body), threadId));

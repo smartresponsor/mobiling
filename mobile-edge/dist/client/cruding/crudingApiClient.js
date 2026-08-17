@@ -17,7 +17,7 @@ export class CrudingApiClient {
             const suffix = identity ? `/${encodeURIComponent(identity)}` : "";
             const path = method === "POST" && resource === "project" && !identity
                 ? "/api/project/wizard"
-                : `/my/api/${encodeURIComponent(resource)}${suffix}`;
+                : `/api/${encodeURIComponent(resource)}${suffix}`;
             url = new URL(baseUrl.replace(/\/$/, "") + path);
         }
         catch {

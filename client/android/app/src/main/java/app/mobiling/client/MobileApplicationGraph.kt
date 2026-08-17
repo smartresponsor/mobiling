@@ -19,11 +19,37 @@ import app.mobiling.client.data.vendor.statement.VendorHttpStatementGateway
 import app.mobiling.client.data.vendor.summary.VendorHttpSummaryGateway
 import app.mobiling.client.data.vendor.transaction.VendorHttpTransactionGateway
 import app.mobiling.client.message.MessageFeatureBridge
+import okhttp3.Cookie
+import okhttp3.CookieJar
+import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 
 class MobileApplicationGraph private constructor(val composition: MobileApplicationComposition) {
     private val baseUrl = composition.mobileEdgeBaseUrl
-    private val httpClient = OkHttpClient()
+    private val sessionCookies = mutableListOf<Cookie>()
+    private val httpClient = OkHttpClient.Builder()
+        .cookieJar(object : CookieJar {
+            @Synchronized
+            override fun saveFromResponse(url: HttpUrl, cookies: List<Cookie>) {
+                val now = System.currentTimeMillis()
+                sessionCookies.removeAll { existing ->
+                    existing.expiresAt <= now || cookies.any { incoming ->
+                        existing.name == incoming.name &&
+                            existing.domain == incoming.domain &&
+                            existing.path == incoming.path
+                    }
+                }
+                sessionCookies += cookies.filter { cookie -> cookie.expiresAt > now }
+            }
+
+            @Synchronized
+            override fun loadForRequest(url: HttpUrl): List<Cookie> {
+                val now = System.currentTimeMillis()
+                sessionCookies.removeAll { cookie -> cookie.expiresAt <= now }
+                return sessionCookies.filter { cookie -> cookie.matches(url) }
+            }
+        })
+        .build()
     private val cartGateway = CartHttpGateway(baseUrl, httpClient)
     private val attachmentGateway = AttachmentHttpGateway(baseUrl, httpClient)
     private val catalogGateway = CatalogHttpGateway(

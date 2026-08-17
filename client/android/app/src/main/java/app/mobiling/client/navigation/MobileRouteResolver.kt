@@ -11,6 +11,7 @@ object MobileRouteResolver {
         return when {
             route == "dashboard" -> MobileRoute.Dashboard
             route == "more" -> MobileRoute.More
+            route == "money" -> MobileRoute.Money
             route == "access/sign-in" -> MobileRoute.Access.SignIn
             route == "access/register" -> MobileRoute.Access.Register
             route == "access/recovery/request" -> MobileRoute.Access.RecoveryRequest
@@ -68,6 +69,7 @@ object MobileRouteResolver {
     fun isCurrentlyRenderable(rawRoute: String?): Boolean = when (resolve(rawRoute)) {
         MobileRoute.Dashboard,
         MobileRoute.More,
+        MobileRoute.Money,
         MobileRoute.Wallet.Overview,
         MobileRoute.Wallet.Transaction,
         MobileRoute.Wallet.Funding,

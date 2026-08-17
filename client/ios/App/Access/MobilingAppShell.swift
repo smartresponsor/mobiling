@@ -2,7 +2,7 @@ import SwiftUI
 
 public struct MobilingAppShell: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    @State private var currentScreen: AccessScreen = .welcome
+    @State private var currentScreen: AccessScreen
     @State private var activeVendorId: String?
     @State private var launchSplashMounted: Bool = true
     @State private var launchSplashVisible: Bool = true
@@ -10,6 +10,7 @@ public struct MobilingAppShell: View {
     private let authFeatureBridge: AuthFeatureBridge?
     private let attachmentFeatureBridge: AttachmentFeatureBridge?
     private let navigationShellGateway: NavigationShellGateway?
+    private let messageFeatureBridge: MessageFeatureBridge?
     private let vendorProfileGateway: VendorProfileGateway?
     private let vendorSummaryGateway: VendorSummaryGateway?
     private let vendorStatementGateway: VendorStatementGateway?
@@ -17,14 +18,16 @@ public struct MobilingAppShell: View {
     private let vendorTransactionGateway: VendorTransactionGateway?
     private let vendorCrudGateway: VendorCrudGateway?
     private let initialRoute: String
+    private let publicInitialRoute: String
     private let catalogEnabled: Bool
     private let availableRetailKinds: [RetailKind]
     private let navigationLabelResolver: (String?, String, String) -> String
 
-    public init(authFeatureBridge: AuthFeatureBridge? = nil, attachmentFeatureBridge: AttachmentFeatureBridge? = nil, navigationShellGateway: NavigationShellGateway? = nil, vendorProfileGateway: VendorProfileGateway? = nil, vendorSummaryGateway: VendorSummaryGateway? = nil, vendorStatementGateway: VendorStatementGateway? = nil, vendorPayoutGateway: VendorPayoutGateway? = nil, vendorTransactionGateway: VendorTransactionGateway? = nil, vendorCrudGateway: VendorCrudGateway? = nil, initialRoute: String = "dashboard", catalogEnabled: Bool = true, availableRetailKinds: [RetailKind] = RetailKind.allCases, navigationLabelResolver: @escaping (String?, String, String) -> String = { _, _, label in label }) {
+    public init(authFeatureBridge: AuthFeatureBridge? = nil, attachmentFeatureBridge: AttachmentFeatureBridge? = nil, navigationShellGateway: NavigationShellGateway? = nil, messageFeatureBridge: MessageFeatureBridge? = nil, vendorProfileGateway: VendorProfileGateway? = nil, vendorSummaryGateway: VendorSummaryGateway? = nil, vendorStatementGateway: VendorStatementGateway? = nil, vendorPayoutGateway: VendorPayoutGateway? = nil, vendorTransactionGateway: VendorTransactionGateway? = nil, vendorCrudGateway: VendorCrudGateway? = nil, initialRoute: String = "dashboard", publicInitialRoute: String = "home", catalogEnabled: Bool = true, availableRetailKinds: [RetailKind] = RetailKind.allCases, navigationLabelResolver: @escaping (String?, String, String) -> String = { _, _, label in label }) {
         self.authFeatureBridge = authFeatureBridge
         self.attachmentFeatureBridge = attachmentFeatureBridge
         self.navigationShellGateway = navigationShellGateway
+        self.messageFeatureBridge = messageFeatureBridge
         self.vendorProfileGateway = vendorProfileGateway
         self.vendorSummaryGateway = vendorSummaryGateway
         self.vendorStatementGateway = vendorStatementGateway
@@ -32,6 +35,8 @@ public struct MobilingAppShell: View {
         self.vendorTransactionGateway = vendorTransactionGateway
         self.vendorCrudGateway = vendorCrudGateway
         self.initialRoute = initialRoute
+        self.publicInitialRoute = publicInitialRoute
+        _currentScreen = State(initialValue: publicInitialRoute == "sign-in" ? .signIn : .welcome)
         self.catalogEnabled = catalogEnabled
         self.availableRetailKinds = availableRetailKinds
         self.navigationLabelResolver = navigationLabelResolver
@@ -44,6 +49,7 @@ public struct MobilingAppShell: View {
             case .dashboard:
                 MobileDashboardShellView(
                     navigationShellGateway: navigationShellGateway,
+                    messageFeatureBridge: messageFeatureBridge,
                     attachmentFeatureBridge: attachmentFeatureBridge,
                     vendorId: activeVendorId,
                     vendorProfileGateway: vendorProfileGateway,
@@ -156,7 +162,7 @@ public struct MobilingAppShell: View {
             }
 
             activeVendorId = nil
-            currentScreen = .welcome
+            currentScreen = publicInitialRoute == "sign-in" ? .signIn : .welcome
         }
     }
 
