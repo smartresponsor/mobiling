@@ -2,7 +2,9 @@ import java.util.Properties
 
 plugins { id("com.android.application"); id("org.jetbrains.kotlin.plugin.compose") }
 
-if (file("google-services.json").exists()) {
+val firebaseConfigurationPresent = file("google-services.json").exists() ||
+    (file("src/oneTasker/google-services.json").exists() && file("src/smartResponsor/google-services.json").exists())
+if (firebaseConfigurationPresent) {
     apply(plugin = "com.google.gms.google-services")
 }
 
