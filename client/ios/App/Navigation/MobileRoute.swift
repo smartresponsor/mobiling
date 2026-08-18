@@ -16,6 +16,7 @@ public enum MobileRoute: Sendable, Equatable {
     case walletTransaction
     case walletFunding
     case walletWithdrawal
+    case walletWithdrawalDetail(withdrawalId: String)
     case vendor
     case vendorProfile
     case vendorSummary

@@ -13,20 +13,21 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.FilterList
 import androidx.compose.material.icons.outlined.Search
-import androidx.compose.material.icons.outlined.Send
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -41,13 +42,27 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import app.mobiling.client.attachment.AttachmentFeatureBridge
+import app.mobiling.client.attachment.AttachmentMobileScreen
 import app.mobiling.client.contract.message.thread.MessageItemPayload
 import app.mobiling.client.contract.message.thread.MessageSendRequest
 import app.mobiling.client.contract.message.thread.MessageThreadSummary
+import app.mobiling.client.design.MobileDesignDefaults
+import app.mobiling.client.design.MobileDesignSystem
+import app.mobiling.client.design.component.CanonicalMessageBubble
+import app.mobiling.client.design.component.CanonicalMessageComposer
+import app.mobiling.client.design.component.CanonicalStateCard
 import kotlinx.coroutines.launch
+import java.time.Instant
 
 @Composable
-fun MessageMobileScreen(messageFeatureBridge: MessageFeatureBridge?) {
+fun MessageMobileScreen(
+    messageFeatureBridge: MessageFeatureBridge?,
+    currentUserId: String?,
+    vendorId: String?,
+    attachmentFeatureBridge: AttachmentFeatureBridge?,
+    onOpenTask: () -> Unit,
+) {
     var threads by remember { mutableStateOf<List<MessageThreadSummary>>(emptyList()) }
     var selectedThread by remember { mutableStateOf<MessageThreadSummary?>(null) }
     var messages by remember { mutableStateOf<List<MessageItemPayload>>(emptyList()) }
@@ -59,7 +74,17 @@ fun MessageMobileScreen(messageFeatureBridge: MessageFeatureBridge?) {
     var threadError by remember { mutableStateOf<String?>(null) }
     var draft by remember { mutableStateOf("") }
     var sending by remember { mutableStateOf(false) }
+    var attachmentOpen by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
+
+    if (attachmentOpen) {
+        AttachmentMobileScreen(
+            vendorId = vendorId,
+            attachmentFeatureBridge = attachmentFeatureBridge,
+            onBack = { attachmentOpen = false },
+        )
+        return
+    }
 
     val filteredThreads by remember(threads, query, unreadOnly) {
         derivedStateOf {
@@ -101,7 +126,21 @@ fun MessageMobileScreen(messageFeatureBridge: MessageFeatureBridge?) {
         threadError = null
         messages = emptyList()
         try {
-            messages = bridge.listItems(thread.threadId)
+            val loadedMessages = bridge.listItems(thread.threadId)
+            messages = loadedMessages
+            if (thread.unreadCount > 0) {
+                val clearedThread = thread.copy(unreadCount = 0)
+                selectedThread = clearedThread
+                threads = threads.map { item -> if (item.threadId == thread.threadId) clearedThread else item }
+                val latestMessage = loadedMessages.lastOrNull()
+                val userId = currentUserId
+                if (latestMessage != null && userId != null) {
+                    try {
+                        bridge.markRead(thread.threadId, userId, latestMessage.messageId)
+                    } catch (_: Exception) {
+                    }
+                }
+            }
         } catch (exception: Exception) {
             threadError = exception.message ?: "Conversation is temporarily unavailable."
         } finally {
@@ -111,8 +150,13 @@ fun MessageMobileScreen(messageFeatureBridge: MessageFeatureBridge?) {
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(start = 16.dp, top = 14.dp, end = 16.dp, bottom = 104.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+        contentPadding = PaddingValues(
+            start = MobileDesignSystem.spacing.lg,
+            top = MobileDesignDefaults.MessageTimeline.topInset,
+            end = MobileDesignSystem.spacing.lg,
+            bottom = MobileDesignDefaults.MessageTimeline.bottomInset,
+        ),
+        verticalArrangement = Arrangement.spacedBy(MobileDesignSystem.spacing.md),
     ) {
         val thread = selectedThread
         if (thread == null) {
@@ -126,40 +170,73 @@ fun MessageMobileScreen(messageFeatureBridge: MessageFeatureBridge?) {
             }
 
             when {
-                loading -> item { MessageStateCard("Loading conversations…", "We are checking recent task and customer messages.") }
-                errorMessage != null -> item { MessageStateCard("Messages are temporarily unavailable", errorMessage ?: "Try again in a moment.") }
-                threads.isEmpty() -> item { MessageStateCard("No conversations yet", "Task and customer conversations will appear here after a customer messages you.") }
-                filteredThreads.isEmpty() -> item { MessageStateCard("No matching conversations", "Try another customer name or disable the unread filter.") }
+                loading -> item { CanonicalStateCard("Loading conversations…", "We are checking recent task and customer messages.") }
+                errorMessage != null -> item { CanonicalStateCard("Messages are temporarily unavailable", errorMessage ?: "Try again in a moment.") }
+                threads.isEmpty() -> item { CanonicalStateCard("No conversations yet", "Task and customer conversations will appear here after a customer messages you.") }
+                filteredThreads.isEmpty() -> item { CanonicalStateCard("No matching conversations", "Try another customer name or disable the unread filter.") }
                 else -> items(filteredThreads, key = { it.threadId }) { item ->
                     MessageThreadRow(item, onClick = { selectedThread = item })
                 }
             }
         } else {
-            item { MessageConversationHeader(thread = thread, onBack = { selectedThread = null }) }
+            item {
+                MessageConversationHeader(
+                    thread = thread,
+                    onBack = { selectedThread = null },
+                    onOpenTask = onOpenTask,
+                )
+            }
             when {
-                loadingMessages -> item { MessageStateCard("Loading messages…", "Opening this conversation.") }
-                threadError != null -> item { MessageStateCard("Conversation is temporarily unavailable", threadError ?: "Try again in a moment.") }
-                messages.isEmpty() -> item { MessageStateCard("No messages yet", "Send the first message in this conversation.") }
-                else -> items(messages, key = { it.messageId }) { message -> MessageBubble(message) }
+                loadingMessages -> item { CanonicalStateCard("Loading messages…", "Opening this conversation.") }
+                threadError != null && messages.isEmpty() -> item { CanonicalStateCard("Conversation is temporarily unavailable", threadError ?: "Try again in a moment.") }
+                messages.isEmpty() -> item { CanonicalStateCard("No messages yet", "Send the first message in this conversation.") }
+                else -> items(messages, key = { it.messageId }) { message ->
+                    CanonicalMessageBubble(
+                        body = message.body,
+                        timestamp = friendlyTimestamp(message.sentAtIso8601),
+                        ownMessage = currentUserId != null && message.senderId == currentUserId,
+                    )
+                }
+            }
+            if (threadError != null && messages.isNotEmpty()) {
+                item { Text(threadError ?: "Message could not be sent.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.error) }
             }
             item {
-                MessageComposer(
+                CanonicalMessageComposer(
                     draft = draft,
                     sending = sending,
                     onDraftChange = { draft = it },
+                    onClear = { draft = "" },
+                    onAttach = { attachmentOpen = true },
                     onSend = {
                         val body = draft.trim()
                         val bridge = messageFeatureBridge
-                        if (body.isNotBlank() && bridge != null && !sending) {
+                        val userId = currentUserId
+                        if (body.isNotBlank() && bridge != null && userId != null && !sending) {
                             scope.launch {
                                 sending = true
                                 threadError = null
+                                val optimisticId = "local-${System.nanoTime()}"
+                                val optimisticMessage = MessageItemPayload(
+                                    messageId = optimisticId,
+                                    threadId = thread.threadId,
+                                    body = body,
+                                    senderId = userId,
+                                    sentAtIso8601 = Instant.now().toString(),
+                                )
+                                messages = (messages + optimisticMessage).sortedBy { it.sentAtIso8601 }
+                                draft = ""
+                                threads = threads.map { item ->
+                                    if (item.threadId == thread.threadId) item.copy(lastMessagePreview = body, unreadCount = 0, updatedAtIso8601 = optimisticMessage.sentAtIso8601) else item
+                                }
+                                selectedThread = selectedThread?.takeIf { it.threadId != thread.threadId }
+                                    ?: thread.copy(lastMessagePreview = body, unreadCount = 0, updatedAtIso8601 = optimisticMessage.sentAtIso8601)
                                 try {
-                                    bridge.send(MessageSendRequest(thread.threadId, body))
-                                    draft = ""
-                                    messages = bridge.listItems(thread.threadId)
-                                    threads = bridge.listThreads()
+                                    val sentMessage = bridge.send(MessageSendRequest(thread.threadId, userId, body))
+                                    messages = messages.map { item -> if (item.messageId == optimisticId) sentMessage else item }.sortedBy { it.sentAtIso8601 }
                                 } catch (exception: Exception) {
+                                    messages = messages.filterNot { it.messageId == optimisticId }
+                                    if (draft.isBlank()) draft = body
                                     threadError = exception.message ?: "Message could not be sent."
                                 } finally {
                                     sending = false
@@ -182,7 +259,7 @@ private fun MessageSearchBar(
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(10.dp),
+        horizontalArrangement = Arrangement.spacedBy(MobileDesignSystem.spacing.sm),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         OutlinedTextField(
@@ -194,6 +271,13 @@ private fun MessageSearchBar(
             leadingIcon = {
                 Icon(Icons.Outlined.Search, contentDescription = null)
             },
+            trailingIcon = if (query.isNotBlank()) {
+                {
+                    IconButton(onClick = { onQueryChange("") }) {
+                        Icon(Icons.Outlined.Close, contentDescription = "Clear search")
+                    }
+                }
+            } else null,
             placeholder = {
                 Text("Search by customer name")
             },
@@ -204,19 +288,12 @@ private fun MessageSearchBar(
                 unfocusedBorderColor = MaterialTheme.colorScheme.outlineVariant,
             ),
         )
-        IconButton(
+        FilterChip(
+            selected = unreadOnly,
             onClick = onToggleUnreadOnly,
-            modifier = Modifier
-                .size(48.dp)
-                .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.surface),
-        ) {
-            Icon(
-                Icons.Outlined.FilterList,
-                contentDescription = "Filter conversations",
-                tint = if (unreadOnly) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
+            label = { Text("Unread") },
+            leadingIcon = { Icon(Icons.Outlined.FilterList, contentDescription = null) },
+        )
     }
 }
 
@@ -226,20 +303,20 @@ private fun MessageThreadRow(thread: MessageThreadSummary, onClick: () -> Unit) 
         onClick = onClick,
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surface),
-        shape = RoundedCornerShape(22.dp),
+        shape = MaterialTheme.shapes.extraLarge,
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            modifier = Modifier.fillMaxWidth().padding(MobileDesignSystem.spacing.lg),
+            horizontalArrangement = Arrangement.spacedBy(MobileDesignSystem.spacing.md),
             verticalAlignment = Alignment.Top,
         ) {
             MessageAvatar(thread)
             Column(
                 modifier = Modifier.weight(1f),
-                verticalArrangement = Arrangement.spacedBy(5.dp),
+                verticalArrangement = Arrangement.spacedBy(MobileDesignSystem.spacing.xs),
             ) {
                 Text(
-                    thread.subject ?: "Conversation ${thread.threadId.take(8)}",
+                    thread.subject ?: "Customer conversation",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold,
                     maxLines = 1,
@@ -256,88 +333,42 @@ private fun MessageThreadRow(thread: MessageThreadSummary, onClick: () -> Unit) 
                 }
             }
             if (thread.updatedAtIso8601.isNotBlank()) {
-                Text(thread.updatedAtIso8601, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                Text(friendlyTimestamp(thread.updatedAtIso8601), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
         }
     }
 }
 
 @Composable
-private fun MessageConversationHeader(thread: MessageThreadSummary, onBack: () -> Unit) {
+private fun MessageConversationHeader(thread: MessageThreadSummary, onBack: () -> Unit, onOpenTask: () -> Unit) {
+    val subjectParts = thread.subject.orEmpty().split(" — ", limit = 2)
+    val customerName = subjectParts.firstOrNull()?.takeIf(String::isNotBlank) ?: "Customer"
+    val taskTitle = subjectParts.getOrNull(1)?.takeIf(String::isNotBlank)
+
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalArrangement = Arrangement.spacedBy(MobileDesignSystem.spacing.sm),
     ) {
         IconButton(onClick = onBack) {
             Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = "Back to conversations")
         }
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                text = thread.subject ?: "Conversation ${thread.threadId.take(8)}",
+                text = customerName,
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.SemiBold,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
             )
+            if (taskTitle != null) {
+                TextButton(onClick = onOpenTask, contentPadding = PaddingValues(0.dp)) {
+                    Text("Task: $taskTitle", maxLines = 1, overflow = TextOverflow.Ellipsis)
+                }
+            }
             if (thread.unreadCount > 0) {
                 Text("${thread.unreadCount} unread", style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.primary)
             }
-        }
-    }
-}
-
-@Composable
-private fun MessageBubble(message: MessageItemPayload) {
-    ElevatedCard(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surface),
-        shape = MaterialTheme.shapes.large,
-    ) {
-        Column(
-            modifier = Modifier.fillMaxWidth().padding(14.dp),
-            verticalArrangement = Arrangement.spacedBy(6.dp),
-        ) {
-            Text(message.body, style = MaterialTheme.typography.bodyLarge)
-            Text(
-                text = "${message.senderId}  ${message.sentAtIso8601}",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
-    }
-}
-
-@Composable
-private fun MessageComposer(
-    draft: String,
-    sending: Boolean,
-    onDraftChange: (String) -> Unit,
-    onSend: () -> Unit,
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        verticalAlignment = Alignment.Bottom,
-    ) {
-        OutlinedTextField(
-            modifier = Modifier.weight(1f),
-            value = draft,
-            onValueChange = onDraftChange,
-            enabled = !sending,
-            placeholder = { Text("Message") },
-            maxLines = 5,
-            shape = MaterialTheme.shapes.extraLarge,
-        )
-        IconButton(
-            onClick = onSend,
-            enabled = draft.isNotBlank() && !sending,
-            modifier = Modifier
-                .size(48.dp)
-                .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.primary),
-        ) {
-            Icon(Icons.Outlined.Send, contentDescription = "Send message", tint = MaterialTheme.colorScheme.onPrimary)
         }
     }
 }
@@ -353,28 +384,19 @@ private fun MessageAvatar(thread: MessageThreadSummary) {
 
     Box(
         modifier = Modifier
-            .size(44.dp)
+            .size(MobileDesignDefaults.MessageTimeline.avatarSize)
             .clip(CircleShape)
-            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.10f)),
+            .background(MaterialTheme.colorScheme.secondaryContainer),
         contentAlignment = Alignment.Center,
     ) {
-        Text(initials, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.SemiBold)
+        Text(initials, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSecondaryContainer, fontWeight = FontWeight.SemiBold)
     }
 }
 
-@Composable
-private fun MessageStateCard(title: String, description: String) {
-    ElevatedCard(
-        modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surface),
-        shape = RoundedCornerShape(24.dp),
-    ) {
-        Column(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 24.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-        ) {
-            Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
-            Text(description, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        }
+private fun friendlyTimestamp(raw: String): String {
+    val value = raw.trim().replace('T', ' ').removeSuffix("Z")
+    if (value.length >= 16 && value.getOrNull(4) == '-' && value.getOrNull(7) == '-') {
+        return "${value.substring(0, 10)} ${value.substring(11, 16)}"
     }
+    return value.take(24)
 }

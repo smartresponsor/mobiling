@@ -40,7 +40,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import app.mobiling.client.cart.CartFeatureBridge
 import app.mobiling.client.cart.CartMobileScreen
 import app.mobiling.client.catalog.CatalogFeatureBridge
@@ -48,7 +47,7 @@ import app.mobiling.client.catalog.CatalogMobileScreen
 import app.mobiling.client.navigation.CanonicalBottomNavigation
 import app.mobiling.client.navigation.CanonicalBottomNavigationItem
 import app.mobiling.client.navigation.CanonicalTopAppBar
-import app.mobiling.client.design.OneTaskerDesignTokens
+import app.mobiling.client.design.MobileDesignSystem
 
 private enum class GuestRoute(val route: String, val label: String, val icon: ImageVector) {
     Home("home", "Home", Icons.Default.Home),
@@ -128,8 +127,8 @@ fun AccessWelcomeScreen(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = OneTaskerDesignTokens.Spacing.Xl, vertical = OneTaskerDesignTokens.Spacing.Sm),
-                verticalArrangement = Arrangement.spacedBy(OneTaskerDesignTokens.Spacing.Md),
+                    .padding(horizontal = MobileDesignSystem.spacing.xl, vertical = MobileDesignSystem.spacing.sm),
+                verticalArrangement = Arrangement.spacedBy(MobileDesignSystem.spacing.md),
             ) {
                 GuestRoute.entries.forEach { route ->
                     ElevatedCard(
@@ -143,8 +142,8 @@ fun AccessWelcomeScreen(
                         ),
                     ) {
                         Row(
-                            modifier = Modifier.fillMaxWidth().padding(OneTaskerDesignTokens.Spacing.Lg),
-                            horizontalArrangement = Arrangement.spacedBy(OneTaskerDesignTokens.Spacing.Lg),
+                            modifier = Modifier.fillMaxWidth().padding(MobileDesignSystem.spacing.lg),
+                            horizontalArrangement = Arrangement.spacedBy(MobileDesignSystem.spacing.lg),
                         ) {
                             Icon(route.icon, contentDescription = null)
                             Text(
@@ -155,7 +154,7 @@ fun AccessWelcomeScreen(
                         }
                     }
                 }
-                Spacer(Modifier.height(OneTaskerDesignTokens.Spacing.Xxl))
+                Spacer(Modifier.height(MobileDesignSystem.spacing.xxl))
             }
         }
     }
@@ -163,8 +162,8 @@ fun AccessWelcomeScreen(
     if (accountOpen) {
         ModalBottomSheet(onDismissRequest = { accountOpen = false }) {
             Column(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = OneTaskerDesignTokens.Spacing.Xxl, vertical = OneTaskerDesignTokens.Spacing.Md),
-                verticalArrangement = Arrangement.spacedBy(OneTaskerDesignTokens.Spacing.Md),
+                modifier = Modifier.fillMaxWidth().padding(horizontal = MobileDesignSystem.spacing.xxl, vertical = MobileDesignSystem.spacing.md),
+                verticalArrangement = Arrangement.spacedBy(MobileDesignSystem.spacing.md),
             ) {
                 Text("Guest account", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
                 Button(
@@ -206,8 +205,8 @@ private fun GuestRouteContent(
             .fillMaxSize()
             .padding(padding)
             .verticalScroll(rememberScrollState())
-            .padding(OneTaskerDesignTokens.Spacing.Xl),
-        verticalArrangement = Arrangement.spacedBy(OneTaskerDesignTokens.Spacing.Lg),
+            .padding(MobileDesignSystem.spacing.xl),
+        verticalArrangement = Arrangement.spacedBy(MobileDesignSystem.spacing.lg),
     ) {
         when (route) {
             GuestRoute.Home -> {
@@ -233,6 +232,6 @@ private fun GuestRouteContent(
 @Composable
 private fun GuestPlaceholder(description: String) {
     Card(colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
-        Text(description, modifier = Modifier.padding(OneTaskerDesignTokens.Spacing.Lg))
+        Text(description, modifier = Modifier.padding(MobileDesignSystem.spacing.lg))
     }
 }

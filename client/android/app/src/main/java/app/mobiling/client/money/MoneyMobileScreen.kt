@@ -21,7 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
-import app.mobiling.client.design.OneTaskerDesignTokens
+import app.mobiling.client.design.MobileDesignSystem
 
 private data class MoneyDestination(
     val label: String,
@@ -37,15 +37,15 @@ fun MoneyMobileScreen(onRouteSelected: (String) -> Unit) {
         MoneyDestination("Cart", "Review items before checkout.", Icons.Default.ShoppingCart, "cart", true),
         MoneyDestination("Wallet", "Balances, reservations and wallet activity.", Icons.Default.Wallet, "wallet", true),
         MoneyDestination("Billing", "Bills, invoices and billing history.", Icons.Default.ReceiptLong, null, false),
-        MoneyDestination("Payments", "Payment activity and payment methods.", Icons.Default.CreditCard, null, false),
+        MoneyDestination("Payment", "Payment activity and payment method.", Icons.Default.CreditCard, null, false),
         MoneyDestination("Finance", "Financial summaries and reporting.", Icons.Default.AccountBalance, null, false),
     )
 
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(OneTaskerDesignTokens.Spacing.Lg),
-        verticalArrangement = Arrangement.spacedBy(OneTaskerDesignTokens.Spacing.Md),
+            .padding(MobileDesignSystem.spacing.lg),
+        verticalArrangement = Arrangement.spacedBy(MobileDesignSystem.spacing.md),
     ) {
         Text("Money", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.SemiBold)
         Text(
@@ -64,13 +64,13 @@ fun MoneyMobileScreen(onRouteSelected: (String) -> Unit) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(OneTaskerDesignTokens.Spacing.Lg),
-                    horizontalArrangement = Arrangement.spacedBy(OneTaskerDesignTokens.Spacing.Lg),
+                        .padding(MobileDesignSystem.spacing.lg),
+                    horizontalArrangement = Arrangement.spacedBy(MobileDesignSystem.spacing.lg),
                 ) {
                     Icon(destination.icon, contentDescription = null)
                     Column(
                         modifier = Modifier.weight(1f),
-                        verticalArrangement = Arrangement.spacedBy(OneTaskerDesignTokens.Spacing.Xs),
+                        verticalArrangement = Arrangement.spacedBy(MobileDesignSystem.spacing.xs),
                     ) {
                         Text(destination.label, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
                         Text(destination.description, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)

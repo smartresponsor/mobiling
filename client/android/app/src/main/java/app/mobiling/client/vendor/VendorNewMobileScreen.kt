@@ -15,6 +15,7 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,6 +30,9 @@ import androidx.compose.ui.viewinterop.AndroidView
 import org.json.JSONObject
 import androidx.compose.ui.unit.dp
 import app.mobiling.client.RetailKind
+import app.mobiling.client.catalog.CatalogFeatureBridge
+import app.mobiling.client.contract.catalog.browse.CatalogListNodeQuery
+import app.mobiling.client.contract.catalog.browse.CatalogNodeSummary
 import kotlinx.coroutines.launch
 
 data class VendorNewField(
@@ -44,6 +48,46 @@ private val ProductKindChoices = mapOf(
     RetailKind.Goods to "Product — I am selling an item",
     RetailKind.Project to "Project — I am publishing a project",
 )
+
+private val RetailCatalogChoices = listOf(
+    "services" to "Services",
+    "products" to "Products",
+    "projects" to "Projects",
+)
+
+private fun retailCatalogCode(kind: String): String = when (kind) {
+    RetailKind.Goods.code -> "products"
+    RetailKind.Project.code -> "projects"
+    else -> "services"
+}
+
+private data class RetailCategoryChoice(val nodeId: String, val label: String)
+
+private suspend fun loadRetailCategoryChoices(
+    catalogFeatureBridge: CatalogFeatureBridge,
+    catalogCode: String,
+    parentNodeId: String? = null,
+    prefix: String = "",
+): List<RetailCategoryChoice> {
+    val nodes = catalogFeatureBridge.list(
+        CatalogListNodeQuery(
+            parentNodeId = parentNodeId,
+            searchText = null,
+            includeEmptyNodes = true,
+            catalogCode = catalogCode,
+        ),
+    )
+
+    return buildList {
+        nodes.forEach { node ->
+            val label = if (prefix.isBlank()) node.title else "$prefix › ${node.title}"
+            add(RetailCategoryChoice(node.nodeId, label))
+            if (node.childCount > 0) {
+                addAll(loadRetailCategoryChoices(catalogFeatureBridge, catalogCode, node.nodeId, label))
+            }
+        }
+    }
+}
 
 @Composable
 private fun ProjectStoryRichTextEditor(
@@ -96,14 +140,44 @@ fun VendorNewMobileScreen(
     onRouteSelected: (String) -> Unit,
     initialValues: Map<String, String> = emptyMap(),
     availableRetailKinds: List<RetailKind> = RetailKind.entries,
+    catalogFeatureBridge: CatalogFeatureBridge? = null,
 ) {
     val scope = rememberCoroutineScope()
     var values by remember(fields, initialValues) {
-        mutableStateOf(fields.associate { it.key to "" } + initialValues)
+        val base = fields.associate { it.key to "" } + initialValues
+        val normalized = if (
+            fields.any { it.key == "catalogCode" } && base["catalogCode"].isNullOrBlank()
+        ) {
+            base + ("catalogCode" to retailCatalogCode(base["kind"].orEmpty()))
+        } else {
+            base
+        }
+        mutableStateOf(normalized)
     }
     var fieldErrors by remember { mutableStateOf<Map<String, String>>(emptyMap()) }
     var submitError by remember { mutableStateOf<String?>(null) }
     var saving by remember { mutableStateOf(false) }
+    var categoryChoices by remember { mutableStateOf<List<RetailCategoryChoice>>(emptyList()) }
+    var categoryLoading by remember { mutableStateOf(false) }
+    var categoryLoadError by remember { mutableStateOf<String?>(null) }
+    val selectedCatalogCode = values["catalogCode"].orEmpty()
+
+    LaunchedEffect(catalogFeatureBridge, selectedCatalogCode) {
+        categoryChoices = emptyList()
+        categoryLoadError = null
+        if (catalogFeatureBridge == null || selectedCatalogCode.isBlank()) {
+            return@LaunchedEffect
+        }
+
+        categoryLoading = true
+        try {
+            categoryChoices = loadRetailCategoryChoices(catalogFeatureBridge, selectedCatalogCode)
+        } catch (exception: Exception) {
+            categoryLoadError = exception.message ?: "Categories could not be loaded."
+        } finally {
+            categoryLoading = false
+        }
+    }
 
     fun validate(): Boolean {
         val errors = buildMap {
@@ -132,7 +206,12 @@ fun VendorNewMobileScreen(
                                 RadioButton(
                                     selected = values["kind"] == kind.code,
                                     onClick = {
+                                        val previousKind = values["kind"].orEmpty()
+                                        val currentCatalog = values["catalogCode"].orEmpty()
                                         values = values + ("kind" to kind.code)
+                                        if (currentCatalog.isBlank() || currentCatalog == retailCatalogCode(previousKind)) {
+                                            values = values + ("catalogCode" to retailCatalogCode(kind.code))
+                                        }
                                         fieldErrors = fieldErrors - "kind"
                                     },
                                 )
@@ -140,6 +219,45 @@ fun VendorNewMobileScreen(
                             }
                         }
                         fieldErrors["kind"]?.let { Text(it) }
+                    }
+                } else if (field.key == "catalogCode") {
+                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        Text("Catalog *", fontWeight = FontWeight.SemiBold)
+                        RetailCatalogChoices.forEach { (code, label) ->
+                            Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+                                RadioButton(
+                                    selected = values["catalogCode"] == code,
+                                    onClick = {
+                                        values = values + mapOf("catalogCode" to code, "categoryId" to "")
+                                        fieldErrors = fieldErrors - "catalogCode" - "categoryId"
+                                    },
+                                )
+                                Text(label)
+                            }
+                        }
+                        fieldErrors["catalogCode"]?.let { Text(it) }
+                    }
+                } else if (field.key == "categoryId") {
+                    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                        Text("Category *", fontWeight = FontWeight.SemiBold)
+                        when {
+                            categoryLoading -> Text("Loading categories…")
+                            categoryLoadError != null -> Text(categoryLoadError.orEmpty())
+                            categoryChoices.isEmpty() -> Text("No published categories are available for this catalog.")
+                            else -> categoryChoices.forEach { category ->
+                                Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+                                    RadioButton(
+                                        selected = values["categoryId"] == category.nodeId,
+                                        onClick = {
+                                            values = values + ("categoryId" to category.nodeId)
+                                            fieldErrors = fieldErrors - "categoryId"
+                                        },
+                                    )
+                                    Text(category.label)
+                                }
+                            }
+                        }
+                        fieldErrors["categoryId"]?.let { Text(it) }
                     }
                 } else OutlinedTextField(
                     value = values[field.key].orEmpty(),
@@ -348,7 +466,8 @@ fun ProjectNewMobileScreen(
 
 val RetailNewFields = listOf(
     VendorNewField("kind", "Listing type", required = true),
-    VendorNewField("categoryId", "Category ID", required = true),
+    VendorNewField("catalogCode", "Catalog", required = true),
+    VendorNewField("categoryId", "Category", required = true),
     VendorNewField("title", "Title", required = true),
     VendorNewField("description", "Description"),
     VendorNewField("amountMinor", "Budget / price in cents", numeric = true),

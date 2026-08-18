@@ -19,8 +19,9 @@ import androidx.core.view.WindowCompat
 import app.mobiling.client.access.MobilingAppShell
 import app.mobiling.client.access.OneTaskerLaunchSplash
 import app.mobiling.client.access.oneTaskerMotionEnabled
-import app.mobiling.client.consumer.OneTaskerTheme
+import app.mobiling.client.consumer.MobileBrandTheme
 import app.mobiling.client.navigation.MobileRouteResolver
+import app.mobiling.client.notification.AndroidPushTokenLifecycle
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
@@ -41,6 +42,7 @@ class MainActivity : ComponentActivity() {
             var launchSplashVisible by remember { mutableStateOf(true) }
             val context = LocalContext.current
             val motionEnabled = remember(context) { oneTaskerMotionEnabled(context) }
+            val pushTokenLifecycle = remember(context) { AndroidPushTokenLifecycle(context.applicationContext) }
 
             LaunchedEffect(Unit) {
                 graph = withContext(Dispatchers.Default) {
@@ -48,14 +50,24 @@ class MainActivity : ComponentActivity() {
                 }
             }
 
+            LaunchedEffect(graph, pushTokenLifecycle) {
+                val resolvedGraph = graph ?: return@LaunchedEffect
+                AndroidPushTokenLifecycle.tokenChanges.collect {
+                    pushTokenLifecycle.sync(
+                        resolvedGraph.notificationFeatureBridge,
+                        resolvedGraph.composition.configuration.product.code,
+                    )
+                }
+            }
+
             LaunchedEffect(motionEnabled) {
-                delay(if (motionEnabled) 1760 else 360)
+                delay(if (motionEnabled) 7200 else 520)
                 launchSplashVisible = false
                 delay(if (motionEnabled) 320 else 120)
                 launchSplashMounted = false
             }
 
-            OneTaskerTheme {
+            MobileBrandTheme(BuildConfig.BRAND_PROFILE) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background,
@@ -70,6 +82,7 @@ class MainActivity : ComponentActivity() {
                                 catalogFeatureBridge = resolvedGraph.catalogFeatureBridge,
                                 navigationShellGateway = resolvedGraph.navigationShellGateway,
                                 messageFeatureBridge = resolvedGraph.messageFeatureBridge,
+                                notificationFeatureBridge = resolvedGraph.notificationFeatureBridge,
                                 productGateway = resolvedGraph.productGateway,
                                 orderGateway = resolvedGraph.orderGateway,
                                 projectGateway = resolvedGraph.projectGateway,
@@ -78,6 +91,7 @@ class MainActivity : ComponentActivity() {
                                 vendorStatementGateway = resolvedGraph.vendorStatementGateway,
                                 vendorPayoutGateway = resolvedGraph.vendorPayoutGateway,
                                 vendorTransactionGateway = resolvedGraph.vendorTransactionGateway,
+                                walletGateway = resolvedGraph.walletGateway,
                                 initialRoute = resolvedGraph.composition.configuration.initialDestination.resolvedRoute(
                                     MobileRouteResolver::isCurrentlyRenderable,
                                 ),
@@ -87,6 +101,18 @@ class MainActivity : ComponentActivity() {
                                 catalogEnabled = resolvedGraph.composition.configuration.catalog.isPrimaryCatalogEnabled(),
                                 availableRetailKinds = resolvedGraph.composition.configuration.retail.availableKinds,
                                 navigationLabelResolver = resolvedGraph.composition.configuration.textResolver::resolveNavigation,
+                                onAuthenticated = {
+                                    pushTokenLifecycle.sync(
+                                        resolvedGraph.notificationFeatureBridge,
+                                        resolvedGraph.composition.configuration.product.code,
+                                    )
+                                },
+                                onBeforeSignOut = {
+                                    pushTokenLifecycle.disable(
+                                        resolvedGraph.notificationFeatureBridge,
+                                        resolvedGraph.composition.configuration.product.code,
+                                    )
+                                },
                             )
                         }
 

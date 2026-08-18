@@ -23,6 +23,7 @@ object MobileRouteResolver {
             route == "wallet/transaction" -> MobileRoute.Wallet.Transaction
             route == "wallet/funding" -> MobileRoute.Wallet.Funding
             route == "wallet/withdrawal" -> MobileRoute.Wallet.Withdrawal
+            segments.size == 3 && segments[0] == "wallet" && segments[1] == "withdrawal" -> MobileRoute.Wallet.WithdrawalDetail(segments[2])
             route == "vendor" -> MobileRoute.Vendor.Overview
             route == "vendor/page" -> MobileRoute.Vendor.Profile
             route == "vendor/summary" -> MobileRoute.Vendor.Summary
@@ -74,6 +75,8 @@ object MobileRouteResolver {
         MobileRoute.Wallet.Transaction,
         MobileRoute.Wallet.Funding,
         MobileRoute.Wallet.Withdrawal,
+        is MobileRoute.Wallet.WithdrawalDetail,
+        MobileRoute.Cart.Current,
         MobileRoute.Vendor.Overview,
         MobileRoute.Vendor.Profile,
         MobileRoute.Vendor.Summary,

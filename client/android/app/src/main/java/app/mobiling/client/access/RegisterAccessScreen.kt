@@ -29,8 +29,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.unit.dp
+import app.mobiling.client.design.MobileDesignDefaults
 import app.mobiling.client.contract.auth.session.AccessAuthSessionPayload
+import app.mobiling.client.design.MobileDesignSystem
 import app.mobiling.client.contract.auth.session.AccessRegisterAuthRequest
 import kotlinx.coroutines.launch
 
@@ -148,14 +149,14 @@ private fun PasswordQualityHint(password: String, confirmPassword: String) {
         else -> "Strong"
     }
 
-    Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+    Column(verticalArrangement = Arrangement.spacedBy(MobileDesignDefaults.Access.passwordQualityGap)) {
         Text("Password quality: $quality", style = MaterialTheme.typography.labelLarge)
         LinearProgressIndicator(
-            progress = score / checks.size.toFloat(),
+            progress = { score / checks.size.toFloat() },
             modifier = Modifier.fillMaxWidth(),
         )
         checks.forEach { (label, satisfied) ->
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Row(horizontalArrangement = Arrangement.spacedBy(MobileDesignSystem.spacing.sm)) {
                 Icon(
                     imageVector = if (satisfied) Icons.Default.CheckCircle else Icons.Default.RadioButtonUnchecked,
                     contentDescription = null,
@@ -177,7 +178,7 @@ private fun PasswordQualityHint(password: String, confirmPassword: String) {
 
 @Composable
 private fun PasswordRequirementRow(label: String, satisfied: Boolean) {
-    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+    Row(horizontalArrangement = Arrangement.spacedBy(MobileDesignSystem.spacing.sm)) {
         Icon(
             imageVector = if (satisfied) Icons.Default.CheckCircle else Icons.Default.RadioButtonUnchecked,
             contentDescription = null,

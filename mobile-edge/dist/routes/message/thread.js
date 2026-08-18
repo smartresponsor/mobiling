@@ -35,9 +35,9 @@ async function resolvedMessagingHeaders(request) {
     if (session.status < 200 || session.status >= 300 || !isRecord(session.body))
         return headers;
     const identity = recordValue(session.body.identity);
-    const userId = stringValue(identity.userId);
-    if (null !== userId)
-        headers["x-user-id"] = userId;
+    const userUuid = stringValue(identity.userUuid);
+    if (null !== userUuid)
+        headers["x-user-id"] = userUuid;
     return headers;
 }
 function isRecord(value) {
@@ -217,6 +217,24 @@ export default async function route(app) {
         const items = Array.isArray(root.items) ? root.items : Array.isArray(root.messages) ? root.messages : [];
         return reply.code(200).send({ threadId: stringValue(root.threadId) ?? threadId, items: items.map((item) => normalizeMessage(item, threadId)), count: integerValue(root.count, items.length), payload: root });
     });
+    app.post("/message/thread/:threadId/read", { schema: { response: { 200: { type: "object", additionalProperties: true }, 400: mobileAccessErrorPayload, 403: mobileAccessErrorPayload, 500: mobileAccessErrorPayload, 503: mobileAccessErrorPayload } } }, async (request, reply) => {
+        const threadId = stringValue(recordValue(request.params).threadId);
+        const requestRecord = request;
+        const headers = await resolvedMessagingHeaders(requestRecord);
+        const requestBody = recordValue(request.body);
+        const messageId = stringValue(requestBody.messageId);
+        const userId = stringValue(requestBody.userId) ?? headers["x-user-id"] ?? null;
+        if (null === threadId)
+            return reply.code(400).send({ code: "thread_id_required", message: "Thread id is required." });
+        if (null === messageId)
+            return reply.code(400).send({ code: "message_id_required", message: "Message id is required." });
+        if (null === userId)
+            return reply.code(400).send({ code: "user_id_required", message: "User id is required." });
+        const result = await messagingRequest("POST", `/api/thread/read/${encodeURIComponent(threadId)}`, { userId, messageId }, headers);
+        if (result.status < 200 || result.status >= 300)
+            return reply.code(result.status).send(normalizeErrorPayload(result.body));
+        return reply.code(200).send(payloadRoot(result.body));
+    });
     app.post("/message/thread/:threadId/send", { schema: { body: messageSendRequest, response: { 200: messageItemPayload, 201: messageItemPayload, 400: mobileAccessErrorPayload, 403: mobileAccessErrorPayload, 429: mobileAccessErrorPayload, 500: mobileAccessErrorPayload, 503: mobileAccessErrorPayload } } }, async (request, reply) => {
         const threadId = stringValue(recordValue(request.params).threadId);
         const requestRecord = request;
@@ -233,6 +251,18 @@ export default async function route(app) {
         const result = await messagingRequest("POST", `/api/thread/reply/${encodeURIComponent(threadId)}`, { userId, text: body }, headers);
         if (result.status < 200 || result.status >= 300)
             return reply.code(result.status).send(normalizeErrorPayload(result.body));
-        return reply.code(201 === result.status ? 201 : 200).send(normalizeMessage(payloadRoot(result.body), threadId));
+        const root = payloadRoot(result.body);
+        const messageId = stringValue(root.messageId ?? root.message_id ?? root.id);
+        if (null === messageId) {
+            return reply.code(502).send({ code: "messaging_reply_contract_invalid", message: "Messaging API accepted the reply but did not return a message id." });
+        }
+        return reply.code(201 === result.status ? 201 : 200).send({
+            messageId,
+            threadId,
+            body,
+            senderId: userId,
+            sentAtIso8601: new Date().toISOString(),
+            payload: root,
+        });
     });
 }

@@ -11,6 +11,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,14 +24,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
+import kotlin.math.PI
+import kotlin.math.sin
 
 private val OneTaskerInk = Color(0xFF2D2F34)
 
@@ -43,6 +47,7 @@ fun OneTaskerLaunchSplash(
     val motionEnabled = remember(context) { oneTaskerMotionEnabled(context) }
     var oneReady by remember { mutableStateOf(!motionEnabled) }
     var wordReady by remember { mutableStateOf(!motionEnabled) }
+    var oneBaselineFraction by remember { mutableStateOf(1f) }
     val wordWidth = 214.dp
 
     LaunchedEffect(motionEnabled) {
@@ -83,6 +88,11 @@ fun OneTaskerLaunchSplash(
         animationSpec = tween(durationMillis = if (motionEnabled) 240 else 80, easing = LinearEasing),
         label = "oneTaskerWordAlpha",
     )
+    val waveProgress by animateFloatAsState(
+        targetValue = if (wordReady && motionEnabled) 1f else 0f,
+        animationSpec = tween(durationMillis = 900, easing = FastOutSlowInEasing),
+        label = "oneTaskerWordWaveProgress",
+    )
 
     Box(
         modifier = modifier
@@ -92,41 +102,67 @@ fun OneTaskerLaunchSplash(
             .clearAndSetSemantics {},
         contentAlignment = Alignment.Center,
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
+        Row {
             Text(
                 text = "1",
                 color = OneTaskerInk,
                 fontSize = 72.sp,
                 fontWeight = FontWeight.Medium,
+                onTextLayout = { layoutResult ->
+                    val height = layoutResult.size.height
+                    if (height > 0) {
+                        oneBaselineFraction = (layoutResult.firstBaseline / height).coerceIn(0f, 1f)
+                    }
+                },
                 modifier = Modifier
                     .alpha(oneAlpha)
-                    .scale(scaleX = 0.72f * oneScale, scaleY = 1.34f * oneScale),
+                    .alignByBaseline()
+                    .graphicsLayer {
+                        scaleX = 0.72f * oneScale
+                        scaleY = 1.34f * oneScale
+                        translationY = 2f
+                        transformOrigin = TransformOrigin(0.5f, oneBaselineFraction)
+                    },
             )
             Box(
                 modifier = Modifier
                     .width(revealWidth)
+                    .alignByBaseline()
                     .clipToBounds(),
             ) {
                 Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.alpha(wordAlpha),
+                    modifier = Modifier
+                        .alpha(wordAlpha)
+                        .graphicsLayer {
+                            scaleX = 0.92f
+                            transformOrigin = TransformOrigin(0f, 0.5f)
+                        },
                 ) {
-                    Text(
-                        text = "tasker",
-                        color = OneTaskerInk,
-                        fontSize = 44.sp,
-                        fontWeight = FontWeight.Normal,
-                        maxLines = 1,
-                    )
-                    Text(
-                        text = ".com",
-                        color = OneTaskerInk.copy(alpha = 0.46f),
-                        fontSize = 34.sp,
-                        fontWeight = FontWeight.Normal,
-                        maxLines = 1,
-                    )
+                    "tasker.com".forEachIndexed { index, character ->
+                        val isDomainSuffix = index >= 6
+                        val waveOffset = if (motionEnabled && wordReady) {
+                            val envelope = sin(PI * waveProgress).toFloat()
+                            val phase = (waveProgress * 2f * PI.toFloat()) - (index * 0.55f)
+                            (sin(phase) * envelope * 0.35f).dp
+                        } else {
+                            0.dp
+                        }
+
+                        Text(
+                                text = character.toString(),
+                                color = if (isDomainSuffix) OneTaskerInk.copy(alpha = 0.72f) else OneTaskerInk,
+                                fontSize = when {
+                                    index == 9 -> 35.sp
+                                    isDomainSuffix -> 34.sp
+                                    else -> 44.sp
+                                },
+                                fontWeight = FontWeight.Normal,
+                                maxLines = 1,
+                                modifier = Modifier
+                                    .alignByBaseline()
+                                    .offset(y = waveOffset),
+                            )
+                        }
                 }
             }
         }

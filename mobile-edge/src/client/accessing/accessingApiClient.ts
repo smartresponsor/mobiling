@@ -32,7 +32,9 @@ export interface AccessingApiRecoveryResetRequest {
 }
 
 export interface AccessingApiIdentityPayload {
-  vendorId: string | number;
+  vendorId?: string | number;
+  userId?: string | number;
+  userUuid?: string | null;
   accountId?: string | null;
   displayName: string;
   email: string;

@@ -41,12 +41,27 @@ class MessageHttpThreadGateway(
             for (index in 0 until items.length()) {
                 items.optJSONObject(index)?.let { item -> add(messageItemFrom(threadId, item)) }
             }
-        }
+        }.sortedBy { it.sentAtIso8601 }
     }
 
     override suspend fun sendMessage(request: MessageSendRequest): MessageItemPayload = withContext(Dispatchers.IO) {
-        val json = request("POST", "/message/thread/${request.threadId}/send", JSONObject().put("body", request.body))
+        val json = request(
+            "POST",
+            "/message/thread/${request.threadId}/send",
+            JSONObject()
+                .put("userId", request.userId)
+                .put("body", request.body),
+        )
         messageItemFrom(request.threadId, json.optJSONObject("payload") ?: json)
+    }
+
+    override suspend fun markRead(threadId: String, userId: String, messageId: String) = withContext(Dispatchers.IO) {
+        request(
+            "POST",
+            "/message/thread/$threadId/read",
+            JSONObject().put("userId", userId).put("messageId", messageId),
+        )
+        Unit
     }
 
     private fun threadSummaryFrom(item: JSONObject): MessageThreadSummary {

@@ -8,14 +8,19 @@ export class CrudingApiClient {
   constructor(private readonly baseUrl = ENV.CRUDING_API_BASE_URL, private readonly timeoutMs = ENV.CRUDING_API_TIMEOUT_MS) {}
 
   request(method: string, resource: string, identity: string | null, body: unknown, headers: Record<string, string>): Promise<CrudingApiResponse> {
+    const suffix = identity ? `/${encodeURIComponent(identity)}` : "";
+    const path = method === "POST" && resource === "project" && !identity
+      ? "/api/project/wizard"
+      : `/api/${encodeURIComponent(resource)}${suffix}`;
+
+    return this.requestPath(method, path, body, headers);
+  }
+
+  requestPath(method: string, path: string, body: unknown, headers: Record<string, string>): Promise<CrudingApiResponse> {
     const baseUrl = this.baseUrl.trim();
     if (!baseUrl) return Promise.resolve({ status: 503, body: { code: "cruding_api_unavailable", message: "Cruding API is unavailable." } });
     let url: URL;
     try {
-      const suffix = identity ? `/${encodeURIComponent(identity)}` : "";
-      const path = method === "POST" && resource === "project" && !identity
-        ? "/api/project/wizard"
-        : `/api/${encodeURIComponent(resource)}${suffix}`;
       url = new URL(baseUrl.replace(/\/$/, "") + path);
     } catch {
       return Promise.resolve({ status: 503, body: { code: "cruding_api_unavailable", message: "Cruding API URL is invalid." } });

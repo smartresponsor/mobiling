@@ -9,15 +9,18 @@ export class CrudingApiClient {
         this.timeoutMs = timeoutMs;
     }
     request(method, resource, identity, body, headers) {
+        const suffix = identity ? `/${encodeURIComponent(identity)}` : "";
+        const path = method === "POST" && resource === "project" && !identity
+            ? "/api/project/wizard"
+            : `/api/${encodeURIComponent(resource)}${suffix}`;
+        return this.requestPath(method, path, body, headers);
+    }
+    requestPath(method, path, body, headers) {
         const baseUrl = this.baseUrl.trim();
         if (!baseUrl)
             return Promise.resolve({ status: 503, body: { code: "cruding_api_unavailable", message: "Cruding API is unavailable." } });
         let url;
         try {
-            const suffix = identity ? `/${encodeURIComponent(identity)}` : "";
-            const path = method === "POST" && resource === "project" && !identity
-                ? "/api/project/wizard"
-                : `/api/${encodeURIComponent(resource)}${suffix}`;
             url = new URL(baseUrl.replace(/\/$/, "") + path);
         }
         catch {

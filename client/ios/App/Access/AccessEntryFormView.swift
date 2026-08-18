@@ -52,7 +52,7 @@ struct AccessFlowShellView<Content: View>: View {
                     if let statusMessage {
                         Text(statusMessage)
                             .font(.callout)
-                            .foregroundStyle(Color(red: 51 / 255, green: 51 / 255, blue: 51 / 255))
+                            .foregroundStyle(Color.accentColor)
                     }
                 }
                 .padding(16)
@@ -67,7 +67,7 @@ struct AccessFlowShellView<Content: View>: View {
 
                 Button(secondaryActionTitle, action: onSecondaryAction)
                     .buttonStyle(.bordered)
-                    .tint(Color(red: 51 / 255, green: 51 / 255, blue: 51 / 255))
+                    .tint(Color.accentColor)
                     .frame(maxWidth: .infinity, alignment: .leading)
 
                 Button("Return to access welcome", action: onBack)

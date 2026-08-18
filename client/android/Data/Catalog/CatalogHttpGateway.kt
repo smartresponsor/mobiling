@@ -20,7 +20,7 @@ class CatalogHttpGateway(
 ) : CatalogBrowseGateway, CatalogNodeDetailGateway {
     override suspend fun listNodes(query: CatalogListNodeQuery): List<CatalogNodeSummary> = withContext(Dispatchers.IO) {
         val url = (baseUrl.trimEnd('/') + "/catalog").toHttpUrl().newBuilder()
-            .addQueryParameter("catalogCode", catalogCode)
+            .addQueryParameter("catalogCode", query.catalogCode?.takeIf(String::isNotBlank) ?: catalogCode)
             .apply {
                 query.parentNodeId?.takeIf(String::isNotBlank)?.let { addQueryParameter("parentNodeId", it) }
                 query.searchText?.takeIf(String::isNotBlank)?.let { addQueryParameter("q", it) }

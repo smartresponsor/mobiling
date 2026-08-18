@@ -122,6 +122,7 @@ class AccessHttpAuthSessionGateway(
                 status = "unauthenticated",
                 sessionId = null,
                 vendorId = null,
+                userUuid = null,
                 authenticated = false,
                 requiresVerification = false,
                 requiresSecondFactor = false,
@@ -132,11 +133,13 @@ class AccessHttpAuthSessionGateway(
         val identity = json.optJSONObject("identity")
         val authenticated = identity != null
         val vendorId = identity?.optString("vendorId")?.trim().takeUnless { it.isNullOrBlank() }
+        val userUuid = identity?.optString("accountId")?.trim().takeUnless { it.isNullOrBlank() }
 
         return AccessAuthSessionPayload(
             status = json.optString("status", if (authenticated) "authenticated" else "unauthenticated"),
             sessionId = null,
             vendorId = vendorId,
+            userUuid = userUuid,
             authenticated = authenticated,
             requiresVerification = json.optBoolean("requiresVerification", false),
             requiresSecondFactor = json.optBoolean("requiresSecondFactor", false),

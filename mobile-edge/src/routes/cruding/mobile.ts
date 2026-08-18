@@ -31,4 +31,28 @@ export default async function route(app: FastifyInstance): Promise<void> {
       return reply.code(result.status).send(result.body);
     },
   });
+
+  app.route({
+    method: ["GET", "POST"],
+    url: "/retail/:retailId/:step",
+    handler: async (request, reply) => {
+      const params = request.params as { retailId?: string; step?: string };
+      const retailId = (params.retailId || "").trim();
+      const step = (params.step || "").trim();
+      const allowedSteps = new Set(["placement", "fulfillment", "location", "pricing", "publish"]);
+      if (!/^[1-9][0-9]*$/.test(retailId) || !allowedSteps.has(step)) {
+        return reply.code(404).send({ code: "retail_placement_route_not_found", message: "Retail placement route is not available." });
+      }
+      if ((step === "placement" && request.method !== "GET") || (step !== "placement" && request.method !== "POST")) {
+        return reply.code(405).send({ code: "retail_placement_method_not_allowed", message: "Retail placement method is not allowed." });
+      }
+      const result = await client.requestPath(
+        request.method,
+        `/api/retail/${encodeURIComponent(retailId)}/${step}`,
+        request.body ?? null,
+        forwarded(request.headers as Record<string, unknown>),
+      );
+      return reply.code(result.status).send(result.body);
+    },
+  });
 }

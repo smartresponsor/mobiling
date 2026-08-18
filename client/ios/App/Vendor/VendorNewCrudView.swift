@@ -15,12 +15,61 @@ public struct VendorNewField: Hashable, Sendable {
     }
 }
 
+private let RetailCatalogChoices: [(value: String, label: String)] = [
+    ("services", "Services"),
+    ("products", "Products"),
+    ("projects", "Projects"),
+]
+
+private func retailCatalogCode(_ kind: String) -> String {
+    switch kind {
+    case RetailKind.goods.rawValue: return "products"
+    case RetailKind.project.rawValue: return "projects"
+    default: return "services"
+    }
+}
+
+private struct RetailCategoryChoice: Identifiable, Hashable {
+    let id: String
+    let label: String
+}
+
+private func loadRetailCategoryChoices(
+    bridge: CatalogFeatureBridge,
+    catalogCode: String,
+    parentNodeId: String? = nil,
+    prefix: String = ""
+) async throws -> [RetailCategoryChoice] {
+    let nodes = try await bridge.list(query: ListCatalogNodesQuery(
+        parentNodeId: parentNodeId,
+        searchText: nil,
+        includeEmptyNodes: true,
+        catalogCode: catalogCode
+    ))
+
+    var choices: [RetailCategoryChoice] = []
+    for node in nodes {
+        let label = prefix.isEmpty ? node.title : "\(prefix) › \(node.title)"
+        choices.append(RetailCategoryChoice(id: node.nodeId, label: label))
+        if node.childCount > 0 {
+            choices.append(contentsOf: try await loadRetailCategoryChoices(
+                bridge: bridge,
+                catalogCode: catalogCode,
+                parentNodeId: node.nodeId,
+                prefix: label
+            ))
+        }
+    }
+    return choices
+}
+
 public struct VendorNewCrudView: View {
     let singular: String
     let resource: String
     let listRoute: String
     let fields: [VendorNewField]
     let gateway: VendorCrudGateway?
+    let catalogFeatureBridge: CatalogFeatureBridge?
     let onRouteSelected: (String) -> Void
     let availableRetailKinds: [RetailKind]
 
@@ -28,18 +77,26 @@ public struct VendorNewCrudView: View {
     @State private var fieldErrors: [String: String] = [:]
     @State private var submitError: String?
     @State private var saving = false
+    @State private var categoryChoices: [RetailCategoryChoice] = []
+    @State private var categoryLoading = false
+    @State private var categoryLoadError: String?
 
-    public init(singular: String, resource: String, listRoute: String, fields: [VendorNewField], gateway: VendorCrudGateway?, onRouteSelected: @escaping (String) -> Void, initialValues: [String: String] = [:], availableRetailKinds: [RetailKind] = RetailKind.allCases) {
+    public init(singular: String, resource: String, listRoute: String, fields: [VendorNewField], gateway: VendorCrudGateway?, catalogFeatureBridge: CatalogFeatureBridge? = nil, onRouteSelected: @escaping (String) -> Void, initialValues: [String: String] = [:], availableRetailKinds: [RetailKind] = RetailKind.allCases) {
         self.singular = singular
         self.resource = resource
         self.listRoute = listRoute
         self.fields = fields
         self.gateway = gateway
+        self.catalogFeatureBridge = catalogFeatureBridge
         self.onRouteSelected = onRouteSelected
         self.availableRetailKinds = availableRetailKinds
-        _values = State(initialValue: fields.reduce(into: initialValues) { values, field in
+        var normalizedValues = fields.reduce(into: initialValues) { values, field in
             if values[field.key] == nil { values[field.key] = "" }
-        })
+        }
+        if fields.contains(where: { $0.key == "catalogCode" }), normalizedValues["catalogCode", default: ""].isEmpty {
+            normalizedValues["catalogCode"] = retailCatalogCode(normalizedValues["kind", default: ""])
+        }
+        _values = State(initialValue: normalizedValues)
     }
 
     public var body: some View {
@@ -54,6 +111,31 @@ public struct VendorNewCrudView: View {
                                 }
                             }
                             .pickerStyle(.inline)
+                        } else if field.key == "catalogCode" {
+                            Picker("Catalog", selection: binding(field.key)) {
+                                ForEach(RetailCatalogChoices, id: \.value) { catalog in
+                                    Text(catalog.label).tag(catalog.value)
+                                }
+                            }
+                            .pickerStyle(.inline)
+                        } else if field.key == "categoryId" {
+                            if categoryLoading {
+                                ProgressView("Loading categories…")
+                            } else if let categoryLoadError {
+                                Text(categoryLoadError).font(.caption).foregroundStyle(.red)
+                            } else if categoryChoices.isEmpty {
+                                Text("No published categories are available for this catalog.")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            } else {
+                                Picker("Category", selection: binding(field.key)) {
+                                    Text("Choose a category").tag("")
+                                    ForEach(categoryChoices) { category in
+                                        Text(category.label).tag(category.id)
+                                    }
+                                }
+                                .pickerStyle(.navigationLink)
+                            }
                         } else {
                             TextField(field.label + (field.required ? " *" : ""), text: binding(field.key), axis: field.key == "description" ? .vertical : .horizontal)
                                 .keyboardType(field.numeric ? .decimalPad : .default)
@@ -74,6 +156,9 @@ public struct VendorNewCrudView: View {
             }
         }
         .navigationTitle("New \(singular)")
+        .task(id: values["catalogCode", default: ""]) {
+            await loadCategories()
+        }
     }
 
     private func retailKindOptionLabel(_ kind: RetailKind) -> String {
@@ -88,8 +173,54 @@ public struct VendorNewCrudView: View {
     private func binding(_ key: String) -> Binding<String> {
         Binding(
             get: { values[key, default: ""] },
-            set: { values[key] = $0; fieldErrors[key] = nil }
+            set: { newValue in
+                let previousKind = values["kind", default: ""]
+                let previousCatalog = values["catalogCode", default: ""]
+                values[key] = newValue
+                if key == "kind", previousCatalog.isEmpty || previousCatalog == retailCatalogCode(previousKind) {
+                    let nextCatalog = retailCatalogCode(newValue)
+                    if nextCatalog != previousCatalog {
+                        values["catalogCode"] = nextCatalog
+                        values["categoryId"] = ""
+                    }
+                } else if key == "catalogCode", newValue != previousCatalog {
+                    values["categoryId"] = ""
+                }
+                fieldErrors[key] = nil
+            }
         )
+    }
+
+    @MainActor
+    private func loadCategories() async {
+        guard fields.contains(where: { $0.key == "categoryId" }) else {
+            return
+        }
+        guard let catalogFeatureBridge else {
+            categoryChoices = []
+            categoryLoadError = "Catalog is not available."
+            return
+        }
+
+        let catalogCode = values["catalogCode", default: ""]
+        guard !catalogCode.isEmpty else {
+            categoryChoices = []
+            categoryLoadError = nil
+            return
+        }
+
+        categoryLoading = true
+        categoryLoadError = nil
+        do {
+            categoryChoices = try await loadRetailCategoryChoices(
+                bridge: catalogFeatureBridge,
+                catalogCode: catalogCode
+            )
+        } catch {
+            categoryChoices = []
+            categoryLoadError = error.localizedDescription
+        }
+        categoryLoading = false
     }
 
     private func submit() {
@@ -367,7 +498,8 @@ public struct ProjectNewWizardView: View {
 
 public let RetailNewFields = [
     VendorNewField("kind", "Listing type", required: true),
-    VendorNewField("categoryId", "Category ID", required: true),
+    VendorNewField("catalogCode", "Catalog", required: true),
+    VendorNewField("categoryId", "Category", required: true),
     VendorNewField("title", "Title", required: true),
     VendorNewField("description", "Description"),
     VendorNewField("amountMinor", "Budget / price in cents", numeric: true),

@@ -24,8 +24,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.unit.dp
-import app.mobiling.client.design.OneTaskerDesignTokens
+import app.mobiling.client.design.MobileDesignDefaults
+import app.mobiling.client.design.MobileDesignSystem
 import app.mobiling.client.navigation.CanonicalTopAppBar
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -61,13 +61,13 @@ internal fun AccessFlowShell(
                 .fillMaxSize()
                 .padding(shellPadding)
                 .verticalScroll(rememberScrollState())
-                .padding(OneTaskerDesignTokens.Spacing.Xxl),
-            verticalArrangement = Arrangement.spacedBy(OneTaskerDesignTokens.Spacing.Lg),
+                .padding(MobileDesignSystem.spacing.xxl),
+            verticalArrangement = Arrangement.spacedBy(MobileDesignSystem.spacing.lg),
         ) {
             Card(colors = androidx.compose.material3.CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
                 Column(
-                    modifier = Modifier.padding(OneTaskerDesignTokens.Spacing.Lg),
-                    verticalArrangement = Arrangement.spacedBy(OneTaskerDesignTokens.Spacing.Md),
+                    modifier = Modifier.padding(MobileDesignSystem.spacing.lg),
+                    verticalArrangement = Arrangement.spacedBy(MobileDesignSystem.spacing.md),
                 ) {
                     Text(
                         text = styledSubtitle ?: AnnotatedString(subtitle),
@@ -87,11 +87,11 @@ internal fun AccessFlowShell(
                 modifier = Modifier.fillMaxWidth(),
                 enabled = !primaryActionLoading,
             ) {
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Row(horizontalArrangement = Arrangement.spacedBy(MobileDesignSystem.spacing.sm)) {
                     if (primaryActionLoading) {
                         CircularProgressIndicator(
-                            modifier = Modifier.size(20.dp),
-                            strokeWidth = 2.dp,
+                            modifier = Modifier.size(MobileDesignDefaults.Access.loadingIndicatorSize),
+                            strokeWidth = MobileDesignDefaults.Access.loadingIndicatorStrokeWidth,
                             color = MaterialTheme.colorScheme.onPrimary,
                         )
                     }

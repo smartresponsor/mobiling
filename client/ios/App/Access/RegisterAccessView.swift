@@ -55,7 +55,7 @@ struct RegisterAccessView: View {
             onBack: onBack,
             statusMessage: statusMessage
         ) {
-            VStack(alignment: .leading, spacing: 12) {
+            VStack(alignment: .leading, spacing: MobileDesignDefaults.Spacing.md) {
                 TextField("Email", text: $email)
                     .textInputAutocapitalization(.never)
                     .keyboardType(.emailAddress)
@@ -105,14 +105,14 @@ private struct PasswordQualityHint: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
+        VStack(alignment: .leading, spacing: MobileDesignDefaults.Access.passwordQualityGap) {
             Text("Password quality: \(quality)")
                 .font(.subheadline.weight(.semibold))
             ProgressView(value: Double(score), total: Double(checks.count))
             ForEach(Array(checks.enumerated()), id: \.offset) { _, check in
                 Label(check.0, systemImage: check.1 ? "checkmark.circle.fill" : "circle")
                     .font(.caption)
-                    .foregroundStyle(check.1 ? Color(red: 51 / 255, green: 51 / 255, blue: 51 / 255) : Color.secondary)
+                    .foregroundStyle(check.1 ? Color.accentColor : Color.secondary)
             }
             if !confirmPassword.isEmpty {
                 Label(
@@ -120,7 +120,7 @@ private struct PasswordQualityHint: View {
                     systemImage: password == confirmPassword ? "checkmark.circle.fill" : "circle"
                 )
                 .font(.caption)
-                .foregroundStyle(password == confirmPassword ? Color(red: 51 / 255, green: 51 / 255, blue: 51 / 255) : Color.secondary)
+                .foregroundStyle(password == confirmPassword ? Color.accentColor : Color.secondary)
             }
             Text("Required: at least 8 characters. Other checks improve password strength.")
                 .font(.caption)
@@ -137,7 +137,7 @@ struct AccessPasswordField: View {
     var isError: Bool = false
 
     var body: some View {
-        HStack(spacing: 8) {
+        HStack(spacing: MobileDesignDefaults.Spacing.sm) {
             Group {
                 if isVisible {
                     TextField(title, text: $text)
@@ -155,11 +155,11 @@ struct AccessPasswordField: View {
             }
             .buttonStyle(.plain)
         }
-        .padding(.horizontal, 12)
-        .frame(minHeight: 44)
+        .padding(.horizontal, MobileDesignDefaults.Spacing.md)
+        .frame(minHeight: MobileDesignDefaults.Control.regular)
         .overlay(
-            RoundedRectangle(cornerRadius: 8)
-                .stroke(isError ? Color.red : Color.secondary.opacity(0.45), lineWidth: 1)
+            RoundedRectangle(cornerRadius: MobileDesignDefaults.Spacing.sm)
+                .stroke(isError ? Color.red : Color.secondary, lineWidth: 1)
         )
     }
 }

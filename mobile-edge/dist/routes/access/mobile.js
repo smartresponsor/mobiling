@@ -50,6 +50,7 @@ function normalizeIdentity(identity) {
         return null;
     }
     const vendorId = stringValue(identity.vendorId ?? identity.userId);
+    const userUuid = stringValue(identity.userUuid);
     const displayName = stringValue(identity.displayName);
     const email = stringValue(identity.email);
     if (null === vendorId || null === displayName || null === email) {
@@ -57,7 +58,7 @@ function normalizeIdentity(identity) {
     }
     return {
         vendorId,
-        accountId: null,
+        accountId: userUuid,
         displayName,
         email,
         emailVerified: Boolean(identity.emailVerified),

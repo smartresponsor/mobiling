@@ -16,3 +16,5 @@ mobile-edge/var/
 **/.console-mcp/
 watchdog/
 **/node_modules/
+**/.kotlin/
+tool/.mobile-edge-current.ps1

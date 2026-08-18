@@ -127,7 +127,7 @@ $created = [System.Collections.Generic.List[object]]::new()
 $stamp = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
 try {
     foreach ($definition in @(
-        @{ Resource = "retail"; Create = @{ kind = "task"; categoryId = "884"; title = "Mobile Smoke Task $stamp"; description = "Live mobile Retail CRUD smoke task."; amountMinor = 1995; currency = "USD"; location = "Katy, TX" }; Update = @{ title = "Mobile Smoke Task Updated $stamp"; amountMinor = 2495 } }
+        @{ Resource = "retail"; Create = @{ kind = "task"; catalogCode = "services"; categoryId = "884"; title = "Mobile Smoke Task $stamp"; description = "Live mobile Retail CRUD smoke task."; amountMinor = 1995; currency = "USD"; location = "Katy, TX" }; Update = @{ title = "Mobile Smoke Task Updated $stamp"; amountMinor = 2495 } }
     )) {
         $resource = [string]$definition.Resource
         Invoke-MobileCrudRequest -Method "GET" -Resource $resource | Out-Null

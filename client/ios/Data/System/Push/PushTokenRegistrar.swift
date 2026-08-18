@@ -3,16 +3,21 @@ import Foundation
 public struct PushTokenRegistrar {
     private let baseUrl: String
 
-    public init(baseUrl: String = "https://httpbin.org") {
+    public init(baseUrl: String) {
         self.baseUrl = baseUrl
     }
 
     public func register(payload: PushRegistrationPayload) async throws -> Bool {
-        let url = URL(string: baseUrl + "/anything/mobile/push/token?platform=\(payload.platform)")!
+        guard let url = URL(string: baseUrl.trimmingCharacters(in: CharacterSet(charactersIn: "/")) + "/notification/subscription") else {
+            return false
+        }
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
-        request.httpBody = payload.token.data(using: .utf8)
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        request.httpBody = try JSONEncoder().encode(payload)
         let (_, response) = try await URLSession.shared.data(for: request)
-        return (response as? HTTPURLResponse)?.statusCode == 200
+        guard let http = response as? HTTPURLResponse else { return false }
+        return (200..<300).contains(http.statusCode)
     }
 }

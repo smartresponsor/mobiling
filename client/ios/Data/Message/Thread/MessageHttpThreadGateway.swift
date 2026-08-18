@@ -18,12 +18,17 @@ public struct MessageHttpThreadGateway: MessageThreadGateway {
     public func listItems(threadId: String) async throws -> [MessageItemPayload] {
         let encoded = threadId.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? threadId
         let response: MessageListResponse = try await request(path: "/message/thread/\(encoded)", method: "GET", body: Optional<EmptyBody>.none)
-        return response.items
+        return response.items.sorted { $0.sentAtIso8601 < $1.sentAtIso8601 }
     }
 
     public func sendMessage(request payload: SendMessageRequest) async throws -> MessageItemPayload {
         let encoded = payload.threadId.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? payload.threadId
         return try await request(path: "/message/thread/\(encoded)/send", method: "POST", body: SendBody(body: payload.body))
+    }
+
+    public func markRead(threadId: String, messageId: String) async throws {
+        let encoded = threadId.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? threadId
+        let _: ReadResponse = try await request(path: "/message/thread/\(encoded)/read", method: "POST", body: ReadBody(messageId: messageId))
     }
 
     private func request<Response: Decodable, Body: Encodable>(path: String, method: String, body: Body?) async throws -> Response {
@@ -49,6 +54,8 @@ public struct MessageHttpThreadGateway: MessageThreadGateway {
 private struct ThreadListResponse: Decodable { let items: [MessageThreadSummary] }
 private struct MessageListResponse: Decodable { let items: [MessageItemPayload] }
 private struct SendBody: Encodable { let body: String }
+private struct ReadBody: Encodable { let messageId: String }
+private struct ReadResponse: Decodable { let ok: Bool? }
 private struct EmptyBody: Encodable {}
 private struct ErrorResponse: Decodable { let message: String? }
 

@@ -29,9 +29,12 @@ targets:
       - path: App/Access
       - path: App/Attachment
       - path: App/Auth
+      - path: App/Cart
       - path: App/Catalog
       - path: App/Dashboard
+      - path: App/Design
       - path: App/Message
+      - path: App/Notification
       - path: App/Order
       - path: App/Product
       - path: App/Profile
@@ -39,6 +42,7 @@ targets:
       - path: App/Shipment
       - path: App/Taxation
       - path: App/Vendor
+      - path: App/Wallet
   CoreConfig:
     type: framework
     platform: iOS
@@ -75,25 +79,34 @@ targets:
     sources:
       - path: App/ContentView.swift
       - path: App/MobileApp.swift
+      - path: App/PushNotificationAppDelegate.swift
       - path: App/MobileClientRuntimeConfig.swift
       - path: App/MobileApplicationComposition.swift
       - path: App/MobileApplicationGraph.swift
       - path: Resources/Localizable.xcstrings
+      - path: Resources/Assets.xcassets
+        buildPhase: resources
       - path: Resources/RichText
         type: folder
         buildPhase: resources
     info:
       path: App/Info.plist
     settings:
+      base:
+        CODE_SIGN_ENTITLEMENTS: App/Mobiling.entitlements
       configs:
         DebugOneTasker:
           PRODUCT_BUNDLE_IDENTIFIER: com.smartresponsor.mobile.onetasker
+          APS_ENVIRONMENT: development
         ReleaseOneTasker:
           PRODUCT_BUNDLE_IDENTIFIER: com.smartresponsor.mobile.onetasker
+          APS_ENVIRONMENT: production
         DebugSmartResponsor:
           PRODUCT_BUNDLE_IDENTIFIER: com.smartresponsor.mobile.platform
+          APS_ENVIRONMENT: development
         ReleaseSmartResponsor:
           PRODUCT_BUNDLE_IDENTIFIER: com.smartresponsor.mobile.platform
+          APS_ENVIRONMENT: production
     dependencies:
       - target: MobileClient
       - target: CoreConfig

@@ -24,7 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
-import app.mobiling.client.design.OneTaskerDesignTokens
+import app.mobiling.client.design.MobileDesignSystem
 
 private object NoNavigationRippleTheme : RippleTheme {
     @Composable
@@ -66,8 +66,8 @@ fun CanonicalBottomNavigation(items: List<CanonicalBottomNavigationItem>) {
                         label = { Text(item.label) },
                         enabled = item.enabled,
                         colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = OneTaskerDesignTokens.Navigation.ActiveColor,
-                            selectedTextColor = OneTaskerDesignTokens.Navigation.ActiveColor,
+                            selectedIconColor = MobileDesignSystem.navigation.activeColor,
+                            selectedTextColor = MobileDesignSystem.navigation.activeColor,
                             indicatorColor = Color.Transparent,
                             unselectedIconColor = MaterialTheme.colorScheme.onSurfaceVariant,
                             unselectedTextColor = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -82,8 +82,8 @@ fun CanonicalBottomNavigation(items: List<CanonicalBottomNavigationItem>) {
                 modifier = Modifier
                     .offset(x = indicatorOffset)
                     .width(itemWidth)
-                    .height(OneTaskerDesignTokens.Navigation.ActiveIndicatorHeight)
-                    .background(OneTaskerDesignTokens.Navigation.ActiveColor),
+                    .height(MobileDesignSystem.navigation.activeIndicatorHeight)
+                    .background(MobileDesignSystem.navigation.activeColor),
             )
         }
     }

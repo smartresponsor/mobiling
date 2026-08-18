@@ -9,37 +9,71 @@ public struct MobilingAppShell: View {
     @State private var launchSplashDismissScheduled: Bool = false
     private let authFeatureBridge: AuthFeatureBridge?
     private let attachmentFeatureBridge: AttachmentFeatureBridge?
+    private let cartFeatureBridge: CartFeatureBridge?
+    private let catalogFeatureBridge: CatalogFeatureBridge?
     private let navigationShellGateway: NavigationShellGateway?
     private let messageFeatureBridge: MessageFeatureBridge?
+    private let notificationFeatureBridge: NotificationFeatureBridge?
     private let vendorProfileGateway: VendorProfileGateway?
     private let vendorSummaryGateway: VendorSummaryGateway?
     private let vendorStatementGateway: VendorStatementGateway?
     private let vendorPayoutGateway: VendorPayoutGateway?
     private let vendorTransactionGateway: VendorTransactionGateway?
     private let vendorCrudGateway: VendorCrudGateway?
+    private let walletGateway: WalletGateway?
     private let initialRoute: String
     private let publicInitialRoute: String
     private let catalogEnabled: Bool
     private let availableRetailKinds: [RetailKind]
     private let navigationLabelResolver: (String?, String, String) -> String
+    private let onAuthenticated: () async -> Void
+    private let onBeforeSignOut: () async -> Void
 
-    public init(authFeatureBridge: AuthFeatureBridge? = nil, attachmentFeatureBridge: AttachmentFeatureBridge? = nil, navigationShellGateway: NavigationShellGateway? = nil, messageFeatureBridge: MessageFeatureBridge? = nil, vendorProfileGateway: VendorProfileGateway? = nil, vendorSummaryGateway: VendorSummaryGateway? = nil, vendorStatementGateway: VendorStatementGateway? = nil, vendorPayoutGateway: VendorPayoutGateway? = nil, vendorTransactionGateway: VendorTransactionGateway? = nil, vendorCrudGateway: VendorCrudGateway? = nil, initialRoute: String = "dashboard", publicInitialRoute: String = "home", catalogEnabled: Bool = true, availableRetailKinds: [RetailKind] = RetailKind.allCases, navigationLabelResolver: @escaping (String?, String, String) -> String = { _, _, label in label }) {
+    public init(
+        authFeatureBridge: AuthFeatureBridge? = nil,
+        attachmentFeatureBridge: AttachmentFeatureBridge? = nil,
+        cartFeatureBridge: CartFeatureBridge? = nil,
+        catalogFeatureBridge: CatalogFeatureBridge? = nil,
+        navigationShellGateway: NavigationShellGateway? = nil,
+        messageFeatureBridge: MessageFeatureBridge? = nil,
+        notificationFeatureBridge: NotificationFeatureBridge? = nil,
+        vendorProfileGateway: VendorProfileGateway? = nil,
+        vendorSummaryGateway: VendorSummaryGateway? = nil,
+        vendorStatementGateway: VendorStatementGateway? = nil,
+        vendorPayoutGateway: VendorPayoutGateway? = nil,
+        vendorTransactionGateway: VendorTransactionGateway? = nil,
+        vendorCrudGateway: VendorCrudGateway? = nil,
+        walletGateway: WalletGateway? = nil,
+        initialRoute: String = "dashboard",
+        publicInitialRoute: String = "home",
+        catalogEnabled: Bool = true,
+        availableRetailKinds: [RetailKind] = RetailKind.allCases,
+        navigationLabelResolver: @escaping (String?, String, String) -> String = { _, _, label in label },
+        onAuthenticated: @escaping () async -> Void = {},
+        onBeforeSignOut: @escaping () async -> Void = {}
+    ) {
         self.authFeatureBridge = authFeatureBridge
         self.attachmentFeatureBridge = attachmentFeatureBridge
+        self.cartFeatureBridge = cartFeatureBridge
+        self.catalogFeatureBridge = catalogFeatureBridge
         self.navigationShellGateway = navigationShellGateway
         self.messageFeatureBridge = messageFeatureBridge
+        self.notificationFeatureBridge = notificationFeatureBridge
         self.vendorProfileGateway = vendorProfileGateway
         self.vendorSummaryGateway = vendorSummaryGateway
         self.vendorStatementGateway = vendorStatementGateway
         self.vendorPayoutGateway = vendorPayoutGateway
         self.vendorTransactionGateway = vendorTransactionGateway
         self.vendorCrudGateway = vendorCrudGateway
+        self.walletGateway = walletGateway
         self.initialRoute = initialRoute
         self.publicInitialRoute = publicInitialRoute
         _currentScreen = State(initialValue: publicInitialRoute == "sign-in" ? .signIn : .welcome)
         self.catalogEnabled = catalogEnabled
         self.availableRetailKinds = availableRetailKinds
         self.navigationLabelResolver = navigationLabelResolver
+        self.onAuthenticated = onAuthenticated
+        self.onBeforeSignOut = onBeforeSignOut
     }
 
     public var body: some View {
@@ -50,7 +84,10 @@ public struct MobilingAppShell: View {
                 MobileDashboardShellView(
                     navigationShellGateway: navigationShellGateway,
                     messageFeatureBridge: messageFeatureBridge,
+                    notificationFeatureBridge: notificationFeatureBridge,
                     attachmentFeatureBridge: attachmentFeatureBridge,
+                    cartFeatureBridge: cartFeatureBridge,
+                    catalogFeatureBridge: catalogFeatureBridge,
                     vendorId: activeVendorId,
                     vendorProfileGateway: vendorProfileGateway,
                     vendorSummaryGateway: vendorSummaryGateway,
@@ -58,6 +95,7 @@ public struct MobilingAppShell: View {
                     vendorPayoutGateway: vendorPayoutGateway,
                     vendorTransactionGateway: vendorTransactionGateway,
                     vendorCrudGateway: vendorCrudGateway,
+                    walletGateway: walletGateway,
                     initialRoute: initialRoute,
                     catalogEnabled: catalogEnabled,
                     availableRetailKinds: availableRetailKinds,
@@ -66,6 +104,9 @@ public struct MobilingAppShell: View {
                 )
             case .welcome:
                 AccessWelcomeView(
+                    initialRoute: publicInitialRoute,
+                    catalogFeatureBridge: catalogFeatureBridge,
+                    cartFeatureBridge: cartFeatureBridge,
                     onSignIn: { currentScreen = .signIn },
                     onCreateAccess: { currentScreen = .register }
                 )
@@ -136,6 +177,7 @@ public struct MobilingAppShell: View {
                     .zIndex(10)
             }
         }
+        .environment(\.mobileMessageComposer, MobileDesignDefaults.messageComposer)
         .onAppear { scheduleLaunchSplashDismiss() }
         .task {
             guard let authFeatureBridge else {
@@ -152,10 +194,15 @@ public struct MobilingAppShell: View {
     private func applyAccessSession(_ payload: AuthSessionPayload) {
         activeVendorId = payload.vendorId
         currentScreen = payload.toAccessScreen()
+        if currentScreen == .dashboard {
+            Task { await onAuthenticated() }
+        }
     }
 
     private func clearAccessSession() {
         Task {
+            await onBeforeSignOut()
+
             do {
                 try await authFeatureBridge?.logout()
             } catch {
@@ -173,7 +220,7 @@ public struct MobilingAppShell: View {
 
         launchSplashDismissScheduled = true
         Task { @MainActor in
-            let holdNanoseconds: UInt64 = reduceMotion ? 360_000_000 : 1_760_000_000
+            let holdNanoseconds: UInt64 = reduceMotion ? 520_000_000 : 7_200_000_000
             let fadeNanoseconds: UInt64 = reduceMotion ? 120_000_000 : 320_000_000
 
             try? await Task.sleep(nanoseconds: holdNanoseconds)

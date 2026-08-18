@@ -2,6 +2,8 @@ import SwiftUI
 
 public struct MessageMobileScreen: View {
     private let bridge: MessageFeatureBridge?
+    private let vendorId: String?
+    private let attachmentFeatureBridge: AttachmentFeatureBridge?
     @State private var threads: [MessageThreadSummary] = []
     @State private var selectedThread: MessageThreadSummary?
     @State private var messages: [MessageItemPayload] = []
@@ -11,9 +13,12 @@ public struct MessageMobileScreen: View {
     @State private var loading = true
     @State private var errorMessage: String?
     @State private var sending = false
+    @State private var attachmentOpen = false
 
-    public init(messageFeatureBridge: MessageFeatureBridge?) {
+    public init(messageFeatureBridge: MessageFeatureBridge?, vendorId: String? = nil, attachmentFeatureBridge: AttachmentFeatureBridge? = nil) {
         self.bridge = messageFeatureBridge
+        self.vendorId = vendorId
+        self.attachmentFeatureBridge = attachmentFeatureBridge
     }
 
     public var body: some View {
@@ -26,12 +31,21 @@ public struct MessageMobileScreen: View {
         }
         .navigationTitle(selectedThread == nil ? "Messages" : "Conversation")
         .task { await loadThreads() }
+        .sheet(isPresented: $attachmentOpen) {
+            NavigationStack {
+                MobileAttachmentView(vendorId: vendorId, attachmentFeatureBridge: attachmentFeatureBridge)
+                    .toolbar {
+                        ToolbarItem(placement: .navigationBarLeading) {
+                            Button("Back") { attachmentOpen = false }
+                        }
+                    }
+            }
+        }
     }
 
     private var inbox: some View {
         List {
             Section {
-                TextField("Search by customer name", text: $query)
                 Toggle("Unread only", isOn: $unreadOnly)
             }
             if loading {
@@ -59,6 +73,7 @@ public struct MessageMobileScreen: View {
                 }
             }
         }
+        .searchable(text: $query, prompt: "Search by customer name")
     }
 
     private func conversation(_ thread: MessageThreadSummary) -> some View {
@@ -66,20 +81,23 @@ public struct MessageMobileScreen: View {
             Section {
                 Button("Back to conversations") { selectedThread = nil; messages = [] }
             }
-            if let errorMessage { Text(errorMessage).foregroundStyle(.secondary) }
+            if let errorMessage {
+                CanonicalStateCard(title: "Conversation is temporarily unavailable", description: errorMessage)
+            }
             ForEach(messages, id: \.messageId) { message in
-                VStack(alignment: .leading, spacing: 4) {
-                    Text(message.body)
-                    Text(message.sentAtIso8601).font(.caption2).foregroundStyle(.secondary)
-                }
-                .padding(.vertical, 4)
+                CanonicalMessageBubble(
+                    body: message.body,
+                    timestamp: message.sentAtIso8601,
+                    ownMessage: message.senderId == "self"
+                )
             }
             Section {
-                HStack {
-                    TextField("Message", text: $draft, axis: .vertical)
-                    Button { Task { await send(thread) } } label: { Image(systemName: "paperplane.fill") }
-                        .disabled(draft.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || sending)
-                }
+                CanonicalMessageComposer(
+                    draft: $draft,
+                    sending: sending,
+                    onAttach: { attachmentOpen = true },
+                    onSend: { Task { await send(thread) } }
+                )
             }
         }
     }
@@ -95,7 +113,7 @@ public struct MessageMobileScreen: View {
     @MainActor private func loadThreads() async {
         guard let bridge else {
             loading = false
-            errorMessage = "Messaging gateway is not available."
+            errorMessage = "Messaging service is not available."
             return
         }
         do {
@@ -111,6 +129,20 @@ public struct MessageMobileScreen: View {
         guard let bridge else { return }
         do {
             messages = try await bridge.listItems(threadId: threadId)
+            if let latestMessage = messages.last {
+                try? await bridge.markRead(threadId: threadId, messageId: latestMessage.messageId)
+            }
+            if let selectedThread, selectedThread.threadId == threadId, selectedThread.unreadCount > 0 {
+                let cleared = MessageThreadSummary(
+                    threadId: selectedThread.threadId,
+                    subject: selectedThread.subject,
+                    lastMessagePreview: selectedThread.lastMessagePreview,
+                    unreadCount: 0,
+                    updatedAtIso8601: selectedThread.updatedAtIso8601
+                )
+                self.selectedThread = cleared
+                threads = threads.map { $0.threadId == threadId ? cleared : $0 }
+            }
             errorMessage = nil
         } catch {
             errorMessage = error.localizedDescription
@@ -120,15 +152,29 @@ public struct MessageMobileScreen: View {
     @MainActor private func send(_ thread: MessageThreadSummary) async {
         guard let bridge else { return }
         let body = draft.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !body.isEmpty else { return }
+        guard !body.isEmpty, !sending else { return }
+
         sending = true
+        errorMessage = nil
+        let optimisticId = "local-\(UUID().uuidString)"
+        let optimistic = MessageItemPayload(
+            messageId: optimisticId,
+            threadId: thread.threadId,
+            body: body,
+            senderId: "self",
+            sentAtIso8601: ISO8601DateFormatter().string(from: Date())
+        )
+        messages.append(optimistic)
+        messages.sort { $0.sentAtIso8601 < $1.sentAtIso8601 }
+        draft = ""
+
         do {
-            _ = try await bridge.send(request: SendMessageRequest(threadId: thread.threadId, body: body))
-            draft = ""
-            messages = try await bridge.listItems(threadId: thread.threadId)
-            threads = try await bridge.listThreads()
-            errorMessage = nil
+            let sent = try await bridge.send(request: SendMessageRequest(threadId: thread.threadId, body: body))
+            messages = messages.map { $0.messageId == optimisticId ? sent : $0 }
+            messages.sort { $0.sentAtIso8601 < $1.sentAtIso8601 }
         } catch {
+            messages.removeAll { $0.messageId == optimisticId }
+            if draft.isEmpty { draft = body }
             errorMessage = error.localizedDescription
         }
         sending = false

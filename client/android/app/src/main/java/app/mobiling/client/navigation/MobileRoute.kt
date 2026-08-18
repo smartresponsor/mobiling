@@ -23,6 +23,7 @@ sealed class MobileRoute(open val routePath: String) {
         object Transaction : Wallet("wallet/transaction")
         object Funding : Wallet("wallet/funding")
         object Withdrawal : Wallet("wallet/withdrawal")
+        data class WithdrawalDetail(val withdrawalId: String) : Wallet("wallet/withdrawal/$withdrawalId")
     }
 
     sealed class Vendor(routePath: String) : MobileRoute(routePath) {

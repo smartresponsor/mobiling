@@ -7,4 +7,5 @@ data class CatalogListNodeQuery(
     val parentNodeId: String?,
     val searchText: String?,
     val includeEmptyNodes: Boolean,
+    val catalogCode: String? = null,
 )

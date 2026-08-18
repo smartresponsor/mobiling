@@ -16,7 +16,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
+import app.mobiling.client.design.MobileDesignSystem
 import app.mobiling.client.contract.catalog.browse.CatalogListNodeQuery
 import app.mobiling.client.contract.catalog.browse.CatalogNodeSummary
 
@@ -38,7 +38,7 @@ fun CatalogMobileScreen(
 
     LaunchedEffect(catalogFeatureBridge, currentParent?.nodeId) {
         if (catalogFeatureBridge == null) {
-            errorText = "Catalog bridge is not configured."
+            errorText = "Catalog service is not available."
             return@LaunchedEffect
         }
 
@@ -59,7 +59,7 @@ fun CatalogMobileScreen(
 
     Column(
         modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(MobileDesignSystem.spacing.sm),
     ) {
         if (path.isNotEmpty()) {
             Text(
@@ -68,22 +68,22 @@ fun CatalogMobileScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable { path = path.dropLast(1) }
-                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                    .padding(horizontal = MobileDesignSystem.spacing.lg, vertical = MobileDesignSystem.spacing.md),
             )
             Text(
                 text = currentParent?.title.orEmpty(),
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(horizontal = 16.dp),
+                modifier = Modifier.padding(horizontal = MobileDesignSystem.spacing.lg),
             )
             HorizontalDivider()
         }
 
         val currentError = errorText
         if (currentError != null) {
-            Text(currentError, modifier = Modifier.padding(horizontal = 16.dp))
+            Text(currentError, modifier = Modifier.padding(horizontal = MobileDesignSystem.spacing.lg))
         }
         if (nodes.isEmpty() && currentError == null) {
-            Text("No catalog nodes are available.", modifier = Modifier.padding(horizontal = 16.dp))
+            Text("No catalog nodes are available.", modifier = Modifier.padding(horizontal = MobileDesignSystem.spacing.lg))
         }
         nodes.forEach { node ->
             ListItem(

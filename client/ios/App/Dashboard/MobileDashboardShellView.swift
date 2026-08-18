@@ -3,7 +3,9 @@ import SwiftUI
 public struct MobileDashboardShellView: View {
     private let navigationShellGateway: NavigationShellGateway?
     private let messageFeatureBridge: MessageFeatureBridge?
+    private let notificationFeatureBridge: NotificationFeatureBridge?
     private let attachmentFeatureBridge: AttachmentFeatureBridge?
+    private let cartFeatureBridge: CartFeatureBridge?
     private let catalogFeatureBridge: CatalogFeatureBridge?
     private let vendorId: String?
     private let vendorProfileGateway: VendorProfileGateway?
@@ -12,6 +14,7 @@ public struct MobileDashboardShellView: View {
     private let vendorPayoutGateway: VendorPayoutGateway?
     private let vendorTransactionGateway: VendorTransactionGateway?
     private let vendorCrudGateway: VendorCrudGateway?
+    private let walletGateway: WalletGateway?
     private let initialRoute: String
     private let catalogEnabled: Bool
     private let availableRetailKinds: [RetailKind]
@@ -23,14 +26,40 @@ public struct MobileDashboardShellView: View {
     @State private var navigationOpen: Bool = false
     @State private var accountOpen: Bool = false
     @State private var moneyOpen: Bool = false
+    @State private var cartOpen: Bool = false
+    @State private var catalogOpen: Bool = false
+    @State private var vendorToolOpen: Bool = false
+    @State private var vendorToolRoute: String = "vendor/summary"
     @State private var newChooserOpen: Bool = false
     @State private var selectedRetailKind: RetailKind
     @State private var shell: MobileNavigationShellScreenContract = MobileDashboardShellView.fallbackShell()
 
-    public init(navigationShellGateway: NavigationShellGateway? = nil, messageFeatureBridge: MessageFeatureBridge? = nil, attachmentFeatureBridge: AttachmentFeatureBridge? = nil, catalogFeatureBridge: CatalogFeatureBridge? = nil, vendorId: String? = nil, vendorProfileGateway: VendorProfileGateway? = nil, vendorSummaryGateway: VendorSummaryGateway? = nil, vendorStatementGateway: VendorStatementGateway? = nil, vendorPayoutGateway: VendorPayoutGateway? = nil, vendorTransactionGateway: VendorTransactionGateway? = nil, vendorCrudGateway: VendorCrudGateway? = nil, initialRoute: String = "vendor/project", catalogEnabled: Bool = true, availableRetailKinds: [RetailKind] = RetailKind.allCases, navigationLabelResolver: @escaping (String?, String, String) -> String = { _, _, label in label }, onSignOut: @escaping () -> Void) {
+    public init(
+        navigationShellGateway: NavigationShellGateway? = nil,
+        messageFeatureBridge: MessageFeatureBridge? = nil,
+        notificationFeatureBridge: NotificationFeatureBridge? = nil,
+        attachmentFeatureBridge: AttachmentFeatureBridge? = nil,
+        cartFeatureBridge: CartFeatureBridge? = nil,
+        catalogFeatureBridge: CatalogFeatureBridge? = nil,
+        vendorId: String? = nil,
+        vendorProfileGateway: VendorProfileGateway? = nil,
+        vendorSummaryGateway: VendorSummaryGateway? = nil,
+        vendorStatementGateway: VendorStatementGateway? = nil,
+        vendorPayoutGateway: VendorPayoutGateway? = nil,
+        vendorTransactionGateway: VendorTransactionGateway? = nil,
+        vendorCrudGateway: VendorCrudGateway? = nil,
+        walletGateway: WalletGateway? = nil,
+        initialRoute: String = "vendor/project",
+        catalogEnabled: Bool = true,
+        availableRetailKinds: [RetailKind] = RetailKind.allCases,
+        navigationLabelResolver: @escaping (String?, String, String) -> String = { _, _, label in label },
+        onSignOut: @escaping () -> Void
+    ) {
         self.navigationShellGateway = navigationShellGateway
         self.messageFeatureBridge = messageFeatureBridge
+        self.notificationFeatureBridge = notificationFeatureBridge
         self.attachmentFeatureBridge = attachmentFeatureBridge
+        self.cartFeatureBridge = cartFeatureBridge
         self.catalogFeatureBridge = catalogFeatureBridge
         self.vendorId = vendorId
         self.vendorProfileGateway = vendorProfileGateway
@@ -39,11 +68,13 @@ public struct MobileDashboardShellView: View {
         self.vendorPayoutGateway = vendorPayoutGateway
         self.vendorTransactionGateway = vendorTransactionGateway
         self.vendorCrudGateway = vendorCrudGateway
+        self.walletGateway = walletGateway
         self.initialRoute = initialRoute
         self.catalogEnabled = catalogEnabled
         self.availableRetailKinds = availableRetailKinds
         self.navigationLabelResolver = navigationLabelResolver
         self._selectedRoute = State(initialValue: MobileDashboardShellView.initialBottomRoute(initialRoute))
+        self._cartOpen = State(initialValue: MobileRouteResolver.normalizeRoute(initialRoute) == "cart")
         self._selectedRetailKind = State(initialValue: availableRetailKinds[0])
         self.onSignOut = onSignOut
     }
@@ -58,7 +89,11 @@ public struct MobileDashboardShellView: View {
             .tag("vendor/project")
 
             NavigationView {
-                MessageMobileScreen(messageFeatureBridge: messageFeatureBridge)
+                MessageMobileScreen(
+                    messageFeatureBridge: messageFeatureBridge,
+                    vendorId: vendorId,
+                    attachmentFeatureBridge: attachmentFeatureBridge
+                )
                     .toolbar { accountToolbar }
             }
             .tabItem { Label(navigationLabelResolver("message", "message", "Messages"), systemImage: "message") }
@@ -72,6 +107,7 @@ public struct MobileDashboardShellView: View {
                         listRoute: "vendor/retail",
                         fields: RetailNewFields,
                         gateway: vendorCrudGateway,
+                        catalogFeatureBridge: catalogFeatureBridge,
                         onRouteSelected: { vendorContentRoute = $0 },
                         initialValues: ["kind": selectedRetailKind.rawValue, "currency": "USD"],
                         availableRetailKinds: availableRetailKinds
@@ -86,7 +122,7 @@ public struct MobileDashboardShellView: View {
             .tag("vendor/retail")
 
             NavigationView {
-                comingSoon(title: "Notifications", systemImage: "bell", description: "Important 1Tasker updates will appear here.")
+                NotificationMobileScreen(notificationFeatureBridge: notificationFeatureBridge)
                     .toolbar { accountToolbar }
             }
             .tabItem { Label(navigationLabelResolver("notification", "notification", "Notifications"), systemImage: "bell") }
@@ -99,7 +135,6 @@ public struct MobileDashboardShellView: View {
             .tabItem { Label(navigationLabelResolver("vendor/page", "profile", "Profile"), systemImage: "person.crop.circle") }
             .tag("vendor/page")
         }
-        .tint(Color(red: 51 / 255, green: 51 / 255, blue: 51 / 255))
         .sheet(isPresented: $navigationOpen) {
             menuSheet(items: shell.moreDrawer) { item in
                 handle(item)
@@ -115,6 +150,21 @@ public struct MobileDashboardShellView: View {
         .sheet(isPresented: $moneyOpen) {
             NavigationView {
                 moneyView
+            }
+        }
+        .sheet(isPresented: $cartOpen) {
+            NavigationView {
+                CartMobileScreen(cartFeatureBridge: cartFeatureBridge)
+            }
+        }
+        .sheet(isPresented: $catalogOpen) {
+            NavigationView {
+                CatalogMobileScreen(catalogFeatureBridge: catalogFeatureBridge)
+            }
+        }
+        .sheet(isPresented: $vendorToolOpen) {
+            NavigationView {
+                vendorToolView
             }
         }
         .confirmationDialog("New", isPresented: $newChooserOpen, titleVisibility: .visible) {
@@ -172,11 +222,46 @@ public struct MobileDashboardShellView: View {
         }
     }
 
+    @ViewBuilder
+    private var vendorToolView: some View {
+        switch vendorToolRoute {
+        case "attachment", "vendor/attachment":
+            MobileAttachmentView(vendorId: vendorId, attachmentFeatureBridge: attachmentFeatureBridge)
+        case "vendor/order":
+            VendorOwnedCrudView(
+                title: "Orders",
+                resource: "order",
+                routeRoot: "vendor/order",
+                selectedId: selectedIdentity(routeRoot: "vendor/order"),
+                gateway: vendorCrudGateway,
+                onRouteSelected: { vendorContentRoute = $0 }
+            )
+        case "vendor/summary":
+            MobileVendorSummaryView(vendorId: vendorId, vendorSummaryGateway: vendorSummaryGateway)
+        case "vendor/statement":
+            MobileVendorStatementView(vendorId: vendorId, vendorStatementGateway: vendorStatementGateway)
+        case "vendor/payout":
+            MobileVendorPayoutView(vendorId: vendorId, vendorPayoutGateway: vendorPayoutGateway)
+        case "vendor/transaction":
+            MobileVendorTransactionView(vendorId: vendorId, vendorTransactionGateway: vendorTransactionGateway)
+        default:
+            Text("Vendor surface is not available.")
+        }
+    }
+
     private var moneyView: some View {
         List {
             Section {
-                moneyRow("Cart", systemImage: "cart", description: "Review items before checkout.", enabled: true)
-                moneyRow("Wallet", systemImage: "wallet.pass", description: "Balances, reservations and wallet activity.", enabled: true)
+                NavigationLink {
+                    CartMobileScreen(cartFeatureBridge: cartFeatureBridge)
+                } label: {
+                    moneyRow("Cart", systemImage: "cart", description: "Review items before checkout.", enabled: true)
+                }
+                NavigationLink {
+                    WalletOverviewView(gateway: walletGateway)
+                } label: {
+                    moneyRow("Wallet", systemImage: "wallet.pass", description: "Balances, reservations and wallet activity.", enabled: true)
+                }
                 moneyRow("Billing", systemImage: "doc.text", description: "Bills, invoices and billing history.", enabled: false)
                 moneyRow("Payments", systemImage: "creditcard", description: "Payment activity and payment methods.", enabled: false)
                 moneyRow("Finance", systemImage: "chart.bar", description: "Financial summaries and reporting.", enabled: false)
@@ -186,10 +271,10 @@ public struct MobileDashboardShellView: View {
     }
 
     private func moneyRow(_ title: String, systemImage: String, description: String, enabled: Bool) -> some View {
-        HStack(spacing: 12) {
+        HStack(spacing: MobileDesignDefaults.Spacing.md) {
             Image(systemName: systemImage)
-                .frame(width: 24)
-            VStack(alignment: .leading, spacing: 4) {
+                .frame(width: MobileDesignDefaults.Spacing.xxl)
+            VStack(alignment: .leading, spacing: MobileDesignDefaults.Spacing.xs) {
                 Text(title).font(.headline)
                 Text(description).font(.footnote).foregroundStyle(.secondary)
             }
@@ -203,64 +288,9 @@ public struct MobileDashboardShellView: View {
         .opacity(enabled ? 1.0 : 0.55)
     }
 
-    private func comingSoon(title: String, systemImage: String, description: String) -> some View {
-        List {
-            Section {
-                VStack(alignment: .leading, spacing: 12) {
-                    Image(systemName: systemImage)
-                        .font(.system(size: 34, weight: .semibold))
-                        .foregroundStyle(.secondary)
-                    Text(title)
-                        .font(.headline)
-                    Text(description)
-                        .font(.footnote)
-                        .foregroundStyle(.secondary)
-                }
-                .padding(.vertical, 18)
-            }
-        }
-        .navigationTitle(title)
-    }
-
-    private func content(title: String, items: [MobileNavigationItemPayload]) -> some View {
-        List {
-            Section {
-                ForEach(items.filter { $0.visible }) { item in
-                    row(item)
-                        .onTapGesture { handle(item) }
-                }
-            }
-        }
-        .navigationTitle(title)
-    }
-
     private func selectedIdentity(routeRoot: String) -> String? {
         guard vendorContentRoute.hasPrefix(routeRoot + "/") else { return nil }
         return vendorContentRoute.split(separator: "/").dropFirst(2).first.map(String.init)
-    }
-
-    private func vendorOwnedRouteView(title: String, routeRoot: String) -> some View {
-        let isDetail = vendorContentRoute != routeRoot
-        return List {
-            Section {
-                Text(isDetail ? "\(title.dropLast()) Detail" : title)
-                    .font(.headline)
-                Text(isDetail ? vendorContentRoute : "Select an item to open its detail view.")
-                    .font(.footnote)
-                    .foregroundStyle(.secondary)
-                if isDetail {
-                    Button("Back to \(title)") { vendorContentRoute = routeRoot }
-                }
-            }
-            if routeRoot == "vendor/order", isDetail {
-                Section("Order") {
-                    let orderId = vendorContentRoute.split(separator: "/").dropFirst(2).first.map(String.init) ?? ""
-                    Button("Shipments") { vendorContentRoute = "vendor/order/\(orderId)/shipment" }
-                    Button("Tax") { vendorContentRoute = "vendor/order/\(orderId)/tax" }
-                }
-            }
-        }
-        .navigationTitle(isDetail ? "\(title.dropLast()) Detail" : title)
     }
 
     private func menuSheet(
@@ -268,16 +298,16 @@ public struct MobileDashboardShellView: View {
         onSelect: @escaping (MobileNavigationItemPayload) -> Void
     ) -> some View {
         ScrollView {
-            LazyVStack(spacing: 12) {
+            LazyVStack(spacing: MobileDesignDefaults.Spacing.md) {
                 ForEach(items.filter { $0.visible }) { item in
                     Button {
                         onSelect(item)
                     } label: {
                         row(item)
-                            .padding(16)
+                            .padding(MobileDesignDefaults.Spacing.lg)
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .background(
-                                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                RoundedRectangle(cornerRadius: MobileDesignDefaults.Spacing.lg, style: .continuous)
                                     .fill(Color(.systemBackground))
                             )
                             .shadow(color: Color.black.opacity(0.06), radius: 8, y: 2)
@@ -286,18 +316,18 @@ public struct MobileDashboardShellView: View {
                     .disabled(!item.enabled)
                 }
             }
-            .padding(.horizontal, 20)
-            .padding(.top, 8)
-            .padding(.bottom, 24)
+            .padding(.horizontal, MobileDesignDefaults.Spacing.xl)
+            .padding(.top, MobileDesignDefaults.Spacing.sm)
+            .padding(.bottom, MobileDesignDefaults.Spacing.xxl)
         }
-        .background(Color(red: 244 / 255, green: 245 / 255, blue: 246 / 255))
+        .background(Color(.systemGroupedBackground))
     }
 
     private func row(_ item: MobileNavigationItemPayload) -> some View {
-        HStack(spacing: 12) {
+        HStack(spacing: MobileDesignDefaults.Spacing.md) {
             Image(systemName: systemImage(for: item))
-                .foregroundColor(item.enabled ? Color(red: 51 / 255, green: 51 / 255, blue: 51 / 255) : .secondary)
-                .frame(width: 24)
+                .foregroundColor(item.enabled ? Color.accentColor : .secondary)
+                .frame(width: MobileDesignDefaults.Spacing.xxl)
 
             Text(displayLabel(for: item))
 
@@ -307,8 +337,8 @@ public struct MobileDashboardShellView: View {
                 Text("Coming soon")
                     .font(.caption2)
                     .foregroundStyle(.secondary)
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 4)
+                    .padding(.horizontal, MobileDesignDefaults.Spacing.sm)
+                    .padding(.vertical, MobileDesignDefaults.Spacing.xs)
                     .background(.quaternary, in: Capsule())
             }
         }
@@ -335,10 +365,25 @@ public struct MobileDashboardShellView: View {
             return
         }
 
-        if route == "attachment" {
-            vendorContentRoute = "attachment"
-            selectedRoute = "vendor"
+        if route == "cart" {
+            cartOpen = true
             accountOpen = false
+            navigationOpen = false
+            return
+        }
+
+        if route == "catalog", catalogEnabled {
+            catalogOpen = true
+            accountOpen = false
+            navigationOpen = false
+            return
+        }
+
+        if ["attachment", "vendor/attachment", "vendor/order", "vendor/summary", "vendor/statement", "vendor/payout", "vendor/transaction"].contains(route) {
+            vendorToolRoute = route
+            vendorToolOpen = true
+            accountOpen = false
+            navigationOpen = false
             return
         }
 
@@ -428,7 +473,7 @@ public struct MobileDashboardShellView: View {
                 item("access_sign_out", "Sign Out", "logout", true, "access/sign-out", action: "access.sign_out"),
             ],
             moreDrawer: [
-                item("dashboard", "Dashboard", "dashboard", true, "dashboard"),
+                item("dashboard", "Dashboard", "dashboard", false, "dashboard"),
                 item("money", "Money", "wallet", true, "money"),
                 item("tasks", "Tasks", "tasks", true, "vendor/project"),
                 item("message", "Messages", "message", true, "message"),

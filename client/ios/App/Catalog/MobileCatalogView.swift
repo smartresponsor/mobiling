@@ -1,7 +1,7 @@
 import SwiftUI
 
 // Marketing America Corp. Oleksandr Tishchenko
-public struct MobileCatalogView: View {
+private struct CatalogReferenceView: View {
     private let catalogFeatureBridge: CatalogFeatureBridge?
     @State private var nodes: [CatalogNodeSummary] = []
     @State private var errorText: String?
@@ -37,7 +37,7 @@ public struct MobileCatalogView: View {
 
     private func loadCatalog() async {
         guard let catalogFeatureBridge else {
-            errorText = "Catalog bridge is not configured."
+            errorText = "Catalog service is not available."
             nodes = []
             return
         }
@@ -48,4 +48,7 @@ public struct MobileCatalogView: View {
         } catch {
             nodes = []
             errorText = error.localizedDescription
+        }
+    }
+}
         }

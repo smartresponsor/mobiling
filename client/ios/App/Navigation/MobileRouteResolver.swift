@@ -68,6 +68,7 @@ public enum MobileRouteResolver {
              .walletTransaction,
              .walletFunding,
              .walletWithdrawal,
+             .walletWithdrawalDetail,
              .vendor,
              .vendorProfile,
              .vendorSummary,
@@ -91,6 +92,7 @@ public enum MobileRouteResolver {
              .message,
              .notification,
              .catalog,
+             .cart,
              .attachment:
             return true
         default:
@@ -108,6 +110,9 @@ public enum MobileRouteResolver {
     }
 
     private static func resolveSegmentedRoute(_ segments: [String]) -> MobileRoute? {
+        if segments.count == 3, segments[0] == "wallet", segments[1] == "withdrawal" {
+            return .walletWithdrawalDetail(withdrawalId: segments[2])
+        }
         if segments.count == 3, segments[0] == "catalog", segments[1] == "node" {
             return .catalogNode(catalogNodeId: segments[2])
         }

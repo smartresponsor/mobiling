@@ -11,4 +11,5 @@ interface MessageThreadGateway {
     suspend fun listThreads(): List<MessageThreadSummary>
     suspend fun listItems(threadId: String): List<MessageItemPayload>
     suspend fun sendMessage(request: MessageSendRequest): MessageItemPayload
+    suspend fun markRead(threadId: String, userId: String, messageId: String)
 }

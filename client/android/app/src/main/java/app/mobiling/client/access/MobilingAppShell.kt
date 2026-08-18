@@ -20,6 +20,7 @@ import app.mobiling.client.RetailKind
 import app.mobiling.client.dashboard.DashboardMobileShell
 import app.mobiling.client.data.navigation.shell.NavigationShellGateway
 import app.mobiling.client.message.MessageFeatureBridge
+import app.mobiling.client.notification.NotificationFeatureBridge
 import app.mobiling.client.data.order.OrderGateway
 import app.mobiling.client.data.product.ProductGateway
 import app.mobiling.client.data.project.ProjectGateway
@@ -28,6 +29,7 @@ import app.mobiling.client.data.vendor.profile.VendorProfileGateway
 import app.mobiling.client.data.vendor.statement.VendorStatementGateway
 import app.mobiling.client.data.vendor.summary.VendorSummaryGateway
 import app.mobiling.client.data.vendor.transaction.VendorTransactionGateway
+import app.mobiling.client.data.wallet.WalletGateway
 import kotlinx.coroutines.launch
 
 @Composable
@@ -38,6 +40,7 @@ fun MobilingAppShell(
     catalogFeatureBridge: CatalogFeatureBridge? = null,
     navigationShellGateway: NavigationShellGateway? = null,
     messageFeatureBridge: MessageFeatureBridge? = null,
+    notificationFeatureBridge: NotificationFeatureBridge? = null,
     productGateway: ProductGateway? = null,
     orderGateway: OrderGateway? = null,
     projectGateway: ProjectGateway? = null,
@@ -46,32 +49,46 @@ fun MobilingAppShell(
     vendorStatementGateway: VendorStatementGateway? = null,
     vendorPayoutGateway: VendorPayoutGateway? = null,
     vendorTransactionGateway: VendorTransactionGateway? = null,
+    walletGateway: WalletGateway? = null,
     initialRoute: String = "dashboard",
     publicInitialRoute: String = "home",
     catalogEnabled: Boolean = true,
     availableRetailKinds: List<RetailKind> = RetailKind.entries,
     navigationLabelResolver: (route: String?, key: String, backendLabel: String) -> String = { _, _, label -> label },
+    onAuthenticated: suspend () -> Unit = {},
+    onBeforeSignOut: suspend () -> Unit = {},
     authenticatedContent: (@Composable (vendorId: String?, onSignOut: () -> Unit) -> Unit)? = null,
 ) {
     var currentScreen by remember(publicInitialRoute) {
         mutableStateOf(if (publicInitialRoute == "sign-in") AccessScreen.SignIn else AccessScreen.Welcome)
     }
     var activeVendorId by remember { mutableStateOf<String?>(null) }
+    var activeUserUuid by remember { mutableStateOf<String?>(null) }
     val coroutineScope = rememberCoroutineScope()
 
     fun applyAccessSession(payload: AccessAuthSessionPayload) {
         activeVendorId = payload.vendorId
+        activeUserUuid = payload.userUuid
         currentScreen = payload.toAccessScreen()
+        if (currentScreen == AccessScreen.Dashboard) {
+            coroutineScope.launch { onAuthenticated() }
+        }
     }
 
     fun clearAccessSession() {
         coroutineScope.launch {
+            try {
+                onBeforeSignOut()
+            } catch (_: Exception) {
+            }
+
             try {
                 accessAuthFeatureBridge?.logout()
             } catch (_: Exception) {
             }
 
             activeVendorId = null
+            activeUserUuid = null
             currentScreen = if (publicInitialRoute == "sign-in") AccessScreen.SignIn else AccessScreen.Welcome
         }
     }
@@ -98,6 +115,7 @@ fun MobilingAppShell(
                     DashboardMobileShell(
                         navigationShellGateway = navigationShellGateway,
                         messageFeatureBridge = messageFeatureBridge,
+                        notificationFeatureBridge = notificationFeatureBridge,
                         productGateway = productGateway,
                         orderGateway = orderGateway,
                         projectGateway = projectGateway,
@@ -105,11 +123,13 @@ fun MobilingAppShell(
                         catalogFeatureBridge = catalogFeatureBridge,
                         attachmentFeatureBridge = attachmentFeatureBridge,
                         vendorId = activeVendorId,
+                        userUuid = activeUserUuid,
                         vendorProfileGateway = vendorProfileGateway,
                         vendorSummaryGateway = vendorSummaryGateway,
                         vendorStatementGateway = vendorStatementGateway,
                         vendorPayoutGateway = vendorPayoutGateway,
                         vendorTransactionGateway = vendorTransactionGateway,
+                        walletGateway = walletGateway,
                         initialRoute = initialRoute,
                         catalogEnabled = catalogEnabled,
                         availableRetailKinds = availableRetailKinds,

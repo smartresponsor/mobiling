@@ -7,13 +7,16 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import app.mobiling.client.design.MobileDesignDefaults
+import app.mobiling.client.design.MobileNavigationMetrics
 import app.mobiling.client.design.OneTaskerDesignTokens
+import app.mobiling.client.design.ProvideMobileDesignSystem
 
 private val OneTaskerShapes = Shapes(
-    extraSmall = RoundedCornerShape(OneTaskerDesignTokens.Spacing.Xs),
-    small = RoundedCornerShape(OneTaskerDesignTokens.Spacing.Sm),
-    medium = RoundedCornerShape(OneTaskerDesignTokens.Spacing.Md),
-    large = RoundedCornerShape(OneTaskerDesignTokens.Spacing.Lg),
+    extraSmall = RoundedCornerShape(MobileDesignDefaults.Spacing.xs),
+    small = RoundedCornerShape(MobileDesignDefaults.Spacing.sm),
+    medium = RoundedCornerShape(MobileDesignDefaults.Spacing.md),
+    large = RoundedCornerShape(MobileDesignDefaults.Spacing.lg),
     extraLarge = RoundedCornerShape(28.dp),
 )
 
@@ -47,9 +50,47 @@ private val OneTaskerLightColorScheme = lightColorScheme(
 fun OneTaskerTheme(
     content: @Composable () -> Unit,
 ) {
-    MaterialTheme(
-        colorScheme = OneTaskerLightColorScheme,
-        shapes = OneTaskerShapes,
-        content = content,
-    )
+    ProvideMobileDesignSystem(
+        spacing = MobileDesignDefaults.spacing,
+        navigation = MobileNavigationMetrics(
+            activeColor = OneTaskerDesignTokens.Navigation.activeColor,
+            activeIndicatorHeight = MobileDesignDefaults.navigationIndicatorHeight,
+        ),
+        messageComposer = MobileDesignDefaults.messageComposer,
+    ) {
+        MaterialTheme(
+            colorScheme = OneTaskerLightColorScheme,
+            shapes = OneTaskerShapes,
+            content = content,
+        )
+    }
+}
+
+private val SmartResponsorLightColorScheme = lightColorScheme()
+
+@Composable
+fun SmartResponsorTheme(
+    content: @Composable () -> Unit,
+) {
+    ProvideMobileDesignSystem(
+        spacing = MobileDesignDefaults.spacing,
+        navigation = MobileNavigationMetrics(
+            activeColor = SmartResponsorLightColorScheme.primary,
+            activeIndicatorHeight = MobileDesignDefaults.navigationIndicatorHeight,
+        ),
+        messageComposer = MobileDesignDefaults.messageComposer,
+    ) {
+        MaterialTheme(
+            colorScheme = SmartResponsorLightColorScheme,
+            content = content,
+        )
+    }
+}
+
+@Composable
+fun MobileBrandTheme(brandProfile: String, content: @Composable () -> Unit) {
+    when (brandProfile) {
+        "smart_responsor" -> SmartResponsorTheme(content)
+        else -> OneTaskerTheme(content)
+    }
 }

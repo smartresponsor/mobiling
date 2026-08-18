@@ -313,7 +313,7 @@ public struct MobileVendorProfileView: View {
         }
 
         guard let vendorProfileGateway else {
-            errorMessage = "Vendor profile gateway is not available."
+            errorMessage = "Vendor profile service is not available."
             return
         }
 

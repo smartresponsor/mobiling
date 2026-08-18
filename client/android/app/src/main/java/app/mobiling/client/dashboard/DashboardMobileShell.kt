@@ -52,7 +52,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
+import app.mobiling.client.design.MobileDesignDefaults
 import app.mobiling.client.RetailKind
 import app.mobiling.client.attachment.AttachmentFeatureBridge
 import app.mobiling.client.attachment.AttachmentMobileScreen
@@ -70,11 +70,12 @@ import app.mobiling.client.data.vendor.profile.VendorProfileGateway
 import app.mobiling.client.data.vendor.statement.VendorStatementGateway
 import app.mobiling.client.data.vendor.summary.VendorSummaryGateway
 import app.mobiling.client.data.vendor.transaction.VendorTransactionGateway
+import app.mobiling.client.data.wallet.WalletGateway
 import app.mobiling.client.ui.navigation.shell.NavigationMobileShellScreenContract
 import app.mobiling.client.navigation.CanonicalBottomNavigation
 import app.mobiling.client.navigation.CanonicalBottomNavigationItem
 import app.mobiling.client.navigation.CanonicalTopAppBar
-import app.mobiling.client.design.OneTaskerDesignTokens
+import app.mobiling.client.design.MobileDesignSystem
 import app.mobiling.client.navigation.MobileRouteResolver
 import app.mobiling.client.usecase.navigation.shell.NavigationLoadShellUseCase
 import app.mobiling.client.vendor.VendorMobileOverviewScreen
@@ -92,13 +93,20 @@ import app.mobiling.client.vendor.OrderNewFields
 import app.mobiling.client.vendor.ProjectNewMobileScreen
 import app.mobiling.client.message.MessageFeatureBridge
 import app.mobiling.client.message.MessageMobileScreen
+import app.mobiling.client.notification.NotificationFeatureBridge
+import app.mobiling.client.notification.NotificationMobileScreen
 import app.mobiling.client.money.MoneyMobileScreen
+import app.mobiling.client.wallet.WalletMobileScreen
+import app.mobiling.client.wallet.WalletOperationMobileScreen
+import app.mobiling.client.wallet.WalletTransactionMobileScreen
+import app.mobiling.client.wallet.WalletWithdrawalDetailMobileScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DashboardMobileShell(
     navigationShellGateway: NavigationShellGateway?,
     messageFeatureBridge: MessageFeatureBridge? = null,
+    notificationFeatureBridge: NotificationFeatureBridge? = null,
     productGateway: ProductGateway? = null,
     orderGateway: OrderGateway? = null,
     projectGateway: ProjectGateway? = null,
@@ -106,11 +114,13 @@ fun DashboardMobileShell(
     catalogFeatureBridge: CatalogFeatureBridge? = null,
     attachmentFeatureBridge: AttachmentFeatureBridge? = null,
     vendorId: String? = null,
+    userUuid: String? = null,
     vendorProfileGateway: VendorProfileGateway? = null,
     vendorSummaryGateway: VendorSummaryGateway? = null,
     vendorStatementGateway: VendorStatementGateway? = null,
     vendorPayoutGateway: VendorPayoutGateway? = null,
     vendorTransactionGateway: VendorTransactionGateway? = null,
+    walletGateway: WalletGateway? = null,
     initialRoute: String = "vendor/project",
     catalogEnabled: Boolean = true,
     availableRetailKinds: List<RetailKind> = RetailKind.entries,
@@ -187,6 +197,7 @@ fun DashboardMobileShell(
             availableRetailKinds = availableRetailKinds,
             shell = shell,
             messageFeatureBridge = messageFeatureBridge,
+            notificationFeatureBridge = notificationFeatureBridge,
             productGateway = productGateway,
             orderGateway = orderGateway,
             projectGateway = projectGateway,
@@ -194,11 +205,13 @@ fun DashboardMobileShell(
             catalogFeatureBridge = catalogFeatureBridge,
             attachmentFeatureBridge = attachmentFeatureBridge,
             vendorId = vendorId,
+            userUuid = userUuid,
             vendorProfileGateway = vendorProfileGateway,
             vendorSummaryGateway = vendorSummaryGateway,
             vendorStatementGateway = vendorStatementGateway,
             vendorPayoutGateway = vendorPayoutGateway,
             vendorTransactionGateway = vendorTransactionGateway,
+            walletGateway = walletGateway,
             onRouteSelected = { route ->
                 val normalizedRoute = MobileRouteResolver.normalizeRoute(route)
                 if (isHandledRoute(normalizedRoute)) selectedRoute = normalizedRoute
@@ -212,7 +225,7 @@ fun DashboardMobileShell(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = OneTaskerDesignTokens.Spacing.Xl, vertical = OneTaskerDesignTokens.Spacing.Sm),
+                    .padding(horizontal = MobileDesignSystem.spacing.xl, vertical = MobileDesignSystem.spacing.sm),
             ) {
                 ShellSection(
                     title = "Navigation",
@@ -224,7 +237,7 @@ fun DashboardMobileShell(
                         navigationOpen = false
                     },
                 )
-                Spacer(Modifier.height(OneTaskerDesignTokens.Spacing.Xxl))
+                Spacer(Modifier.height(MobileDesignSystem.spacing.xxl))
             }
         }
     }
@@ -249,8 +262,8 @@ fun DashboardMobileShell(
     if (newChooserOpen) {
         ModalBottomSheet(onDismissRequest = { newChooserOpen = false }) {
             Column(
-                modifier = Modifier.fillMaxWidth().padding(horizontal = OneTaskerDesignTokens.Spacing.Lg, vertical = OneTaskerDesignTokens.Spacing.Sm),
-                verticalArrangement = Arrangement.spacedBy(OneTaskerDesignTokens.Spacing.Md),
+                modifier = Modifier.fillMaxWidth().padding(horizontal = MobileDesignSystem.spacing.lg, vertical = MobileDesignSystem.spacing.sm),
+                verticalArrangement = Arrangement.spacedBy(MobileDesignSystem.spacing.md),
             ) {
                 availableRetailKinds.forEach { kind ->
                     NewChoice(
@@ -263,7 +276,7 @@ fun DashboardMobileShell(
                         newChooserOpen = false
                     }
                 }
-                Spacer(Modifier.height(OneTaskerDesignTokens.Spacing.Lg))
+                Spacer(Modifier.height(MobileDesignSystem.spacing.lg))
             }
         }
     }
@@ -276,6 +289,7 @@ private fun DashboardContent(
     availableRetailKinds: List<RetailKind>,
     shell: NavigationMobileShellScreenContract,
     messageFeatureBridge: MessageFeatureBridge?,
+    notificationFeatureBridge: NotificationFeatureBridge?,
     productGateway: ProductGateway?,
     orderGateway: OrderGateway?,
     projectGateway: ProjectGateway?,
@@ -283,11 +297,13 @@ private fun DashboardContent(
     catalogFeatureBridge: CatalogFeatureBridge?,
     attachmentFeatureBridge: AttachmentFeatureBridge?,
     vendorId: String?,
+    userUuid: String?,
     vendorProfileGateway: VendorProfileGateway?,
     vendorSummaryGateway: VendorSummaryGateway?,
     vendorStatementGateway: VendorStatementGateway?,
     vendorPayoutGateway: VendorPayoutGateway?,
     vendorTransactionGateway: VendorTransactionGateway?,
+    walletGateway: WalletGateway?,
     onRouteSelected: (String) -> Unit,
     padding: PaddingValues,
 ) {
@@ -295,6 +311,30 @@ private fun DashboardContent(
         "money" -> {
             Box(Modifier.fillMaxSize().padding(padding)) {
                 MoneyMobileScreen(onRouteSelected = onRouteSelected)
+            }
+            return
+        }
+        "wallet" -> {
+            Box(Modifier.fillMaxSize().padding(padding)) {
+                WalletMobileScreen(walletGateway = walletGateway, onRouteSelected = onRouteSelected)
+            }
+            return
+        }
+        "wallet/transaction" -> {
+            Box(Modifier.fillMaxSize().padding(padding)) {
+                WalletTransactionMobileScreen(walletGateway = walletGateway)
+            }
+            return
+        }
+        "wallet/funding" -> {
+            Box(Modifier.fillMaxSize().padding(padding)) {
+                WalletOperationMobileScreen(type = "funding", walletGateway = walletGateway)
+            }
+            return
+        }
+        "wallet/withdrawal" -> {
+            Box(Modifier.fillMaxSize().padding(padding)) {
+                WalletOperationMobileScreen(type = "withdrawal", walletGateway = walletGateway, onRouteSelected = onRouteSelected)
             }
             return
         }
@@ -318,7 +358,19 @@ private fun DashboardContent(
         }
         "message" -> {
             Box(Modifier.fillMaxSize().padding(padding)) {
-                MessageMobileScreen(messageFeatureBridge = messageFeatureBridge)
+                MessageMobileScreen(
+                    messageFeatureBridge = messageFeatureBridge,
+                    currentUserId = userUuid,
+                    vendorId = vendorId,
+                    attachmentFeatureBridge = attachmentFeatureBridge,
+                    onOpenTask = { onRouteSelected("vendor/project") },
+                )
+            }
+            return
+        }
+        "notification" -> {
+            Box(Modifier.fillMaxSize().padding(padding)) {
+                NotificationMobileScreen(notificationFeatureBridge = notificationFeatureBridge)
             }
             return
         }
@@ -383,6 +435,12 @@ private fun DashboardContent(
         else -> {
             val segments = selectedRoute.split('/').filter(String::isNotBlank)
             when {
+                segments.size == 3 && segments[0] == "wallet" && segments[1] == "withdrawal" -> {
+                    Box(Modifier.fillMaxSize().padding(padding)) {
+                        WalletWithdrawalDetailMobileScreen(withdrawalId = segments[2], walletGateway = walletGateway)
+                    }
+                    return
+                }
                 selectedRoute == "vendor/retail/new" -> {
                     Box(Modifier.fillMaxSize().padding(padding)) {
                         VendorNewMobileScreen(
@@ -396,6 +454,7 @@ private fun DashboardContent(
                                 "currency" to "USD",
                             ),
                             availableRetailKinds = availableRetailKinds,
+                            catalogFeatureBridge = catalogFeatureBridge,
                         )
                     }
                     return
@@ -432,8 +491,8 @@ private fun DashboardContent(
         modifier = Modifier
             .fillMaxSize()
             .padding(padding),
-        contentPadding = PaddingValues(OneTaskerDesignTokens.Spacing.Lg),
-        verticalArrangement = Arrangement.spacedBy(OneTaskerDesignTokens.Spacing.Md),
+        contentPadding = PaddingValues(MobileDesignSystem.spacing.lg),
+        verticalArrangement = Arrangement.spacedBy(MobileDesignSystem.spacing.md),
     ) {
         when (selectedRoute) {
             "attachment" -> item {
@@ -488,13 +547,13 @@ private fun NewChoice(title: String, description: String, icon: ImageVector, onC
         colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surface),
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().padding(OneTaskerDesignTokens.Spacing.Lg),
-            horizontalArrangement = Arrangement.spacedBy(OneTaskerDesignTokens.Spacing.Lg),
+            modifier = Modifier.fillMaxWidth().padding(MobileDesignSystem.spacing.lg),
+            horizontalArrangement = Arrangement.spacedBy(MobileDesignSystem.spacing.lg),
         ) {
             Surface(shape = MaterialTheme.shapes.medium, color = MaterialTheme.colorScheme.primaryContainer) {
-                Icon(icon, contentDescription = null, modifier = Modifier.padding(10.dp))
+                Icon(icon, contentDescription = null, modifier = Modifier.padding(MobileDesignDefaults.Dashboard.iconInset))
             }
-            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(OneTaskerDesignTokens.Spacing.Xs)) {
+            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(MobileDesignSystem.spacing.xs)) {
                 Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
                 Text(description, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
@@ -505,8 +564,8 @@ private fun NewChoice(title: String, description: String, icon: ImageVector, onC
 @Composable
 private fun EmptyMobileState(title: String, description: String) {
     Column(
-        modifier = Modifier.fillMaxWidth().padding(vertical = OneTaskerDesignTokens.Spacing.Xxl),
-        verticalArrangement = Arrangement.spacedBy(OneTaskerDesignTokens.Spacing.Sm),
+        modifier = Modifier.fillMaxWidth().padding(vertical = MobileDesignSystem.spacing.xxl),
+        verticalArrangement = Arrangement.spacedBy(MobileDesignSystem.spacing.sm),
     ) {
         Text(title, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
         Text(description, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -521,7 +580,7 @@ private fun ShellSection(
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(OneTaskerDesignTokens.Spacing.Md),
+        verticalArrangement = Arrangement.spacedBy(MobileDesignSystem.spacing.md),
     ) {
         Text(
             text = title,
@@ -542,8 +601,8 @@ private fun ShellSection(
                 ),
             ) {
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(OneTaskerDesignTokens.Spacing.Lg),
-                    horizontalArrangement = Arrangement.spacedBy(OneTaskerDesignTokens.Spacing.Lg),
+                    modifier = Modifier.fillMaxWidth().padding(MobileDesignSystem.spacing.lg),
+                    horizontalArrangement = Arrangement.spacedBy(MobileDesignSystem.spacing.lg),
                 ) {
                     Surface(
                         shape = MaterialTheme.shapes.medium,
@@ -552,7 +611,7 @@ private fun ShellSection(
                         Icon(
                             imageVector = iconFor(item),
                             contentDescription = null,
-                            modifier = Modifier.padding(10.dp),
+                            modifier = Modifier.padding(MobileDesignDefaults.Dashboard.iconInset),
                             tint = MaterialTheme.colorScheme.onPrimaryContainer,
                         )
                     }
@@ -699,6 +758,11 @@ private fun routeTitle(route: String, retailKind: String): String = when {
     route == "vendor" -> "Profile"
     route == "more" -> "More"
     route == "money" -> "Money"
+    route == "wallet" -> "Wallet"
+    route == "wallet/transaction" -> "Transaction"
+    route == "wallet/funding" -> "Funding"
+    route == "wallet/withdrawal" -> "Withdrawal"
+    route.startsWith("wallet/withdrawal/") -> "Withdrawal detail"
     route == "attachment" || route == "vendor/attachment" -> "Attachment"
     route == "vendor/page" -> "Profile"
     route == "vendor/summary" -> "Summary"

@@ -4,10 +4,13 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -27,17 +30,18 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.unit.dp
 import app.mobiling.client.contract.attachment.AttachmentItemPayload
+import app.mobiling.client.design.MobileDesignDefaults
+import app.mobiling.client.design.MobileDesignSystem
 import app.mobiling.client.contract.attachment.AttachmentListPayload
 import coil.compose.AsyncImage
-import app.mobiling.client.contract.attachment.AttachmentUploadHandoffRequest
 import kotlinx.coroutines.launch
 
 @Composable
 fun AttachmentMobileScreen(
     vendorId: String?,
     attachmentFeatureBridge: AttachmentFeatureBridge? = null,
+    onBack: (() -> Unit)? = null,
 ) {
     var attachmentList by remember { mutableStateOf<AttachmentListPayload?>(null) }
     var error by remember { mutableStateOf<String?>(null) }
@@ -50,14 +54,14 @@ fun AttachmentMobileScreen(
     fun refresh() {
         if (activeVendorId.isBlank()) {
             attachmentList = null
-            error = "Attachment require an active vendor session."
+            error = "Attachments require an active vendor session."
             loading = false
             return
         }
 
         if (attachmentFeatureBridge == null) {
             attachmentList = null
-            error = "Attachment bridge is not available."
+            error = "Attachment service is not available."
             loading = false
             return
         }
@@ -69,7 +73,7 @@ fun AttachmentMobileScreen(
                 error = null
             } catch (exception: Exception) {
                 attachmentList = null
-                error = exception.message ?: "Attachment are unavailable."
+                error = exception.message ?: "Attachments are unavailable."
             } finally {
                 loading = false
             }
@@ -81,16 +85,26 @@ fun AttachmentMobileScreen(
     }
 
     Column(
-        modifier = Modifier.fillMaxWidth().padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = Modifier.fillMaxWidth().padding(MobileDesignSystem.spacing.lg),
+        verticalArrangement = Arrangement.spacedBy(MobileDesignSystem.spacing.sm),
     ) {
-        Text(statusText(loading = loading, error = error, attachmentList = attachmentList))
+        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+            if (onBack != null) {
+                IconButton(onClick = onBack) {
+                    Icon(Icons.AutoMirrored.Outlined.ArrowBack, contentDescription = "Back to conversation")
+                }
+            }
+            Column(modifier = Modifier.padding(start = MobileDesignSystem.spacing.xs)) {
+                Text("Attachment library", style = MaterialTheme.typography.titleLarge)
+                Text(statusText(loading = loading, error = error, attachmentList = attachmentList), style = MaterialTheme.typography.bodySmall)
+            }
+        }
         val allItems = attachmentList?.items.orEmpty()
         val visibleItems = allItems.filter { category.matches(it) }
 
         Row(
             modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(MobileDesignSystem.spacing.sm),
         ) {
             AttachmentCategory.entries.forEach { option ->
                 FilterChip(
@@ -105,10 +119,10 @@ fun AttachmentMobileScreen(
             Text("No ${category.label.lowercase()} attachments.")
         } else {
             LazyVerticalGrid(
-                columns = GridCells.Adaptive(150.dp),
-                modifier = Modifier.fillMaxWidth().height(520.dp),
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-                verticalArrangement = Arrangement.spacedBy(10.dp),
+                columns = GridCells.Adaptive(MobileDesignDefaults.Attachment.gridMinCellWidth),
+                modifier = Modifier.fillMaxWidth().height(MobileDesignDefaults.Attachment.browserHeight),
+                horizontalArrangement = Arrangement.spacedBy(MobileDesignDefaults.Attachment.gridGap),
+                verticalArrangement = Arrangement.spacedBy(MobileDesignDefaults.Attachment.gridGap),
             ) {
                 items(visibleItems, key = { "${it.attachmentId}:${it.context.orEmpty()}:${it.slot.orEmpty()}:${it.position}" }) { item ->
                     AttachmentBrowserCard(item = item, onClick = { selectedItem = item })
@@ -128,12 +142,12 @@ fun AttachmentMobileScreen(
             },
             title = { Text(item.displayName()) },
             text = {
-                Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                Column(verticalArrangement = Arrangement.spacedBy(MobileDesignDefaults.Attachment.gridGap)) {
                     if (item.type == "media" && item.mediaKind == "image" && !item.downloadUrl.isNullOrBlank()) {
                         AsyncImage(
                             model = item.downloadUrl,
                             contentDescription = item.displayName(),
-                            modifier = Modifier.fillMaxWidth().height(360.dp),
+                            modifier = Modifier.fillMaxWidth().height(MobileDesignDefaults.Attachment.detailPreviewHeight),
                             contentScale = ContentScale.Fit,
                         )
                     }
@@ -153,12 +167,15 @@ private fun AttachmentBrowserCard(item: AttachmentItemPayload, onClick: () -> Un
         modifier = Modifier.fillMaxWidth(),
         shape = MaterialTheme.shapes.large,
     ) {
-        Column(verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(10.dp)) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(MobileDesignSystem.spacing.sm),
+            modifier = Modifier.padding(MobileDesignDefaults.Attachment.cardInset),
+        ) {
             if (item.type == "media" && item.mediaKind == "image" && !item.downloadUrl.isNullOrBlank()) {
                 AsyncImage(
                     model = item.downloadUrl,
                     contentDescription = item.displayName(),
-                    modifier = Modifier.fillMaxWidth().height(130.dp),
+                    modifier = Modifier.fillMaxWidth().height(MobileDesignDefaults.Attachment.cardPreviewHeight),
                     contentScale = ContentScale.Crop,
                 )
             } else {
@@ -168,7 +185,9 @@ private fun AttachmentBrowserCard(item: AttachmentItemPayload, onClick: () -> Un
                         else -> item.mediaKind?.uppercase() ?: "FILE"
                     },
                     style = MaterialTheme.typography.headlineSmall,
-                    modifier = Modifier.height(130.dp).padding(top = 42.dp),
+                    modifier = Modifier
+                        .height(MobileDesignDefaults.Attachment.cardPreviewHeight)
+                        .padding(top = MobileDesignDefaults.Attachment.placeholderTopInset),
                 )
             }
             Text(item.displayName(), style = MaterialTheme.typography.titleSmall, maxLines = 2)

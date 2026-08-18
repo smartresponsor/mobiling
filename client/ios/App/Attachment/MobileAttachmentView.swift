@@ -10,7 +10,12 @@ public struct MobileAttachmentView: View {
     @State private var category: AttachmentCategory = .all
     @State private var selectedItem: AttachmentItemPayload?
 
-    private let columns = [GridItem(.adaptive(minimum: 150), spacing: 12)]
+    private let columns = [
+        GridItem(
+            .adaptive(minimum: MobileDesignDefaults.Attachment.gridMinCellWidth),
+            spacing: MobileDesignDefaults.Spacing.md
+        )
+    ]
 
     public init(vendorId: String?, attachmentFeatureBridge: AttachmentFeatureBridge?) {
         self.vendorId = vendorId
@@ -36,7 +41,7 @@ public struct MobileAttachmentView: View {
                         .foregroundStyle(.secondary)
 
                     ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 8) {
+                        HStack(spacing: MobileDesignDefaults.Spacing.sm) {
                             ForEach(AttachmentCategory.allCases) { option in
                                 Button(option.label) { category = option }
                                     .buttonStyle(.bordered)
@@ -53,7 +58,7 @@ public struct MobileAttachmentView: View {
                     }
                 } else {
                     Section("Files") {
-                        LazyVGrid(columns: columns, spacing: 12) {
+                        LazyVGrid(columns: columns, spacing: MobileDesignDefaults.Spacing.md) {
                             ForEach(visibleItems) { item in
                                 attachmentCard(item)
                                     .onTapGesture { selectedItem = item }
@@ -80,7 +85,7 @@ public struct MobileAttachmentView: View {
         .sheet(item: $selectedItem) { item in
             NavigationStack {
                 ScrollView {
-                    VStack(alignment: .leading, spacing: 16) {
+                    VStack(alignment: .leading, spacing: MobileDesignDefaults.Spacing.lg) {
                         if item.type == "media", item.mediaKind == "image", let url = item.downloadUrl.flatMap(URL.init(string:)) {
                             AsyncImage(url: url) { phase in
                                 switch phase {
@@ -89,14 +94,14 @@ public struct MobileAttachmentView: View {
                                 default: ProgressView()
                                 }
                             }
-                            .frame(maxWidth: .infinity, minHeight: 260)
+                            .frame(maxWidth: .infinity, minHeight: MobileDesignDefaults.Attachment.detailPreviewMinHeight)
                         }
                         Text(item.displayName).font(.title2.bold())
                         Text(item.categoryLabel).foregroundStyle(.secondary)
                         if let mimeType = item.mimeType { Text(mimeType).font(.caption) }
                         if item.size > 0 { Text(ByteCountFormatter.string(fromByteCount: item.size, countStyle: .file)).font(.caption) }
                     }
-                    .padding(16)
+                    .padding(MobileDesignDefaults.Spacing.lg)
                 }
                 .navigationTitle("Attachment")
                 .toolbar {
@@ -110,7 +115,7 @@ public struct MobileAttachmentView: View {
 
     @ViewBuilder
     private func attachmentCard(_ item: AttachmentItemPayload) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: MobileDesignDefaults.Spacing.sm) {
             if item.type == "media", item.mediaKind == "image", let url = item.downloadUrl.flatMap(URL.init(string:)) {
                 AsyncImage(url: url) { phase in
                     switch phase {
@@ -119,23 +124,27 @@ public struct MobileAttachmentView: View {
                     default: ProgressView()
                     }
                 }
-                .frame(maxWidth: .infinity, minHeight: 120, maxHeight: 120)
+                .frame(
+                    maxWidth: .infinity,
+                    minHeight: MobileDesignDefaults.Attachment.cardPreviewHeight,
+                    maxHeight: MobileDesignDefaults.Attachment.cardPreviewHeight
+                )
                 .clipped()
-                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .clipShape(RoundedRectangle(cornerRadius: MobileDesignDefaults.Attachment.previewRadius))
             } else {
                 ZStack {
-                    RoundedRectangle(cornerRadius: 12).fill(.quaternary)
+                    RoundedRectangle(cornerRadius: MobileDesignDefaults.Attachment.previewRadius).fill(.quaternary)
                     Image(systemName: item.type == "document" ? "doc.fill" : "paperclip").font(.largeTitle)
                 }
-                .frame(height: 120)
+                .frame(height: MobileDesignDefaults.Attachment.cardPreviewHeight)
             }
             Text(item.displayName).font(.subheadline.weight(.semibold)).lineLimit(2)
             Text(item.categoryLabel).font(.caption).foregroundStyle(.secondary)
             if item.isPrimary { Text("Primary").font(.caption2.weight(.semibold)) }
         }
-        .padding(10)
-        .background(.background, in: RoundedRectangle(cornerRadius: 14))
-        .overlay(RoundedRectangle(cornerRadius: 14).stroke(.quaternary))
+        .padding(MobileDesignDefaults.Attachment.cardInset)
+        .background(.background, in: RoundedRectangle(cornerRadius: MobileDesignDefaults.Attachment.cardRadius))
+        .overlay(RoundedRectangle(cornerRadius: MobileDesignDefaults.Attachment.cardRadius).stroke(.quaternary))
     }
 
     private func load() async {
@@ -143,12 +152,12 @@ public struct MobileAttachmentView: View {
         errorMessage = nil
 
         guard let activeVendorId = vendorId?.trimmingCharacters(in: .whitespacesAndNewlines), !activeVendorId.isEmpty else {
-            errorMessage = "Attachment require an active vendor session."
+            errorMessage = "Attachments require an active vendor session."
             return
         }
 
         guard let attachmentFeatureBridge else {
-            errorMessage = "Attachment bridge is not available."
+            errorMessage = "Attachment service is not available."
             return
         }
 
