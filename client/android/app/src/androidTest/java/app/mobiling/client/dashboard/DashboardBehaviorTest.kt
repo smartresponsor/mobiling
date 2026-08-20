@@ -318,10 +318,12 @@ private class ProductGatewayFixture(
     var deleteCalls = 0
 
     override suspend fun loadProducts(vendorId: String) = rows.toList()
-    override suspend fun createProduct(fields: Map<String, String>) {
+    override suspend fun createProduct(fields: Map<String, String>): String {
         createCalls++
         createFailure?.let { error(it) }
-        rows += ProductMobileItemPayload("product-1", fields.getValue("title"), fields["status"], fields["price"])
+        val identity = "product-1"
+        rows += ProductMobileItemPayload(identity, fields.getValue("title"), fields["status"], fields["price"])
+        return identity
     }
     override suspend fun updateProduct(productId: String, fields: Map<String, String>) {
         updateCalls++

@@ -3,7 +3,7 @@ import SwiftUI
 
 public protocol VendorCrudGateway: Sendable {
     func list(resource: String) async throws -> [[String: String]]
-    func create(resource: String, fields: [String: String]) async throws
+    func create(resource: String, fields: [String: String]) async throws -> String
     func update(resource: String, identity: String, fields: [String: String]) async throws
     func delete(resource: String, identity: String) async throws
 }
@@ -22,8 +22,15 @@ public final class HttpVendorCrudGateway: VendorCrudGateway, @unchecked Sendable
         return (payload["items"] as? [[String: Any]] ?? []).map(Self.strings)
     }
 
-    public func create(resource: String, fields: [String: String]) async throws {
-        _ = try await request(method: "POST", resource: resource, identity: nil, fields: fields)
+    public func create(resource: String, fields: [String: String]) async throws -> String {
+        let payload = try await request(method: "POST", resource: resource, identity: nil, fields: fields)
+        let item = payload["item"] as? [String: Any] ?? [:]
+        let strings = Self.strings(item)
+        let identity = strings["id"] ?? strings["retailId"] ?? ""
+        guard !identity.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            throw NSError(domain: "VendorCrud", code: 500, userInfo: [NSLocalizedDescriptionKey: "Create response did not include an identity."])
+        }
+        return identity
     }
 
     public func update(resource: String, identity: String, fields: [String: String]) async throws {

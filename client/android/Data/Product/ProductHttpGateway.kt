@@ -22,7 +22,15 @@ class ProductHttpGateway(private val baseUrl: String, private val client: OkHttp
         }
     }
 
-    override suspend fun createProduct(fields: Map<String, String>) { request("POST", null, fields) }
+    override suspend fun createProduct(fields: Map<String, String>): String {
+        val root = request("POST", null, fields)
+        val item = root.optJSONObject("item") ?: JSONObject()
+        val identity = item.optString("id", item.optString("retailId")).trim()
+        if (identity.isBlank()) {
+            throw IllegalStateException("Retail create response did not include an identity.")
+        }
+        return identity
+    }
     override suspend fun updateProduct(productId: String, fields: Map<String, String>) { request("PATCH", productId, fields) }
     override suspend fun deleteProduct(productId: String) { request("DELETE", productId, null) }
 
