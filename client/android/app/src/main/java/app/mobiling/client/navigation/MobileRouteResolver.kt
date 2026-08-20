@@ -45,6 +45,7 @@ object MobileRouteResolver {
             segments.size == 4 && segments[0] == "cart" && segments[1] == "checkout" && segments[2] == "result" -> MobileRoute.Cart.CheckoutResult(segments[3])
             route == "vendor/retail" -> MobileRoute.Product.Listing
             route == "vendor/retail/new" -> MobileRoute.Product.New
+            segments.size == 4 && segments[0] == "vendor" && segments[1] == "retail" && segments[3] == "placement" -> MobileRoute.Product.Placement(segments[2])
             segments.size == 3 && segments[0] == "vendor" && segments[1] == "product" -> MobileRoute.Product.Detail(segments[2])
             route == "vendor/order" -> MobileRoute.Order.Listing
             route == "vendor/order/new" -> MobileRoute.Order.New
@@ -88,6 +89,7 @@ object MobileRouteResolver {
         MobileRoute.Notification,
         MobileRoute.Product.Listing,
         MobileRoute.Product.New,
+        is MobileRoute.Product.Placement,
         is MobileRoute.Product.Detail,
         MobileRoute.Order.Listing,
         MobileRoute.Order.New,

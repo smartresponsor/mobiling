@@ -65,6 +65,7 @@ import app.mobiling.client.data.navigation.shell.NavigationShellGateway
 import app.mobiling.client.data.order.OrderGateway
 import app.mobiling.client.data.product.ProductGateway
 import app.mobiling.client.data.project.ProjectGateway
+import app.mobiling.client.data.retail.placement.RetailPlacementGateway
 import app.mobiling.client.data.vendor.payout.VendorPayoutGateway
 import app.mobiling.client.data.vendor.profile.VendorProfileGateway
 import app.mobiling.client.data.vendor.statement.VendorStatementGateway
@@ -95,6 +96,7 @@ import app.mobiling.client.message.MessageFeatureBridge
 import app.mobiling.client.message.MessageMobileScreen
 import app.mobiling.client.notification.NotificationFeatureBridge
 import app.mobiling.client.notification.NotificationMobileScreen
+import app.mobiling.client.retail.RetailPlacementMobileScreen
 import app.mobiling.client.money.MoneyMobileScreen
 import app.mobiling.client.wallet.WalletMobileScreen
 import app.mobiling.client.wallet.WalletOperationMobileScreen
@@ -108,6 +110,7 @@ fun DashboardMobileShell(
     messageFeatureBridge: MessageFeatureBridge? = null,
     notificationFeatureBridge: NotificationFeatureBridge? = null,
     productGateway: ProductGateway? = null,
+    retailPlacementGateway: RetailPlacementGateway? = null,
     orderGateway: OrderGateway? = null,
     projectGateway: ProjectGateway? = null,
     cartFeatureBridge: CartFeatureBridge? = null,
@@ -199,6 +202,7 @@ fun DashboardMobileShell(
             messageFeatureBridge = messageFeatureBridge,
             notificationFeatureBridge = notificationFeatureBridge,
             productGateway = productGateway,
+            retailPlacementGateway = retailPlacementGateway,
             orderGateway = orderGateway,
             projectGateway = projectGateway,
             cartFeatureBridge = cartFeatureBridge,
@@ -291,6 +295,7 @@ private fun DashboardContent(
     messageFeatureBridge: MessageFeatureBridge?,
     notificationFeatureBridge: NotificationFeatureBridge?,
     productGateway: ProductGateway?,
+    retailPlacementGateway: RetailPlacementGateway?,
     orderGateway: OrderGateway?,
     projectGateway: ProjectGateway?,
     cartFeatureBridge: CartFeatureBridge?,
@@ -449,6 +454,7 @@ private fun DashboardContent(
                             fields = RetailNewFields,
                             onCreate = { fields -> productGateway?.createProduct(fields) ?: error("Retail gateway is not available.") },
                             onRouteSelected = onRouteSelected,
+                            createdRoute = { identity -> "vendor/retail/$identity/placement" },
                             initialValues = mapOf(
                                 "kind" to selectedProductKind,
                                 "currency" to "USD",
@@ -461,13 +467,22 @@ private fun DashboardContent(
                 }
                 selectedRoute == "vendor/order/new" -> {
                     Box(Modifier.fillMaxSize().padding(padding)) {
-                        VendorNewMobileScreen("Order", "vendor/order", OrderNewFields, { fields -> orderGateway?.createOrder(fields) ?: error("Order gateway is not available.") }, onRouteSelected)
+                        VendorNewMobileScreen("Order", "vendor/order", OrderNewFields, { fields ->
+                            orderGateway?.createOrder(fields) ?: error("Order gateway is not available.")
+                            null
+                        }, onRouteSelected)
                     }
                     return
                 }
                 selectedRoute == "vendor/project/new" -> {
                     Box(Modifier.fillMaxSize().padding(padding)) {
                         ProjectNewMobileScreen({ fields -> projectGateway?.createProject(fields) ?: error("Project gateway is not available.") }, onRouteSelected)
+                    }
+                    return
+                }
+                segments.size == 4 && segments[0] == "vendor" && segments[1] == "retail" && segments[3] == "placement" -> {
+                    Box(Modifier.fillMaxSize().padding(padding)) {
+                        RetailPlacementMobileScreen(segments[2], retailPlacementGateway, onRouteSelected)
                     }
                     return
                 }

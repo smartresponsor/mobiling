@@ -65,6 +65,7 @@ sealed class MobileRoute(open val routePath: String) {
         object Listing : Product("vendor/retail")
         object New : Product("vendor/retail/new")
         data class Detail(val productId: String) : Product("vendor/retail/$productId")
+        data class Placement(val retailId: String) : Product("vendor/retail/$retailId/placement")
     }
 
     sealed class Order(routePath: String) : MobileRoute(routePath) {

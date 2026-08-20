@@ -14,6 +14,7 @@ import app.mobiling.client.data.notification.NotificationHttpGateway
 import app.mobiling.client.data.order.OrderHttpGateway
 import app.mobiling.client.data.product.ProductHttpGateway
 import app.mobiling.client.data.project.ProjectHttpGateway
+import app.mobiling.client.data.retail.placement.RetailPlacementHttpGateway
 import app.mobiling.client.data.vendor.payout.VendorHttpPayoutGateway
 import app.mobiling.client.data.vendor.profile.VendorHttpProfileGateway
 import app.mobiling.client.data.vendor.statement.VendorHttpStatementGateway
@@ -69,6 +70,7 @@ class MobileApplicationGraph private constructor(val composition: MobileApplicat
     val messageFeatureBridge = MessageFeatureBridge(MessageHttpThreadGateway(baseUrl, httpClient))
     val notificationFeatureBridge = NotificationFeatureBridge(NotificationHttpGateway(baseUrl, httpClient))
     val productGateway = ProductHttpGateway(baseUrl, httpClient)
+    val retailPlacementGateway = RetailPlacementHttpGateway(baseUrl, httpClient)
     val orderGateway = OrderHttpGateway(baseUrl, httpClient)
     val projectGateway = ProjectHttpGateway(baseUrl, httpClient)
     val vendorProfileGateway = VendorHttpProfileGateway(baseUrl, httpClient)

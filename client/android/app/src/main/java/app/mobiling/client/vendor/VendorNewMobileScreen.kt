@@ -136,8 +136,9 @@ fun VendorNewMobileScreen(
     singular: String,
     listRoute: String,
     fields: List<VendorNewField>,
-    onCreate: suspend (Map<String, String>) -> Unit,
+    onCreate: suspend (Map<String, String>) -> String?,
     onRouteSelected: (String) -> Unit,
+    createdRoute: ((String) -> String)? = null,
     initialValues: Map<String, String> = emptyMap(),
     availableRetailKinds: List<RetailKind> = RetailKind.entries,
     catalogFeatureBridge: CatalogFeatureBridge? = null,
@@ -283,8 +284,9 @@ fun VendorNewMobileScreen(
                         saving = true
                         submitError = null
                         try {
-                            onCreate(values.mapValues { it.value.trim() }.filterValues { it.isNotBlank() })
-                            onRouteSelected(listRoute)
+                            val identity = onCreate(values.mapValues { it.value.trim() }.filterValues { it.isNotBlank() })
+                            val route = if (identity != null && createdRoute != null) createdRoute(identity) else listRoute
+                            onRouteSelected(route)
                         } catch (exception: Exception) {
                             submitError = exception.message ?: "The $singular could not be created."
                         }
@@ -470,9 +472,6 @@ val RetailNewFields = listOf(
     VendorNewField("categoryId", "Category", required = true),
     VendorNewField("title", "Title", required = true),
     VendorNewField("description", "Description"),
-    VendorNewField("amountMinor", "Budget / price in cents", numeric = true),
-    VendorNewField("currency", "Currency", required = true),
-    VendorNewField("location", "Location"),
 )
 
 val OrderNewFields = listOf(

@@ -84,6 +84,7 @@ class MainActivity : ComponentActivity() {
                                 messageFeatureBridge = resolvedGraph.messageFeatureBridge,
                                 notificationFeatureBridge = resolvedGraph.notificationFeatureBridge,
                                 productGateway = resolvedGraph.productGateway,
+                                retailPlacementGateway = resolvedGraph.retailPlacementGateway,
                                 orderGateway = resolvedGraph.orderGateway,
                                 projectGateway = resolvedGraph.projectGateway,
                                 vendorProfileGateway = resolvedGraph.vendorProfileGateway,
