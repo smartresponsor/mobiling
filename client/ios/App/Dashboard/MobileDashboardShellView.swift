@@ -14,6 +14,7 @@ public struct MobileDashboardShellView: View {
     private let vendorPayoutGateway: VendorPayoutGateway?
     private let vendorTransactionGateway: VendorTransactionGateway?
     private let vendorCrudGateway: VendorCrudGateway?
+    private let retailPlacementGateway: RetailPlacementGateway?
     private let walletGateway: WalletGateway?
     private let initialRoute: String
     private let catalogEnabled: Bool
@@ -48,6 +49,7 @@ public struct MobileDashboardShellView: View {
         vendorPayoutGateway: VendorPayoutGateway? = nil,
         vendorTransactionGateway: VendorTransactionGateway? = nil,
         vendorCrudGateway: VendorCrudGateway? = nil,
+        retailPlacementGateway: RetailPlacementGateway? = nil,
         walletGateway: WalletGateway? = nil,
         initialRoute: String = "vendor/project",
         catalogEnabled: Bool = true,
@@ -68,6 +70,7 @@ public struct MobileDashboardShellView: View {
         self.vendorPayoutGateway = vendorPayoutGateway
         self.vendorTransactionGateway = vendorTransactionGateway
         self.vendorCrudGateway = vendorCrudGateway
+        self.retailPlacementGateway = retailPlacementGateway
         self.walletGateway = walletGateway
         self.initialRoute = initialRoute
         self.catalogEnabled = catalogEnabled
@@ -109,8 +112,16 @@ public struct MobileDashboardShellView: View {
                         gateway: vendorCrudGateway,
                         catalogFeatureBridge: catalogFeatureBridge,
                         onRouteSelected: { vendorContentRoute = $0 },
+                        createdRoute: { "vendor/retail/\($0)/placement" },
                         initialValues: ["kind": selectedRetailKind.rawValue, "currency": "USD"],
                         availableRetailKinds: availableRetailKinds
+                    )
+                    .toolbar { accountToolbar }
+                } else if let retailId = retailPlacementIdentity() {
+                    RetailPlacementView(
+                        retailId: retailId,
+                        gateway: retailPlacementGateway,
+                        onRouteSelected: { vendorContentRoute = $0 }
                     )
                     .toolbar { accountToolbar }
                 } else {
@@ -286,6 +297,15 @@ public struct MobileDashboardShellView: View {
             }
         }
         .opacity(enabled ? 1.0 : 0.55)
+    }
+
+    private func retailPlacementIdentity() -> String? {
+        let segments = vendorContentRoute.split(separator: "/").map(String.init)
+        guard segments.count == 4,
+              segments[0] == "vendor",
+              segments[1] == "retail",
+              segments[3] == "placement" else { return nil }
+        return segments[2]
     }
 
     private func selectedIdentity(routeRoot: String) -> String? {

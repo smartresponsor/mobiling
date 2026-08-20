@@ -22,6 +22,7 @@ struct ContentView: View {
             vendorPayoutGateway: graph.vendorPayoutGateway,
             vendorTransactionGateway: graph.vendorTransactionGateway,
             vendorCrudGateway: graph.vendorCrudGateway,
+            retailPlacementGateway: graph.retailPlacementGateway,
             walletGateway: graph.walletGateway,
             initialRoute: graph.composition.configuration.initialDestination.resolvedRoute(
                 isRenderable: MobileRouteResolver.isCurrentlyRenderable

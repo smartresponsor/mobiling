@@ -71,6 +71,7 @@ public struct VendorNewCrudView: View {
     let gateway: VendorCrudGateway?
     let catalogFeatureBridge: CatalogFeatureBridge?
     let onRouteSelected: (String) -> Void
+    let createdRoute: ((String) -> String)?
     let availableRetailKinds: [RetailKind]
 
     @State private var values: [String: String]
@@ -81,7 +82,7 @@ public struct VendorNewCrudView: View {
     @State private var categoryLoading = false
     @State private var categoryLoadError: String?
 
-    public init(singular: String, resource: String, listRoute: String, fields: [VendorNewField], gateway: VendorCrudGateway?, catalogFeatureBridge: CatalogFeatureBridge? = nil, onRouteSelected: @escaping (String) -> Void, initialValues: [String: String] = [:], availableRetailKinds: [RetailKind] = RetailKind.allCases) {
+    public init(singular: String, resource: String, listRoute: String, fields: [VendorNewField], gateway: VendorCrudGateway?, catalogFeatureBridge: CatalogFeatureBridge? = nil, onRouteSelected: @escaping (String) -> Void, createdRoute: ((String) -> String)? = nil, initialValues: [String: String] = [:], availableRetailKinds: [RetailKind] = RetailKind.allCases) {
         self.singular = singular
         self.resource = resource
         self.listRoute = listRoute
@@ -89,6 +90,7 @@ public struct VendorNewCrudView: View {
         self.gateway = gateway
         self.catalogFeatureBridge = catalogFeatureBridge
         self.onRouteSelected = onRouteSelected
+        self.createdRoute = createdRoute
         self.availableRetailKinds = availableRetailKinds
         var normalizedValues = fields.reduce(into: initialValues) { values, field in
             if values[field.key] == nil { values[field.key] = "" }
@@ -238,8 +240,12 @@ public struct VendorNewCrudView: View {
             submitError = nil
             do {
                 let payload = values.mapValues { $0.trimmingCharacters(in: .whitespacesAndNewlines) }.filter { !$0.value.isEmpty }
-                try await gateway?.create(resource: resource, fields: payload)
-                onRouteSelected(listRoute)
+                let identity = try await gateway?.create(resource: resource, fields: payload)
+                if let identity, let createdRoute {
+                    onRouteSelected(createdRoute(identity))
+                } else {
+                    onRouteSelected(listRoute)
+                }
             } catch {
                 submitError = error.localizedDescription
             }
@@ -502,9 +508,6 @@ public let RetailNewFields = [
     VendorNewField("categoryId", "Category", required: true),
     VendorNewField("title", "Title", required: true),
     VendorNewField("description", "Description"),
-    VendorNewField("amountMinor", "Budget / price in cents", numeric: true),
-    VendorNewField("currency", "Currency", required: true),
-    VendorNewField("location", "Location"),
 ]
 public let OrderNewFields = [
     VendorNewField("reference", "Reference", required: true), VendorNewField("status", "Status"), VendorNewField("total", "Total", numeric: true),

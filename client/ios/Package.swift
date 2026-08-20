@@ -32,6 +32,7 @@ let package = Package(
         "App/Product",
         "App/Profile",
         "App/Project",
+        "App/Retail",
         "App/Shipment",
         "App/Taxation",
         "App/Vendor",

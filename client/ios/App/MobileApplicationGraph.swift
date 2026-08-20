@@ -15,6 +15,7 @@ struct MobileApplicationGraph {
     let vendorPayoutGateway: VendorPayoutGateway
     let vendorTransactionGateway: VendorTransactionGateway
     let vendorCrudGateway: VendorCrudGateway
+    let retailPlacementGateway: RetailPlacementGateway
     let walletGateway: WalletGateway
 
     static func current(composition: MobileApplicationComposition = .current) -> MobileApplicationGraph {
@@ -41,6 +42,7 @@ struct MobileApplicationGraph {
             vendorPayoutGateway: HttpVendorPayoutGateway(baseUrl: baseUrl),
             vendorTransactionGateway: HttpVendorTransactionGateway(baseUrl: baseUrl),
             vendorCrudGateway: HttpVendorCrudGateway(baseUrl: baseUrl),
+            retailPlacementGateway: HttpRetailPlacementGateway(baseUrl: baseUrl),
             walletGateway: WalletHttpGateway(baseUrl: baseUrl)
         )
     }

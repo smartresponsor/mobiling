@@ -20,6 +20,7 @@ public struct MobilingAppShell: View {
     private let vendorPayoutGateway: VendorPayoutGateway?
     private let vendorTransactionGateway: VendorTransactionGateway?
     private let vendorCrudGateway: VendorCrudGateway?
+    private let retailPlacementGateway: RetailPlacementGateway?
     private let walletGateway: WalletGateway?
     private let initialRoute: String
     private let publicInitialRoute: String
@@ -43,6 +44,7 @@ public struct MobilingAppShell: View {
         vendorPayoutGateway: VendorPayoutGateway? = nil,
         vendorTransactionGateway: VendorTransactionGateway? = nil,
         vendorCrudGateway: VendorCrudGateway? = nil,
+        retailPlacementGateway: RetailPlacementGateway? = nil,
         walletGateway: WalletGateway? = nil,
         initialRoute: String = "dashboard",
         publicInitialRoute: String = "home",
@@ -65,6 +67,7 @@ public struct MobilingAppShell: View {
         self.vendorPayoutGateway = vendorPayoutGateway
         self.vendorTransactionGateway = vendorTransactionGateway
         self.vendorCrudGateway = vendorCrudGateway
+        self.retailPlacementGateway = retailPlacementGateway
         self.walletGateway = walletGateway
         self.initialRoute = initialRoute
         self.publicInitialRoute = publicInitialRoute
@@ -95,6 +98,7 @@ public struct MobilingAppShell: View {
                     vendorPayoutGateway: vendorPayoutGateway,
                     vendorTransactionGateway: vendorTransactionGateway,
                     vendorCrudGateway: vendorCrudGateway,
+                    retailPlacementGateway: retailPlacementGateway,
                     walletGateway: walletGateway,
                     initialRoute: initialRoute,
                     catalogEnabled: catalogEnabled,

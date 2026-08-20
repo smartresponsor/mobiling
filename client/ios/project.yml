@@ -39,6 +39,7 @@ targets:
       - path: App/Product
       - path: App/Profile
       - path: App/Project
+      - path: App/Retail
       - path: App/Shipment
       - path: App/Taxation
       - path: App/Vendor

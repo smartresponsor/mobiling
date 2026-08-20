@@ -36,8 +36,8 @@ public enum MobileRouteResolver {
         case "attachment": return .attachment
         case "cart": return .cart
         case "cart/checkout": return .cartCheckout
-        case "vendor/product": return .vendorProduct
-        case "vendor/product/new": return .vendorProductNew
+        case "vendor/retail": return .vendorProduct
+        case "vendor/retail/new": return .vendorProductNew
         case "vendor/order": return .vendorOrder
         case "vendor/order/new": return .vendorOrderNew
         case "vendor/project": return .vendorProject
@@ -79,6 +79,7 @@ public enum MobileRouteResolver {
              .vendorProduct,
              .vendorProductNew,
              .vendorProductDetail,
+             .vendorProductPlacement,
              .vendorOrder,
              .vendorOrderNew,
              .vendorOrderDetail,
@@ -125,7 +126,10 @@ public enum MobileRouteResolver {
         if segments.count == 4, segments[0] == "cart", segments[1] == "checkout", segments[2] == "result" {
             return .cartCheckoutResult(checkoutId: segments[3])
         }
-        if segments.count == 3, segments[0] == "vendor", segments[1] == "product" {
+        if segments.count == 4, segments[0] == "vendor", segments[1] == "retail", segments[3] == "placement" {
+            return .vendorProductPlacement(retailId: segments[2])
+        }
+        if segments.count == 3, segments[0] == "vendor", segments[1] == "retail" {
             return .vendorProductDetail(productId: segments[2])
         }
         if segments.count == 3, segments[0] == "vendor", segments[1] == "order" {

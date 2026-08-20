@@ -39,6 +39,7 @@ public enum MobileRoute: Sendable, Equatable {
     case vendorProduct
     case vendorProductNew
     case vendorProductDetail(productId: String)
+    case vendorProductPlacement(retailId: String)
     case vendorOrder
     case vendorOrderNew
     case vendorOrderDetail(orderId: String)
