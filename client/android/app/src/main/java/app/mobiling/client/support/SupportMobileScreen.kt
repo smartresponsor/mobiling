@@ -155,6 +155,20 @@ fun SupportMobileScreen(
                     }
                 }
 
+                current.informationQuestion?.let { question ->
+                    item {
+                        ElevatedCard(modifier = Modifier.fillMaxWidth()) {
+                            Column(
+                                modifier = Modifier.fillMaxWidth().padding(MobileDesignSystem.spacing.lg),
+                                verticalArrangement = Arrangement.spacedBy(MobileDesignSystem.spacing.xs),
+                            ) {
+                                Text("Information requested", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.primary)
+                                Text(question, style = MaterialTheme.typography.bodyLarge)
+                            }
+                        }
+                    }
+                }
+
                 items(current.fields, key = { it.name }) { field ->
                     SupportField(
                         field = field,

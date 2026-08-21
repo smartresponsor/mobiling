@@ -110,7 +110,8 @@ public struct SupportHttpGateway: SupportGateway {
             status: optionalString(data["status"]),
             businessContext: optionalString(data["businessContext"]),
             category: optionalString(data["category"]),
-            descriptionText: optionalString(data["description"])
+            descriptionText: optionalString(data["description"]),
+            informationQuestion: optionalString((data["informationRequest"] as? [String: Any])?["question"])
         )
     }
 

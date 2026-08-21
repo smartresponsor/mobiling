@@ -66,8 +66,14 @@ public struct SupportMobileScreen: View {
                     }
                 }
 
+                if let informationQuestion = page.informationQuestion {
+                    Section("Information requested") {
+                        Text(informationQuestion)
+                    }
+                }
+
                 if !page.fields.isEmpty {
-                    Section("Details") {
+                    Section("Your response") {
                         ForEach(page.fields) { field in
                             supportField(field)
                         }

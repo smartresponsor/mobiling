@@ -49,4 +49,5 @@ data class SupportPagePayload(
     val businessContext: String? = null,
     val category: String? = null,
     val descriptionText: String? = null,
+    val informationQuestion: String? = null,
 )

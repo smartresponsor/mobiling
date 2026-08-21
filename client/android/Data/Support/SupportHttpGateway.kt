@@ -99,6 +99,7 @@ class SupportHttpGateway(
             businessContext = data.optString("businessContext").takeIf(String::isNotBlank),
             category = data.optString("category").takeIf(String::isNotBlank),
             descriptionText = data.optString("description").takeIf(String::isNotBlank),
+            informationQuestion = data.optJSONObject("informationRequest")?.optString("question")?.takeIf(String::isNotBlank),
         )
     }
 

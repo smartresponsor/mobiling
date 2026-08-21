@@ -56,4 +56,5 @@ public struct SupportPagePayload: Sendable {
     public let businessContext: String?
     public let category: String?
     public let descriptionText: String?
+    public let informationQuestion: String?
 }
