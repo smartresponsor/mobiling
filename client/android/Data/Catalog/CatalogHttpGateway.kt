@@ -59,6 +59,7 @@ class CatalogHttpGateway(
     private fun parseNode(item: JSONObject) = CatalogNodeSummary(
         nodeId = item.optString("nodeId"), parentNodeId = item.optString("parentNodeId").takeIf(String::isNotBlank),
         title = item.optString("title", "Catalog item"), slug = item.optString("slug").takeIf(String::isNotBlank),
+        imageUrl = item.optString("imageUrl").takeIf(String::isNotBlank),
         childCount = item.optInt("childCount", 0), productCount = item.optInt("productCount", 0),
     )
 }

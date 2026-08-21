@@ -93,6 +93,7 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended")
     implementation("io.coil-kt:coil-compose:2.6.0")
     implementation("com.github.yalantis:ucrop:2.2.11")
+    implementation("androidx.work:work-runtime-ktx:2.9.0")
     implementation(platform("com.google.firebase:firebase-bom:34.16.0"))
     implementation("com.google.firebase:firebase-messaging")
 

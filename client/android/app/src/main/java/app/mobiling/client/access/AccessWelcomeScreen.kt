@@ -33,7 +33,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -71,7 +70,6 @@ fun AccessWelcomeScreen(
     onCreateAccess: () -> Unit,
 ) {
     var selectedRoute by remember(initialRoute) { mutableStateOf(GuestRoute.fromRoute(initialRoute)) }
-    var catalogRootRequest by remember { mutableIntStateOf(0) }
     var navigationOpen by remember { mutableStateOf(false) }
     var accountOpen by remember { mutableStateOf(false) }
 
@@ -101,9 +99,6 @@ fun AccessWelcomeScreen(
                         icon = route.icon,
                         selected = selectedRoute == route,
                         onClick = {
-                            if (route == GuestRoute.Catalog && selectedRoute == GuestRoute.Catalog) {
-                                catalogRootRequest += 1
-                            }
                             selectedRoute = route
                         },
                     )
@@ -115,7 +110,6 @@ fun AccessWelcomeScreen(
             route = selectedRoute,
             padding = padding,
             catalogFeatureBridge = catalogFeatureBridge,
-            catalogRootRequest = catalogRootRequest,
             cartFeatureBridge = cartFeatureBridge,
             onSignIn = onSignIn,
             onCreateAccess = onCreateAccess,
@@ -195,7 +189,6 @@ private fun GuestRouteContent(
     route: GuestRoute,
     padding: PaddingValues,
     catalogFeatureBridge: CatalogFeatureBridge?,
-    catalogRootRequest: Int,
     cartFeatureBridge: CartFeatureBridge?,
     onSignIn: () -> Unit,
     onCreateAccess: () -> Unit,
@@ -214,10 +207,7 @@ private fun GuestRouteContent(
                 OutlinedButton(onClick = onCreateAccess, modifier = Modifier.fillMaxWidth()) { Text("Create account") }
                 GuestLegalFooter()
             }
-            GuestRoute.Catalog -> CatalogMobileScreen(
-                catalogFeatureBridge = catalogFeatureBridge,
-                rootRequest = catalogRootRequest,
-            )
+            GuestRoute.Catalog -> CatalogMobileScreen(catalogFeatureBridge = catalogFeatureBridge)
             GuestRoute.Cart -> CartMobileScreen(cartFeatureBridge = cartFeatureBridge)
             GuestRoute.User -> GuestPlaceholder(
                 description = "Public customer, specialist, vendor, and sponsor profiles will be available here without exposing private account data.",

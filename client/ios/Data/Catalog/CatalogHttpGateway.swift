@@ -69,6 +69,7 @@ public final class CatalogHttpGateway: CatalogBrowseGateway, CatalogNodeDetailGa
             parentNodeId: string(payload["parentNodeId"]),
             title: string(payload["title"]) ?? "Catalog item",
             slug: string(payload["slug"]),
+            imageUrl: string(payload["imageUrl"]),
             childCount: integer(payload["childCount"]),
             productCount: integer(payload["productCount"])
         )

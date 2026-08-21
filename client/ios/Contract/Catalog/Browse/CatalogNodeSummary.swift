@@ -6,6 +6,7 @@ public struct CatalogNodeSummary: Sendable, Equatable {
     public let parentNodeId: String?
     public let title: String
     public let slug: String?
+    public let imageUrl: String?
     public let childCount: Int
     public let productCount: Int?
 }

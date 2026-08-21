@@ -4,6 +4,7 @@ export interface CatalogNode {
   parentNodeId?: string | null;
   title: string;
   slug?: string | null;
+  imageUrl?: string | null;
   childCount: number;
   productCount?: number | null;
 }

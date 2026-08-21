@@ -8,6 +8,7 @@ data class CatalogNodeSummary(
     val parentNodeId: String?,
     val title: String,
     val slug: String?,
+    val imageUrl: String?,
     val childCount: Int,
     val productCount: Int?,
 )

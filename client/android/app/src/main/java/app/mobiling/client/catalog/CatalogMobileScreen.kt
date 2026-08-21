@@ -1,111 +1,257 @@
 package app.mobiling.client.catalog
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.ListItem
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
-import app.mobiling.client.design.MobileDesignSystem
+import androidx.compose.ui.unit.dp
 import app.mobiling.client.contract.catalog.browse.CatalogListNodeQuery
 import app.mobiling.client.contract.catalog.browse.CatalogNodeSummary
+import coil.compose.AsyncImage
 
 @Composable
-fun CatalogMobileScreen(
-    catalogFeatureBridge: CatalogFeatureBridge?,
-    rootRequest: Int = 0,
-) {
+fun CatalogMobileScreen(catalogFeatureBridge: CatalogFeatureBridge?) {
     var nodes by remember { mutableStateOf<List<CatalogNodeSummary>>(emptyList()) }
-    var path by remember { mutableStateOf<List<CatalogNodeSummary>>(emptyList()) }
+    var loading by remember { mutableStateOf(true) }
     var errorText by remember { mutableStateOf<String?>(null) }
-    val currentParent = path.lastOrNull()
+    var reloadKey by remember { mutableStateOf(0) }
+    val navigationStack = remember { mutableStateListOf<CatalogNodeSummary>() }
+    val parentNodeId = navigationStack.lastOrNull()?.nodeId
 
-    LaunchedEffect(rootRequest) {
-        if (path.isNotEmpty()) {
-            path = emptyList()
-        }
-    }
+    LaunchedEffect(catalogFeatureBridge, parentNodeId, reloadKey) {
+        loading = true
+        errorText = null
 
-    LaunchedEffect(catalogFeatureBridge, currentParent?.nodeId) {
         if (catalogFeatureBridge == null) {
-            errorText = "Catalog service is not available."
+            nodes = emptyList()
+            loading = false
+            errorText = "Catalog is temporarily unavailable."
             return@LaunchedEffect
         }
 
         try {
             nodes = catalogFeatureBridge.list(
                 CatalogListNodeQuery(
-                    parentNodeId = currentParent?.nodeId,
+                    parentNodeId = parentNodeId,
                     searchText = null,
                     includeEmptyNodes = true,
                 ),
             )
-            errorText = null
         } catch (exception: Exception) {
             nodes = emptyList()
             errorText = exception.message ?: "Catalog could not be loaded."
+        } finally {
+            loading = false
         }
     }
 
     Column(
         modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(MobileDesignSystem.spacing.sm),
+        verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        if (path.isNotEmpty()) {
-            Text(
-                text = "‹ " + if (path.size == 1) "Services" else path[path.lastIndex - 1].title,
-                fontWeight = FontWeight.SemiBold,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { path = path.dropLast(1) }
-                    .padding(horizontal = MobileDesignSystem.spacing.lg, vertical = MobileDesignSystem.spacing.md),
-            )
-            Text(
-                text = currentParent?.title.orEmpty(),
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(horizontal = MobileDesignSystem.spacing.lg),
-            )
-            HorizontalDivider()
-        }
+        CatalogHeader(
+            title = navigationStack.lastOrNull()?.title ?: "Explore catalogs",
+            subtitle = if (navigationStack.isEmpty()) {
+                "Find work, orders, products, and professional services."
+            } else {
+                "Choose a category to continue."
+            },
+            canGoBack = navigationStack.isNotEmpty(),
+            onBack = { if (navigationStack.isNotEmpty()) navigationStack.removeAt(navigationStack.lastIndex) },
+        )
 
-        val currentError = errorText
-        if (currentError != null) {
-            Text(currentError, modifier = Modifier.padding(horizontal = MobileDesignSystem.spacing.lg))
-        }
-        if (nodes.isEmpty() && currentError == null) {
-            Text("No catalog nodes are available.", modifier = Modifier.padding(horizontal = MobileDesignSystem.spacing.lg))
-        }
-        nodes.forEach { node ->
-            ListItem(
-                headlineContent = { Text(node.title) },
-                supportingContent = {
-                    Text(
-                        when {
-                            node.childCount > 0 -> "${node.childCount} service types"
-                            (node.productCount ?: 0) > 0 -> "${node.productCount ?: 0} services"
-                            else -> node.slug ?: "Service type"
-                        },
-                    )
-                },
-                trailingContent = {
-                    if (node.childCount > 0) Text("›", fontWeight = FontWeight.Bold)
-                },
-                modifier = if (node.childCount > 0) {
-                    Modifier.clickable { path = path + node }
-                } else {
-                    Modifier
+        when {
+            loading -> Row(
+                modifier = Modifier.fillMaxWidth().padding(24.dp),
+                horizontalArrangement = Arrangement.Center,
+            ) {
+                CircularProgressIndicator()
+            }
+
+            errorText != null -> CatalogMessage(
+                title = "We could not load this catalog",
+                message = errorText.orEmpty(),
+                actionLabel = "Try again",
+                onAction = { reloadKey += 1 },
+            )
+
+            nodes.isEmpty() -> CatalogMessage(
+                title = "Nothing here yet",
+                message = "New categories and listings will appear here as they become available.",
+                actionLabel = if (navigationStack.isEmpty()) null else "Back to catalogs",
+                onAction = {
+                    if (navigationStack.isNotEmpty()) navigationStack.clear()
                 },
             )
+
+            else -> nodes.forEach { node ->
+                CatalogNodeCard(
+                    node = node,
+                    onClick = {
+                        if (node.childCount > 0) {
+                            navigationStack.add(node)
+                        }
+                    },
+                )
+            }
         }
     }
+}
+
+@Composable
+private fun CatalogHeader(
+    title: String,
+    subtitle: String,
+    canGoBack: Boolean,
+    onBack: () -> Unit,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(20.dp))
+            .padding(20.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        if (canGoBack) {
+            Text(
+                text = "‹ Back",
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.clickable(onClick = onBack),
+            )
+        }
+        Text(title, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+        Text(subtitle, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+    }
+}
+
+@Composable
+private fun CatalogNodeCard(node: CatalogNodeSummary, onClick: () -> Unit) {
+    val interactive = node.childCount > 0
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(enabled = interactive, onClick = onClick),
+        shape = RoundedCornerShape(18.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(14.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            CatalogNodeVisual(node)
+            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                Text(node.title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                Text(
+                    catalogDescription(node),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Text(
+                    catalogCountLabel(node),
+                    style = MaterialTheme.typography.labelMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+            }
+            if (interactive) {
+                Text("›", style = MaterialTheme.typography.headlineSmall)
+            }
+        }
+    }
+}
+
+@Composable
+private fun CatalogNodeVisual(node: CatalogNodeSummary) {
+    val imageUrl = node.imageUrl?.trim()?.takeIf {
+        it.startsWith("https://") || it.startsWith("http://")
+    }
+
+    if (imageUrl != null) {
+        AsyncImage(
+            model = imageUrl,
+            contentDescription = node.title,
+            modifier = Modifier
+                .size(64.dp)
+                .clip(RoundedCornerShape(14.dp)),
+            contentScale = ContentScale.Crop,
+        )
+    } else {
+        Text(
+            catalogSymbol(node),
+            style = MaterialTheme.typography.headlineMedium,
+            modifier = Modifier.size(64.dp),
+        )
+    }
+}
+
+@Composable
+private fun CatalogMessage(title: String, message: String, actionLabel: String?, onAction: () -> Unit) {
+    Column(
+        modifier = Modifier.fillMaxWidth().padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
+        Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+        Text(message, style = MaterialTheme.typography.bodyMedium)
+        if (actionLabel != null) {
+            Button(onClick = onAction) { Text(actionLabel) }
+        }
+    }
+}
+
+private fun catalogSymbol(node: CatalogNodeSummary): String {
+    val value = "${node.title} ${node.slug.orEmpty()}".lowercase()
+    return when {
+        "task" in value -> "🧰"
+        "order" in value -> "📋"
+        "product" in value || "merch" in value -> "📦"
+        "service" in value -> "🛠️"
+        "appliance" in value -> "🏠"
+        "furniture" in value -> "🪑"
+        "repair" in value -> "🔧"
+        "install" in value -> "⚙️"
+        else -> "🗂️"
+    }
+}
+
+private fun catalogDescription(node: CatalogNodeSummary): String {
+    val value = "${node.title} ${node.slug.orEmpty()}".lowercase()
+    return when {
+        "task" in value -> "Customer requests ready for local professionals."
+        "order" in value -> "Active and packaged work requested by customers."
+        "product" in value || "merch" in value -> "Tools, parts, fixtures, and marketplace goods."
+        "service" in value -> "Professional services offered by verified vendors."
+        node.childCount > 0 -> "Browse ${node.childCount} related categories."
+        else -> "Open this catalog section."
+    }
+}
+
+private fun catalogCountLabel(node: CatalogNodeSummary): String = when {
+    node.childCount > 0 -> "${node.childCount} categories"
+    node.productCount != null -> "${node.productCount} listings"
+    else -> "View section"
 }

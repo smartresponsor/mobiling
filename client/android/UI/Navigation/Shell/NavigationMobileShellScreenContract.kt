@@ -11,10 +11,25 @@ data class NavigationMobileShellScreenContract(
 ) {
     companion object {
         fun from(payload: NavigationMobileShellPayload): NavigationMobileShellScreenContract = NavigationMobileShellScreenContract(
-            bottomPrimary = payload.items("mobile.bottom.primary"),
+            bottomPrimary = activateCatalog(payload.items("mobile.bottom.primary")),
             accountQuick = payload.items("mobile.account.quick"),
-            moreDrawer = payload.items("mobile.more.drawer"),
+            moreDrawer = activateCatalog(payload.items("mobile.more.drawer")),
             vendorContext = payload.items("mobile.vendor.context"),
         )
+
+        private fun activateCatalog(items: List<NavigationMobileItemPayload>): List<NavigationMobileItemPayload> =
+            items.map { item ->
+                if (item.route == "catalog" || item.key == "catalog") {
+                    item.copy(
+                        badge = null,
+                        enabled = true,
+                        status = "active",
+                        disabledReason = null,
+                        route = "catalog",
+                    )
+                } else {
+                    item
+                }
+            }
     }
 }
