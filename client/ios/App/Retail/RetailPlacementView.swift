@@ -59,17 +59,26 @@ public struct RetailPlacementView: View {
         switch snapshot.nextStep {
         case "fulfillment":
             Section("Fulfillment") {
-                TextField("Mode", text: binding("mode"))
-                Text("Allowed: \(fulfillmentModes(snapshot.kind).joined(separator: ", "))")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                Picker("Fulfillment", selection: binding("mode")) {
+                    Text("Choose fulfillment").tag("")
+                    ForEach(fulfillmentModes(snapshot.kind), id: \.self) { mode in
+                        Text(choiceLabel(mode)).tag(mode)
+                    }
+                }
+                .pickerStyle(.menu)
                 TextField("Service area / region", text: binding("serviceArea"))
                 TextField("Radius (km)", text: binding("radiusKm"))
                     .keyboardType(.decimalPad)
-                if snapshot.kind == "goods" {
+                if snapshot.kind == "goods", values["mode"] == "shipping" {
                     TextField("Weight (kg)", text: binding("weightKg"))
                         .keyboardType(.decimalPad)
-                    TextField("Priority", text: binding("priority"))
+                    Picker("Priority", selection: binding("priority")) {
+                        Text("Choose priority").tag("")
+                        ForEach(["STANDARD", "EXPRESS", "OVERNIGHT"], id: \.self) { priority in
+                            Text(choiceLabel(priority)).tag(priority)
+                        }
+                    }
+                    .pickerStyle(.menu)
                 }
             }
 
@@ -86,14 +95,21 @@ public struct RetailPlacementView: View {
 
         case "pricing":
             Section("Pricing") {
-                TextField("Pricing mode", text: binding("mode"))
-                Text("Allowed: \(pricingModes(snapshot.kind).joined(separator: ", "))")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                TextField("Amount (minor units)", text: binding("amountMinor"))
-                    .keyboardType(.numberPad)
-                TextField("Maximum amount", text: binding("maxAmountMinor"))
-                    .keyboardType(.numberPad)
+                Picker("Pricing", selection: binding("model")) {
+                    Text("Choose pricing").tag("")
+                    ForEach(pricingModels(snapshot.kind), id: \.self) { model in
+                        Text(choiceLabel(model)).tag(model)
+                    }
+                }
+                .pickerStyle(.menu)
+                if let model = values["model"], !model.isEmpty, model != "quote" {
+                    TextField("Amount (minor units)", text: binding("amountMinor"))
+                        .keyboardType(.numberPad)
+                }
+                if values["model"] == "range" {
+                    TextField("Maximum amount", text: binding("maximumAmountMinor"))
+                        .keyboardType(.numberPad)
+                }
                 TextField("Currency", text: binding("currency", defaultValue: "USD"))
                     .textInputAutocapitalization(.characters)
             }
@@ -119,6 +135,10 @@ public struct RetailPlacementView: View {
                     .foregroundStyle(.red)
             }
         }
+    }
+
+    private func choiceLabel(_ value: String) -> String {
+        value.lowercased().replacingOccurrences(of: "_", with: " ").capitalized
     }
 
     private func binding(_ key: String, defaultValue: String = "") -> Binding<String> {
@@ -172,7 +192,7 @@ public struct RetailPlacementView: View {
         kind == "goods" ? ["shipping", "pickup", "digital"] : ["onsite", "remote", "hybrid"]
     }
 
-    private func pricingModes(_ kind: String) -> [String] {
+    private func pricingModels(_ kind: String) -> [String] {
         switch kind {
         case "service": return ["fixed", "hourly", "minimum", "quote"]
         case "goods": return ["fixed", "deposit"]

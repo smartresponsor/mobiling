@@ -1,11 +1,14 @@
 package app.mobiling.client.retail
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -60,13 +63,26 @@ fun RetailPlacementMobileScreen(
 
         when (current.nextStep) {
             "fulfillment" -> {
-                item { PlacementField("Mode", "mode", values) { values = values + ("mode" to it) } }
-                item { Text("Allowed: ${fulfillmentModes(current.kind).joinToString()}") }
+                item {
+                    PlacementChoice(
+                        label = "Fulfillment",
+                        key = "mode",
+                        choices = fulfillmentModes(current.kind),
+                        values = values,
+                    ) { values = values + ("mode" to it) }
+                }
                 item { PlacementField("Service area / region", "serviceArea", values) { values = values + ("serviceArea" to it) } }
                 item { PlacementField("Radius (km)", "radiusKm", values) { values = values + ("radiusKm" to it) } }
-                if (current.kind == "goods") {
+                if (current.kind == "goods" && values["mode"] == "shipping") {
                     item { PlacementField("Weight (kg)", "weightKg", values) { values = values + ("weightKg" to it) } }
-                    item { PlacementField("Priority", "priority", values) { values = values + ("priority" to it) } }
+                    item {
+                        PlacementChoice(
+                            label = "Priority",
+                            key = "priority",
+                            choices = listOf("STANDARD", "EXPRESS", "OVERNIGHT"),
+                            values = values,
+                        ) { values = values + ("priority" to it) }
+                    }
                 }
             }
 
@@ -75,10 +91,20 @@ fun RetailPlacementMobileScreen(
             }
 
             "pricing" -> {
-                item { PlacementField("Pricing mode", "mode", values) { values = values + ("mode" to it) } }
-                item { Text("Allowed: ${pricingModes(current.kind).joinToString()}") }
-                item { PlacementField("Amount (minor units)", "amountMinor", values) { values = values + ("amountMinor" to it) } }
-                item { PlacementField("Maximum amount", "maxAmountMinor", values) { values = values + ("maxAmountMinor" to it) } }
+                item {
+                    PlacementChoice(
+                        label = "Pricing",
+                        key = "model",
+                        choices = pricingModels(current.kind),
+                        values = values,
+                    ) { values = values + ("model" to it) }
+                }
+                if (!values["model"].isNullOrBlank() && values["model"] != "quote") {
+                    item { PlacementField("Amount (minor units)", "amountMinor", values) { values = values + ("amountMinor" to it) } }
+                }
+                if (values["model"] == "range") {
+                    item { PlacementField("Maximum amount", "maximumAmountMinor", values) { values = values + ("maximumAmountMinor" to it) } }
+                }
                 item { PlacementField("Currency", "currency", values, "USD") { values = values + ("currency" to it) } }
             }
 
@@ -148,10 +174,32 @@ private fun PlacementField(
     )
 }
 
+@Composable
+private fun PlacementChoice(
+    label: String,
+    key: String,
+    choices: List<String>,
+    values: Map<String, String>,
+    onChange: (String) -> Unit,
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Text(label, fontWeight = FontWeight.SemiBold)
+        choices.forEach { choice ->
+            Row {
+                RadioButton(
+                    selected = values[key] == choice,
+                    onClick = { onChange(choice) },
+                )
+                Text(choice.lowercase().replaceFirstChar { character -> character.uppercase() })
+            }
+        }
+    }
+}
+
 private fun fulfillmentModes(kind: String): List<String> =
     if (kind == "goods") listOf("shipping", "pickup", "digital") else listOf("onsite", "remote", "hybrid")
 
-private fun pricingModes(kind: String): List<String> = when (kind) {
+private fun pricingModels(kind: String): List<String> = when (kind) {
     "service" -> listOf("fixed", "hourly", "minimum", "quote")
     "goods" -> listOf("fixed", "deposit")
     "task" -> listOf("budget", "range", "fixed")
