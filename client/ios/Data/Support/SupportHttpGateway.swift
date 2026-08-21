@@ -88,7 +88,10 @@ public struct SupportHttpGateway: SupportGateway {
                 }
             )
         }
-        let actions = (data["headerActions"] as? [[String: Any]] ?? []).map {
+        let actionDictionaries = data["headerActions"] as? [[String: Any]]
+            ?? data["actions"] as? [[String: Any]]
+            ?? []
+        let actions = actionDictionaries.map {
             SupportActionPayload(
                 label: string($0["label"]),
                 href: string($0["href"]),

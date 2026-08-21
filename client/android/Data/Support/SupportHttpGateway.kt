@@ -89,7 +89,7 @@ class SupportHttpGateway(
             rows = supportRows,
             cases = caseRows,
             fields = parseFields(data.optJSONArray("formFields") ?: data.optJSONObject("informationForm")?.optJSONArray("fields")),
-            actions = parseActions(data.optJSONArray("headerActions")),
+            actions = parseActions(data.optJSONArray("headerActions") ?: data.optJSONArray("actions")),
             action = data.optString("action").takeIf(String::isNotBlank)
                 ?: data.optJSONObject("informationForm")?.optString("action")?.takeIf(String::isNotBlank),
             method = data.optString("method", data.optJSONObject("informationForm")?.optString("method", "GET") ?: "GET"),
