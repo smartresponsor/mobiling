@@ -33,6 +33,8 @@ public enum MobileRouteResolver {
         case "catalog/search": return .catalogSearch(searchText: query["q"] ?? query["searchText"])
         case "message": return .message
         case "notification": return .notification
+        case "support": return .support
+        case "support/case": return .supportCases
         case "attachment": return .attachment
         case "cart": return .cart
         case "cart/checkout": return .cartCheckout
@@ -92,6 +94,10 @@ public enum MobileRouteResolver {
              .vendorProjectDetail,
              .message,
              .notification,
+             .support,
+             .supportCases,
+             .supportCaseDetail,
+             .supportFlow,
              .catalog,
              .cart,
              .attachment:
@@ -119,6 +125,12 @@ public enum MobileRouteResolver {
         }
         if segments.count == 3, segments[0] == "message", segments[1] == "thread" {
             return .messageThread(threadId: segments[2])
+        }
+        if segments.count == 3, segments[0] == "support", segments[1] == "case" {
+            return .supportCaseDetail(caseReference: segments[2])
+        }
+        if segments.first == "support", segments.count > 1 {
+            return .supportFlow(path: segments.joined(separator: "/"))
         }
         if segments.count == 2, segments[0] == "attachment" {
             return .attachmentDetail(attachmentId: segments[1])

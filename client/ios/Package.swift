@@ -33,6 +33,7 @@ let package = Package(
         "App/Profile",
         "App/Project",
         "App/Retail",
+        "App/Support",
         "App/Shipment",
         "App/Taxation",
         "App/Vendor",

@@ -40,6 +40,7 @@ targets:
       - path: App/Profile
       - path: App/Project
       - path: App/Retail
+      - path: App/Support
       - path: App/Shipment
       - path: App/Taxation
       - path: App/Vendor

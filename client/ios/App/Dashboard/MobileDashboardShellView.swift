@@ -4,6 +4,7 @@ public struct MobileDashboardShellView: View {
     private let navigationShellGateway: NavigationShellGateway?
     private let messageFeatureBridge: MessageFeatureBridge?
     private let notificationFeatureBridge: NotificationFeatureBridge?
+    private let supportFeatureBridge: SupportFeatureBridge?
     private let attachmentFeatureBridge: AttachmentFeatureBridge?
     private let cartFeatureBridge: CartFeatureBridge?
     private let catalogFeatureBridge: CatalogFeatureBridge?
@@ -29,6 +30,8 @@ public struct MobileDashboardShellView: View {
     @State private var moneyOpen: Bool = false
     @State private var cartOpen: Bool = false
     @State private var catalogOpen: Bool = false
+    @State private var supportOpen: Bool = false
+    @State private var supportRoute: String = "support"
     @State private var vendorToolOpen: Bool = false
     @State private var vendorToolRoute: String = "vendor/summary"
     @State private var newChooserOpen: Bool = false
@@ -39,6 +42,7 @@ public struct MobileDashboardShellView: View {
         navigationShellGateway: NavigationShellGateway? = nil,
         messageFeatureBridge: MessageFeatureBridge? = nil,
         notificationFeatureBridge: NotificationFeatureBridge? = nil,
+        supportFeatureBridge: SupportFeatureBridge? = nil,
         attachmentFeatureBridge: AttachmentFeatureBridge? = nil,
         cartFeatureBridge: CartFeatureBridge? = nil,
         catalogFeatureBridge: CatalogFeatureBridge? = nil,
@@ -60,6 +64,7 @@ public struct MobileDashboardShellView: View {
         self.navigationShellGateway = navigationShellGateway
         self.messageFeatureBridge = messageFeatureBridge
         self.notificationFeatureBridge = notificationFeatureBridge
+        self.supportFeatureBridge = supportFeatureBridge
         self.attachmentFeatureBridge = attachmentFeatureBridge
         self.cartFeatureBridge = cartFeatureBridge
         self.catalogFeatureBridge = catalogFeatureBridge
@@ -171,6 +176,15 @@ public struct MobileDashboardShellView: View {
         .sheet(isPresented: $catalogOpen) {
             NavigationView {
                 CatalogMobileScreen(catalogFeatureBridge: catalogFeatureBridge)
+            }
+        }
+        .sheet(isPresented: $supportOpen) {
+            NavigationView {
+                SupportMobileScreen(
+                    route: supportRoute,
+                    supportFeatureBridge: supportFeatureBridge,
+                    onRouteSelected: { route in supportRoute = route }
+                )
             }
         }
         .sheet(isPresented: $vendorToolOpen) {
@@ -399,6 +413,14 @@ public struct MobileDashboardShellView: View {
             return
         }
 
+        if route == "support" || route.hasPrefix("support/") {
+            supportRoute = route
+            supportOpen = true
+            accountOpen = false
+            navigationOpen = false
+            return
+        }
+
         if ["attachment", "vendor/attachment", "vendor/order", "vendor/summary", "vendor/statement", "vendor/payout", "vendor/transaction"].contains(route) {
             vendorToolRoute = route
             vendorToolOpen = true
@@ -459,6 +481,7 @@ public struct MobileDashboardShellView: View {
         case "tasks": return "list.bullet.rectangle"
         case "notification": return "bell"
         case "wallet": return "wallet.pass"
+        case "support": return "questionmark.circle"
         default: return "house"
         }
     }
@@ -490,6 +513,7 @@ public struct MobileDashboardShellView: View {
                 item("access_password", "Change Password", "key", false, "access/password"),
                 item("access_verification", "Verification", "key", false, "access/verification"),
                 item("vendor_attachment", "My Attachment", "attachment", true, "attachment"),
+                item("casing_cases", "My cases", "support", true, "support/case"),
                 item("access_sign_out", "Sign Out", "logout", true, "access/sign-out", action: "access.sign_out"),
             ],
             moreDrawer: [
@@ -499,6 +523,7 @@ public struct MobileDashboardShellView: View {
                 item("message", "Messages", "message", true, "message"),
                 item("services", "Services", "store", true, "vendor/retail"),
                 item("notification", "Notifications", "notification", true, "notification"),
+                item("support", "Support", "support", true, "support"),
                 item("vendor_page", "Profile", "person", true, "vendor/page"),
                 item("catalog", "Catalog", "catalog", false, "catalog"),
                 item("attachment", "Attachment", "attachment", true, "attachment"),

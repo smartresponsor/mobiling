@@ -58,7 +58,7 @@ for shell_name, shell_text in [("Android", android_shell), ("iOS", ios_shell)]:
     require_shell_contains(shell_name, shell_text, "access.sign_out")
     require_shell_excludes(shell_name, shell_text, "access/change-password")
 
-for route in ["vendor/project", "message", "vendor/retail", "notification", "vendor/page"]:
+for route in ["vendor/project", "message", "vendor/retail", "notification", "support", "support/case", "vendor/page"]:
     require_shell_contains("Android handled route", android_shell, f'"{route}"')
     require_shell_contains("iOS handled route", ios_shell, f'"{route}"')
 
@@ -96,6 +96,11 @@ for needle in [
 ]:
     require_shell_contains("mobile-edge navigation shell schema", edge_navigation_contract, needle)
 
+require_shell_contains("mobile-edge Casing support registration", edge, "routeMobileSupport(app)")
+support_edge = (root / "mobile-edge/src/routes/support/mobile.ts").read_text(encoding="utf-8")
+for needle in ['app.get("/support"', 'app.post("/support"', 'app.get("/support/*"', 'app.post("/support/*"', "CASING_API_BASE_URL", "forwardedHeaders"]:
+    require_shell_contains("mobile-edge Casing support route", support_edge, needle)
+
 for route in ["Config", "Entitlement", "Push", "Receipt", "Analytic", "Sync", "ApiKey", "Admin", "Webhook"]:
     if f"route{route}(app)" not in edge: error.append(f"unregistered mobile-edge route: {route}")
 if (root / ".materialize").exists(): error.append("bootstrap payload remains")
@@ -104,6 +109,7 @@ for active_item in [
     'item("message", "Messages", "message", true, "message")',
     'item("services", "Services", "store", true, "vendor/retail")',
     'item("notification", "Notifications", "notification", true, "notification")',
+    'item("support", "Support", "support", true, "support")',
     'item("vendor_page", "Profile", "person", true, "vendor/page")',
 ]:
     require_shell_contains("Android active fallback item", android_shell, active_item)
@@ -117,6 +123,8 @@ for disabled_item in [
     require_shell_contains("Android disabled fallback item", android_shell, disabled_item)
     require_shell_contains("iOS disabled fallback item", ios_shell, disabled_item)
 
+require_shell_contains("Android My cases fallback item", android_shell, 'item("casing_cases", "My cases", "support", true, "support/case")')
+require_shell_contains("iOS My cases fallback item", ios_shell, 'item("casing_cases", "My cases", "support", true, "support/case")')
 require_shell_contains("Android sign out fallback item", android_shell, 'item("access_sign_out", "Sign Out", "logout", true, "access/sign-out", action = "access.sign_out")')
 require_shell_contains("iOS sign out fallback item", ios_shell, 'item("access_sign_out", "Sign Out", "logout", true, "access/sign-out", action: "access.sign_out")')
 if error:

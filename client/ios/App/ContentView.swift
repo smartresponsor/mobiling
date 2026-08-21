@@ -16,6 +16,7 @@ struct ContentView: View {
             navigationShellGateway: graph.navigationShellGateway,
             messageFeatureBridge: graph.messageFeatureBridge,
             notificationFeatureBridge: graph.notificationFeatureBridge,
+            supportFeatureBridge: graph.supportFeatureBridge,
             vendorProfileGateway: graph.vendorProfileGateway,
             vendorSummaryGateway: graph.vendorSummaryGateway,
             vendorStatementGateway: graph.vendorStatementGateway,

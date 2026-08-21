@@ -38,6 +38,10 @@ object MobileRouteResolver {
             route == "message" -> MobileRoute.Message.Inbox
             segments.size == 3 && segments[0] == "message" && segments[1] == "thread" -> MobileRoute.Message.Thread(segments[2])
             route == "notification" -> MobileRoute.Notification
+            route == "support" -> MobileRoute.Support.Home
+            route == "support/case" -> MobileRoute.Support.Cases
+            segments.size == 3 && segments[0] == "support" && segments[1] == "case" -> MobileRoute.Support.CaseDetail(segments[2])
+            route.startsWith("support/") -> MobileRoute.Support.Flow(route)
             route == "attachment" -> MobileRoute.Attachment.Root
             segments.size == 2 && segments[0] == "attachment" -> MobileRoute.Attachment.Detail(segments[1])
             route == "cart" -> MobileRoute.Cart.Current
@@ -87,6 +91,10 @@ object MobileRouteResolver {
         MobileRoute.Vendor.Attachment,
         MobileRoute.Message.Inbox,
         MobileRoute.Notification,
+        MobileRoute.Support.Home,
+        MobileRoute.Support.Cases,
+        is MobileRoute.Support.CaseDetail,
+        is MobileRoute.Support.Flow,
         MobileRoute.Product.Listing,
         MobileRoute.Product.New,
         is MobileRoute.Product.Placement,

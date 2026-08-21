@@ -14,6 +14,7 @@ import app.mobiling.client.data.notification.NotificationHttpGateway
 import app.mobiling.client.data.order.OrderHttpGateway
 import app.mobiling.client.data.product.ProductHttpGateway
 import app.mobiling.client.data.project.ProjectHttpGateway
+import app.mobiling.client.data.support.SupportHttpGateway
 import app.mobiling.client.data.retail.placement.RetailPlacementHttpGateway
 import app.mobiling.client.data.vendor.payout.VendorHttpPayoutGateway
 import app.mobiling.client.data.vendor.profile.VendorHttpProfileGateway
@@ -23,6 +24,7 @@ import app.mobiling.client.data.vendor.transaction.VendorHttpTransactionGateway
 import app.mobiling.client.data.wallet.WalletHttpGateway
 import app.mobiling.client.message.MessageFeatureBridge
 import app.mobiling.client.notification.NotificationFeatureBridge
+import app.mobiling.client.support.SupportFeatureBridge
 import okhttp3.Cookie
 import okhttp3.CookieJar
 import okhttp3.HttpUrl
@@ -69,6 +71,7 @@ class MobileApplicationGraph private constructor(val composition: MobileApplicat
     val navigationShellGateway = NavigationHttpShellGateway(baseUrl, httpClient)
     val messageFeatureBridge = MessageFeatureBridge(MessageHttpThreadGateway(baseUrl, httpClient))
     val notificationFeatureBridge = NotificationFeatureBridge(NotificationHttpGateway(baseUrl, httpClient))
+    val supportFeatureBridge = SupportFeatureBridge(SupportHttpGateway(baseUrl, httpClient))
     val productGateway = ProductHttpGateway(baseUrl, httpClient)
     val retailPlacementGateway = RetailPlacementHttpGateway(baseUrl, httpClient)
     val orderGateway = OrderHttpGateway(baseUrl, httpClient)

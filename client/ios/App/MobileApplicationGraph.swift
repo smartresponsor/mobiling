@@ -9,6 +9,7 @@ struct MobileApplicationGraph {
     let navigationShellGateway: NavigationShellGateway
     let messageFeatureBridge: MessageFeatureBridge
     let notificationFeatureBridge: NotificationFeatureBridge
+    let supportFeatureBridge: SupportFeatureBridge
     let vendorProfileGateway: VendorProfileGateway
     let vendorSummaryGateway: VendorSummaryGateway
     let vendorStatementGateway: VendorStatementGateway
@@ -36,6 +37,7 @@ struct MobileApplicationGraph {
             navigationShellGateway: HttpNavigationShellGateway(baseUrl: baseUrl),
             messageFeatureBridge: MessageFeatureBridge(gateway: MessageHttpThreadGateway(baseUrl: baseUrl)),
             notificationFeatureBridge: NotificationFeatureBridge(gateway: NotificationHttpGateway(baseUrl: baseUrl)),
+            supportFeatureBridge: SupportFeatureBridge(gateway: SupportHttpGateway(baseUrl: baseUrl)),
             vendorProfileGateway: HttpVendorProfileGateway(baseUrl: baseUrl),
             vendorSummaryGateway: HttpVendorSummaryGateway(baseUrl: baseUrl),
             vendorStatementGateway: HttpVendorStatementGateway(baseUrl: baseUrl),

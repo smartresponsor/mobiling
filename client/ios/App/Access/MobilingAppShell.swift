@@ -14,6 +14,7 @@ public struct MobilingAppShell: View {
     private let navigationShellGateway: NavigationShellGateway?
     private let messageFeatureBridge: MessageFeatureBridge?
     private let notificationFeatureBridge: NotificationFeatureBridge?
+    private let supportFeatureBridge: SupportFeatureBridge?
     private let vendorProfileGateway: VendorProfileGateway?
     private let vendorSummaryGateway: VendorSummaryGateway?
     private let vendorStatementGateway: VendorStatementGateway?
@@ -38,6 +39,7 @@ public struct MobilingAppShell: View {
         navigationShellGateway: NavigationShellGateway? = nil,
         messageFeatureBridge: MessageFeatureBridge? = nil,
         notificationFeatureBridge: NotificationFeatureBridge? = nil,
+        supportFeatureBridge: SupportFeatureBridge? = nil,
         vendorProfileGateway: VendorProfileGateway? = nil,
         vendorSummaryGateway: VendorSummaryGateway? = nil,
         vendorStatementGateway: VendorStatementGateway? = nil,
@@ -61,6 +63,7 @@ public struct MobilingAppShell: View {
         self.navigationShellGateway = navigationShellGateway
         self.messageFeatureBridge = messageFeatureBridge
         self.notificationFeatureBridge = notificationFeatureBridge
+        self.supportFeatureBridge = supportFeatureBridge
         self.vendorProfileGateway = vendorProfileGateway
         self.vendorSummaryGateway = vendorSummaryGateway
         self.vendorStatementGateway = vendorStatementGateway
@@ -88,6 +91,7 @@ public struct MobilingAppShell: View {
                     navigationShellGateway: navigationShellGateway,
                     messageFeatureBridge: messageFeatureBridge,
                     notificationFeatureBridge: notificationFeatureBridge,
+                    supportFeatureBridge: supportFeatureBridge,
                     attachmentFeatureBridge: attachmentFeatureBridge,
                     cartFeatureBridge: cartFeatureBridge,
                     catalogFeatureBridge: catalogFeatureBridge,

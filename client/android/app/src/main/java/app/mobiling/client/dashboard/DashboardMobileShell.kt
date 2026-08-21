@@ -19,6 +19,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AttachFile
 import androidx.compose.material.icons.filled.Dashboard
 import androidx.compose.material.icons.filled.Inventory2
+import androidx.compose.material.icons.automirrored.filled.HelpOutline
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.Payments
@@ -96,6 +97,8 @@ import app.mobiling.client.message.MessageFeatureBridge
 import app.mobiling.client.message.MessageMobileScreen
 import app.mobiling.client.notification.NotificationFeatureBridge
 import app.mobiling.client.notification.NotificationMobileScreen
+import app.mobiling.client.support.SupportFeatureBridge
+import app.mobiling.client.support.SupportMobileScreen
 import app.mobiling.client.retail.RetailPlacementMobileScreen
 import app.mobiling.client.money.MoneyMobileScreen
 import app.mobiling.client.wallet.WalletMobileScreen
@@ -109,6 +112,7 @@ fun DashboardMobileShell(
     navigationShellGateway: NavigationShellGateway?,
     messageFeatureBridge: MessageFeatureBridge? = null,
     notificationFeatureBridge: NotificationFeatureBridge? = null,
+    supportFeatureBridge: SupportFeatureBridge? = null,
     productGateway: ProductGateway? = null,
     retailPlacementGateway: RetailPlacementGateway? = null,
     orderGateway: OrderGateway? = null,
@@ -187,7 +191,7 @@ fun DashboardMobileShell(
             )
         },
         floatingActionButton = {
-            if (!selectedRoute.endsWith("/new")) {
+            if (!selectedRoute.endsWith("/new") && !selectedRoute.startsWith("support")) {
                 FloatingActionButton(onClick = { newChooserOpen = true }) {
                     Icon(Icons.Default.Add, contentDescription = "Create new")
                 }
@@ -201,6 +205,7 @@ fun DashboardMobileShell(
             shell = shell,
             messageFeatureBridge = messageFeatureBridge,
             notificationFeatureBridge = notificationFeatureBridge,
+            supportFeatureBridge = supportFeatureBridge,
             productGateway = productGateway,
             retailPlacementGateway = retailPlacementGateway,
             orderGateway = orderGateway,
@@ -294,6 +299,7 @@ private fun DashboardContent(
     shell: NavigationMobileShellScreenContract,
     messageFeatureBridge: MessageFeatureBridge?,
     notificationFeatureBridge: NotificationFeatureBridge?,
+    supportFeatureBridge: SupportFeatureBridge?,
     productGateway: ProductGateway?,
     retailPlacementGateway: RetailPlacementGateway?,
     orderGateway: OrderGateway?,
@@ -312,6 +318,13 @@ private fun DashboardContent(
     onRouteSelected: (String) -> Unit,
     padding: PaddingValues,
 ) {
+    if (selectedRoute == "support" || selectedRoute.startsWith("support/")) {
+        Box(Modifier.fillMaxSize().padding(padding)) {
+            SupportMobileScreen(selectedRoute, supportFeatureBridge, onRouteSelected)
+        }
+        return
+    }
+
     when (selectedRoute) {
         "money" -> {
             Box(Modifier.fillMaxSize().padding(padding)) {
@@ -662,6 +675,7 @@ private fun iconFor(item: NavigationMobileItemPayload): ImageVector = when (item
     "tasks" -> Icons.AutoMirrored.Filled.ReceiptLong
     "notification" -> Icons.Default.Notifications
     "wallet" -> Icons.Default.Wallet
+    "support" -> Icons.AutoMirrored.Filled.HelpOutline
     else -> Icons.Default.Dashboard
 }
 
@@ -696,6 +710,7 @@ private fun fallbackShell(): NavigationMobileShellScreenContract = NavigationMob
         item("access_password", "Change Password", "key", false, "access/password"),
         item("access_verification", "Verification", "key", false, "access/verification"),
         item("vendor_attachment", "My Attachment", "attachment", true, "attachment"),
+        item("casing_cases", "My cases", "support", true, "support/case"),
         item("access_sign_out", "Sign Out", "logout", true, "access/sign-out", action = "access.sign_out"),
     ),
     moreDrawer = listOf(
@@ -705,6 +720,7 @@ private fun fallbackShell(): NavigationMobileShellScreenContract = NavigationMob
         item("message", "Messages", "message", true, "message"),
         item("services", "Services", "store", true, "vendor/retail"),
         item("notification", "Notifications", "notification", true, "notification"),
+        item("support", "Support", "support", true, "support"),
         item("vendor_page", "Profile", "person", true, "vendor/page"),
         item("catalog", "Catalog", "catalog", false, "catalog"),
         item("attachment", "Attachment", "attachment", true, "attachment"),
@@ -786,6 +802,10 @@ private fun routeTitle(route: String, retailKind: String): String = when {
     route == "vendor/transaction" -> "Transactions"
     route == "message" -> "Messages"
     route == "notification" -> "Notifications"
+    route == "support" -> "Support"
+    route == "support/case" -> "My cases"
+    route.startsWith("support/case/") -> "Case"
+    route.startsWith("support/") -> "Support"
     route == "vendor/retail/new" -> "New ${retailKindLabel(retailKind)}"
     route == "vendor/order/new" -> "New Order"
     route == "vendor/project/new" -> "New Project"

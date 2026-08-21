@@ -21,6 +21,7 @@ import app.mobiling.client.dashboard.DashboardMobileShell
 import app.mobiling.client.data.navigation.shell.NavigationShellGateway
 import app.mobiling.client.message.MessageFeatureBridge
 import app.mobiling.client.notification.NotificationFeatureBridge
+import app.mobiling.client.support.SupportFeatureBridge
 import app.mobiling.client.data.order.OrderGateway
 import app.mobiling.client.data.product.ProductGateway
 import app.mobiling.client.data.project.ProjectGateway
@@ -42,6 +43,7 @@ fun MobilingAppShell(
     navigationShellGateway: NavigationShellGateway? = null,
     messageFeatureBridge: MessageFeatureBridge? = null,
     notificationFeatureBridge: NotificationFeatureBridge? = null,
+    supportFeatureBridge: SupportFeatureBridge? = null,
     productGateway: ProductGateway? = null,
     retailPlacementGateway: RetailPlacementGateway? = null,
     orderGateway: OrderGateway? = null,
@@ -118,6 +120,7 @@ fun MobilingAppShell(
                         navigationShellGateway = navigationShellGateway,
                         messageFeatureBridge = messageFeatureBridge,
                         notificationFeatureBridge = notificationFeatureBridge,
+                        supportFeatureBridge = supportFeatureBridge,
                         productGateway = productGateway,
                         retailPlacementGateway = retailPlacementGateway,
                         orderGateway = orderGateway,

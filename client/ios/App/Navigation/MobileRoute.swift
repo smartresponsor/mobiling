@@ -31,6 +31,10 @@ public enum MobileRoute: Sendable, Equatable {
     case message
     case messageThread(threadId: String)
     case notification
+    case support
+    case supportCases
+    case supportCaseDetail(caseReference: String)
+    case supportFlow(path: String)
     case attachment
     case attachmentDetail(attachmentId: String)
     case cart

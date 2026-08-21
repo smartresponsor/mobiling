@@ -50,6 +50,13 @@ sealed class MobileRoute(open val routePath: String) {
 
     object Notification : MobileRoute("notification")
 
+    sealed class Support(routePath: String) : MobileRoute(routePath) {
+        object Home : Support("support")
+        object Cases : Support("support/case")
+        data class CaseDetail(val caseReference: String) : Support("support/case/$caseReference")
+        data class Flow(val supportPath: String) : Support(supportPath)
+    }
+
     sealed class Attachment(routePath: String) : MobileRoute(routePath) {
         object Root : Attachment("attachment")
         data class Detail(val attachmentId: String) : Attachment("attachment/$attachmentId")
