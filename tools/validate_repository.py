@@ -58,7 +58,7 @@ for shell_name, shell_text in [("Android", android_shell), ("iOS", ios_shell)]:
     require_shell_contains(shell_name, shell_text, "access.sign_out")
     require_shell_excludes(shell_name, shell_text, "access/change-password")
 
-for route in ["vendor/project", "message", "vendor/retail", "notification", "support", "support/case", "vendor/page"]:
+for route in ["vendor/project", "message", "vendor/retail", "notification", "support", "support/case", "support/order", "vendor/page"]:
     require_shell_contains("Android handled route", android_shell, f'"{route}"')
     require_shell_contains("iOS handled route", ios_shell, f'"{route}"')
 
@@ -125,6 +125,10 @@ for disabled_item in [
 
 require_shell_contains("Android My cases fallback item", android_shell, 'item("casing_cases", "My cases", "support", true, "support/case")')
 require_shell_contains("iOS My cases fallback item", ios_shell, 'item("casing_cases", "My cases", "support", true, "support/case")')
+require_shell_contains("Android Order help fallback item", android_shell, 'item("casing_order_help", "Order help", "receipt", true, "support/order")')
+require_shell_contains("iOS Order help fallback item", ios_shell, 'item("casing_order_help", "Order help", "receipt", true, "support/order")')
+require_shell_contains("Android Order help title", android_shell, 'route == "support/order" -> "Order help"')
+require_shell_contains("iOS Order help title", (root / "client/ios/App/Support/SupportMobileScreen.swift").read_text(encoding="utf-8"), 'route == "support/order" ? "Order help"')
 require_shell_contains("Android sign out fallback item", android_shell, 'item("access_sign_out", "Sign Out", "logout", true, "access/sign-out", action = "access.sign_out")')
 require_shell_contains("iOS sign out fallback item", ios_shell, 'item("access_sign_out", "Sign Out", "logout", true, "access/sign-out", action: "access.sign_out")')
 if error:

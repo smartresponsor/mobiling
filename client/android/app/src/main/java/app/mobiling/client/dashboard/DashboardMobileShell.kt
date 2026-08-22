@@ -711,6 +711,7 @@ private fun fallbackShell(): NavigationMobileShellScreenContract = NavigationMob
         item("access_verification", "Verification", "key", false, "access/verification"),
         item("vendor_attachment", "My Attachment", "attachment", true, "attachment"),
         item("casing_cases", "My cases", "support", true, "support/case"),
+        item("casing_order_help", "Order help", "receipt", true, "support/order"),
         item("access_sign_out", "Sign Out", "logout", true, "access/sign-out", action = "access.sign_out"),
     ),
     moreDrawer = listOf(
@@ -804,6 +805,7 @@ private fun routeTitle(route: String, retailKind: String): String = when {
     route == "notification" -> "Notifications"
     route == "support" -> "Support"
     route == "support/case" -> "My cases"
+    route == "support/order" -> "Order help"
     route.startsWith("support/case/") -> "Case"
     route.startsWith("support/") -> "Support"
     route == "vendor/retail/new" -> "New ${retailKindLabel(retailKind)}"

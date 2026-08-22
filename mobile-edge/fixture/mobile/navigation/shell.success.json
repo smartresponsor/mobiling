@@ -105,6 +105,25 @@
         }
       },
       {
+        "key": "casing_order_help",
+        "label": "Order help",
+        "icon": "receipt",
+        "badge": null,
+        "enabled": true,
+        "visible": true,
+        "status": "active",
+        "disabledReason": null,
+        "requiredComponent": null,
+        "location": "mobile.account.quick",
+        "group": "account",
+        "groupLabel": "Account",
+        "action": null,
+        "route": "support/order",
+        "metadata": {
+          "mobile_route": "support/order"
+        }
+      },
+      {
         "key": "access_sign_out",
         "label": "Sign Out",
         "icon": "logout",

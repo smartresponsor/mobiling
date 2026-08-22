@@ -97,7 +97,7 @@ public struct SupportMobileScreen: View {
                 }
             }
         }
-        .navigationTitle(route == "support/case" ? "My cases" : "Support")
+        .navigationTitle(route == "support/case" ? "My cases" : (route == "support/order" ? "Order help" : "Support"))
         .task(id: route) { await load() }
     }
 
