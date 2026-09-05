@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct AccessEntryFormView<Content: View>: View {
+struct AccessFlowShellView<Content: View>: View {
     let title: String
     let subtitle: String
     let primaryActionTitle: String
@@ -36,14 +36,15 @@ struct AccessEntryFormView<Content: View>: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 20) {
-                VStack(alignment: .leading, spacing: 10) {
-                    Text("SmartResponsor")
-                        .font(.largeTitle.weight(.semibold))
+                HStack(spacing: 12) {
+                    Button(action: onBack) {
+                        Image(systemName: "chevron.backward")
+                            .font(.headline)
+                    }
+                    .accessibilityLabel("Back")
                     Text(title)
-                        .font(.title2.weight(.semibold))
-                    Text(subtitle)
-                        .font(.body)
-                        .foregroundStyle(.secondary)
+                        .font(.headline.weight(.semibold))
+                    Spacer()
                 }
 
                 VStack(alignment: .leading, spacing: 16) {
@@ -51,13 +52,13 @@ struct AccessEntryFormView<Content: View>: View {
                     if let statusMessage {
                         Text(statusMessage)
                             .font(.callout)
-                            .foregroundStyle(.accentColor)
+                            .foregroundStyle(Color.accentColor)
                     }
                 }
                 .padding(16)
                 .background(
                     RoundedRectangle(cornerRadius: 16, style: .continuous)
-                        .fill(Color(.secondarySystemBackground))
+                        .fill(Color(.systemBackground))
                 )
 
                 Button(primaryActionTitle, action: onPrimaryAction)
@@ -66,6 +67,7 @@ struct AccessEntryFormView<Content: View>: View {
 
                 Button(secondaryActionTitle, action: onSecondaryAction)
                     .buttonStyle(.bordered)
+                    .tint(Color.accentColor)
                     .frame(maxWidth: .infinity, alignment: .leading)
 
                 Button("Return to access welcome", action: onBack)
@@ -73,6 +75,6 @@ struct AccessEntryFormView<Content: View>: View {
             }
             .padding(24)
         }
-        .background(Color(.systemBackground))
+        .background(Color(.systemGroupedBackground))
     }
 }

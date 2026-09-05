@@ -5,7 +5,7 @@ struct SecondFactorRequiredView: View {
     let onUseDifferentAccess: () -> Void
 
     var body: some View {
-        AccessEntryFormView(
+        AccessFlowShellView(
             title: "Second factor required",
             subtitle: "Accessing requires an additional verification step before this mobile session can continue.",
             primaryActionTitle: "Check again",

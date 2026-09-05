@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">1tasker</string>
+    <string name="navigation_dashboard">Dashboard</string>
+    <string name="navigation_catalog">Catalog</string>
+    <string name="navigation_message">Message</string>
+    <string name="navigation_notification">Notifications</string>
+    <string name="navigation_tasks">Tasks</string>
+    <string name="navigation_services">Services</string>
+    <string name="navigation_profile">Profile</string>
+    <string name="navigation_vendor">Vendor</string>
+</resources>

@@ -28,7 +28,6 @@ fun VendorMobileTransactionScreen(vendorId: String?, vendorTransactionGateway: V
         try { transaction = VendorMobileTransactionScreenContract.from(VendorLoadTransactionUseCase(vendorTransactionGateway).load(vendorId)) } catch (exception: Exception) { errorMessage = exception.message ?: "Vendor transaction is temporarily unavailable." }
     }
     LazyColumn(contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        item { Text("Vendor Transaction", fontWeight = FontWeight.Bold) }
         when {
             errorMessage != null -> item { Text(errorMessage ?: "Vendor transaction is temporarily unavailable.") }
             transaction == null -> item { Text("Loading vendor transaction...") }

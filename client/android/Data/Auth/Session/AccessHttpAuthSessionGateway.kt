@@ -7,6 +7,8 @@ import app.mobiling.client.contract.auth.session.AccessRequestRecoveryRequest
 import app.mobiling.client.contract.auth.session.AccessResetRecoveryRequest
 import app.mobiling.client.contract.auth.session.AccessStartAuthRequest
 import app.mobiling.client.contract.auth.session.AccessVerifySecondFactorRequest
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -89,7 +91,7 @@ class AccessHttpAuthSessionGateway(
             .put("password", request.password),
     )
 
-    private fun sendSessionRequest(method: String, path: String, body: JSONObject?): AccessAuthSessionPayload {
+    private suspend fun sendSessionRequest(method: String, path: String, body: JSONObject?): AccessAuthSessionPayload = withContext(Dispatchers.IO) {
         val requestBuilder = Request.Builder()
             .url(normalizedBaseUrl() + path)
             .header("Accept", "application/json")
@@ -110,7 +112,7 @@ class AccessHttpAuthSessionGateway(
                 throw IllegalStateException(errorMessage(responseBody, response.code))
             }
 
-            return payloadFrom(responseBody)
+            return@withContext payloadFrom(responseBody)
         }
     }
 
@@ -120,6 +122,7 @@ class AccessHttpAuthSessionGateway(
                 status = "unauthenticated",
                 sessionId = null,
                 vendorId = null,
+                userUuid = null,
                 authenticated = false,
                 requiresVerification = false,
                 requiresSecondFactor = false,
@@ -130,11 +133,13 @@ class AccessHttpAuthSessionGateway(
         val identity = json.optJSONObject("identity")
         val authenticated = identity != null
         val vendorId = identity?.optString("vendorId")?.trim().takeUnless { it.isNullOrBlank() }
+        val userUuid = identity?.optString("accountId")?.trim().takeUnless { it.isNullOrBlank() }
 
         return AccessAuthSessionPayload(
             status = json.optString("status", if (authenticated) "authenticated" else "unauthenticated"),
             sessionId = null,
             vendorId = vendorId,
+            userUuid = userUuid,
             authenticated = authenticated,
             requiresVerification = json.optBoolean("requiresVerification", false),
             requiresSecondFactor = json.optBoolean("requiresSecondFactor", false),

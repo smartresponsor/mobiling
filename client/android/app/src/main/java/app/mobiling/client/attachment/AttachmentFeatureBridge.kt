@@ -1,6 +1,7 @@
 package app.mobiling.client.attachment
 
 import app.mobiling.client.contract.attachment.AttachmentFileHandoffPayload
+import app.mobiling.client.contract.attachment.AttachmentItemPayload
 import app.mobiling.client.contract.attachment.AttachmentLinkPayload
 import app.mobiling.client.contract.attachment.AttachmentLinkRequest
 import app.mobiling.client.contract.attachment.AttachmentListPayload
@@ -36,4 +37,11 @@ class AttachmentFeatureBridge(
 
     suspend fun uploadHandoff(request: AttachmentUploadHandoffRequest): AttachmentUploadHandoffPayload =
         AttachmentUploadHandoffUseCase(writer).invoke(request)
+
+    suspend fun upload(
+        request: AttachmentUploadHandoffRequest,
+        fileName: String,
+        mimeType: String,
+        bytes: ByteArray,
+    ): AttachmentItemPayload = writer.uploadAttachment(request, fileName, mimeType, bytes)
 }

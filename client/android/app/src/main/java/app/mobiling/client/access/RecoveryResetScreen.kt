@@ -28,7 +28,7 @@ fun RecoveryResetScreen(
     var status by remember { mutableStateOf<String?>(null) }
     val coroutineScope = rememberCoroutineScope()
 
-    AccessEntryFormScaffold(
+    AccessFlowShell(
         title = "Reset access",
         subtitle = "Use your recovery code and choose a new password.",
         primaryActionLabel = "Reset access",

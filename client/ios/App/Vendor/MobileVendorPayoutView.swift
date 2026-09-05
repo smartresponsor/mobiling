@@ -32,7 +32,7 @@ public struct MobileVendorPayoutView: View {
     private func load() async {
         payout = nil; errorMessage = nil
         guard let vendorId, !vendorId.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { errorMessage = "Payout requires an active vendor session."; return }
-        guard let vendorPayoutGateway else { errorMessage = "Vendor payout gateway is not available."; return }
+        guard let vendorPayoutGateway else { errorMessage = "Vendor payout service is not available."; return }
         do { payout = MobileVendorPayoutScreenContract(payload: try await LoadVendorPayoutUseCase(gateway: vendorPayoutGateway)(vendorId: vendorId)) }
         catch { errorMessage = error.localizedDescription }
     }

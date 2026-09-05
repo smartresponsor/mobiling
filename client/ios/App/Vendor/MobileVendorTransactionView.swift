@@ -35,7 +35,7 @@ public struct MobileVendorTransactionView: View {
     private func load() async {
         transaction = nil; errorMessage = nil
         guard let vendorId, !vendorId.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { errorMessage = "Transaction requires an active vendor session."; return }
-        guard let vendorTransactionGateway else { errorMessage = "Vendor transaction gateway is not available."; return }
+        guard let vendorTransactionGateway else { errorMessage = "Vendor transaction service is not available."; return }
         do { transaction = MobileVendorTransactionScreenContract(payload: try await LoadVendorTransactionUseCase(gateway: vendorTransactionGateway)(vendorId: vendorId)) }
         catch { errorMessage = error.localizedDescription }
     }

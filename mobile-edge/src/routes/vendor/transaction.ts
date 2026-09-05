@@ -9,6 +9,8 @@ function forwardedHeaders(request: { headers: Record<string, unknown> }): Record
   const headers: Record<string, string> = {};
   const cookie = request.headers.cookie;
   const authorization = request.headers.authorization;
+  const applicationKey = request.headers["x-application-key"];
+  const applicationEnvironment = request.headers["x-application-environment"];
 
   if ("string" === typeof cookie && "" !== cookie.trim()) {
     headers.cookie = cookie.trim();
@@ -16,6 +18,12 @@ function forwardedHeaders(request: { headers: Record<string, unknown> }): Record
 
   if ("string" === typeof authorization && "" !== authorization.trim()) {
     headers.authorization = authorization.trim();
+  }
+  if ("string" === typeof applicationKey && "" !== applicationKey.trim()) {
+    headers["x-application-key"] = applicationKey.trim();
+  }
+  if ("string" === typeof applicationEnvironment && "" !== applicationEnvironment.trim()) {
+    headers["x-application-environment"] = applicationEnvironment.trim();
   }
 
   return headers;
@@ -93,7 +101,7 @@ export default async function route(app: FastifyInstance): Promise<void> {
     const result = await vendoringApiClient.getTransactionList(vendorId, forwardedHeaders(request as { headers: Record<string, unknown> }));
 
     if (result.status < 200 || result.status >= 300) {
-      return reply.code(result.status).send(normalizeErrorPayload(result.body));
+      return reply.code(result.status as any).send(normalizeErrorPayload(result.body));
     }
 
     const root = transactionPayload(result.body);

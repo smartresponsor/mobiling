@@ -1,0 +1,10 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "navigation.catalog" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Catalog" } } } },
+    "navigation.dashboard" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Dashboard" } } } },
+    "navigation.message" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Message" } } } },
+    "navigation.vendor" : { "localizations" : { "en" : { "stringUnit" : { "state" : "translated", "value" : "Vendor" } } } }
+  },
+  "version" : "1.0"
+}

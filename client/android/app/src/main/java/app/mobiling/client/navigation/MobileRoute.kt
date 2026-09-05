@@ -16,10 +16,19 @@ sealed class MobileRoute(open val routePath: String) {
 
     object Dashboard : MobileRoute("dashboard")
     object More : MobileRoute("more")
+    object Money : MobileRoute("money")
+
+    sealed class Wallet(routePath: String) : MobileRoute(routePath) {
+        object Overview : Wallet("wallet")
+        object Transaction : Wallet("wallet/transaction")
+        object Funding : Wallet("wallet/funding")
+        object Withdrawal : Wallet("wallet/withdrawal")
+        data class WithdrawalDetail(val withdrawalId: String) : Wallet("wallet/withdrawal/$withdrawalId")
+    }
 
     sealed class Vendor(routePath: String) : MobileRoute(routePath) {
         object Overview : Vendor("vendor")
-        object Profile : Vendor("vendor/profile")
+        object Profile : Vendor("vendor/page")
         object Summary : Vendor("vendor/summary")
         object Statement : Vendor("vendor/statement")
         object Payout : Vendor("vendor/payout")
@@ -39,6 +48,15 @@ sealed class MobileRoute(open val routePath: String) {
         data class Thread(val threadId: String) : Message("message/thread/$threadId")
     }
 
+    object Notification : MobileRoute("notification")
+
+    sealed class Support(routePath: String) : MobileRoute(routePath) {
+        object Home : Support("support")
+        object Cases : Support("support/case")
+        data class CaseDetail(val caseReference: String) : Support("support/case/$caseReference")
+        data class Flow(val supportPath: String) : Support(supportPath)
+    }
+
     sealed class Attachment(routePath: String) : MobileRoute(routePath) {
         object Root : Attachment("attachment")
         data class Detail(val attachmentId: String) : Attachment("attachment/$attachmentId")
@@ -51,16 +69,25 @@ sealed class MobileRoute(open val routePath: String) {
     }
 
     sealed class Product(routePath: String) : MobileRoute(routePath) {
-        object Listing : Product("vendor/product")
-        data class Detail(val productId: String) : Product("vendor/product/$productId")
+        object Listing : Product("vendor/retail")
+        object New : Product("vendor/retail/new")
+        data class Detail(val productId: String) : Product("vendor/retail/$productId")
+        data class Placement(val retailId: String) : Product("vendor/retail/$retailId/placement")
     }
 
     sealed class Order(routePath: String) : MobileRoute(routePath) {
         object Listing : Order("vendor/order")
+        object New : Order("vendor/order/new")
         data class Detail(val orderId: String) : Order("vendor/order/$orderId")
         data class Shipment(val orderId: String) : Order("vendor/order/$orderId/shipment")
         data class ShipmentDetail(val orderId: String, val shipmentId: String) : Order("vendor/order/$orderId/shipment/$shipmentId")
         data class Tax(val orderId: String) : Order("vendor/order/$orderId/tax")
         data class TaxDetail(val orderId: String, val taxId: String) : Order("vendor/order/$orderId/tax/$taxId")
+    }
+
+    sealed class Project(routePath: String) : MobileRoute(routePath) {
+        object Listing : Project("vendor/project")
+        object New : Project("vendor/project/new")
+        data class Detail(val projectId: String) : Project("vendor/project/$projectId")
     }
 }

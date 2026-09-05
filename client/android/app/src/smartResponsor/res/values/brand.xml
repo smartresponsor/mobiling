@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">SmartResponsor</string>
+    <string name="navigation_dashboard">Dashboard</string>
+    <string name="navigation_catalog">Catalog</string>
+    <string name="navigation_message">Message</string>
+    <string name="navigation_vendor">Vendor</string>
+</resources>

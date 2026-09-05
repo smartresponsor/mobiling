@@ -2,6 +2,8 @@ package app.mobiling.client.data.navigation.shell
 
 import app.mobiling.client.contract.navigation.shell.NavigationMobileItemPayload
 import app.mobiling.client.contract.navigation.shell.NavigationMobileShellPayload
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.json.JSONArray
@@ -11,7 +13,7 @@ class NavigationHttpShellGateway(
     private val baseUrl: String,
     private val client: OkHttpClient = OkHttpClient(),
 ) : NavigationShellGateway {
-    override suspend fun loadMobileShell(): NavigationMobileShellPayload {
+    override suspend fun loadMobileShell(): NavigationMobileShellPayload = withContext(Dispatchers.IO) {
         val request = Request.Builder()
             .url(normalizedBaseUrl() + "/navigation/mobile/shell")
             .header("Accept", "application/json")
@@ -24,7 +26,7 @@ class NavigationHttpShellGateway(
                 throw IllegalStateException(errorMessage(responseBody, response.code))
             }
 
-            return payloadFrom(responseBody)
+            return@withContext payloadFrom(responseBody)
         }
     }
 

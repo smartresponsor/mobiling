@@ -6,6 +6,16 @@ options:
 settings:
   base:
     SWIFT_VERSION: "5.9"
+configs:
+  DebugOneTasker: debug
+  ReleaseOneTasker: release
+  DebugSmartResponsor: debug
+  ReleaseSmartResponsor: release
+configFiles:
+  DebugOneTasker: Config/Brand/OneTasker.xcconfig
+  ReleaseOneTasker: Config/Brand/OneTasker.xcconfig
+  DebugSmartResponsor: Config/Brand/SmartResponsor.xcconfig
+  ReleaseSmartResponsor: Config/Brand/SmartResponsor.xcconfig
 targets:
   MobileClient:
     type: framework
@@ -19,16 +29,22 @@ targets:
       - path: App/Access
       - path: App/Attachment
       - path: App/Auth
+      - path: App/Cart
       - path: App/Catalog
       - path: App/Dashboard
+      - path: App/Design
       - path: App/Message
+      - path: App/Notification
       - path: App/Order
       - path: App/Product
       - path: App/Profile
       - path: App/Project
+      - path: App/Retail
+      - path: App/Support
       - path: App/Shipment
       - path: App/Taxation
       - path: App/Vendor
+      - path: App/Wallet
   CoreConfig:
     type: framework
     platform: iOS
@@ -65,12 +81,34 @@ targets:
     sources:
       - path: App/ContentView.swift
       - path: App/MobileApp.swift
+      - path: App/PushNotificationAppDelegate.swift
       - path: App/MobileClientRuntimeConfig.swift
+      - path: App/MobileApplicationComposition.swift
+      - path: App/MobileApplicationGraph.swift
+      - path: Resources/Localizable.xcstrings
+      - path: Resources/Assets.xcassets
+        buildPhase: resources
+      - path: Resources/RichText
+        type: folder
+        buildPhase: resources
     info:
       path: App/Info.plist
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.smartresponsor.mobile
+        CODE_SIGN_ENTITLEMENTS: App/Mobiling.entitlements
+      configs:
+        DebugOneTasker:
+          PRODUCT_BUNDLE_IDENTIFIER: com.smartresponsor.mobile.onetasker
+          APS_ENVIRONMENT: development
+        ReleaseOneTasker:
+          PRODUCT_BUNDLE_IDENTIFIER: com.smartresponsor.mobile.onetasker
+          APS_ENVIRONMENT: production
+        DebugSmartResponsor:
+          PRODUCT_BUNDLE_IDENTIFIER: com.smartresponsor.mobile.platform
+          APS_ENVIRONMENT: development
+        ReleaseSmartResponsor:
+          PRODUCT_BUNDLE_IDENTIFIER: com.smartresponsor.mobile.platform
+          APS_ENVIRONMENT: production
     dependencies:
       - target: MobileClient
       - target: CoreConfig
@@ -80,9 +118,19 @@ targets:
       - target: CorePush
       - target: CoreSecurity
 schemes:
-  Mobiling:
+  OneTasker:
     build:
       targets:
         Mobiling: all
     run:
-      config: Debug
+      config: DebugOneTasker
+    archive:
+      config: ReleaseOneTasker
+  SmartResponsor:
+    build:
+      targets:
+        Mobiling: all
+    run:
+      config: DebugSmartResponsor
+    archive:
+      config: ReleaseSmartResponsor

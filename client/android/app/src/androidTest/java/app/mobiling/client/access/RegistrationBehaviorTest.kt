@@ -1,0 +1,110 @@
+package app.mobiling.client.access
+
+import androidx.compose.material3.Text
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performTextInput
+import app.mobiling.client.auth.AccessAuthFeatureBridge
+import org.junit.Rule
+import org.junit.Test
+
+/**
+ * Copyright (c) 2025 Oleksandr Tishchenko / Marketing America Corp.
+ *
+ * Behavioral coverage for Android registration response handling.
+ */
+class RegistrationBehaviorTest {
+    @get:Rule
+    val composeRule = createComposeRule()
+
+    @Test
+    fun registrationResponseRoutesToVerificationRequired() {
+        val gateway = AccessAuthSessionGatewayFixture(
+            registrationPayload = verificationRequiredPayload(),
+        )
+
+        composeRule.setAccessShell(gateway)
+
+        submitRegistration()
+        composeRule.waitUntil(timeoutMillis = 5_000) { gateway.registrationCalls == 1 }
+        check(gateway.registrationRequest?.displayName == "user")
+        check(gateway.registrationRequest?.email == "user@example.com")
+        check(gateway.registrationRequest?.password == "password")
+        composeRule.assertVerificationRequiredDisplayed()
+    }
+
+    @Test
+    fun registrationResponseRoutesToSecondFactorRequired() {
+        val gateway = AccessAuthSessionGatewayFixture(
+            registrationPayload = secondFactorRequiredPayload(),
+        )
+
+        composeRule.setAccessShell(gateway)
+
+        submitRegistration()
+        composeRule.waitUntil(timeoutMillis = 5_000) { gateway.registrationCalls == 1 }
+        composeRule.assertSecondFactorRequiredDisplayed()
+    }
+
+    @Test
+    fun registrationResponseRoutesToAuthenticatedContentWithVendorIdentity() {
+        val gateway = AccessAuthSessionGatewayFixture(
+            registrationPayload = testSessionPayload(authenticated = true),
+        )
+
+        composeRule.setContent {
+            MobilingAppShell(
+                accessAuthFeatureBridge = AccessAuthFeatureBridge(gateway),
+                authenticatedContent = { vendorId, _ -> Text("Registered vendor: $vendorId") },
+            )
+        }
+
+        submitRegistration()
+        composeRule.waitUntil(timeoutMillis = 5_000) { gateway.registrationCalls == 1 }
+        composeRule.onNodeWithText("Registered vendor: test-vendor").assertIsDisplayed()
+    }
+
+    @Test
+    fun unavailableRegistrationBridgeKeepsFormAndShowsStatus() {
+        composeRule.setContent { MobilingAppShell() }
+
+        submitRegistration()
+        composeRule.onNodeWithText(AccessUnavailableMessage).assertIsDisplayed()
+        assertRegistrationFormDisplayed()
+    }
+
+    @Test
+    fun registrationFailureKeepsFormAndShowsStatus() {
+        val gateway = AccessAuthSessionGatewayFixture(
+            registrationFailure = IllegalStateException("registration unavailable"),
+        )
+
+        composeRule.setAccessShell(gateway)
+
+        submitRegistration()
+        composeRule.waitUntil(timeoutMillis = 5_000) { gateway.registrationCalls == 1 }
+        composeRule.onNodeWithText("Access could not be created.").assertIsDisplayed()
+        assertRegistrationFormDisplayed()
+    }
+
+    private fun submitRegistration() {
+        composeRule.performAccessAction("Create access")
+        composeRule.onNodeWithText("Email").performTextInput("user@example.com")
+        composeRule.onNodeWithText("Password").performTextInput("password")
+        composeRule.onNodeWithText("Confirm password").performTextInput("password")
+        composeRule.performAccessAction("Create access")
+    }
+
+    private fun assertRegistrationFormDisplayed() {
+        composeRule.onNodeWithText("Email").assertIsDisplayed()
+        composeRule.onNodeWithText("Password").assertIsDisplayed()
+        composeRule.onNodeWithText("Confirm password").assertIsDisplayed()
+        composeRule.onNodeWithText("Password quality: Weak").assertIsDisplayed()
+        composeRule.onAllNodesWithText("At least 8 characters")[0].assertIsDisplayed()
+        composeRule
+            .onNodeWithText("Set up a guest entry for the 1tasker workspace.")
+            .assertIsDisplayed()
+    }
+}

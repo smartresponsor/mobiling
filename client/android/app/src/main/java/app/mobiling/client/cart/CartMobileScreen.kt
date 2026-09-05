@@ -15,8 +15,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
+import app.mobiling.client.design.MobileDesignSystem
 import app.mobiling.client.contract.cart.CartMobilePayload
 import kotlinx.coroutines.launch
 
@@ -42,10 +41,9 @@ fun CartMobileScreen(cartFeatureBridge: CartFeatureBridge? = null) {
     }
 
     Column(
-        modifier = Modifier.fillMaxWidth().padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = Modifier.fillMaxWidth().padding(MobileDesignSystem.spacing.lg),
+        verticalArrangement = Arrangement.spacedBy(MobileDesignSystem.spacing.sm),
     ) {
-        Text("Cart", fontWeight = FontWeight.Bold)
         Text(error ?: "Current cart status: ${cart?.status ?: "not loaded"}")
         cart?.items.orEmpty().forEach { item ->
             ListItem(

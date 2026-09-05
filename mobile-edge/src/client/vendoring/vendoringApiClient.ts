@@ -1,6 +1,7 @@
 import { request as httpRequest } from "http";
 import { request as httpsRequest } from "https";
 import { ENV } from "../../env.js";
+import { resolveUpstreamBaseUrl } from "../../runtime/applicationRuntimeResolver.js";
 
 export interface VendoringApiErrorPayload {
   code: string;
@@ -46,7 +47,7 @@ export class VendoringApiClient {
   }
 
   private async request(method: string, path: string, body: unknown, forwardedHeaders: Record<string, string>): Promise<VendoringApiResponse> {
-    const baseUrl = this.baseUrl.trim();
+    const baseUrl = await resolveUpstreamBaseUrl(forwardedHeaders, this.baseUrl);
 
     if ("" === baseUrl) {
       return this.unavailable();

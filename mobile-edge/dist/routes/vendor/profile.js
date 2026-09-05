@@ -1,16 +1,26 @@
 import { mobileAccessErrorPayload } from "../../contract/access/error.js";
 import { mobileVendorProfilePayload } from "../../contract/vendor/profile.js";
 import { VendoringApiClient } from "../../client/vendoring/vendoringApiClient.js";
+import { ENV } from "../../env.js";
+import { resolveUpstreamBaseUrl } from "../../runtime/applicationRuntimeResolver.js";
 const vendoringApiClient = new VendoringApiClient();
 function forwardedHeaders(request) {
     const headers = {};
     const cookie = request.headers.cookie;
     const authorization = request.headers.authorization;
+    const applicationKey = request.headers["x-application-key"];
+    const applicationEnvironment = request.headers["x-application-environment"];
     if ("string" === typeof cookie && "" !== cookie.trim()) {
         headers.cookie = cookie.trim();
     }
     if ("string" === typeof authorization && "" !== authorization.trim()) {
         headers.authorization = authorization.trim();
+    }
+    if ("string" === typeof applicationKey && "" !== applicationKey.trim()) {
+        headers["x-application-key"] = applicationKey.trim();
+    }
+    if ("string" === typeof applicationEnvironment && "" !== applicationEnvironment.trim()) {
+        headers["x-application-environment"] = applicationEnvironment.trim();
     }
     return headers;
 }
@@ -43,7 +53,18 @@ function nestedRecord(source, field) {
 function nestedString(source, field) {
     return stringValue(source[field]);
 }
-function normalizeProfile(vendorId, body) {
+function absoluteVendoringUrl(value, baseUrl) {
+    if (null === value) {
+        return null;
+    }
+    try {
+        return new URL(value, baseUrl.replace(/\/$/, "") + "/").toString();
+    }
+    catch {
+        return value;
+    }
+}
+function normalizeProfile(vendorId, body, baseUrl) {
     const unwrappedBody = profilePayload(body);
     const root = isRecord(unwrappedBody) ? unwrappedBody : {};
     const profile = nestedRecord(root, "profile");
@@ -60,8 +81,11 @@ function normalizeProfile(vendorId, body) {
         completionPercent: null === completion ? 0 : Math.max(0, Math.min(100, Math.round(completion))),
         readyForPublishing: true === root.readyForPublishing,
         nextAction: stringValue(root.nextAction),
-        avatarUrl: nestedString(avatar, "url"),
-        coverUrl: nestedString(cover, "url"),
+        avatarUrl: absoluteVendoringUrl(nestedString(avatar, "url"), baseUrl),
+        avatarAttachmentId: nestedString(avatar, "attachmentId") ?? nestedString(avatar, "id"),
+        coverUrl: absoluteVendoringUrl(nestedString(cover, "url"), baseUrl),
+        coverAttachmentId: nestedString(cover, "attachmentId") ?? nestedString(cover, "id"),
+        canEditProfileMedia: true,
         about: nestedString(publicProfile, "about") ?? nestedString(profile, "about"),
         website: nestedString(publicProfile, "website") ?? nestedString(profile, "website"),
         publicationStatus: nestedString(publication, "status") ?? nestedString(publicProfile, "status"),
@@ -110,9 +134,11 @@ export default async function route(app) {
                 message: "Vendor profile request requires a vendor id.",
             });
         }
-        const result = await vendoringApiClient.getProfile(vendorId, forwardedHeaders(request));
+        const headers = forwardedHeaders(request);
+        const result = await vendoringApiClient.getProfile(vendorId, headers);
         if (result.status >= 200 && result.status < 300) {
-            return reply.code(200).send(normalizeProfile(vendorId, result.body));
+            const baseUrl = await resolveUpstreamBaseUrl(headers, ENV.VENDORING_API_BASE_URL);
+            return reply.code(200).send(normalizeProfile(vendorId, result.body, baseUrl));
         }
         return reply.code(result.status).send(normalizeErrorPayload(result.body));
     });

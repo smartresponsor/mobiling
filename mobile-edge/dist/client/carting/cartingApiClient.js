@@ -1,6 +1,7 @@
 import { request as httpRequest } from "http";
 import { request as httpsRequest } from "https";
 import { ENV } from "../../env.js";
+import { resolveUpstreamBaseUrl } from "../../runtime/applicationRuntimeResolver.js";
 const CARTING_API_UNAVAILABLE_PAYLOAD = {
     code: "carting_api_unavailable",
     message: "Carting API is unavailable from mobile-edge.",
@@ -22,7 +23,7 @@ export class CartingApiClient {
         return this.request("POST", "/api/cart/checkout-handoff", null, forwardedHeaders);
     }
     async request(method, path, body, forwardedHeaders) {
-        const baseUrl = this.baseUrl.trim();
+        const baseUrl = await resolveUpstreamBaseUrl(forwardedHeaders, this.baseUrl);
         if ("" === baseUrl) {
             return this.unavailable();
         }
@@ -57,9 +58,11 @@ export class CartingApiClient {
                         return;
                     }
                     const text = Buffer.concat(chunks).toString("utf8");
+                    const cartTokenHeader = response.headers["x-cart-token"];
                     resolve({
                         status,
                         body: this.parseResponseBody(text),
+                        ...(typeof cartTokenHeader === "string" && cartTokenHeader.trim() !== "" ? { cartToken: cartTokenHeader.trim() } : {}),
                     });
                 });
             });

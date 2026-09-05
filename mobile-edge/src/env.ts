@@ -7,6 +7,10 @@ const boolean = (name: string, fallback: boolean): boolean =>
 const list = (name: string, fallback = ""): string[] =>
   (process.env[name] || fallback).split(",").map((value) => value.trim()).filter(Boolean);
 
+const localSymfonyApiBaseUrl =
+  process.env.LOCAL_SYMFONY_API_BASE_URL
+  || ((process.env.NODE_ENV || "development") === "production" ? "" : "http://127.0.0.1:8000");
+
 export const ENV = {
   NODE_ENV: process.env.NODE_ENV || "development",
   PORT: integer("PORT", 8080),
@@ -29,20 +33,30 @@ export const ENV = {
   CONFIG_KEY_ID: process.env.CONFIG_KEY_ID || "k1",
   ANALYTIC_SECRET: process.env.ANALYTIC_SECRET || "dev-analytic",
   RATE_MOBILE_RPM: integer("RATE_MOBILE_RPM", 120),
-  ACCESSING_API_BASE_URL: process.env.ACCESSING_API_BASE_URL || "",
-  ACCESSING_API_TIMEOUT_MS: integer("ACCESSING_API_TIMEOUT_MS", 3000),
-  VENDORING_API_BASE_URL: process.env.VENDORING_API_BASE_URL || "",
-  VENDORING_API_TIMEOUT_MS: integer("VENDORING_API_TIMEOUT_MS", 3000),
-  NAVIGATING_API_BASE_URL: process.env.NAVIGATING_API_BASE_URL || "",
+  ACCESSING_API_BASE_URL: process.env.ACCESSING_API_BASE_URL || localSymfonyApiBaseUrl,
+  ACCESSING_API_TIMEOUT_MS: integer("ACCESSING_API_TIMEOUT_MS", 10000),
+  VENDORING_API_BASE_URL: process.env.VENDORING_API_BASE_URL || localSymfonyApiBaseUrl,
+  VENDORING_API_TIMEOUT_MS: integer("VENDORING_API_TIMEOUT_MS", 30000),
+  CRUDING_API_BASE_URL: process.env.CRUDING_API_BASE_URL || process.env.VENDORING_API_BASE_URL || localSymfonyApiBaseUrl,
+  CRUDING_API_TIMEOUT_MS: integer("CRUDING_API_TIMEOUT_MS", 10000),
+  APPLICATION_RUNTIME_API_BASE_URL: process.env.APPLICATION_RUNTIME_API_BASE_URL || localSymfonyApiBaseUrl,
+  APPLICATION_RUNTIME_API_TIMEOUT_MS: integer("APPLICATION_RUNTIME_API_TIMEOUT_MS", 3000),
+  NAVIGATING_API_BASE_URL: process.env.NAVIGATING_API_BASE_URL || localSymfonyApiBaseUrl,
   NAVIGATING_API_TIMEOUT_MS: integer("NAVIGATING_API_TIMEOUT_MS", 3000),
-  CARTING_API_BASE_URL: process.env.CARTING_API_BASE_URL || "",
+  CARTING_API_BASE_URL: process.env.CARTING_API_BASE_URL || localSymfonyApiBaseUrl,
   CARTING_API_TIMEOUT_MS: integer("CARTING_API_TIMEOUT_MS", 3000),
-  CATALOGING_API_BASE_URL: process.env.CATALOGING_API_BASE_URL || "",
+  CATALOGING_API_BASE_URL: process.env.CATALOGING_API_BASE_URL || localSymfonyApiBaseUrl,
   CATALOGING_API_TIMEOUT_MS: integer("CATALOGING_API_TIMEOUT_MS", 3000),
-  ATTACHING_API_BASE_URL: process.env.ATTACHING_API_BASE_URL || "",
+  ATTACHING_API_BASE_URL: process.env.ATTACHING_API_BASE_URL || localSymfonyApiBaseUrl,
   ATTACHING_API_TIMEOUT_MS: integer("ATTACHING_API_TIMEOUT_MS", 3000),
-  LOCALIZING_API_BASE_URL: process.env.LOCALIZING_API_BASE_URL || "",
+  LOCALIZING_API_BASE_URL: process.env.LOCALIZING_API_BASE_URL || localSymfonyApiBaseUrl,
   LOCALIZING_API_TIMEOUT_MS: integer("LOCALIZING_API_TIMEOUT_MS", 3000),
+  MESSAGING_API_BASE_URL: process.env.MESSAGING_API_BASE_URL || localSymfonyApiBaseUrl,
+  MESSAGING_API_TIMEOUT_MS: integer("MESSAGING_API_TIMEOUT_MS", 10000),
+  NOTIFYING_API_BASE_URL: process.env.NOTIFYING_API_BASE_URL || localSymfonyApiBaseUrl,
+  NOTIFYING_API_TIMEOUT_MS: integer("NOTIFYING_API_TIMEOUT_MS", 10000),
+  CASING_API_BASE_URL: process.env.CASING_API_BASE_URL || localSymfonyApiBaseUrl,
+  CASING_API_TIMEOUT_MS: integer("CASING_API_TIMEOUT_MS", 10000),
   CORE_COMMERCE_URL: process.env.CORE_COMMERCE_URL || "http://localhost:9000",
   CORE_AUTH: process.env.CORE_AUTH || "",
   CORE_TIMEOUT_MS: integer("CORE_TIMEOUT_MS", 3000),
@@ -74,10 +88,14 @@ export function assertRuntimeEnv(): void {
     ["ANALYTIC_SECRET", ENV.ANALYTIC_SECRET, "dev-analytic"],
     ["ACCESSING_API_BASE_URL", ENV.ACCESSING_API_BASE_URL, ""],
     ["VENDORING_API_BASE_URL", ENV.VENDORING_API_BASE_URL, ""],
+    ["APPLICATION_RUNTIME_API_BASE_URL", ENV.APPLICATION_RUNTIME_API_BASE_URL, ""],
     ["NAVIGATING_API_BASE_URL", ENV.NAVIGATING_API_BASE_URL, ""],
     ["CARTING_API_BASE_URL", ENV.CARTING_API_BASE_URL, ""],
     ["CATALOGING_API_BASE_URL", ENV.CATALOGING_API_BASE_URL, ""],
     ["ATTACHING_API_BASE_URL", ENV.ATTACHING_API_BASE_URL, ""],
+    ["MESSAGING_API_BASE_URL", ENV.MESSAGING_API_BASE_URL, ""],
+    ["NOTIFYING_API_BASE_URL", ENV.NOTIFYING_API_BASE_URL, ""],
+    ["CASING_API_BASE_URL", ENV.CASING_API_BASE_URL, ""],
   ].filter(([, value, forbidden]) => value === forbidden).map(([name]) => name);
   if (invalid.length > 0) {
     throw new Error(`Unsafe production configuration: ${invalid.join(", ")}`);

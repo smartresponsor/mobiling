@@ -7,7 +7,10 @@
   "readyForPublishing": true,
   "nextAction": "review_publication",
   "avatarUrl": null,
+  "avatarAttachmentId": null,
   "coverUrl": null,
+  "coverAttachmentId": null,
+  "canEditProfileMedia": true,
   "about": "Demo vendor profile for mobile screen fixtures.",
   "website": "https://example.test",
   "publicationStatus": "draft"

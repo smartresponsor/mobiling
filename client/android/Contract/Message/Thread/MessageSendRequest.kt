@@ -5,5 +5,6 @@ package app.mobiling.client.contract.message.thread
  */
 data class MessageSendRequest(
     val threadId: String,
+    val userId: String,
     val body: String,
 )

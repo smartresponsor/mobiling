@@ -53,7 +53,7 @@ public struct MobileVendorStatementView: View {
         }
 
         guard let vendorStatementGateway else {
-            errorMessage = "Vendor statement gateway is not available."
+            errorMessage = "Vendor statement service is not available."
             return
         }
 

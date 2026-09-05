@@ -1,6 +1,7 @@
 import { request as httpRequest } from "http";
 import { request as httpsRequest } from "https";
 import { ENV } from "../../env.js";
+import { ApplicationRuntimeResolver } from "../../runtime/applicationRuntimeResolver.js";
 
 export interface NavigatingApiErrorPayload {
   code: string;
@@ -18,6 +19,8 @@ const NAVIGATING_API_UNAVAILABLE_PAYLOAD: NavigatingApiErrorPayload = {
 };
 
 export class NavigatingApiClient {
+  private readonly runtimeResolver = new ApplicationRuntimeResolver();
+
   constructor(
     private readonly baseUrl: string = ENV.NAVIGATING_API_BASE_URL,
     private readonly timeoutMs: number = ENV.NAVIGATING_API_TIMEOUT_MS,
@@ -29,7 +32,10 @@ export class NavigatingApiClient {
   }
 
   private async request(method: string, path: string, forwardedHeaders: Record<string, string>): Promise<NavigatingApiResponse> {
-    const baseUrl = this.baseUrl.trim();
+    const applicationKey = forwardedHeaders["x-application-key"] || "";
+    const applicationEnvironment = forwardedHeaders["x-application-environment"] || "";
+    const runtime = await this.runtimeResolver.resolve(applicationKey, applicationEnvironment);
+    const baseUrl = (runtime?.effectiveOrigin || this.baseUrl).trim();
 
     if ("" === baseUrl) {
       return this.unavailable();
