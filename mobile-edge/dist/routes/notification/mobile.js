@@ -2,6 +2,7 @@ import { request as httpRequest } from "http";
 import { request as httpsRequest } from "https";
 import { mobileAccessErrorPayload } from "../../contract/access/error.js";
 import { ENV } from "../../env.js";
+import { resolveUpstreamBaseUrl } from "../../runtime/applicationRuntimeResolver.js";
 const unavailablePayload = { code: "notifying_api_unavailable", message: "Notifying API is unavailable from mobile-edge." };
 function isRecord(value) {
     return null !== value && "object" === typeof value && !Array.isArray(value);
@@ -15,7 +16,7 @@ function integerValue(value) {
 }
 function forwardedHeaders(request) {
     const headers = {};
-    for (const name of ["cookie", "authorization", "x-notifying-recipient-key"]) {
+    for (const name of ["cookie", "authorization", "x-notifying-recipient-key", "x-application-key", "x-application-environment"]) {
         const value = request.headers[name];
         if ("string" === typeof value && "" !== value.trim())
             headers[name] = value.trim();
@@ -32,8 +33,8 @@ function parseBody(text) {
         return text;
     }
 }
-function notifyingRequest(method, path, body, headers) {
-    const baseUrl = ENV.NOTIFYING_API_BASE_URL.trim();
+async function notifyingRequest(method, path, body, headers) {
+    const baseUrl = await resolveUpstreamBaseUrl(headers, ENV.NOTIFYING_API_BASE_URL);
     if ("" === baseUrl)
         return Promise.resolve({ status: 503, body: unavailablePayload });
     let url;

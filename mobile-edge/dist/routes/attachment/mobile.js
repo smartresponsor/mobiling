@@ -6,11 +6,19 @@ function forwardedHeaders(request) {
     const headers = {};
     const cookie = request.headers.cookie;
     const authorization = request.headers.authorization;
+    const applicationKey = request.headers["x-application-key"];
+    const applicationEnvironment = request.headers["x-application-environment"];
     if ("string" === typeof cookie && "" !== cookie.trim()) {
         headers.cookie = cookie.trim();
     }
     if ("string" === typeof authorization && "" !== authorization.trim()) {
         headers.authorization = authorization.trim();
+    }
+    if ("string" === typeof applicationKey && "" !== applicationKey.trim()) {
+        headers["x-application-key"] = applicationKey.trim();
+    }
+    if ("string" === typeof applicationEnvironment && "" !== applicationEnvironment.trim()) {
+        headers["x-application-environment"] = applicationEnvironment.trim();
     }
     return headers;
 }
@@ -63,7 +71,7 @@ function attachmentRoot(body) {
     }
     return isRecord(body.data) ? body.data : body;
 }
-function normalizeAttachmentItem(value) {
+async function normalizeAttachmentItem(value, headers) {
     const item = recordValue(value);
     const attachmentId = stringValue(item.attachmentId ?? item.id) ?? "attachment-unavailable";
     return {
@@ -85,13 +93,13 @@ function normalizeAttachmentItem(value) {
         isPrimary: booleanValue(item.isPrimary, false),
         position: integerValue(item.position, 0),
         createdAt: stringValue(item.createdAt),
-        downloadUrl: attachingApiClient.attachmentFileUrl(attachmentId) ?? stringValue(item.downloadUrl),
+        downloadUrl: stringValue(item.downloadUrl) ?? await attachingApiClient.attachmentFileUrl(attachmentId, headers),
         payload: item,
     };
 }
-function normalizeAttachmentList(body) {
+async function normalizeAttachmentList(body, headers) {
     const root = attachmentRoot(body);
-    const items = Array.isArray(root.items) ? root.items.map(normalizeAttachmentItem) : [];
+    const items = Array.isArray(root.items) ? await Promise.all(root.items.map((item) => normalizeAttachmentItem(item, headers))) : [];
     return {
         ownerType: stringValue(root.ownerType) ?? "unknown",
         ownerId: stringValue(root.ownerId) ?? "unknown",
@@ -169,11 +177,12 @@ function listQuery(query) {
 }
 export default async function route(app) {
     app.get("/attachment", { schema: { response: { 200: mobileAttachmentListPayload, 400: mobileAccessErrorPayload, 404: mobileAccessErrorPayload, 422: mobileAccessErrorPayload, 500: mobileAccessErrorPayload, 503: mobileAccessErrorPayload } } }, async (request, reply) => {
-        const result = await attachingApiClient.listAttachment(listQuery(request.query), forwardedHeaders(request));
+        const headers = forwardedHeaders(request);
+        const result = await attachingApiClient.listAttachment(listQuery(request.query), headers);
         if (result.status < 200 || result.status >= 300) {
             return reply.code(result.status).send(normalizeErrorPayload(result.body));
         }
-        return reply.code(200).send(normalizeAttachmentList(result.body));
+        return reply.code(200).send(await normalizeAttachmentList(result.body, headers));
     });
     app.post("/attachment/link", { schema: { body: mobileAttachmentLinkRequest, response: { 200: mobileAttachmentLinkPayload, 201: mobileAttachmentLinkPayload, 400: mobileAccessErrorPayload, 404: mobileAccessErrorPayload, 409: mobileAccessErrorPayload, 422: mobileAccessErrorPayload, 500: mobileAccessErrorPayload, 503: mobileAccessErrorPayload } } }, async (request, reply) => {
         const result = await attachingApiClient.attachAttachment(request.body, forwardedHeaders(request));
@@ -195,14 +204,14 @@ export default async function route(app) {
         if (null === attachmentId) {
             return reply.code(422).send({ code: "attachment_id_required", message: "Attachment id is required." });
         }
-        const downloadUrl = attachingApiClient.attachmentFileUrl(attachmentId);
+        const downloadUrl = await attachingApiClient.attachmentFileUrl(attachmentId, forwardedHeaders(request));
         if (null === downloadUrl) {
             return reply.code(503).send({ code: "attaching_api_unavailable", message: "Attaching API is unavailable from mobile-edge." });
         }
         return reply.code(200).send(normalizeAttachmentFile(attachmentId, downloadUrl));
     });
     app.post("/attachment/upload-handoff", { schema: { body: mobileAttachmentUploadHandoffRequest, response: { 200: mobileAttachmentUploadHandoffPayload, 400: mobileAccessErrorPayload, 422: mobileAccessErrorPayload, 500: mobileAccessErrorPayload, 503: mobileAccessErrorPayload } } }, async (request, reply) => {
-        const uploadUrl = attachingApiClient.attachmentUploadUrl();
+        const uploadUrl = await attachingApiClient.attachmentUploadUrl(forwardedHeaders(request));
         if (null === uploadUrl) {
             return reply.code(503).send({ code: "attaching_api_unavailable", message: "Attaching API is unavailable from mobile-edge." });
         }

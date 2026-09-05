@@ -1,6 +1,7 @@
 import { request as httpRequest } from "http";
 import { request as httpsRequest } from "https";
 import { ENV } from "../../env.js";
+import { ApplicationRuntimeResolver } from "../../runtime/applicationRuntimeResolver.js";
 const ACCESSING_API_UNAVAILABLE_PAYLOAD = {
     code: "accessing_api_unavailable",
     message: "Accessing API is unavailable from mobile-edge.",
@@ -8,6 +9,7 @@ const ACCESSING_API_UNAVAILABLE_PAYLOAD = {
 export class AccessingApiClient {
     baseUrl;
     timeoutMs;
+    runtimeResolver = new ApplicationRuntimeResolver();
     constructor(baseUrl = ENV.ACCESSING_API_BASE_URL, timeoutMs = ENV.ACCESSING_API_TIMEOUT_MS) {
         this.baseUrl = baseUrl;
         this.timeoutMs = timeoutMs;
@@ -43,7 +45,10 @@ export class AccessingApiClient {
         return this.request("POST", "/api/access/recovery/reset", request, forwardedHeaders);
     }
     async request(method, path, body, forwardedHeaders) {
-        const baseUrl = this.baseUrl.trim();
+        const applicationKey = forwardedHeaders["x-application-key"] || "";
+        const applicationEnvironment = forwardedHeaders["x-application-environment"] || "";
+        const runtime = await this.runtimeResolver.resolve(applicationKey, applicationEnvironment);
+        const baseUrl = (runtime?.effectiveOrigin || this.baseUrl).trim();
         if ("" === baseUrl) {
             return this.unavailable();
         }

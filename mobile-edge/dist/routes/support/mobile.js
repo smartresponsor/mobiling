@@ -1,13 +1,14 @@
 import { request as httpRequest } from "http";
 import { request as httpsRequest } from "https";
 import { ENV } from "../../env.js";
+import { resolveUpstreamBaseUrl } from "../../runtime/applicationRuntimeResolver.js";
 const unavailablePayload = {
     code: "casing_api_unavailable",
     message: "Casing API is unavailable from mobile-edge.",
 };
 function forwardedHeaders(request) {
     const headers = {};
-    for (const name of ["cookie", "authorization"]) {
+    for (const name of ["cookie", "authorization", "x-application-key", "x-application-environment"]) {
         const value = request.headers[name];
         if ("string" === typeof value && "" !== value.trim())
             headers[name] = value.trim();
@@ -24,8 +25,8 @@ function parseBody(text) {
         return { message: text };
     }
 }
-function casingRequest(method, path, body, headers) {
-    const baseUrl = ENV.CASING_API_BASE_URL.trim();
+async function casingRequest(method, path, body, headers) {
+    const baseUrl = await resolveUpstreamBaseUrl(headers, ENV.CASING_API_BASE_URL);
     if ("" === baseUrl)
         return Promise.resolve({ status: 503, body: unavailablePayload });
     let url;

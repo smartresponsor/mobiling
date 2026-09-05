@@ -1,6 +1,7 @@
 import { request as httpRequest } from "http";
 import { request as httpsRequest } from "https";
 import { ENV } from "../../env.js";
+import { resolveUpstreamBaseUrl } from "../../runtime/applicationRuntimeResolver.js";
 export class WalletingApiClient {
     baseUrl;
     timeoutMs;
@@ -35,8 +36,8 @@ export class WalletingApiClient {
     get(path, headers) {
         return this.send("GET", path, headers);
     }
-    send(method, path, headers, body) {
-        const baseUrl = this.baseUrl.trim();
+    async send(method, path, headers, body) {
+        const baseUrl = await resolveUpstreamBaseUrl(headers, this.baseUrl);
         if (!baseUrl)
             return Promise.resolve({ status: 503, body: { code: "walleting_api_unavailable", message: "Walleting API is unavailable." } });
         let url;

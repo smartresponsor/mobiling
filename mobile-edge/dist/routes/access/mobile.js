@@ -7,11 +7,19 @@ function forwardedHeaders(request) {
     const headers = {};
     const cookie = request.headers.cookie;
     const authorization = request.headers.authorization;
+    const applicationKey = request.headers["x-application-key"];
+    const applicationEnvironment = request.headers["x-application-environment"];
     if ("string" === typeof cookie && "" !== cookie.trim()) {
         headers.cookie = cookie.trim();
     }
     if ("string" === typeof authorization && "" !== authorization.trim()) {
         headers.authorization = authorization.trim();
+    }
+    if ("string" === typeof applicationKey && "" !== applicationKey.trim()) {
+        headers["x-application-key"] = applicationKey.trim();
+    }
+    if ("string" === typeof applicationEnvironment && "" !== applicationEnvironment.trim()) {
+        headers["x-application-environment"] = applicationEnvironment.trim();
     }
     return headers;
 }

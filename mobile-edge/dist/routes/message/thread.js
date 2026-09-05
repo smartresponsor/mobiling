@@ -3,6 +3,7 @@ import { request as httpsRequest } from "https";
 import { mobileAccessErrorPayload } from "../../contract/access/error.js";
 import { AccessingApiClient } from "../../client/accessing/accessingApiClient.js";
 import { ENV } from "../../env.js";
+import { resolveUpstreamBaseUrl } from "../../runtime/applicationRuntimeResolver.js";
 const unavailablePayload = {
     code: "messaging_api_unavailable",
     message: "Messaging API is unavailable from mobile-edge.",
@@ -15,6 +16,8 @@ function forwardedHeaders(request) {
     const userId = request.headers["x-user-id"];
     const powNonce = request.headers["x-pow-nonce"];
     const powTs = request.headers["x-pow-ts"];
+    const applicationKey = request.headers["x-application-key"];
+    const applicationEnvironment = request.headers["x-application-environment"];
     if ("string" === typeof cookie && "" !== cookie.trim())
         headers.cookie = cookie.trim();
     if ("string" === typeof authorization && "" !== authorization.trim())
@@ -25,6 +28,10 @@ function forwardedHeaders(request) {
         headers["x-pow-nonce"] = powNonce.trim();
     if ("string" === typeof powTs && "" !== powTs.trim())
         headers["x-pow-ts"] = powTs.trim();
+    if ("string" === typeof applicationKey && "" !== applicationKey.trim())
+        headers["x-application-key"] = applicationKey.trim();
+    if ("string" === typeof applicationEnvironment && "" !== applicationEnvironment.trim())
+        headers["x-application-environment"] = applicationEnvironment.trim();
     return headers;
 }
 async function resolvedMessagingHeaders(request) {
@@ -75,8 +82,8 @@ function parseBody(text) {
         return text;
     }
 }
-function messagingRequest(method, path, body, headers) {
-    const baseUrl = ENV.MESSAGING_API_BASE_URL.trim();
+async function messagingRequest(method, path, body, headers) {
+    const baseUrl = await resolveUpstreamBaseUrl(headers, ENV.MESSAGING_API_BASE_URL);
     if ("" === baseUrl)
         return Promise.resolve({ status: 503, body: unavailablePayload });
     let url;

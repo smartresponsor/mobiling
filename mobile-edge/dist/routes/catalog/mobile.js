@@ -6,11 +6,19 @@ function forwardedHeaders(request) {
     const headers = {};
     const cookie = request.headers.cookie;
     const authorization = request.headers.authorization;
+    const applicationKey = request.headers["x-application-key"];
+    const applicationEnvironment = request.headers["x-application-environment"];
     if ("string" === typeof cookie && "" !== cookie.trim()) {
         headers.cookie = cookie.trim();
     }
     if ("string" === typeof authorization && "" !== authorization.trim()) {
         headers.authorization = authorization.trim();
+    }
+    if ("string" === typeof applicationKey && "" !== applicationKey.trim()) {
+        headers["x-application-key"] = applicationKey.trim();
+    }
+    if ("string" === typeof applicationEnvironment && "" !== applicationEnvironment.trim()) {
+        headers["x-application-environment"] = applicationEnvironment.trim();
     }
     return headers;
 }
@@ -45,69 +53,87 @@ function normalizeErrorPayload(body) {
     }
     return { code: "cataloging_api_error", message: "Cataloging API returned an unexpected response." };
 }
-function catalogRoot(body) {
+function responsePayload(body) {
     if (!isRecord(body)) {
-        return {};
+        return body;
     }
-    return isRecord(body.data) ? body.data : body;
+    return undefined === body.data ? body : body.data;
 }
-function catalogItems(root) {
-    if (Array.isArray(root.nodes))
-        return root.nodes;
-    if (Array.isArray(root.items))
-        return root.items;
-    if (Array.isArray(root.categories))
-        return root.categories;
+function catalogItems(payload) {
+    if (Array.isArray(payload))
+        return payload;
+    if (!isRecord(payload))
+        return [];
+    if (Array.isArray(payload.nodes))
+        return payload.nodes;
+    if (Array.isArray(payload.items))
+        return payload.items;
+    if (Array.isArray(payload.categories))
+        return payload.categories;
     return [];
 }
-function catalogNodeId(value) {
+function nodeId(value) {
     const item = recordValue(value);
     return stringValue(item.nodeId ?? item.catalogNodeId ?? item.categoryId ?? item.id);
 }
-function catalogChildren(value) {
-    const item = recordValue(value);
-    return Array.isArray(item.children) ? item.children : [];
-}
-function findCatalogNode(value, nodeId) {
-    const item = recordValue(value);
-    if (catalogNodeId(item) === nodeId) {
-        return item;
+function directChildren(nodes, parentNodeId) {
+    if (!parentNodeId) {
+        return nodes;
     }
-    for (const child of catalogChildren(item)) {
-        const match = findCatalogNode(child, nodeId);
-        if (match)
-            return match;
+    const stack = [...nodes];
+    while (stack.length > 0) {
+        const candidate = stack.shift();
+        if (!isRecord(candidate))
+            continue;
+        if (nodeId(candidate) === parentNodeId) {
+            return Array.isArray(candidate.children) ? candidate.children : [];
+        }
+        if (Array.isArray(candidate.children)) {
+            stack.push(...candidate.children);
+        }
     }
-    return null;
+    return [];
 }
 function normalizeCatalogNode(value) {
     const item = recordValue(value);
+    const media = recordValue(item.media ?? item.image ?? item.icon);
+    const children = Array.isArray(item.children) ? item.children : [];
     return {
-        nodeId: stringValue(item.nodeId ?? item.catalogNodeId ?? item.categoryId ?? item.id) ?? "catalog-node-unavailable",
-        parentNodeId: stringValue(item.parentNodeId ?? item.parentId),
-        title: stringValue(item.title ?? item.name ?? item.label) ?? "Untitled catalog node",
+        nodeId: nodeId(item) ?? "catalog-node-unavailable",
+        parentNodeId: stringValue(item.parentNodeId ?? item.parentId ?? item.parent_id),
+        title: stringValue(item.title ?? item.name ?? item.nameEntity ?? item.label) ?? "Untitled catalog node",
         slug: stringValue(item.slug),
-        childCount: integerValue(item.childCount ?? item.childrenCount, 0),
+        imageUrl: stringValue(item.imageUrl
+            ?? item.iconUrl
+            ?? item.icon_url
+            ?? item.thumbnailUrl
+            ?? item.thumbnail_url
+            ?? media.url
+            ?? media.imageUrl
+            ?? media.iconUrl),
+        childCount: integerValue(item.childCount ?? item.childrenCount, children.length),
         productCount: integerValue(item.productCount, 0),
     };
 }
-function normalizeCatalogList(body) {
-    const root = catalogRoot(body);
-    return { nodes: catalogItems(root).map(normalizeCatalogNode), payload: root };
+function normalizeCatalogList(body, parentNodeId = null) {
+    const payload = responsePayload(body);
+    const nodes = directChildren(catalogItems(payload), parentNodeId);
+    return { nodes: nodes.map(normalizeCatalogNode), payload };
 }
 function normalizeCatalogDetail(body) {
-    const root = catalogRoot(body);
+    const payload = responsePayload(body);
+    const root = recordValue(payload);
     const node = normalizeCatalogNode(root.node ?? root.category ?? root.item ?? root);
     return {
         node,
         description: stringValue(root.description),
         breadcrumbLabels: Array.isArray(root.breadcrumbLabels) ? root.breadcrumbLabels.map(stringValue).filter(Boolean) : [],
         featuredProductIds: Array.isArray(root.featuredProductIds) ? root.featuredProductIds.map(stringValue).filter(Boolean) : [],
-        payload: root,
+        payload,
     };
 }
 function normalizeCatalogMutation(body, fallbackStatus, catalogNodeId = null, attachmentId = null) {
-    const root = catalogRoot(body);
+    const root = recordValue(responsePayload(body));
     return {
         status: stringValue(root.status ?? root.state) ?? fallbackStatus,
         catalogNodeId: stringValue(root.catalogNodeId ?? root.categoryId ?? root.id) ?? catalogNodeId,
@@ -118,35 +144,20 @@ function normalizeCatalogMutation(body, fallbackStatus, catalogNodeId = null, at
 function querySuffix(query) {
     const source = recordValue(query);
     const search = new URLSearchParams();
-    const parentNodeId = stringValue(source.parentNodeId);
     const q = stringValue(source.q ?? source.searchText);
-    if (parentNodeId)
-        search.set("parentNodeId", parentNodeId);
     if (q)
         search.set("q", q);
     return "" === search.toString() ? "" : `?${search.toString()}`;
 }
 export default async function route(app) {
-    app.get("/catalog", { schema: { response: { 200: mobileCatalogListPayload, 400: mobileAccessErrorPayload, 404: mobileAccessErrorPayload, 503: mobileAccessErrorPayload } } }, async (request, reply) => {
-        const catalogCode = stringValue(recordValue(request.query).catalogCode);
-        if (!catalogCode) {
-            return reply.code(400).send({ code: "catalog_code_required", message: "catalogCode is required." });
-        }
-        const result = await catalogingApiClient.get(`/api/catalog/${encodeURIComponent(catalogCode)}/category/tree`, forwardedHeaders(request));
+    app.get("/catalog", { schema: { response: { 200: mobileCatalogListPayload, 503: mobileAccessErrorPayload } } }, async (request, reply) => {
+        const query = recordValue(request.query);
+        const parentNodeId = stringValue(query.parentNodeId);
+        const result = await catalogingApiClient.get(`/api/catalog/category/store${querySuffix(query)}`, forwardedHeaders(request));
         if (result.status < 200 || result.status >= 300) {
             return reply.code(result.status).send(normalizeErrorPayload(result.body));
         }
-        const normalized = normalizeCatalogList(result.body);
-        const parentNodeId = stringValue(recordValue(request.query).parentNodeId);
-        if (!parentNodeId) {
-            return reply.code(200).send(normalized);
-        }
-        const root = catalogRoot(result.body);
-        const parent = findCatalogNode(recordValue(root.root), parentNodeId);
-        return reply.code(200).send({
-            nodes: catalogChildren(parent).map(normalizeCatalogNode),
-            payload: root,
-        });
+        return reply.code(200).send(normalizeCatalogList(result.body, parentNodeId));
     });
     app.get("/catalog/node/:catalogNodeId", { schema: { response: { 200: mobileCatalogNodeDetailPayload, 503: mobileAccessErrorPayload } } }, async (request, reply) => {
         const params = recordValue(request.params);

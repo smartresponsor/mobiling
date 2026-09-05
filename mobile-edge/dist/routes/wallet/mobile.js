@@ -2,7 +2,7 @@ import { WalletingApiClient } from "../../client/walleting/walletingApiClient.js
 const client = new WalletingApiClient();
 function forwarded(headers) {
     const result = {};
-    for (const key of ["cookie", "authorization"]) {
+    for (const key of ["cookie", "authorization", "x-application-key", "x-application-environment"]) {
         const value = headers[key];
         if (typeof value === "string" && value.trim())
             result[key] = value.trim();

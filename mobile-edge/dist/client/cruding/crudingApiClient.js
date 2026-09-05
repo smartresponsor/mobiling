@@ -1,6 +1,7 @@
 import { request as httpRequest } from "http";
 import { request as httpsRequest } from "https";
 import { ENV } from "../../env.js";
+import { resolveUpstreamBaseUrl } from "../../runtime/applicationRuntimeResolver.js";
 export class CrudingApiClient {
     baseUrl;
     timeoutMs;
@@ -15,8 +16,8 @@ export class CrudingApiClient {
             : `/api/${encodeURIComponent(resource)}${suffix}`;
         return this.requestPath(method, path, body, headers);
     }
-    requestPath(method, path, body, headers) {
-        const baseUrl = this.baseUrl.trim();
+    async requestPath(method, path, body, headers) {
+        const baseUrl = await resolveUpstreamBaseUrl(headers, this.baseUrl);
         if (!baseUrl)
             return Promise.resolve({ status: 503, body: { code: "cruding_api_unavailable", message: "Cruding API is unavailable." } });
         let url;

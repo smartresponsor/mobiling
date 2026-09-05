@@ -1,6 +1,7 @@
 import { request as httpRequest } from "http";
 import { request as httpsRequest } from "https";
 import { ENV } from "../../env.js";
+import { resolveUpstreamBaseUrl } from "../../runtime/applicationRuntimeResolver.js";
 const CATALOGING_API_UNAVAILABLE_PAYLOAD = {
     code: "cataloging_api_unavailable",
     message: "Cataloging API is unavailable from mobile-edge.",
@@ -22,7 +23,7 @@ export class CatalogingApiClient {
         return this.request("DELETE", path, undefined, forwardedHeaders);
     }
     async request(method, path, body, forwardedHeaders) {
-        const baseUrl = this.baseUrl.trim();
+        const baseUrl = await resolveUpstreamBaseUrl(forwardedHeaders, this.baseUrl);
         if ("" === baseUrl) {
             return this.unavailable();
         }
