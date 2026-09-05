@@ -3,6 +3,7 @@ import { request as httpsRequest } from "https";
 import type { FastifyInstance } from "fastify";
 import { mobileAccessErrorPayload } from "../../contract/access/error.js";
 import { ENV } from "../../env.js";
+import { resolveUpstreamBaseUrl } from "../../runtime/applicationRuntimeResolver.js";
 
 interface NotifyingApiResponse { status: number; body: unknown }
 
@@ -23,7 +24,7 @@ function integerValue(value: unknown): number {
 
 function forwardedHeaders(request: { headers: Record<string, unknown> }): Record<string, string> {
   const headers: Record<string, string> = {};
-  for (const name of ["cookie", "authorization", "x-notifying-recipient-key"]) {
+  for (const name of ["cookie", "authorization", "x-notifying-recipient-key", "x-application-key", "x-application-environment"]) {
     const value = request.headers[name];
     if ("string" === typeof value && "" !== value.trim()) headers[name] = value.trim();
   }
@@ -35,8 +36,8 @@ function parseBody(text: string): unknown {
   try { return JSON.parse(text); } catch { return text; }
 }
 
-function notifyingRequest(method: string, path: string, body: unknown, headers: Record<string, string>): Promise<NotifyingApiResponse> {
-  const baseUrl = ENV.NOTIFYING_API_BASE_URL.trim();
+async function notifyingRequest(method: string, path: string, body: unknown, headers: Record<string, string>): Promise<NotifyingApiResponse> {
+  const baseUrl = await resolveUpstreamBaseUrl(headers, ENV.NOTIFYING_API_BASE_URL);
   if ("" === baseUrl) return Promise.resolve({ status: 503, body: unavailablePayload });
   let url: URL;
   try { url = new URL(baseUrl.replace(/\/$/, "") + path); } catch { return Promise.resolve({ status: 503, body: unavailablePayload }); }

@@ -5,7 +5,7 @@ const client = new WalletingApiClient();
 
 function forwarded(headers: Record<string, unknown>): Record<string, string> {
   const result: Record<string, string> = {};
-  for (const key of ["cookie", "authorization"] as const) {
+  for (const key of ["cookie", "authorization", "x-application-key", "x-application-environment"] as const) {
     const value = headers[key];
     if (typeof value === "string" && value.trim()) result[key] = value.trim();
   }

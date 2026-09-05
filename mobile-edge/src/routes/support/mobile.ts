@@ -3,6 +3,7 @@ import type { FastifyInstance } from "fastify";
 import { request as httpRequest } from "http";
 import { request as httpsRequest } from "https";
 import { ENV } from "../../env.js";
+import { resolveUpstreamBaseUrl } from "../../runtime/applicationRuntimeResolver.js";
 
 interface CasingApiResponse {
   status: number;
@@ -16,7 +17,7 @@ const unavailablePayload = {
 
 function forwardedHeaders(request: { headers: Record<string, unknown> }): Record<string, string> {
   const headers: Record<string, string> = {};
-  for (const name of ["cookie", "authorization"]) {
+  for (const name of ["cookie", "authorization", "x-application-key", "x-application-environment"]) {
     const value = request.headers[name];
     if ("string" === typeof value && "" !== value.trim()) headers[name] = value.trim();
   }
@@ -28,8 +29,8 @@ function parseBody(text: string): unknown {
   try { return JSON.parse(text); } catch { return { message: text }; }
 }
 
-function casingRequest(method: string, path: string, body: unknown, headers: Record<string, string>): Promise<CasingApiResponse> {
-  const baseUrl = ENV.CASING_API_BASE_URL.trim();
+async function casingRequest(method: string, path: string, body: unknown, headers: Record<string, string>): Promise<CasingApiResponse> {
+  const baseUrl = await resolveUpstreamBaseUrl(headers, ENV.CASING_API_BASE_URL);
   if ("" === baseUrl) return Promise.resolve({ status: 503, body: unavailablePayload });
 
   let url: URL;

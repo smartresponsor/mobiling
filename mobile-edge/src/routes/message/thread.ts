@@ -4,6 +4,7 @@ import type { FastifyInstance } from "fastify";
 import { mobileAccessErrorPayload } from "../../contract/access/error.js";
 import { AccessingApiClient } from "../../client/accessing/accessingApiClient.js";
 import { ENV } from "../../env.js";
+import { resolveUpstreamBaseUrl } from "../../runtime/applicationRuntimeResolver.js";
 
 interface MessagingApiResponse {
   status: number;
@@ -24,12 +25,16 @@ function forwardedHeaders(request: { headers: Record<string, unknown> }): Record
   const userId = request.headers["x-user-id"];
   const powNonce = request.headers["x-pow-nonce"];
   const powTs = request.headers["x-pow-ts"];
+  const applicationKey = request.headers["x-application-key"];
+  const applicationEnvironment = request.headers["x-application-environment"];
 
   if ("string" === typeof cookie && "" !== cookie.trim()) headers.cookie = cookie.trim();
   if ("string" === typeof authorization && "" !== authorization.trim()) headers.authorization = authorization.trim();
   if ("string" === typeof userId && "" !== userId.trim()) headers["x-user-id"] = userId.trim();
   if ("string" === typeof powNonce && "" !== powNonce.trim()) headers["x-pow-nonce"] = powNonce.trim();
   if ("string" === typeof powTs && "" !== powTs.trim()) headers["x-pow-ts"] = powTs.trim();
+  if ("string" === typeof applicationKey && "" !== applicationKey.trim()) headers["x-application-key"] = applicationKey.trim();
+  if ("string" === typeof applicationEnvironment && "" !== applicationEnvironment.trim()) headers["x-application-environment"] = applicationEnvironment.trim();
 
   return headers;
 }
@@ -88,8 +93,8 @@ function parseBody(text: string): unknown {
   }
 }
 
-function messagingRequest(method: string, path: string, body: unknown, headers: Record<string, string>): Promise<MessagingApiResponse> {
-  const baseUrl = ENV.MESSAGING_API_BASE_URL.trim();
+async function messagingRequest(method: string, path: string, body: unknown, headers: Record<string, string>): Promise<MessagingApiResponse> {
+  const baseUrl = await resolveUpstreamBaseUrl(headers, ENV.MESSAGING_API_BASE_URL);
   if ("" === baseUrl) return Promise.resolve({ status: 503, body: unavailablePayload });
 
   let url: URL;

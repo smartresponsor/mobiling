@@ -3,6 +3,7 @@ import { mobileAccessErrorPayload } from "../../contract/access/error.js";
 import { mobileVendorProfilePayload } from "../../contract/vendor/profile.js";
 import { VendoringApiClient, type VendoringApiErrorPayload } from "../../client/vendoring/vendoringApiClient.js";
 import { ENV } from "../../env.js";
+import { resolveUpstreamBaseUrl } from "../../runtime/applicationRuntimeResolver.js";
 
 const vendoringApiClient = new VendoringApiClient();
 
@@ -28,6 +29,8 @@ function forwardedHeaders(request: { headers: Record<string, unknown> }): Record
   const headers: Record<string, string> = {};
   const cookie = request.headers.cookie;
   const authorization = request.headers.authorization;
+  const applicationKey = request.headers["x-application-key"];
+  const applicationEnvironment = request.headers["x-application-environment"];
 
   if ("string" === typeof cookie && "" !== cookie.trim()) {
     headers.cookie = cookie.trim();
@@ -35,6 +38,12 @@ function forwardedHeaders(request: { headers: Record<string, unknown> }): Record
 
   if ("string" === typeof authorization && "" !== authorization.trim()) {
     headers.authorization = authorization.trim();
+  }
+  if ("string" === typeof applicationKey && "" !== applicationKey.trim()) {
+    headers["x-application-key"] = applicationKey.trim();
+  }
+  if ("string" === typeof applicationEnvironment && "" !== applicationEnvironment.trim()) {
+    headers["x-application-environment"] = applicationEnvironment.trim();
   }
 
   return headers;
@@ -80,19 +89,19 @@ function nestedString(source: Record<string, unknown>, field: string): string | 
   return stringValue(source[field]);
 }
 
-function absoluteVendoringUrl(value: string | null): string | null {
+function absoluteVendoringUrl(value: string | null, baseUrl: string): string | null {
   if (null === value) {
     return null;
   }
 
   try {
-    return new URL(value, ENV.VENDORING_API_BASE_URL.replace(/\/$/, "") + "/").toString();
+    return new URL(value, baseUrl.replace(/\/$/, "") + "/").toString();
   } catch {
     return value;
   }
 }
 
-function normalizeProfile(vendorId: string, body: unknown): MobileVendorProfilePayload {
+function normalizeProfile(vendorId: string, body: unknown, baseUrl: string): MobileVendorProfilePayload {
   const unwrappedBody = profilePayload(body);
   const root = isRecord(unwrappedBody) ? unwrappedBody : {};
   const profile = nestedRecord(root, "profile");
@@ -110,9 +119,9 @@ function normalizeProfile(vendorId: string, body: unknown): MobileVendorProfileP
     completionPercent: null === completion ? 0 : Math.max(0, Math.min(100, Math.round(completion))),
     readyForPublishing: true === root.readyForPublishing,
     nextAction: stringValue(root.nextAction),
-    avatarUrl: absoluteVendoringUrl(nestedString(avatar, "url")),
+    avatarUrl: absoluteVendoringUrl(nestedString(avatar, "url"), baseUrl),
     avatarAttachmentId: nestedString(avatar, "attachmentId") ?? nestedString(avatar, "id"),
-    coverUrl: absoluteVendoringUrl(nestedString(cover, "url")),
+    coverUrl: absoluteVendoringUrl(nestedString(cover, "url"), baseUrl),
     coverAttachmentId: nestedString(cover, "attachmentId") ?? nestedString(cover, "id"),
     canEditProfileMedia: true,
     about: nestedString(publicProfile, "about") ?? nestedString(profile, "about"),
@@ -171,13 +180,12 @@ export default async function route(app: FastifyInstance): Promise<void> {
       });
     }
 
-    const result = await vendoringApiClient.getProfile(
-      vendorId,
-      forwardedHeaders(request as { headers: Record<string, unknown> }),
-    );
+    const headers = forwardedHeaders(request as { headers: Record<string, unknown> });
+    const result = await vendoringApiClient.getProfile(vendorId, headers);
 
     if (result.status >= 200 && result.status < 300) {
-      return reply.code(200).send(normalizeProfile(vendorId, result.body));
+      const baseUrl = await resolveUpstreamBaseUrl(headers, ENV.VENDORING_API_BASE_URL);
+      return reply.code(200).send(normalizeProfile(vendorId, result.body, baseUrl));
     }
 
     return reply.code(result.status as any).send(normalizeErrorPayload(result.body));

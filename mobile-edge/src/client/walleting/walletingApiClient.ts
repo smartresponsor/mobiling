@@ -1,6 +1,7 @@
 import { request as httpRequest } from "http";
 import { request as httpsRequest } from "https";
 import { ENV } from "../../env.js";
+import { resolveUpstreamBaseUrl } from "../../runtime/applicationRuntimeResolver.js";
 
 export interface WalletingApiResponse { status: number; body: unknown }
 
@@ -43,8 +44,8 @@ export class WalletingApiClient {
     return this.send("GET", path, headers);
   }
 
-  private send(method: "GET" | "POST", path: string, headers: Record<string, string>, body?: unknown): Promise<WalletingApiResponse> {
-    const baseUrl = this.baseUrl.trim();
+  private async send(method: "GET" | "POST", path: string, headers: Record<string, string>, body?: unknown): Promise<WalletingApiResponse> {
+    const baseUrl = await resolveUpstreamBaseUrl(headers, this.baseUrl);
     if (!baseUrl) return Promise.resolve({ status: 503, body: { code: "walleting_api_unavailable", message: "Walleting API is unavailable." } });
     let url: URL;
     try { url = new URL(baseUrl.replace(/\/$/, "") + path); }
