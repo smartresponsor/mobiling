@@ -46,7 +46,7 @@ class MainActivity : ComponentActivity() {
 
             LaunchedEffect(Unit) {
                 graph = withContext(Dispatchers.Default) {
-                    MobileApplicationGraph.current(localText)
+                    MobileApplicationGraph.current(applicationContext, localText)
                 }
             }
 

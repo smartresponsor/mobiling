@@ -1,12 +1,16 @@
 ﻿package app.mobiling.client
 
+import android.content.Context
 import app.mobiling.client.attachment.AttachmentFeatureBridge
 import app.mobiling.client.auth.AccessAuthFeatureBridge
+import app.mobiling.client.cart.AndroidCartTokenStore
 import app.mobiling.client.cart.CartFeatureBridge
 import app.mobiling.client.catalog.CatalogFeatureBridge
 import app.mobiling.client.data.attachment.AttachmentHttpGateway
 import app.mobiling.client.data.auth.session.AccessHttpAuthSessionGateway
 import app.mobiling.client.data.cart.CartHttpGateway
+import app.mobiling.client.data.cart.CartTokenStore
+import app.mobiling.client.data.cart.InMemoryCartTokenStore
 import app.mobiling.client.data.catalog.CatalogHttpGateway
 import app.mobiling.client.data.navigation.shell.NavigationHttpShellGateway
 import app.mobiling.client.data.message.thread.MessageHttpThreadGateway
@@ -30,10 +34,20 @@ import okhttp3.CookieJar
 import okhttp3.HttpUrl
 import okhttp3.OkHttpClient
 
-class MobileApplicationGraph private constructor(val composition: MobileApplicationComposition) {
+class MobileApplicationGraph private constructor(
+    val composition: MobileApplicationComposition,
+    private val cartTokenStore: CartTokenStore,
+) {
     private val baseUrl = composition.mobileEdgeBaseUrl
     private val sessionCookies = mutableListOf<Cookie>()
     private val httpClient = OkHttpClient.Builder()
+        .addInterceptor { chain ->
+            val request = chain.request().newBuilder()
+                .header("X-Application-Key", composition.configuration.product.code)
+                .header("X-Application-Environment", composition.configuration.environment.code)
+                .build()
+            chain.proceed(request)
+        }
         .cookieJar(object : CookieJar {
             @Synchronized
             override fun saveFromResponse(url: HttpUrl, cookies: List<Cookie>) {
@@ -56,7 +70,7 @@ class MobileApplicationGraph private constructor(val composition: MobileApplicat
             }
         })
         .build()
-    private val cartGateway = CartHttpGateway(baseUrl, httpClient)
+    private val cartGateway = CartHttpGateway(baseUrl, httpClient, cartTokenStore)
     private val attachmentGateway = AttachmentHttpGateway(baseUrl, httpClient)
     private val catalogGateway = CatalogHttpGateway(
         baseUrl,
@@ -85,9 +99,15 @@ class MobileApplicationGraph private constructor(val composition: MobileApplicat
 
     companion object {
         fun current(composition: MobileApplicationComposition = MobileApplicationComposer.current()) =
-            MobileApplicationGraph(composition)
+            MobileApplicationGraph(composition, InMemoryCartTokenStore())
+
+        fun current(context: Context, composition: MobileApplicationComposition = MobileApplicationComposer.current()) =
+            MobileApplicationGraph(composition, AndroidCartTokenStore(context.applicationContext))
 
         fun current(localText: Map<String, String>): MobileApplicationGraph =
-            MobileApplicationGraph(MobileApplicationComposer.current(localText))
+            MobileApplicationGraph(MobileApplicationComposer.current(localText), InMemoryCartTokenStore())
+
+        fun current(context: Context, localText: Map<String, String>): MobileApplicationGraph =
+            MobileApplicationGraph(MobileApplicationComposer.current(localText), AndroidCartTokenStore(context.applicationContext))
     }
 }
