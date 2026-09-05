@@ -1,4 +1,5 @@
-﻿import MobileClient
+﻿import Foundation
+import MobileClient
 
 struct MobileApplicationGraph {
     let composition: MobileApplicationComposition
@@ -21,31 +22,38 @@ struct MobileApplicationGraph {
 
     static func current(composition: MobileApplicationComposition = .current) -> MobileApplicationGraph {
         let baseUrl = composition.mobileEdgeBaseUrl
-        let attachmentGateway = HttpAttachmentGateway(baseUrl: baseUrl)
-        let cartGateway = CartHttpGateway(baseUrl: baseUrl)
+        let sessionConfiguration = URLSessionConfiguration.default
+        sessionConfiguration.httpAdditionalHeaders = [
+            "X-Application-Key": composition.configuration.product.code,
+            "X-Application-Environment": composition.configuration.environment.code,
+        ]
+        let session = URLSession(configuration: sessionConfiguration)
+        let attachmentGateway = HttpAttachmentGateway(baseUrl: baseUrl, session: session)
+        let cartGateway = CartHttpGateway(baseUrl: baseUrl, session: session)
         let catalogGateway = CatalogHttpGateway(
             baseUrl: baseUrl,
-            catalogCode: composition.configuration.catalog.primaryCatalog
+            catalogCode: composition.configuration.catalog.primaryCatalog,
+            session: session
         )
 
         return MobileApplicationGraph(
             composition: composition,
-            authFeatureBridge: AuthFeatureBridge(gateway: HttpAuthSessionGateway(baseUrl: baseUrl)),
+            authFeatureBridge: AuthFeatureBridge(gateway: HttpAuthSessionGateway(baseUrl: baseUrl, session: session)),
             attachmentFeatureBridge: AttachmentFeatureBridge(reader: attachmentGateway, writer: attachmentGateway),
             cartFeatureBridge: CartFeatureBridge(reader: cartGateway, writer: cartGateway, checkoutGateway: cartGateway),
             catalogFeatureBridge: CatalogFeatureBridge(browseGateway: catalogGateway, detailGateway: catalogGateway),
-            navigationShellGateway: HttpNavigationShellGateway(baseUrl: baseUrl),
-            messageFeatureBridge: MessageFeatureBridge(gateway: MessageHttpThreadGateway(baseUrl: baseUrl)),
-            notificationFeatureBridge: NotificationFeatureBridge(gateway: NotificationHttpGateway(baseUrl: baseUrl)),
-            supportFeatureBridge: SupportFeatureBridge(gateway: SupportHttpGateway(baseUrl: baseUrl)),
-            vendorProfileGateway: HttpVendorProfileGateway(baseUrl: baseUrl),
-            vendorSummaryGateway: HttpVendorSummaryGateway(baseUrl: baseUrl),
-            vendorStatementGateway: HttpVendorStatementGateway(baseUrl: baseUrl),
-            vendorPayoutGateway: HttpVendorPayoutGateway(baseUrl: baseUrl),
-            vendorTransactionGateway: HttpVendorTransactionGateway(baseUrl: baseUrl),
-            vendorCrudGateway: HttpVendorCrudGateway(baseUrl: baseUrl),
-            retailPlacementGateway: HttpRetailPlacementGateway(baseUrl: baseUrl),
-            walletGateway: WalletHttpGateway(baseUrl: baseUrl)
+            navigationShellGateway: HttpNavigationShellGateway(baseUrl: baseUrl, session: session),
+            messageFeatureBridge: MessageFeatureBridge(gateway: MessageHttpThreadGateway(baseUrl: baseUrl, session: session)),
+            notificationFeatureBridge: NotificationFeatureBridge(gateway: NotificationHttpGateway(baseUrl: baseUrl, session: session)),
+            supportFeatureBridge: SupportFeatureBridge(gateway: SupportHttpGateway(baseUrl: baseUrl, session: session)),
+            vendorProfileGateway: HttpVendorProfileGateway(baseUrl: baseUrl, session: session),
+            vendorSummaryGateway: HttpVendorSummaryGateway(baseUrl: baseUrl, session: session),
+            vendorStatementGateway: HttpVendorStatementGateway(baseUrl: baseUrl, session: session),
+            vendorPayoutGateway: HttpVendorPayoutGateway(baseUrl: baseUrl, session: session),
+            vendorTransactionGateway: HttpVendorTransactionGateway(baseUrl: baseUrl, session: session),
+            vendorCrudGateway: HttpVendorCrudGateway(baseUrl: baseUrl, session: session),
+            retailPlacementGateway: HttpRetailPlacementGateway(baseUrl: baseUrl, session: session),
+            walletGateway: WalletHttpGateway(baseUrl: baseUrl, session: session)
         )
     }
 }
