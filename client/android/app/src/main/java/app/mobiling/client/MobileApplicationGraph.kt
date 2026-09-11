@@ -12,6 +12,7 @@ import app.mobiling.client.data.cart.CartHttpGateway
 import app.mobiling.client.data.cart.CartTokenStore
 import app.mobiling.client.data.cart.InMemoryCartTokenStore
 import app.mobiling.client.data.catalog.CatalogHttpGateway
+import app.mobiling.client.data.currency.CurrencyHttpGateway
 import app.mobiling.client.data.navigation.shell.NavigationHttpShellGateway
 import app.mobiling.client.data.message.thread.MessageHttpThreadGateway
 import app.mobiling.client.data.notification.NotificationHttpGateway
@@ -82,6 +83,7 @@ class MobileApplicationGraph private constructor(
     val cartFeatureBridge = CartFeatureBridge(cartGateway, cartGateway, cartGateway)
     val attachmentFeatureBridge = AttachmentFeatureBridge(attachmentGateway, attachmentGateway)
     val catalogFeatureBridge = CatalogFeatureBridge(catalogGateway, catalogGateway)
+    val currencyGateway = CurrencyHttpGateway(baseUrl, httpClient)
     val navigationShellGateway = NavigationHttpShellGateway(baseUrl, httpClient)
     val messageFeatureBridge = MessageFeatureBridge(MessageHttpThreadGateway(baseUrl, httpClient))
     val notificationFeatureBridge = NotificationFeatureBridge(NotificationHttpGateway(baseUrl, httpClient))
