@@ -301,6 +301,27 @@ paths:
       responses:
         '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/MobileCatalogMutationPayload' } } } }
         '503': { description: Cataloging API unavailable, content: { application/json: { schema: { $ref: '#/components/schemas/MobileAccessErrorPayload' } } } }
+  /currency/catalog:
+    get:
+      summary: Mobile currency catalog sourced from Currencing
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/MobileCurrencyCatalogPayload' } } } }
+        '503': { description: Currencing API unavailable, content: { application/json: { schema: { $ref: '#/components/schemas/MobileAccessErrorPayload' } } } }
+  /currency/selector:
+    get:
+      summary: Mobile currency selector sourced from Currencing
+      parameters:
+        - in: query
+          name: selectedCode
+          required: false
+          schema: { type: string, minLength: 3 }
+        - in: query
+          name: locale
+          required: false
+          schema: { type: string, minLength: 1 }
+      responses:
+        '200': { description: OK, content: { application/json: { schema: { $ref: '#/components/schemas/MobileCurrencySelectorPayload' } } } }
+        '503': { description: Currencing API unavailable, content: { application/json: { schema: { $ref: '#/components/schemas/MobileAccessErrorPayload' } } } }
   /attachment:
     get:
       summary: Mobile attachment list
@@ -656,6 +677,43 @@ components:
         catalogNodeId: { anyOf: [{ type: string, minLength: 1 }, { type: 'null' }] }
         attachmentId: { anyOf: [{ type: string, minLength: 1 }, { type: 'null' }] }
         payload: { type: object, additionalProperties: true }
+    MobileCurrencyMetadataPayload:
+      type: object
+      additionalProperties: false
+      required: [code, numericCode, minorUnit, symbol, displayName]
+      properties:
+        code: { type: string, minLength: 3 }
+        numericCode: { anyOf: [{ type: string, minLength: 3 }, { type: 'null' }] }
+        minorUnit: { type: integer, minimum: 0, maximum: 8 }
+        symbol: { anyOf: [{ type: string, minLength: 1 }, { type: 'null' }] }
+        displayName: { anyOf: [{ type: string, minLength: 1 }, { type: 'null' }] }
+    MobileCurrencyCatalogPayload:
+      type: object
+      additionalProperties: false
+      required: [items]
+      properties:
+        items:
+          type: array
+          items: { $ref: '#/components/schemas/MobileCurrencyMetadataPayload' }
+    MobileCurrencyChoicePayload:
+      type: object
+      additionalProperties: false
+      required: [code, label, symbol, minorUnit]
+      properties:
+        code: { type: string, minLength: 3 }
+        label: { type: string, minLength: 1 }
+        symbol: { anyOf: [{ type: string, minLength: 1 }, { type: 'null' }] }
+        minorUnit: { type: integer, minimum: 0, maximum: 8 }
+    MobileCurrencySelectorPayload:
+      type: object
+      additionalProperties: false
+      required: [choices, selectedCode, placeholder]
+      properties:
+        choices:
+          type: array
+          items: { $ref: '#/components/schemas/MobileCurrencyChoicePayload' }
+        selectedCode: { anyOf: [{ type: string, minLength: 3 }, { type: 'null' }] }
+        placeholder: { type: string, minLength: 1 }
     MobileAttachmentItemPayload:
       type: object
       additionalProperties: false

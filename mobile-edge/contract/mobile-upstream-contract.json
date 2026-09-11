@@ -119,6 +119,18 @@
       "status": "declared-in-component"
     },
     {
+      "owner": "Currencing",
+      "mobileRoute": "GET /currency/catalog",
+      "upstreamRoute": "GET /currencing/currencies",
+      "status": "declared-in-component"
+    },
+    {
+      "owner": "Currencing",
+      "mobileRoute": "GET /currency/selector",
+      "upstreamRoute": "GET /currencing/currency-selector",
+      "status": "declared-in-component"
+    },
+    {
       "owner": "Localizing",
       "mobileRoute": "GET /locale",
       "upstreamRoute": "GET /api/locale",
