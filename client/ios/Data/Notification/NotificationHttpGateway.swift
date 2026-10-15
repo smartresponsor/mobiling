@@ -23,6 +23,20 @@ public struct NotificationHttpGateway: NotificationGateway {
         return payload.unreadCount
     }
 
+    public func recognizedNeed(request payload: RecognizedNeedRequest) async throws -> Bool {
+        let response: RecognizedNeedPayload = try await request(path: "/need/recognized", method: "POST", body: payload)
+        return response.ok
+    }
+
+    public func requestNeedCallback(recipientEntryId: String) async throws -> Bool {
+        let response: CallbackPayload = try await request(
+            path: "/need/callback",
+            method: "POST",
+            body: CallbackRequest(recipientEntryId: recipientEntryId)
+        )
+        return response.ok
+    }
+
     public func subscription(request payload: NotificationSubscriptionRequest) async throws -> Bool {
         let response: SubscriptionPayload = try await request(path: "/notification/subscription", method: "POST", body: payload)
         return response.ok
@@ -49,6 +63,9 @@ public struct NotificationHttpGateway: NotificationGateway {
 
 private struct UnreadPayload: Decodable { let unreadCount: Int }
 private struct SubscriptionPayload: Decodable { let ok: Bool }
+private struct RecognizedNeedPayload: Decodable { let ok: Bool }
+private struct CallbackPayload: Decodable { let ok: Bool }
+private struct CallbackRequest: Encodable { let recipientEntryId: String }
 private struct MarkReadBody: Encodable { let ids: [String] }
 private struct EmptyBody: Encodable {}
 private struct ErrorPayload: Decodable { let message: String? }

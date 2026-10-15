@@ -1,4 +1,4 @@
-﻿# Repository Agent Instructions
+# Repository Agent Instructions
 
 <!-- ENVIRONMENT-SNAPSHOT:START -->
 ## Environment Snapshot Contract
@@ -86,5 +86,8 @@ Known local warnings:
 - Bash exists, but WSL currently reports a .wslconfig error. Prefer PowerShell for local commands until WSL is fixed.
 - Composer exists, but version check may fail through composer.bat under Windows PowerShell 5.1. Treat Composer as available if direct composer commands work.
 <!-- ENVIRONMENT-SNAPSHOT:END -->
+## Platform Canon Precedence
 
+For work under `D:\PhpstormProjects\www`, authoritative platform rules live in the Canonization repository. Gating is the executable mirror for objectively guardable rules. This `AGENTS.md` is an agent-facing projection or local supplement and must not override or contradict Canonization.
 
+If a local instruction conflicts with current Canonization, follow Canonization and synchronize this file. Local instructions may narrow scope or add repository-specific constraints only when they remain compatible with Canonization.

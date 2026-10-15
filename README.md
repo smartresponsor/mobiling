@@ -19,6 +19,12 @@ This baseline materializes build and runtime structure only. Product visual dire
 
 The preparatory product-configuration foundation and preserved defaults are documented in `docs/product-configuration.md`.
 
+The lightweight OneTasker Widget track is materialized in:
+
+- `docs/one-tasker-widget-architecture.md` — product, repository, Notifying, and Ordering boundaries;
+- `docs/one-tasker-widget-speech-and-privacy.md` — native/system-first speech-to-text, semantic classification, no-voice-record, and privacy invariants;
+- `docs/one-tasker-widget-milestone-0.md` — Milestone 0 scope and acceptance criteria.
+
 ## Local Android runtime
 
 The local runtime chain is intentionally split across the emulator and the Windows host:

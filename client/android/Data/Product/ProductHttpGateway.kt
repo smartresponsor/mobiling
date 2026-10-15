@@ -46,7 +46,10 @@ class ProductHttpGateway(private val baseUrl: String, private val client: OkHttp
         }
         client.newCall(builder.build()).execute().use { response ->
             val body = response.body?.string().orEmpty()
-            if (!response.isSuccessful) throw IllegalStateException(JSONObject(body.ifBlank { "{}" }).optString("message", "Product CRUD request failed with HTTP ${response.code}."))
+            if (!response.isSuccessful) {
+                val problem = JSONObject(body.ifBlank { "{}" })
+                throw IllegalStateException(problem.optString("detail", problem.optString("message", "Product CRUD request failed with HTTP ${response.code}.")))
+            }
             JSONObject(body.ifBlank { "{}" })
         }
     }

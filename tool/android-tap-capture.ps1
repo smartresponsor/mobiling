@@ -9,22 +9,23 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 $repositoryRoot = Split-Path -Parent $PSScriptRoot
+. (Join-Path $PSScriptRoot "visual-artifact-path.ps1")
 $runtimeRoot = Join-Path $repositoryRoot "watchdog/runtime/device"
-$historyRoot = Join-Path $runtimeRoot "history"
 
 & adb -s $DeviceSerial shell input tap $X $Y
 if ($LASTEXITCODE -ne 0) { throw "Android tap failed." }
 Start-Sleep -Milliseconds 1200
 
-New-Item -ItemType Directory -Force -Path $historyRoot | Out-Null
+New-Item -ItemType Directory -Force -Path $runtimeRoot | Out-Null
 $timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
 $safeName = ($ScreenshotName -replace "[^a-zA-Z0-9._-]", "-").Trim("-")
-$latestScreenshot = Join-Path $runtimeRoot "latest.png"
-$historyScreenshot = Join-Path $historyRoot "$timestamp-$safeName.png"
+if ([string]::IsNullOrWhiteSpace($safeName)) { $safeName = "tap" }
+$artifactRun = New-VisualArtifactRun -RepositoryRoot $repositoryRoot -Producer 'mobile-ui' -Platform 'android' -Cohort 'unspecified' -Scenario 'tap-capture' -RunId "$timestamp-$safeName"
+$historyScreenshot = Join-Path $artifactRun.Screenshots "$safeName.png"
+$latestScreenshot = $historyScreenshot
 
-& adb -s $DeviceSerial exec-out screencap -p > $latestScreenshot
+& adb -s $DeviceSerial exec-out screencap -p > $historyScreenshot
 if ($LASTEXITCODE -ne 0) { throw "Screenshot capture failed." }
-Copy-Item -Force -Path $latestScreenshot -Destination $historyScreenshot
 $uiDumpDevicePath = "/sdcard/window_dump.xml"
 $uiDumpPath = Join-Path $runtimeRoot "current-ui.xml"
 & adb -s $DeviceSerial shell uiautomator dump $uiDumpDevicePath | Out-Null

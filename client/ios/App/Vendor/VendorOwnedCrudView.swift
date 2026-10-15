@@ -43,7 +43,7 @@ public final class HttpVendorCrudGateway: VendorCrudGateway, @unchecked Sendable
 
     private func request(method: String, resource: String, identity: String?, fields: [String: String]?) async throws -> [String: Any] {
         let suffix = identity.map { "/\($0.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? $0)" } ?? ""
-        guard let url = URL(string: baseUrl.trimmingCharacters(in: CharacterSet(charactersIn: "/")) + "/crud/my/\(resource)\(suffix)") else {
+        guard let url = URL(string: baseUrl.trimmingCharacters(in: CharacterSet(charactersIn: "/")) + "/my/\(resource)\(suffix)") else {
             throw URLError(.badURL)
         }
         var request = URLRequest(url: url)
@@ -57,7 +57,7 @@ public final class HttpVendorCrudGateway: VendorCrudGateway, @unchecked Sendable
         guard let http = response as? HTTPURLResponse else { throw URLError(.badServerResponse) }
         let payload = (try? JSONSerialization.jsonObject(with: data)) as? [String: Any] ?? [:]
         guard (200..<300).contains(http.statusCode) else {
-            throw NSError(domain: "VendorCrud", code: http.statusCode, userInfo: [NSLocalizedDescriptionKey: payload["message"] as? String ?? "CRUD request failed."])
+            throw NSError(domain: "VendorCrud", code: http.statusCode, userInfo: [NSLocalizedDescriptionKey: payload["detail"] as? String ?? payload["message"] as? String ?? "CRUD request failed."])
         }
         return payload
     }

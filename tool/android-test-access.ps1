@@ -71,6 +71,7 @@ function Invoke-AdbDiagnostic {
 }
 
 $repositoryRoot = Split-Path -Parent $PSScriptRoot
+. (Join-Path $PSScriptRoot "visual-artifact-path.ps1")
 $androidRoot = Join-Path $repositoryRoot "client/android"
 $gradleWrapper = Join-Path $androidRoot "gradlew.bat"
 $appPackageName = "app.mobiling.client"
@@ -118,6 +119,7 @@ if ([string]::IsNullOrWhiteSpace($DeviceSerial)) {
 $runId = Get-Date -Format "yyyyMMdd-HHmmss"
 $outputDirectory = Join-Path $repositoryRoot (Join-Path $OutputRoot $runId)
 New-Item -ItemType Directory -Force -Path $outputDirectory | Out-Null
+$artifactRun = New-VisualArtifactRun -RepositoryRoot $repositoryRoot -Producer 'mobile-ui' -Platform 'android' -Cohort 'unspecified' -Scenario 'android-access-behavior' -RunId $runId
 
 $instrumentationLog = Join-Path $outputDirectory "instrumentation.txt"
 $commandLog = Join-Path $outputDirectory "command.txt"
@@ -136,7 +138,7 @@ $dropboxRelevantInfo = Join-Path $outputDirectory "dropbox-relevant.txt"
 $tombstoneInfo = Join-Path $outputDirectory "tombstones.txt"
 $windowInfo = Join-Path $outputDirectory "window.txt"
 $hierarchy = Join-Path $outputDirectory "hierarchy.xml"
-$screenshot = Join-Path $outputDirectory "screenshot.png"
+$screenshot = Join-Path $artifactRun.Screenshots "screenshot.png"
 
 $gradleArguments = @(
     ":app:connectedDebugAndroidTest"
@@ -286,7 +288,9 @@ finally {
 }
 
 if ($testExitCode -ne 0) {
+    Set-VisualArtifactRunStatus -ArtifactRun $artifactRun -Status 'ATTENTION'
     throw "Android access tests failed with exit code $testExitCode. Artifacts: $outputDirectory"
 }
 
+Set-VisualArtifactRunStatus -ArtifactRun $artifactRun -Status 'GREEN'
 Write-Host "Android access tests passed. Artifacts: $outputDirectory"

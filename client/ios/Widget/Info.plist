@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>CFBundleDisplayName</key><string>$(PRODUCT_DISPLAY_NAME)</string>
+  <key>MOBILE_PRODUCT_PROFILE</key><string>$(MOBILE_PRODUCT_PROFILE)</string>
+  <key>MOBILE_BRAND_PROFILE</key><string>$(MOBILE_BRAND_PROFILE)</string>
+  <key>MOBILE_ENVIRONMENT_PROFILE</key><string>$(MOBILE_ENVIRONMENT_PROFILE)</string>
+  <key>MOBILE_EDGE_BASE_URL</key><string>$(MOBILE_EDGE_BASE_URL)</string>
+  <key>MOBILE_PRIVACY_POLICY_URL</key><string>$(MOBILE_PRIVACY_POLICY_URL)</string>
+  <key>MOBILE_TERMS_OF_SERVICE_URL</key><string>$(MOBILE_TERMS_OF_SERVICE_URL)</string>
+  <key>MOBILE_ABOUT_URL</key><string>$(MOBILE_ABOUT_URL)</string>
+  <key>NSMicrophoneUsageDescription</key><string>OneTasker uses the microphone only while you hold Listen to recognize a service need.</string>
+  <key>NSSpeechRecognitionUsageDescription</key><string>OneTasker converts your spoken request to text so it can identify a possible service need.</string>
+</dict>
+</plist>

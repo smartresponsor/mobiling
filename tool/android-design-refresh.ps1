@@ -96,6 +96,7 @@ function Dismiss-SystemUiAnrIfPresent {
 }
 
 $repositoryRoot = Split-Path -Parent $PSScriptRoot
+. (Join-Path $PSScriptRoot "visual-artifact-path.ps1")
 $androidRoot = Join-Path $repositoryRoot "client/android"
 $gradleWrapper = Join-Path $androidRoot "gradlew.bat"
 $apkPath = switch ($PackageName) {
@@ -104,7 +105,6 @@ $apkPath = switch ($PackageName) {
     default { throw "Unsupported Android package '$PackageName'." }
 }
 $runtimeRoot = Join-Path $repositoryRoot "watchdog/runtime/device"
-$historyRoot = Join-Path $runtimeRoot "history"
 
 if (-not (Test-Path $gradleWrapper)) {
     throw "Gradle wrapper was not found at $gradleWrapper"
@@ -194,7 +194,6 @@ if (-not $foregroundReady) {
 }
 
 New-Item -ItemType Directory -Force -Path $runtimeRoot | Out-Null
-New-Item -ItemType Directory -Force -Path $historyRoot | Out-Null
 
 $timestamp = Get-Date -Format "yyyyMMdd-HHmmss"
 $safeName = ($ScreenshotName -replace "[^a-zA-Z0-9._-]", "-").Trim("-")
@@ -202,16 +201,15 @@ if ([string]::IsNullOrWhiteSpace($safeName)) {
     $safeName = "latest"
 }
 
-$latestScreenshot = Join-Path $runtimeRoot "latest.png"
-$historyScreenshot = Join-Path $historyRoot "$timestamp-$safeName.png"
+$artifactRun = New-VisualArtifactRun -RepositoryRoot $repositoryRoot -Producer 'mobile-ui' -Platform 'android' -Cohort 'unspecified' -Scenario 'design-refresh' -RunId "$timestamp-$safeName"
+$historyScreenshot = Join-Path $artifactRun.Screenshots "$safeName.png"
+$latestScreenshot = $historyScreenshot
 
 Start-Sleep -Milliseconds 700
-& adb -s $resolvedSerial exec-out screencap -p > $latestScreenshot
+& adb -s $resolvedSerial exec-out screencap -p > $historyScreenshot
 if ($LASTEXITCODE -ne 0) {
     throw "Screenshot capture failed with exit code $LASTEXITCODE."
 }
-
-Copy-Item -Force -Path $latestScreenshot -Destination $historyScreenshot
 
 $uiDumpDevicePath = "/sdcard/window_dump.xml"
 $latestUiDump = Join-Path $runtimeRoot "current-ui.xml"

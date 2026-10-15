@@ -8,6 +8,8 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+$repositoryRoot = Split-Path -Parent $PSScriptRoot
+. (Join-Path $PSScriptRoot 'visual-artifact-path.ps1')
 
 function Invoke-Adb {
     param([Parameter(ValueFromRemainingArguments)] [string[]] $Arguments)
@@ -178,15 +180,22 @@ if ($null -eq $submit) { throw 'Sign in submit button was not found.' }
 Tap-Node $submit
 Start-Sleep -Seconds 5
 
-$runtimeRoot = Join-Path (Split-Path $PSScriptRoot -Parent) 'watchdog\runtime\device'
+$runtimeRoot = Join-Path $repositoryRoot 'watchdog\runtime\device'
 New-Item -ItemType Directory -Force -Path $runtimeRoot | Out-Null
-$screenshot = Join-Path $runtimeRoot 'after-login.png'
+$runId = Get-Date -Format 'yyyyMMdd-HHmmss'
+$artifactRun = New-VisualArtifactRun -RepositoryRoot $repositoryRoot -Producer 'mobile-ui' -Platform 'android' -Cohort 'existing-user' -Scenario 'login' -RunId $runId
+$screenshot = Join-Path $artifactRun.Screenshots 'after-login.png'
 & adb -s $DeviceSerial exec-out screencap -p > $screenshot
 
 $finalHierarchy = Get-Hierarchy
+$visibleTexts = @($finalHierarchy.SelectNodes('//node[@text!=""]') | ForEach-Object { $_.text } | Select-Object -Unique)
+$loginStillVisible = $visibleTexts -contains 'Sign in' -or $null -ne (Find-Node -Hierarchy $finalHierarchy -ResourceId 'access-sign-in-password')
+$visualStatus = if ($loginStillVisible) { 'ATTENTION' } else { 'GREEN' }
+Set-VisualArtifactRunStatus -ArtifactRun $artifactRun -Status $visualStatus
 [ordered]@{
-    ok = $true
+    ok = -not $loginStillVisible
+    status = $visualStatus
     deviceSerial = $DeviceSerial
     screenshot = $screenshot
-    visibleTexts = @($finalHierarchy.SelectNodes('//node[@text!=""]') | ForEach-Object { $_.text } | Select-Object -Unique)
+    visibleTexts = $visibleTexts
 } | ConvertTo-Json -Depth 5

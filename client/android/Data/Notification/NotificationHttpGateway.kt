@@ -3,6 +3,7 @@ package app.mobiling.client.data.notification
 import app.mobiling.client.contract.notification.NotificationInboxItem
 import app.mobiling.client.contract.notification.NotificationInboxPayload
 import app.mobiling.client.contract.notification.NotificationSubscriptionRequest
+import app.mobiling.client.contract.notification.RecognizedNeedRequest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaType
@@ -28,12 +29,19 @@ class NotificationHttpGateway(
                             id = item.optString("id"),
                             notificationId = item.optString("notificationId"),
                             status = item.optString("status", "new"),
+                            sourceComponent = item.optString("sourceComponent", "unknown"),
+                            eventName = item.optString("eventName", "unknown"),
+                            topic = item.optString("topic", "default"),
                             title = item.optString("title", "Notification"),
                             body = item.optString("body"),
                             priority = item.optString("priority", "normal"),
                             actionUrl = item.optString("actionUrl").takeIf(String::isNotBlank),
                             createdAt = item.optString("createdAt"),
                             readAt = item.optString("readAt").takeIf(String::isNotBlank),
+                            needCategory = item.optString("needCategory").takeIf(String::isNotBlank),
+                            needConfidence = item.optDouble("needConfidence").takeUnless(Double::isNaN),
+                            needLocale = item.optString("needLocale").takeIf(String::isNotBlank),
+                            needClassifierVersion = item.optString("needClassifierVersion").takeIf(String::isNotBlank),
                         ))
                     }
                 }
@@ -49,6 +57,22 @@ class NotificationHttpGateway(
     override suspend fun markRead(ids: List<String>): Int = withContext(Dispatchers.IO) {
         val body = JSONObject().put("ids", org.json.JSONArray(ids))
         request("POST", "/notification/mark/read", body).optInt("unreadCount", 0)
+    }
+
+    override suspend fun recognizedNeed(request: RecognizedNeedRequest): Boolean = withContext(Dispatchers.IO) {
+        val body = JSONObject()
+            .put("summary", request.summary)
+            .put("category", request.category)
+            .put("source", request.source)
+        request.confidence?.let { body.put("confidence", it) }
+        request.locale?.let { body.put("locale", it) }
+        request.classifierVersion?.let { body.put("classifierVersion", it) }
+        request.correlationId?.let { body.put("correlationId", it) }
+        request("POST", "/need/recognized", body).optBoolean("ok", false)
+    }
+
+    override suspend fun requestNeedCallback(recipientEntryId: String): Boolean = withContext(Dispatchers.IO) {
+        request("POST", "/need/callback", JSONObject().put("recipientEntryId", recipientEntryId)).optBoolean("ok", false)
     }
 
     override suspend fun subscription(request: NotificationSubscriptionRequest): Boolean = withContext(Dispatchers.IO) {

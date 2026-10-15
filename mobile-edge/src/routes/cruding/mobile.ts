@@ -1,5 +1,5 @@
 import type { FastifyInstance } from "fastify";
-import { CrudingApiClient } from "../../client/cruding/crudingApiClient.js";
+import { CrudingApiClient, crudingProblem } from "../../client/cruding/crudingApiClient.js";
 
 const client = new CrudingApiClient();
 const allowed = new Set(["retail", "order", "project", "wallet", "account", "reservation", "funding", "withdrawal", "payment-instrument"]);
@@ -15,12 +15,31 @@ function forwarded(headers: Record<string, unknown>): Record<string, string> {
 
 export default async function route(app: FastifyInstance): Promise<void> {
   app.route({
+    method: "GET",
+    url: "/my/:resource/capabilities",
+    handler: async (request, reply) => {
+      const params = request.params as { resource?: string };
+      const resource = (params.resource || "").trim();
+      if (!allowed.has(resource)) {
+        return reply.code(404).send(crudingProblem(404, "crud_resource_not_allowed", "Not Found", "Mobile CRUD resource is not allowed.", resource || null));
+      }
+      const result = await client.capabilities(
+        resource,
+        forwarded(request.headers as Record<string, unknown>),
+      );
+      return reply.code(result.status).send(result.body);
+    },
+  });
+
+  app.route({
     method: ["GET", "POST", "PUT", "PATCH", "DELETE"],
     url: "/my/:resource/:identity?",
     handler: async (request, reply) => {
       const params = request.params as { resource?: string; identity?: string };
       const resource = (params.resource || "").trim();
-      if (!allowed.has(resource)) return reply.code(404).send({ code: "crud_resource_not_allowed", message: "Mobile CRUD resource is not allowed." });
+      if (!allowed.has(resource)) {
+        return reply.code(404).send(crudingProblem(404, "crud_resource_not_allowed", "Not Found", "Mobile CRUD resource is not allowed.", resource || null));
+      }
       const result = await client.request(
         request.method,
         resource,

@@ -11,12 +11,24 @@ configs:
   ReleaseOneTasker: release
   DebugSmartResponsor: debug
   ReleaseSmartResponsor: release
+  DebugOneTaskerWidget: debug
+  ReleaseOneTaskerWidget: release
 configFiles:
   DebugOneTasker: Config/Brand/OneTasker.xcconfig
   ReleaseOneTasker: Config/Brand/OneTasker.xcconfig
   DebugSmartResponsor: Config/Brand/SmartResponsor.xcconfig
   ReleaseSmartResponsor: Config/Brand/SmartResponsor.xcconfig
+  DebugOneTaskerWidget: Config/Brand/OneTaskerWidget.xcconfig
+  ReleaseOneTaskerWidget: Config/Brand/OneTaskerWidget.xcconfig
 targets:
+  WidgetClient:
+    type: framework
+    platform: iOS
+    sources:
+      - path: Contract/Auth/Session
+      - path: Contract/Notification
+      - path: Data/Auth/Session
+      - path: Data/Notification
   MobileClient:
     type: framework
     platform: iOS
@@ -117,6 +129,25 @@ targets:
       - target: CoreAnalytic
       - target: CorePush
       - target: CoreSecurity
+  OneTaskerWidget:
+    type: application
+    platform: iOS
+    sources:
+      - path: Widget/OneTaskerWidgetApp.swift
+      - path: Widget/OneTaskerWidgetRootView.swift
+      - path: Widget/WidgetApplicationGraph.swift
+      - path: Widget/Semantic
+      - path: Widget/Speech
+    info:
+      path: Widget/Info.plist
+    dependencies:
+      - target: WidgetClient
+    settings:
+      configs:
+        DebugOneTaskerWidget:
+          PRODUCT_BUNDLE_IDENTIFIER: com.smartresponsor.mobile.onetasker.widget
+        ReleaseOneTaskerWidget:
+          PRODUCT_BUNDLE_IDENTIFIER: com.smartresponsor.mobile.onetasker.widget
 schemes:
   OneTasker:
     build:
@@ -134,3 +165,11 @@ schemes:
       config: DebugSmartResponsor
     archive:
       config: ReleaseSmartResponsor
+  OneTaskerWidget:
+    build:
+      targets:
+        OneTaskerWidget: all
+    run:
+      config: DebugOneTaskerWidget
+    archive:
+      config: ReleaseOneTaskerWidget
