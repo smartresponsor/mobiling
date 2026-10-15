@@ -9,7 +9,7 @@ struct RecoveryRequestView: View {
     @State private var statusMessage: String?
 
     var body: some View {
-        AccessEntryFormView(
+        AccessFlowShellView(
             title: "Recover access",
             subtitle: "Request a recovery code for your SmartResponsor access.",
             primaryActionTitle: "Send recovery code",

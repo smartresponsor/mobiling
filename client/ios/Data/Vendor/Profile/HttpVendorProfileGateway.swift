@@ -46,7 +46,10 @@ public struct HttpVendorProfileGateway: VendorProfileGateway {
             readyForPublishing: object["readyForPublishing"] as? Bool ?? false,
             nextAction: string(object["nextAction"]),
             avatarUrl: string(object["avatarUrl"]),
+            avatarAttachmentId: string(object["avatarAttachmentId"]),
             coverUrl: string(object["coverUrl"]),
+            coverAttachmentId: string(object["coverAttachmentId"]),
+            canEditProfileMedia: object["canEditProfileMedia"] as? Bool ?? false,
             about: string(object["about"]),
             website: string(object["website"]),
             publicationStatus: string(object["publicationStatus"])

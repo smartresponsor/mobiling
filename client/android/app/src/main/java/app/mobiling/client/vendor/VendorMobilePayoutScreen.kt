@@ -27,7 +27,6 @@ fun VendorMobilePayoutScreen(vendorId: String?, vendorPayoutGateway: VendorPayou
         try { payout = VendorMobilePayoutScreenContract.from(VendorLoadPayoutUseCase(vendorPayoutGateway).load(vendorId)) } catch (exception: Exception) { errorMessage = exception.message ?: "Vendor payout is temporarily unavailable." }
     }
     LazyColumn(contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        item { Text("Vendor Payout", fontWeight = FontWeight.Bold) }
         when {
             errorMessage != null -> item { Text(errorMessage ?: "Vendor payout is temporarily unavailable.") }
             payout == null -> item { Text("Loading vendor payout...") }

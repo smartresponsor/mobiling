@@ -8,7 +8,7 @@ fun SecondFactorRequiredScreen(
     onBack: () -> Unit,
     onUseDifferentAccess: () -> Unit,
 ) {
-    AccessEntryFormScaffold(
+    AccessFlowShell(
         title = "Second factor required",
         subtitle = "Accessing requires an additional verification step before this mobile session can continue.",
         primaryActionLabel = "Check again",

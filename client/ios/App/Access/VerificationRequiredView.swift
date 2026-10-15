@@ -5,7 +5,7 @@ struct VerificationRequiredView: View {
     let onUseDifferentAccess: () -> Void
 
     var body: some View {
-        AccessEntryFormView(
+        AccessFlowShellView(
             title: "Verification required",
             subtitle: "Accessing requires identity verification before this mobile session can continue.",
             primaryActionTitle: "Check again",

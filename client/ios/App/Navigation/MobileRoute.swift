@@ -11,6 +11,12 @@ public enum MobileRoute: Sendable, Equatable {
     case accessSignOut
     case dashboard
     case more
+    case money
+    case wallet
+    case walletTransaction
+    case walletFunding
+    case walletWithdrawal
+    case walletWithdrawalDetail(withdrawalId: String)
     case vendor
     case vendorProfile
     case vendorSummary
@@ -24,17 +30,28 @@ public enum MobileRoute: Sendable, Equatable {
     case catalogSearch(searchText: String?)
     case message
     case messageThread(threadId: String)
+    case notification
+    case support
+    case supportCases
+    case supportCaseDetail(caseReference: String)
+    case supportFlow(path: String)
     case attachment
     case attachmentDetail(attachmentId: String)
     case cart
     case cartCheckout
     case cartCheckoutResult(checkoutId: String)
     case vendorProduct
+    case vendorProductNew
     case vendorProductDetail(productId: String)
+    case vendorProductPlacement(retailId: String)
     case vendorOrder
+    case vendorOrderNew
     case vendorOrderDetail(orderId: String)
     case vendorOrderShipment(orderId: String)
     case vendorOrderShipmentDetail(orderId: String, shipmentId: String)
     case vendorOrderTax(orderId: String)
     case vendorOrderTaxDetail(orderId: String, taxId: String)
+    case vendorProject
+    case vendorProjectNew
+    case vendorProjectDetail(projectId: String)
 }

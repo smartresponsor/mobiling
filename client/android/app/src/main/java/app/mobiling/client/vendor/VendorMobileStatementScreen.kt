@@ -27,7 +27,6 @@ fun VendorMobileStatementScreen(vendorId: String?, vendorStatementGateway: Vendo
         try { statement = VendorMobileStatementScreenContract.from(VendorLoadStatementUseCase(vendorStatementGateway).load(vendorId)) } catch (exception: Exception) { errorMessage = exception.message ?: "Vendor statement is temporarily unavailable." }
     }
     LazyColumn(contentPadding = PaddingValues(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-        item { Text("Vendor Statement", fontWeight = FontWeight.Bold) }
         when {
             errorMessage != null -> item { Text(errorMessage ?: "Vendor statement is temporarily unavailable.") }
             statement == null -> item { Text("Loading vendor statement...") }

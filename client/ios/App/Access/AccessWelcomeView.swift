@@ -1,56 +1,131 @@
 import SwiftUI
 
-struct AccessWelcomeView: View {
-    let onSignIn: () -> Void
-    let onCreateAccess: () -> Void
+private enum GuestRoute: String, CaseIterable {
+    case home
+    case catalog
+    case users
+    case orders
+    case cart
 
-    private let businessAreas = ["Vendor", "Catalog", "Order", "Message"]
+    var title: String {
+        switch self {
+        case .home: return "Home"
+        case .catalog: return "Catalog"
+        case .users: return "Users"
+        case .orders: return "Orders"
+        case .cart: return "Cart"
+        }
+    }
+
+    var systemImage: String {
+        switch self {
+        case .home: return "house"
+        case .catalog: return "square.grid.2x2"
+        case .users: return "person.2"
+        case .orders: return "doc.text"
+        case .cart: return "cart"
+        }
+    }
+
+    static func resolve(_ rawRoute: String) -> GuestRoute {
+        GuestRoute(rawValue: rawRoute) ?? .home
+    }
+}
+
+struct AccessWelcomeView: View {
+    private let catalogFeatureBridge: CatalogFeatureBridge?
+    private let cartFeatureBridge: CartFeatureBridge?
+    private let onSignIn: () -> Void
+    private let onCreateAccess: () -> Void
+
+    @State private var selectedRoute: GuestRoute
+
+    init(
+        initialRoute: String = "home",
+        catalogFeatureBridge: CatalogFeatureBridge? = nil,
+        cartFeatureBridge: CartFeatureBridge? = nil,
+        onSignIn: @escaping () -> Void,
+        onCreateAccess: @escaping () -> Void
+    ) {
+        self.catalogFeatureBridge = catalogFeatureBridge
+        self.cartFeatureBridge = cartFeatureBridge
+        self.onSignIn = onSignIn
+        self.onCreateAccess = onCreateAccess
+        self._selectedRoute = State(initialValue: GuestRoute.resolve(initialRoute))
+    }
 
     var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 20) {
-                Text("SmartResponsor")
-                    .font(.largeTitle.weight(.semibold))
-                Text("Business access for vendor, catalog, order, and message workflows.")
-                    .font(.title3)
-                Text("Access is required to open the business workspace.")
-                    .foregroundStyle(.secondary)
+        TabView(selection: $selectedRoute) {
+            NavigationView {
+                homeView
+                    .navigationTitle("1tasker")
+            }
+            .tabItem { Label(GuestRoute.home.title, systemImage: GuestRoute.home.systemImage) }
+            .tag(GuestRoute.home)
 
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: 96), spacing: 8)], alignment: .leading, spacing: 8) {
-                    ForEach(businessAreas, id: \.self) { area in
-                        Text(area)
-                            .font(.callout.weight(.semibold))
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 8)
-                            .background(
-                                Capsule(style: .continuous)
-                                    .fill(Color(.secondarySystemBackground))
-                            )
-                    }
-                }
+            NavigationView {
+                CatalogMobileScreen(catalogFeatureBridge: catalogFeatureBridge)
+            }
+            .tabItem { Label(GuestRoute.catalog.title, systemImage: GuestRoute.catalog.systemImage) }
+            .tag(GuestRoute.catalog)
 
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Guest entry")
-                        .font(.headline)
-                    Text("Sign in to continue or create access for a new workspace account.")
-                        .foregroundStyle(.secondary)
-                }
-                .padding(16)
-                .background(
-                    RoundedRectangle(cornerRadius: 16, style: .continuous)
-                        .fill(Color(.secondarySystemBackground))
+            NavigationView {
+                guestPlaceholder(
+                    title: "Users",
+                    description: "Public customer, specialist, vendor, and sponsor profiles will be available here without exposing private account data."
                 )
+            }
+            .tabItem { Label(GuestRoute.users.title, systemImage: GuestRoute.users.systemImage) }
+            .tag(GuestRoute.users)
+
+            NavigationView {
+                guestPlaceholder(
+                    title: "Orders",
+                    description: "Guests can start checkout activity here. Personal order history remains available only after authentication."
+                )
+            }
+            .tabItem { Label(GuestRoute.orders.title, systemImage: GuestRoute.orders.systemImage) }
+            .tag(GuestRoute.orders)
+
+            NavigationView {
+                CartMobileScreen(cartFeatureBridge: cartFeatureBridge)
+            }
+            .tabItem { Label(GuestRoute.cart.title, systemImage: GuestRoute.cart.systemImage) }
+            .tag(GuestRoute.cart)
+        }
+    }
+
+    private var homeView: some View {
+        ScrollView {
+            VStack(alignment: .leading, spacing: MobileDesignDefaults.Spacing.xl) {
+                Text("Find work, services, and products from one marketplace.")
+                    .font(.title2.weight(.semibold))
+
+                Text("Browse publicly now, or sign in to manage your tasks, messages, services, and profile.")
+                    .foregroundStyle(.secondary)
 
                 Button("Sign in", action: onSignIn)
                     .buttonStyle(.borderedProminent)
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .frame(maxWidth: .infinity)
 
-                Button("Create access", action: onCreateAccess)
+                Button("Create account", action: onCreateAccess)
                     .buttonStyle(.bordered)
-                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .frame(maxWidth: .infinity)
             }
-            .padding(24)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(MobileDesignDefaults.Spacing.xxl)
         }
-        .background(Color(.systemBackground))
+        .background(Color(.systemGroupedBackground))
+    }
+
+    private func guestPlaceholder(title: String, description: String) -> some View {
+        List {
+            Section {
+                CanonicalStateCard(title: title, description: description)
+                    .listRowInsets(EdgeInsets())
+                    .listRowBackground(Color.clear)
+            }
+        }
+        .navigationTitle(title)
     }
 }

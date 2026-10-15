@@ -6,11 +6,23 @@ function forwardedHeaders(request) {
     const headers = {};
     const cookie = request.headers.cookie;
     const authorization = request.headers.authorization;
+    const applicationKey = request.headers["x-application-key"];
+    const applicationEnvironment = request.headers["x-application-environment"];
+    const cartToken = request.headers["x-cart-token"];
     if ("string" === typeof cookie && "" !== cookie.trim()) {
         headers.cookie = cookie.trim();
     }
     if ("string" === typeof authorization && "" !== authorization.trim()) {
         headers.authorization = authorization.trim();
+    }
+    if ("string" === typeof applicationKey && "" !== applicationKey.trim()) {
+        headers["x-application-key"] = applicationKey.trim();
+    }
+    if ("string" === typeof applicationEnvironment && "" !== applicationEnvironment.trim()) {
+        headers["x-application-environment"] = applicationEnvironment.trim();
+    }
+    if ("string" === typeof cartToken && "" !== cartToken.trim()) {
+        headers["x-cart-token"] = cartToken.trim();
     }
     return headers;
 }
@@ -103,6 +115,8 @@ function normalizeCheckoutHandoff(body) {
 export default async function route(app) {
     app.get("/cart/current", { schema: { response: { 200: mobileCartPayload, 400: mobileAccessErrorPayload, 404: mobileAccessErrorPayload, 422: mobileAccessErrorPayload, 500: mobileAccessErrorPayload, 503: mobileAccessErrorPayload } } }, async (request, reply) => {
         const result = await cartingApiClient.getCurrentCart(forwardedHeaders(request));
+        if (result.cartToken)
+            reply.header("x-cart-token", result.cartToken);
         if (result.status < 200 || result.status >= 300) {
             return reply.code(result.status).send(normalizeErrorPayload(result.body));
         }
@@ -110,6 +124,8 @@ export default async function route(app) {
     });
     app.post("/cart/item", { schema: { body: mobileCartItemMutationRequest, response: { 200: mobileCartPayload, 201: mobileCartPayload, 400: mobileAccessErrorPayload, 404: mobileAccessErrorPayload, 422: mobileAccessErrorPayload, 500: mobileAccessErrorPayload, 503: mobileAccessErrorPayload } } }, async (request, reply) => {
         const result = await cartingApiClient.addItem(request.body, forwardedHeaders(request));
+        if (result.cartToken)
+            reply.header("x-cart-token", result.cartToken);
         if (result.status < 200 || result.status >= 300) {
             return reply.code(result.status).send(normalizeErrorPayload(result.body));
         }
@@ -117,6 +133,8 @@ export default async function route(app) {
     });
     app.post("/cart/checkout-handoff", { schema: { response: { 200: mobileCartCheckoutHandoffPayload, 201: mobileCartCheckoutHandoffPayload, 400: mobileAccessErrorPayload, 404: mobileAccessErrorPayload, 409: mobileAccessErrorPayload, 422: mobileAccessErrorPayload, 500: mobileAccessErrorPayload, 503: mobileAccessErrorPayload } } }, async (request, reply) => {
         const result = await cartingApiClient.prepareCheckoutHandoff(forwardedHeaders(request));
+        if (result.cartToken)
+            reply.header("x-cart-token", result.cartToken);
         if (result.status < 200 || result.status >= 300) {
             return reply.code(result.status).send(normalizeErrorPayload(result.body));
         }

@@ -1,0 +1,8 @@
+#include "../Base.xcconfig"
+MOBILE_PRODUCT_PROFILE = one_tasker_widget
+MOBILE_BRAND_PROFILE = one_tasker
+MOBILE_AVAILABLE_RETAIL_KINDS = task,service
+PRODUCT_DISPLAY_NAME = OneTasker
+MOBILE_PRIVACY_POLICY_URL = https:/$()/app.smartresponsor.com/page/privacy-policy
+MOBILE_TERMS_OF_SERVICE_URL = https:/$()/app.smartresponsor.com/page/terms-of-service
+MOBILE_ABOUT_URL = https:/$()/app.smartresponsor.com/page/about

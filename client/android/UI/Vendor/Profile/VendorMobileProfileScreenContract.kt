@@ -13,7 +13,10 @@ data class VendorMobileProfileScreenContract(
     val about: String?,
     val website: String?,
     val avatarUrl: String?,
+    val avatarAttachmentId: String?,
     val coverUrl: String?,
+    val coverAttachmentId: String?,
+    val canEditProfileMedia: Boolean,
     val publicationStatus: String?,
 ) {
     companion object {
@@ -29,7 +32,10 @@ data class VendorMobileProfileScreenContract(
                 about = payload.about,
                 website = payload.website,
                 avatarUrl = payload.avatarUrl,
+                avatarAttachmentId = payload.avatarAttachmentId,
                 coverUrl = payload.coverUrl,
+                coverAttachmentId = payload.coverAttachmentId,
+                canEditProfileMedia = payload.canEditProfileMedia,
                 publicationStatus = payload.publicationStatus,
             )
     }

@@ -26,4 +26,7 @@ class MessageFeatureBridge(
 
     suspend fun send(request: MessageSendRequest): MessageItemPayload =
         MessageSendUseCase(gateway).invoke(request)
+
+    suspend fun markRead(threadId: String, userId: String, messageId: String) =
+        gateway.markRead(threadId, userId, messageId)
 }

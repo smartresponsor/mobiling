@@ -5,14 +5,24 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
+import org.json.JSONObject
 
-class PushTokenRegistrar(private val baseUrl: String = "https://httpbin.org") {
-    private val client = OkHttpClient()
+class PushTokenRegistrar(
+    private val baseUrl: String,
+    private val client: OkHttpClient = OkHttpClient(),
+) {
 
     fun register(payload: PushRegistrationPayload): Boolean {
-        val body = payload.token.toRequestBody("text/plain".toMediaType())
+        val body = JSONObject()
+            .put("token", payload.token)
+            .put("platform", payload.platform)
+            .put("appKey", payload.appKey)
+            .put("deviceId", payload.deviceId)
+            .put("enabled", payload.enabled)
+            .toString()
+            .toRequestBody("application/json".toMediaType())
         val request = Request.Builder()
-            .url("$baseUrl/anything/mobile/push/token?platform=${payload.platform}")
+            .url(baseUrl.trimEnd('/') + "/notification/subscription")
             .post(body)
             .build()
 

@@ -250,6 +250,22 @@
     },
     {
       "method": "GET",
+      "path": "/currency/catalog",
+      "owner": "Currencing",
+      "routeFile": "src/routes/currency/mobile.ts",
+      "routeClass": "transport",
+      "responseSchema": "MobileCurrencyCatalogPayload"
+    },
+    {
+      "method": "GET",
+      "path": "/currency/selector",
+      "owner": "Currencing",
+      "routeFile": "src/routes/currency/mobile.ts",
+      "routeClass": "transport",
+      "responseSchema": "MobileCurrencySelectorPayload"
+    },
+    {
+      "method": "GET",
       "path": "/locale",
       "owner": "Localizing",
       "routeFile": "src/routes/locale/mobile.ts",

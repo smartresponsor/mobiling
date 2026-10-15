@@ -56,7 +56,7 @@ public struct MobileVendorSummaryView: View {
         }
 
         guard let vendorSummaryGateway else {
-            errorMessage = "Vendor summary gateway is not available."
+            errorMessage = "Vendor summary service is not available."
             return
         }
 

@@ -1,6 +1,7 @@
 import { request as httpRequest } from "http";
 import { request as httpsRequest } from "https";
 import { ENV } from "../../env.js";
+import { resolveUpstreamBaseUrl } from "../../runtime/applicationRuntimeResolver.js";
 const LOCALIZING_API_UNAVAILABLE_PAYLOAD = {
     code: "localizing_api_unavailable",
     message: "Localizing API is unavailable from mobile-edge.",
@@ -23,7 +24,7 @@ export class LocalizingApiClient {
         return this.request("GET", `/api/locale/translation/message/resolve?${params.toString()}`, forwardedHeaders);
     }
     async request(method, path, forwardedHeaders) {
-        const baseUrl = this.baseUrl.trim();
+        const baseUrl = await resolveUpstreamBaseUrl(forwardedHeaders, this.baseUrl);
         if ("" === baseUrl) {
             return this.unavailable();
         }

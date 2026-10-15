@@ -7,9 +7,15 @@ public struct RegisterPushTokenUseCase {
         self.pushTokenRegistrar = pushTokenRegistrar
     }
 
-    public func callAsFunction(token: String, platform: String = "ios") async throws -> Bool {
+    public func callAsFunction(
+        token: String,
+        platform: String = "ios",
+        appKey: String,
+        deviceId: String,
+        enabled: Bool = true
+    ) async throws -> Bool {
         try await pushTokenRegistrar.register(
-            payload: PushRegistrationPayload(token: token, platform: platform)
+            payload: PushRegistrationPayload(token: token, platform: platform, appKey: appKey, deviceId: deviceId, enabled: enabled)
         )
     }
 }

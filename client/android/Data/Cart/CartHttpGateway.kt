@@ -16,6 +16,7 @@ import org.json.JSONObject
 class CartHttpGateway(
     private val baseUrl: String,
     private val client: OkHttpClient = OkHttpClient(),
+    private val tokenStore: CartTokenStore = InMemoryCartTokenStore(),
 ) : CartReader, CartWriter, CartCheckoutGateway {
     private val jsonMediaType = "application/json".toMediaType()
 
@@ -86,6 +87,7 @@ class CartHttpGateway(
         val requestBuilder = Request.Builder()
             .url(normalizedBaseUrl() + path)
             .header("Accept", "application/json")
+        tokenStore.current()?.let { requestBuilder.header("X-Cart-Token", it) }
 
         if (body == null) {
             when (method) {
@@ -99,11 +101,14 @@ class CartHttpGateway(
 
         client.newCall(requestBuilder.build()).execute().use { response ->
             val responseBody = response.body?.string().orEmpty()
+            response.header("X-Cart-Token")?.let(tokenStore::save)
             if (!response.isSuccessful) {
                 throw IllegalStateException("Mobile cart request failed with HTTP ${response.code}.")
             }
 
-            return if (responseBody.isBlank()) JSONObject() else JSONObject(responseBody)
+            val json = if (responseBody.isBlank()) JSONObject() else JSONObject(responseBody)
+            json.optString("cartToken").trim().takeIf(String::isNotEmpty)?.let(tokenStore::save)
+            return json
         }
     }
 

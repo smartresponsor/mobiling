@@ -1,6 +1,7 @@
 import { request as httpRequest } from "http";
 import { request as httpsRequest } from "https";
 import { ENV } from "../../env.js";
+import { resolveUpstreamBaseUrl } from "../../runtime/applicationRuntimeResolver.js";
 const ATTACHING_API_UNAVAILABLE_PAYLOAD = {
     code: "attaching_api_unavailable",
     message: "Attaching API is unavailable from mobile-edge.",
@@ -28,8 +29,8 @@ export class AttachingApiClient {
     detachAttachment(body, forwardedHeaders = {}) {
         return this.request("POST", "/attachment/detach", body, forwardedHeaders);
     }
-    attachmentFileUrl(attachmentId) {
-        const baseUrl = this.baseUrl.trim();
+    async attachmentFileUrl(attachmentId, forwardedHeaders = {}) {
+        const baseUrl = await resolveUpstreamBaseUrl(forwardedHeaders, this.baseUrl);
         if ("" === baseUrl || "" === attachmentId.trim()) {
             return null;
         }
@@ -40,8 +41,8 @@ export class AttachingApiClient {
             return null;
         }
     }
-    attachmentUploadUrl() {
-        const baseUrl = this.baseUrl.trim();
+    async attachmentUploadUrl(forwardedHeaders = {}) {
+        const baseUrl = await resolveUpstreamBaseUrl(forwardedHeaders, this.baseUrl);
         if ("" === baseUrl) {
             return null;
         }
@@ -53,7 +54,7 @@ export class AttachingApiClient {
         }
     }
     async request(method, path, body, forwardedHeaders) {
-        const baseUrl = this.baseUrl.trim();
+        const baseUrl = await resolveUpstreamBaseUrl(forwardedHeaders, this.baseUrl);
         if ("" === baseUrl) {
             return this.unavailable();
         }

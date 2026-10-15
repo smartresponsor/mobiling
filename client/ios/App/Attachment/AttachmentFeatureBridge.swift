@@ -24,4 +24,8 @@ public struct AttachmentFeatureBridge: Sendable {
     public func uploadHandoff(request: AttachmentUploadHandoffRequest) async throws -> AttachmentUploadHandoffPayload {
         try await writer.uploadHandoff(request: request)
     }
+
+    public func upload(request: AttachmentUploadHandoffRequest, fileName: String, mimeType: String, data: Data) async throws -> AttachmentItemPayload {
+        try await writer.uploadAttachment(request: request, fileName: fileName, mimeType: mimeType, data: data)
+    }
 }

@@ -1,25 +1,49 @@
 package app.mobiling.client.dashboard
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AttachFile
+import androidx.compose.material.icons.filled.Dashboard
+import androidx.compose.material.icons.filled.Inventory2
+import androidx.compose.material.icons.automirrored.filled.HelpOutline
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.MoreHoriz
+import androidx.compose.material.icons.filled.Payments
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.automirrored.filled.ReceiptLong
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.filled.Storefront
+import androidx.compose.material.icons.filled.VpnKey
+import androidx.compose.material.icons.filled.Wallet
+import androidx.compose.material.icons.filled.ChatBubbleOutline
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material3.AssistChip
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ListItem
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -27,8 +51,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
+import app.mobiling.client.design.MobileDesignDefaults
+import app.mobiling.client.RetailKind
 import app.mobiling.client.attachment.AttachmentFeatureBridge
 import app.mobiling.client.attachment.AttachmentMobileScreen
 import app.mobiling.client.cart.CartFeatureBridge
@@ -37,98 +63,192 @@ import app.mobiling.client.catalog.CatalogMobileScreen
 import app.mobiling.client.cart.CartMobileScreen
 import app.mobiling.client.contract.navigation.shell.NavigationMobileItemPayload
 import app.mobiling.client.data.navigation.shell.NavigationShellGateway
+import app.mobiling.client.data.order.OrderGateway
+import app.mobiling.client.data.product.ProductGateway
+import app.mobiling.client.data.project.ProjectGateway
+import app.mobiling.client.data.retail.placement.RetailPlacementGateway
 import app.mobiling.client.data.vendor.payout.VendorPayoutGateway
 import app.mobiling.client.data.vendor.profile.VendorProfileGateway
 import app.mobiling.client.data.vendor.statement.VendorStatementGateway
 import app.mobiling.client.data.vendor.summary.VendorSummaryGateway
 import app.mobiling.client.data.vendor.transaction.VendorTransactionGateway
+import app.mobiling.client.data.wallet.WalletGateway
 import app.mobiling.client.ui.navigation.shell.NavigationMobileShellScreenContract
+import app.mobiling.client.navigation.CanonicalBottomNavigation
+import app.mobiling.client.navigation.CanonicalBottomNavigationItem
+import app.mobiling.client.navigation.CanonicalTopAppBar
+import app.mobiling.client.design.MobileDesignSystem
 import app.mobiling.client.navigation.MobileRouteResolver
 import app.mobiling.client.usecase.navigation.shell.NavigationLoadShellUseCase
+import app.mobiling.client.vendor.VendorMobileOverviewScreen
 import app.mobiling.client.vendor.VendorMobilePayoutScreen
 import app.mobiling.client.vendor.VendorMobileProfileScreen
 import app.mobiling.client.vendor.VendorMobileStatementScreen
 import app.mobiling.client.vendor.VendorMobileSummaryScreen
 import app.mobiling.client.vendor.VendorMobileTransactionScreen
+import app.mobiling.client.vendor.ProductMobileScreen
+import app.mobiling.client.vendor.OrderMobileScreen
+import app.mobiling.client.vendor.ProjectMobileScreen
+import app.mobiling.client.vendor.VendorNewMobileScreen
+import app.mobiling.client.vendor.RetailNewFields
+import app.mobiling.client.vendor.OrderNewFields
+import app.mobiling.client.vendor.ProjectNewMobileScreen
+import app.mobiling.client.message.MessageFeatureBridge
+import app.mobiling.client.message.MessageMobileScreen
+import app.mobiling.client.notification.NotificationFeatureBridge
+import app.mobiling.client.notification.NotificationMobileScreen
+import app.mobiling.client.support.SupportFeatureBridge
+import app.mobiling.client.support.SupportMobileScreen
+import app.mobiling.client.retail.RetailPlacementMobileScreen
+import app.mobiling.client.money.MoneyMobileScreen
+import app.mobiling.client.wallet.WalletMobileScreen
+import app.mobiling.client.wallet.WalletOperationMobileScreen
+import app.mobiling.client.wallet.WalletTransactionMobileScreen
+import app.mobiling.client.wallet.WalletWithdrawalDetailMobileScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DashboardMobileShell(
     navigationShellGateway: NavigationShellGateway?,
+    messageFeatureBridge: MessageFeatureBridge? = null,
+    notificationFeatureBridge: NotificationFeatureBridge? = null,
+    supportFeatureBridge: SupportFeatureBridge? = null,
+    productGateway: ProductGateway? = null,
+    retailPlacementGateway: RetailPlacementGateway? = null,
+    orderGateway: OrderGateway? = null,
+    projectGateway: ProjectGateway? = null,
     cartFeatureBridge: CartFeatureBridge? = null,
     catalogFeatureBridge: CatalogFeatureBridge? = null,
     attachmentFeatureBridge: AttachmentFeatureBridge? = null,
     vendorId: String? = null,
+    userUuid: String? = null,
     vendorProfileGateway: VendorProfileGateway? = null,
     vendorSummaryGateway: VendorSummaryGateway? = null,
     vendorStatementGateway: VendorStatementGateway? = null,
     vendorPayoutGateway: VendorPayoutGateway? = null,
     vendorTransactionGateway: VendorTransactionGateway? = null,
+    walletGateway: WalletGateway? = null,
+    initialRoute: String = "vendor/project",
+    catalogEnabled: Boolean = true,
+    availableRetailKinds: List<RetailKind> = RetailKind.entries,
+    navigationLabelResolver: (route: String?, key: String, backendLabel: String) -> String = { _, _, label -> label },
     onSignOut: () -> Unit,
 ) {
-    var selectedRoute by remember { mutableStateOf("dashboard") }
+    var selectedRoute by remember { mutableStateOf(initialRoute) }
+    var navigationOpen by remember { mutableStateOf(false) }
     var accountOpen by remember { mutableStateOf(false) }
-    var shell by remember { mutableStateOf(fallbackShell()) }
+    var newChooserOpen by remember { mutableStateOf(false) }
+    var selectedProductKind by remember(availableRetailKinds) { mutableStateOf(availableRetailKinds.first().code) }
+    var shell by remember { mutableStateOf(localizeShell(fallbackShell(), navigationLabelResolver)) }
 
     LaunchedEffect(navigationShellGateway) {
         if (navigationShellGateway != null) {
             shell = try {
-                NavigationMobileShellScreenContract.from(NavigationLoadShellUseCase(navigationShellGateway).invoke())
+                localizeShell(
+                    NavigationMobileShellScreenContract.from(NavigationLoadShellUseCase(navigationShellGateway).invoke()),
+                    navigationLabelResolver,
+                )
             } catch (_: Exception) {
-                fallbackShell()
+                localizeShell(fallbackShell(), navigationLabelResolver)
             }
         }
     }
 
     Scaffold(
+        containerColor = MaterialTheme.colorScheme.background,
         topBar = {
-            TopAppBar(
-                title = {
-                    Column {
-                        Text("SmartResponsor", fontWeight = FontWeight.SemiBold)
-                        Text("Mobile dashboard")
+            CanonicalTopAppBar(
+                title = routeTitle(selectedRoute, selectedProductKind),
+                navigationIcon = {
+                    IconButton(onClick = { navigationOpen = true }) {
+                        Icon(Icons.Default.Menu, contentDescription = "Open navigation")
                     }
                 },
                 actions = {
-                    TextButton(onClick = { accountOpen = true }) {
-                        Text("Account")
+                    IconButton(onClick = { accountOpen = true }) {
+                        Icon(Icons.Default.AccountCircle, contentDescription = "Account")
                     }
                 },
             )
         },
         bottomBar = {
-            NavigationBar {
-                shell.bottomPrimary.filter { it.visible }.forEach { item ->
-                    NavigationBarItem(
-                        selected = selectedRoute == item.route,
+            val bottomItems = shell.bottomPrimary.filter { it.visible }
+            CanonicalBottomNavigation(
+                items = bottomItems.map { item ->
+                    CanonicalBottomNavigationItem(
+                        key = item.key,
+                        label = item.label,
+                        icon = iconFor(item),
+                        selected = isBottomNavigationItemSelected(selectedRoute, item.route),
+                        enabled = item.enabled,
                         onClick = {
-                            if (item.enabled && isHandledRoute(item.route)) {
+                            if (item.enabled && isHandledRoute(item.route) && (item.route != "catalog" || catalogEnabled)) {
                                 selectedRoute = item.route ?: item.key
                             }
                         },
-                        icon = { Text(iconLabel(item)) },
-                        label = { Text(item.label) },
-                        enabled = item.enabled,
                     )
+                },
+            )
+        },
+        floatingActionButton = {
+            if (!selectedRoute.endsWith("/new") && !selectedRoute.startsWith("support")) {
+                FloatingActionButton(onClick = { newChooserOpen = true }) {
+                    Icon(Icons.Default.Add, contentDescription = "Create new")
                 }
             }
         },
     ) { padding ->
         DashboardContent(
             selectedRoute = selectedRoute,
+            selectedProductKind = selectedProductKind,
+            availableRetailKinds = availableRetailKinds,
             shell = shell,
+            messageFeatureBridge = messageFeatureBridge,
+            notificationFeatureBridge = notificationFeatureBridge,
+            supportFeatureBridge = supportFeatureBridge,
+            productGateway = productGateway,
+            retailPlacementGateway = retailPlacementGateway,
+            orderGateway = orderGateway,
+            projectGateway = projectGateway,
             cartFeatureBridge = cartFeatureBridge,
             catalogFeatureBridge = catalogFeatureBridge,
             attachmentFeatureBridge = attachmentFeatureBridge,
             vendorId = vendorId,
+            userUuid = userUuid,
             vendorProfileGateway = vendorProfileGateway,
             vendorSummaryGateway = vendorSummaryGateway,
             vendorStatementGateway = vendorStatementGateway,
             vendorPayoutGateway = vendorPayoutGateway,
             vendorTransactionGateway = vendorTransactionGateway,
-            onRouteSelected = { route -> if (isHandledRoute(route)) selectedRoute = route },
+            walletGateway = walletGateway,
+            onRouteSelected = { route ->
+                val normalizedRoute = MobileRouteResolver.normalizeRoute(route)
+                if (isHandledRoute(normalizedRoute)) selectedRoute = normalizedRoute
+            },
             padding = padding,
         )
+    }
+
+    if (navigationOpen) {
+        ModalBottomSheet(onDismissRequest = { navigationOpen = false }) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = MobileDesignSystem.spacing.xl, vertical = MobileDesignSystem.spacing.sm),
+            ) {
+                ShellSection(
+                    title = "Navigation",
+                    items = shell.moreDrawer,
+                    onItemClick = { item ->
+                        if (item.enabled && isHandledRoute(item.route) && (item.route != "catalog" || catalogEnabled)) {
+                            selectedRoute = MobileRouteResolver.normalizeRoute(item.route)
+                        }
+                        navigationOpen = false
+                    },
+                )
+                Spacer(Modifier.height(MobileDesignSystem.spacing.xxl))
+            }
+        }
     }
 
     if (accountOpen) {
@@ -139,7 +259,7 @@ fun DashboardMobileShell(
                 onItemClick = { item ->
                     when {
                         MobileRouteResolver.isSignOutAction(item.action, item.route) -> onSignOut()
-                        item.enabled && isHandledRoute(item.route) -> selectedRoute = MobileRouteResolver.normalizeRoute(item.route)
+                        item.enabled && isHandledRoute(item.route) && (item.route != "catalog" || catalogEnabled) -> selectedRoute = MobileRouteResolver.normalizeRoute(item.route)
                         else -> Unit
                     }
                     accountOpen = false
@@ -147,54 +267,261 @@ fun DashboardMobileShell(
             )
         }
     }
+
+    if (newChooserOpen) {
+        ModalBottomSheet(onDismissRequest = { newChooserOpen = false }) {
+            Column(
+                modifier = Modifier.fillMaxWidth().padding(horizontal = MobileDesignSystem.spacing.lg, vertical = MobileDesignSystem.spacing.sm),
+                verticalArrangement = Arrangement.spacedBy(MobileDesignSystem.spacing.md),
+            ) {
+                availableRetailKinds.forEach { kind ->
+                    NewChoice(
+                        title = retailKindLabel(kind.code),
+                        description = retailKindDescription(kind),
+                        icon = retailKindIcon(kind),
+                    ) {
+                        selectedProductKind = kind.code
+                        selectedRoute = "vendor/retail/new"
+                        newChooserOpen = false
+                    }
+                }
+                Spacer(Modifier.height(MobileDesignSystem.spacing.lg))
+            }
+        }
+    }
 }
 
 @Composable
 private fun DashboardContent(
     selectedRoute: String,
+    selectedProductKind: String,
+    availableRetailKinds: List<RetailKind>,
     shell: NavigationMobileShellScreenContract,
+    messageFeatureBridge: MessageFeatureBridge?,
+    notificationFeatureBridge: NotificationFeatureBridge?,
+    supportFeatureBridge: SupportFeatureBridge?,
+    productGateway: ProductGateway?,
+    retailPlacementGateway: RetailPlacementGateway?,
+    orderGateway: OrderGateway?,
+    projectGateway: ProjectGateway?,
     cartFeatureBridge: CartFeatureBridge?,
     catalogFeatureBridge: CatalogFeatureBridge?,
     attachmentFeatureBridge: AttachmentFeatureBridge?,
     vendorId: String?,
+    userUuid: String?,
     vendorProfileGateway: VendorProfileGateway?,
     vendorSummaryGateway: VendorSummaryGateway?,
     vendorStatementGateway: VendorStatementGateway?,
     vendorPayoutGateway: VendorPayoutGateway?,
     vendorTransactionGateway: VendorTransactionGateway?,
+    walletGateway: WalletGateway?,
     onRouteSelected: (String) -> Unit,
     padding: PaddingValues,
 ) {
+    if (selectedRoute == "support" || selectedRoute.startsWith("support/")) {
+        Box(Modifier.fillMaxSize().padding(padding)) {
+            SupportMobileScreen(selectedRoute, supportFeatureBridge, onRouteSelected)
+        }
+        return
+    }
+
+    when (selectedRoute) {
+        "money" -> {
+            Box(Modifier.fillMaxSize().padding(padding)) {
+                MoneyMobileScreen(onRouteSelected = onRouteSelected)
+            }
+            return
+        }
+        "wallet" -> {
+            Box(Modifier.fillMaxSize().padding(padding)) {
+                WalletMobileScreen(walletGateway = walletGateway, onRouteSelected = onRouteSelected)
+            }
+            return
+        }
+        "wallet/transaction" -> {
+            Box(Modifier.fillMaxSize().padding(padding)) {
+                WalletTransactionMobileScreen(walletGateway = walletGateway)
+            }
+            return
+        }
+        "wallet/funding" -> {
+            Box(Modifier.fillMaxSize().padding(padding)) {
+                WalletOperationMobileScreen(type = "funding", walletGateway = walletGateway)
+            }
+            return
+        }
+        "wallet/withdrawal" -> {
+            Box(Modifier.fillMaxSize().padding(padding)) {
+                WalletOperationMobileScreen(type = "withdrawal", walletGateway = walletGateway, onRouteSelected = onRouteSelected)
+            }
+            return
+        }
+        "attachment", "vendor/attachment" -> {
+            Box(Modifier.fillMaxSize().padding(padding)) {
+                AttachmentMobileScreen(vendorId = vendorId, attachmentFeatureBridge = attachmentFeatureBridge)
+            }
+            return
+        }
+        "cart" -> {
+            Box(Modifier.fillMaxSize().padding(padding)) {
+                CartMobileScreen(cartFeatureBridge = cartFeatureBridge)
+            }
+            return
+        }
+        "catalog" -> {
+            Box(Modifier.fillMaxSize().padding(padding)) {
+                CatalogMobileScreen(catalogFeatureBridge = catalogFeatureBridge)
+            }
+            return
+        }
+        "message" -> {
+            Box(Modifier.fillMaxSize().padding(padding)) {
+                MessageMobileScreen(
+                    messageFeatureBridge = messageFeatureBridge,
+                    currentUserId = userUuid,
+                    vendorId = vendorId,
+                    attachmentFeatureBridge = attachmentFeatureBridge,
+                    onOpenTask = { onRouteSelected("vendor/project") },
+                )
+            }
+            return
+        }
+        "notification" -> {
+            Box(Modifier.fillMaxSize().padding(padding)) {
+                NotificationMobileScreen(notificationFeatureBridge = notificationFeatureBridge)
+            }
+            return
+        }
+        "vendor" -> {
+            Box(Modifier.fillMaxSize().padding(padding)) {
+                VendorMobileOverviewScreen(
+                    vendorId = vendorId,
+                    vendorSummaryGateway = vendorSummaryGateway,
+                    onRouteSelected = onRouteSelected,
+                )
+            }
+            return
+        }
+        "vendor/page" -> {
+            Box(Modifier.fillMaxSize().padding(padding)) {
+                VendorMobileProfileScreen(vendorId = vendorId, vendorProfileGateway = vendorProfileGateway, attachmentFeatureBridge = attachmentFeatureBridge)
+            }
+            return
+        }
+        "vendor/summary" -> {
+            Box(Modifier.fillMaxSize().padding(padding)) {
+                VendorMobileSummaryScreen(vendorId = vendorId, vendorSummaryGateway = vendorSummaryGateway)
+            }
+            return
+        }
+        "vendor/statement" -> {
+            Box(Modifier.fillMaxSize().padding(padding)) {
+                VendorMobileStatementScreen(vendorId = vendorId, vendorStatementGateway = vendorStatementGateway)
+            }
+            return
+        }
+        "vendor/payout" -> {
+            Box(Modifier.fillMaxSize().padding(padding)) {
+                VendorMobilePayoutScreen(vendorId = vendorId, vendorPayoutGateway = vendorPayoutGateway)
+            }
+            return
+        }
+        "vendor/transaction" -> {
+            Box(Modifier.fillMaxSize().padding(padding)) {
+                VendorMobileTransactionScreen(vendorId = vendorId, vendorTransactionGateway = vendorTransactionGateway)
+            }
+            return
+        }
+        "vendor/retail" -> {
+            Box(Modifier.fillMaxSize().padding(padding)) {
+                ProductMobileScreen(vendorId, null, productGateway, onRouteSelected)
+            }
+            return
+        }
+        "vendor/order" -> {
+            Box(Modifier.fillMaxSize().padding(padding)) {
+                OrderMobileScreen(vendorId, null, orderGateway, onRouteSelected)
+            }
+            return
+        }
+        "vendor/project" -> {
+            Box(Modifier.fillMaxSize().padding(padding)) {
+                ProjectMobileScreen(vendorId, null, projectGateway, onRouteSelected)
+            }
+            return
+        }
+        else -> {
+            val segments = selectedRoute.split('/').filter(String::isNotBlank)
+            when {
+                segments.size == 3 && segments[0] == "wallet" && segments[1] == "withdrawal" -> {
+                    Box(Modifier.fillMaxSize().padding(padding)) {
+                        WalletWithdrawalDetailMobileScreen(withdrawalId = segments[2], walletGateway = walletGateway)
+                    }
+                    return
+                }
+                selectedRoute == "vendor/retail/new" -> {
+                    Box(Modifier.fillMaxSize().padding(padding)) {
+                        VendorNewMobileScreen(
+                            singular = retailKindLabel(selectedProductKind),
+                            listRoute = "vendor/retail",
+                            fields = RetailNewFields,
+                            onCreate = { fields -> productGateway?.createProduct(fields) ?: error("Retail gateway is not available.") },
+                            onRouteSelected = onRouteSelected,
+                            createdRoute = { identity -> "vendor/retail/$identity/placement" },
+                            initialValues = mapOf(
+                                "kind" to selectedProductKind,
+                                "currency" to "USD",
+                            ),
+                            availableRetailKinds = availableRetailKinds,
+                            catalogFeatureBridge = catalogFeatureBridge,
+                        )
+                    }
+                    return
+                }
+                selectedRoute == "vendor/order/new" -> {
+                    Box(Modifier.fillMaxSize().padding(padding)) {
+                        VendorNewMobileScreen("Order", "vendor/order", OrderNewFields, { fields ->
+                            orderGateway?.createOrder(fields) ?: error("Order gateway is not available.")
+                            null
+                        }, onRouteSelected)
+                    }
+                    return
+                }
+                selectedRoute == "vendor/project/new" -> {
+                    Box(Modifier.fillMaxSize().padding(padding)) {
+                        ProjectNewMobileScreen({ fields -> projectGateway?.createProject(fields) ?: error("Project gateway is not available.") }, onRouteSelected)
+                    }
+                    return
+                }
+                segments.size == 4 && segments[0] == "vendor" && segments[1] == "retail" && segments[3] == "placement" -> {
+                    Box(Modifier.fillMaxSize().padding(padding)) {
+                        RetailPlacementMobileScreen(segments[2], retailPlacementGateway, onRouteSelected)
+                    }
+                    return
+                }
+                segments.size == 3 && segments[0] == "vendor" && segments[1] == "product" -> {
+                    Box(Modifier.fillMaxSize().padding(padding)) { ProductMobileScreen(vendorId, segments[2], productGateway, onRouteSelected) }
+                    return
+                }
+                segments.size >= 3 && segments[0] == "vendor" && segments[1] == "order" -> {
+                    Box(Modifier.fillMaxSize().padding(padding)) { OrderMobileScreen(vendorId, segments[2], orderGateway, onRouteSelected) }
+                    return
+                }
+                segments.size == 3 && segments[0] == "vendor" && segments[1] == "project" -> {
+                    Box(Modifier.fillMaxSize().padding(padding)) { ProjectMobileScreen(vendorId, segments[2], projectGateway, onRouteSelected) }
+                    return
+                }
+            }
+        }
+    }
+
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .padding(padding),
-        contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp),
+        contentPadding = PaddingValues(MobileDesignSystem.spacing.lg),
+        verticalArrangement = Arrangement.spacedBy(MobileDesignSystem.spacing.md),
     ) {
-        item {
-            Text(
-                text = when (selectedRoute) {
-                    "attachment" -> "Attachment"
-                    "cart" -> "Cart"
-                    "catalog" -> "Catalog"
-                    "vendor" -> "Vendor"
-                    "vendor/profile" -> "My Profile"
-                    "vendor/summary" -> "Vendor Summary"
-                    "vendor/statement" -> "Vendor Statement"
-                    "vendor/payout" -> "Vendor Payout"
-                    "vendor/transaction" -> "Vendor Transaction"
-                    "more" -> "More"
-                    else -> "Dashboard"
-                },
-                fontWeight = FontWeight.Bold,
-            )
-        }
-
-        item {
-            Text("Root shell is loaded from Navigating publication. Inactive modules stay visible as Coming soon.")
-        }
-
         when (selectedRoute) {
             "attachment" -> item {
                 AttachmentMobileScreen(vendorId = vendorId, attachmentFeatureBridge = attachmentFeatureBridge)
@@ -210,8 +537,8 @@ private fun DashboardContent(
                     item.route?.let(onRouteSelected)
                 })
             }
-            "vendor/profile" -> item {
-                VendorMobileProfileScreen(vendorId = vendorId, vendorProfileGateway = vendorProfileGateway)
+            "vendor/page" -> item {
+                VendorMobileProfileScreen(vendorId = vendorId, vendorProfileGateway = vendorProfileGateway, attachmentFeatureBridge = attachmentFeatureBridge)
             }
             "vendor/summary" -> item {
                 VendorMobileSummaryScreen(vendorId = vendorId, vendorSummaryGateway = vendorSummaryGateway)
@@ -224,6 +551,9 @@ private fun DashboardContent(
             }
             "vendor/transaction" -> item {
                 VendorMobileTransactionScreen(vendorId = vendorId, vendorTransactionGateway = vendorTransactionGateway)
+            }
+            "notification" -> item {
+                EmptyMobileState(title = "Notifications", description = "Important 1Tasker updates will appear here.")
             }
             "more" -> item {
                 ShellSection(title = "More", items = shell.moreDrawer, onItemClick = { item ->
@@ -238,6 +568,39 @@ private fun DashboardContent(
 }
 
 @Composable
+private fun NewChoice(title: String, description: String, icon: ImageVector, onClick: () -> Unit) {
+    ElevatedCard(
+        onClick = onClick,
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surface),
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(MobileDesignSystem.spacing.lg),
+            horizontalArrangement = Arrangement.spacedBy(MobileDesignSystem.spacing.lg),
+        ) {
+            Surface(shape = MaterialTheme.shapes.medium, color = MaterialTheme.colorScheme.primaryContainer) {
+                Icon(icon, contentDescription = null, modifier = Modifier.padding(MobileDesignDefaults.Dashboard.iconInset))
+            }
+            Column(modifier = Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(MobileDesignSystem.spacing.xs)) {
+                Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+                Text(description, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+        }
+    }
+}
+
+@Composable
+private fun EmptyMobileState(title: String, description: String) {
+    Column(
+        modifier = Modifier.fillMaxWidth().padding(vertical = MobileDesignSystem.spacing.xxl),
+        verticalArrangement = Arrangement.spacedBy(MobileDesignSystem.spacing.sm),
+    ) {
+        Text(title, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
+        Text(description, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+    }
+}
+
+@Composable
 private fun ShellSection(
     title: String,
     items: List<NavigationMobileItemPayload>,
@@ -245,80 +608,138 @@ private fun ShellSection(
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(4.dp),
+        verticalArrangement = Arrangement.spacedBy(MobileDesignSystem.spacing.md),
     ) {
-        Text(title, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(horizontal = 16.dp))
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleLarge,
+            fontWeight = FontWeight.SemiBold,
+        )
         items.filter { it.visible }.forEach { item ->
-            ListItem(
-                headlineContent = { Text(item.label) },
-                supportingContent = { Text(item.badge ?: item.route ?: item.key) },
-                leadingContent = { Text(iconLabel(item)) },
-                trailingContent = {
-                    if (!item.enabled) {
-                        AssistChip(
-                            onClick = {},
-                            label = { Text(item.badge ?: "Coming soon") },
+            ElevatedCard(
+                onClick = { onItemClick(item) },
+                enabled = item.enabled,
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.elevatedCardColors(
+                    containerColor = if (item.enabled) {
+                        MaterialTheme.colorScheme.surface
+                    } else {
+                        MaterialTheme.colorScheme.surfaceVariant
+                    },
+                ),
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(MobileDesignSystem.spacing.lg),
+                    horizontalArrangement = Arrangement.spacedBy(MobileDesignSystem.spacing.lg),
+                ) {
+                    Surface(
+                        shape = MaterialTheme.shapes.medium,
+                        color = MaterialTheme.colorScheme.primaryContainer,
+                    ) {
+                        Icon(
+                            imageVector = iconFor(item),
+                            contentDescription = null,
+                            modifier = Modifier.padding(MobileDesignDefaults.Dashboard.iconInset),
+                            tint = MaterialTheme.colorScheme.onPrimaryContainer,
                         )
                     }
-                },
-                modifier = Modifier.clickable(enabled = item.enabled) {
-                    onItemClick(item)
-                },
-            )
+                    Text(
+                        text = item.label,
+                        modifier = Modifier.weight(1f),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                    if (!item.enabled) {
+                        AssistChip(onClick = {}, label = { Text(item.badge ?: "Coming soon") })
+                    }
+                }
+            }
         }
     }
 }
 
-private fun iconLabel(item: NavigationMobileItemPayload): String =
-    when (item.icon) {
-        "cart" -> "🛒"
-        "store" -> "🏬"
-        "person" -> "👤"
-        "attachment" -> "📎"
-        "message" -> "💬"
-        "catalog" -> "🛍"
-        "key" -> "🔑"
-        "logout" -> "↩"
-        "summary" -> "📊"
-        "statement" -> "🧾"
-        "payout" -> "💵"
-        "receipt" -> "🧾"
-        "menu" -> "☰"
-        else -> "⌂"
-    }
+private fun iconFor(item: NavigationMobileItemPayload): ImageVector = when (item.icon) {
+    "cart" -> Icons.Default.ShoppingCart
+    "store" -> Icons.Default.Storefront
+    "person" -> Icons.Default.Person
+    "attachment" -> Icons.Default.AttachFile
+    "message" -> Icons.Default.ChatBubbleOutline
+    "catalog" -> Icons.Default.Inventory2
+    "key" -> Icons.Default.VpnKey
+    "logout" -> Icons.AutoMirrored.Filled.Logout
+    "summary" -> Icons.Default.Dashboard
+    "statement" -> Icons.AutoMirrored.Filled.ReceiptLong
+    "payout" -> Icons.Default.Payments
+    "receipt" -> Icons.AutoMirrored.Filled.ReceiptLong
+    "menu" -> Icons.Default.MoreHoriz
+    "tasks" -> Icons.AutoMirrored.Filled.ReceiptLong
+    "notification" -> Icons.Default.Notifications
+    "wallet" -> Icons.Default.Wallet
+    "support" -> Icons.AutoMirrored.Filled.HelpOutline
+    else -> Icons.Default.Dashboard
+}
+
+private fun itemDescription(item: NavigationMobileItemPayload): String = when (item.route) {
+    "dashboard" -> "Overview of your active workspace."
+    "cart" -> "Review selected products and checkout activity."
+    "vendor" -> "Open vendor tools and business information."
+    "vendor/page" -> "Review your 1Tasker profile identity and completion."
+    "vendor/summary" -> "See the current vendor status at a glance."
+    "vendor/statement" -> "Review statement totals and status."
+    "vendor/payout" -> "Track available and pending payout amounts."
+    "vendor/transaction" -> "Review recent vendor transactions."
+    "attachment" -> "Manage files linked to your vendor workspace."
+    "catalog" -> "Browse and manage catalog capabilities."
+    "vendor/project" -> "Review active tasks and jobs."
+    "vendor/retail" -> "Manage your published services."
+    "message" -> "Open task and customer conversations."
+    "notification" -> "Review important 1Tasker updates."
+    else -> item.badge ?: item.route ?: item.key
+}
 
 private fun fallbackShell(): NavigationMobileShellScreenContract = NavigationMobileShellScreenContract(
     bottomPrimary = listOf(
-        item("dashboard", "Dashboard", "dashboard", true, "dashboard"),
-        item("cart", "Cart", "cart", true, "cart"),
-        item("vendor", "Vendor", "store", true, "vendor"),
-        item("more", "More", "menu", true, "more"),
+        item("tasks", "Tasks", "tasks", true, "vendor/project"),
+        item("message", "Messages", "message", true, "message"),
+        item("services", "Services", "store", true, "vendor/retail"),
+        item("notification", "Notifications", "notification", true, "notification"),
+        item("profile", "Profile", "person", true, "vendor/page"),
     ),
     accountQuick = listOf(
-        item("vendor_profile", "My Profile", "person", true, "vendor/profile"),
+        item("vendor_page", "Profile", "person", true, "vendor/page"),
         item("access_password", "Change Password", "key", false, "access/password"),
         item("access_verification", "Verification", "key", false, "access/verification"),
         item("vendor_attachment", "My Attachment", "attachment", true, "attachment"),
+        item("casing_cases", "My cases", "support", true, "support/case"),
+        item("casing_order_help", "Order help", "receipt", true, "support/order"),
         item("access_sign_out", "Sign Out", "logout", true, "access/sign-out", action = "access.sign_out"),
     ),
     moreDrawer = listOf(
         item("dashboard", "Dashboard", "dashboard", true, "dashboard"),
-        item("cart", "Cart", "cart", true, "cart"),
-        item("vendor", "Vendor", "store", true, "vendor"),
+        item("money", "Money", "wallet", true, "money"),
+        item("tasks", "Tasks", "tasks", true, "vendor/project"),
+        item("message", "Messages", "message", true, "message"),
+        item("services", "Services", "store", true, "vendor/retail"),
+        item("notification", "Notifications", "notification", true, "notification"),
+        item("support", "Support", "support", true, "support"),
+        item("vendor_page", "Profile", "person", true, "vendor/page"),
         item("catalog", "Catalog", "catalog", false, "catalog"),
-        item("message", "Message", "message", false, "message"),
         item("attachment", "Attachment", "attachment", true, "attachment"),
     ),
     vendorContext = listOf(
-        item("vendor_overview", "My Vendor", "store", true, "vendor"),
-        item("vendor_profile", "My Profile", "person", true, "vendor/profile"),
+        item("vendor_overview", "Profile Overview", "person", true, "vendor"),
+        item("vendor_page", "Profile", "person", true, "vendor/page"),
         item("vendor_summary", "Summary", "summary", true, "vendor/summary"),
         item("vendor_statement", "Statement", "statement", true, "vendor/statement"),
         item("vendor_payout", "Payout", "payout", true, "vendor/payout"),
         item("vendor_transaction", "Transaction", "receipt", true, "vendor/transaction"),
         item("vendor_attachment", "My Attachment", "attachment", true, "attachment"),
+        item("vendor_product", "Services", "catalog", true, "vendor/retail"),
+        item("vendor_order", "Orders", "statement", true, "vendor/order"),
+        item("vendor_project", "Tasks", "tasks", true, "vendor/project"),
     ),
 )
+
 
 private fun item(
     key: String,
@@ -344,7 +765,91 @@ private fun item(
     route = route,
 )
 
+private fun localizeShell(
+    shell: NavigationMobileShellScreenContract,
+    resolver: (route: String?, key: String, backendLabel: String) -> String,
+): NavigationMobileShellScreenContract {
+    fun localize(items: List<NavigationMobileItemPayload>): List<NavigationMobileItemPayload> =
+        items.map { item ->
+            val route = MobileRouteResolver.normalizeRoute(item.route)
+            item.copy(label = resolver(route, item.key, item.label), route = route.ifBlank { item.route })
+        }
+
+    return shell.copy(
+        bottomPrimary = localize(shell.bottomPrimary),
+        accountQuick = localize(shell.accountQuick),
+        moreDrawer = localize(shell.moreDrawer),
+        vendorContext = localize(shell.vendorContext),
+    )
+}
+
+private fun routeTitle(route: String, retailKind: String): String = when {
+    route == "dashboard" -> "Dashboard"
+    route == "cart" -> "Cart"
+    route == "catalog" -> "Catalog"
+    route == "vendor" -> "Profile"
+    route == "more" -> "More"
+    route == "money" -> "Money"
+    route == "wallet" -> "Wallet"
+    route == "wallet/transaction" -> "Transaction"
+    route == "wallet/funding" -> "Funding"
+    route == "wallet/withdrawal" -> "Withdrawal"
+    route.startsWith("wallet/withdrawal/") -> "Withdrawal detail"
+    route == "attachment" || route == "vendor/attachment" -> "Attachment"
+    route == "vendor/page" -> "Profile"
+    route == "vendor/summary" -> "Summary"
+    route == "vendor/statement" -> "Statement"
+    route == "vendor/payout" -> "Payout"
+    route == "vendor/transaction" -> "Transactions"
+    route == "message" -> "Messages"
+    route == "notification" -> "Notifications"
+    route == "support" -> "Support"
+    route == "support/case" -> "My cases"
+    route == "support/order" -> "Order help"
+    route.startsWith("support/case/") -> "Case"
+    route.startsWith("support/") -> "Support"
+    route == "vendor/retail/new" -> "New ${retailKindLabel(retailKind)}"
+    route == "vendor/order/new" -> "New Order"
+    route == "vendor/project/new" -> "New Project"
+    route == "vendor/retail" -> "Services"
+    route == "vendor/order" -> "Orders"
+    route == "vendor/project" -> "Tasks"
+    route.startsWith("vendor/retail/") -> "Product"
+    route.startsWith("vendor/order/") -> "Order"
+    route.startsWith("vendor/project/") -> "Project"
+    else -> "1tasker"
+}
+
+private fun retailKindLabel(kind: String): String = when (kind) {
+    "task" -> "Task"
+    "service" -> "Service"
+    "goods" -> "Product"
+    "project" -> "Project"
+    else -> "Listing"
+}
+
+private fun retailKindDescription(kind: RetailKind): String = when (kind) {
+    RetailKind.Task -> "Post work you need someone to complete."
+    RetailKind.Service -> "Offer your skills or professional service."
+    RetailKind.Goods -> "Sell a physical or digital item."
+    RetailKind.Project -> "Publish a project to the marketplace."
+}
+
+private fun retailKindIcon(kind: RetailKind): ImageVector = when (kind) {
+    RetailKind.Task -> Icons.AutoMirrored.Filled.ReceiptLong
+    RetailKind.Service -> Icons.Default.Storefront
+    RetailKind.Goods -> Icons.Default.Inventory2
+    RetailKind.Project -> Icons.Default.Dashboard
+}
+
 private fun isHandledRoute(route: String?): Boolean = MobileRouteResolver.isCurrentlyRenderable(route)
+
+private fun isBottomNavigationItemSelected(selectedRoute: String, itemRoute: String?): Boolean {
+    val route = MobileRouteResolver.normalizeRoute(itemRoute)
+    if (route.isBlank()) return false
+
+    return selectedRoute == route || selectedRoute.startsWith("$route/")
+}
 
 
 

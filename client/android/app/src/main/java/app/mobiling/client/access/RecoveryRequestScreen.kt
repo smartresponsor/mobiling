@@ -26,7 +26,7 @@ fun RecoveryRequestScreen(
     var status by remember { mutableStateOf<String?>(null) }
     val coroutineScope = rememberCoroutineScope()
 
-    AccessEntryFormScaffold(
+    AccessFlowShell(
         title = "Recover access",
         subtitle = "Request a recovery code for your SmartResponsor access.",
         primaryActionLabel = "Send recovery code",

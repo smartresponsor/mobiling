@@ -1,7 +1,17 @@
 plugins {
     id("com.android.library")
-    id("org.jetbrains.kotlin.android")
 }
+
+val moduleSourceDirs = file(".")
+    .listFiles()
+    ?.filter { candidate ->
+        candidate.isDirectory &&
+            candidate.name != "build" &&
+            candidate.name != ".gradle" &&
+            candidate.walkTopDown().any { source -> source.isFile && source.extension == "kt" }
+    }
+    ?.map { candidate -> candidate.path }
+    ?: emptyList()
 
 android {
     namespace = "app.mobiling.client.ui"
@@ -13,26 +23,17 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    kotlinOptions {
-        jvmTarget = "17"
-    }
-        val moduleRoot = file(".")
-    val moduleSourceDir = moduleRoot
-        .listFiles()
-        ?.filter { candidate ->
-            candidate.isDirectory &&
-                candidate.name != "build" &&
-                candidate.name != ".gradle" &&
-                candidate.walkTopDown().any { source -> source.isFile && source.extension == "kt" }
-        }
-        ?.map { candidate -> candidate.path }
-        ?: emptyList()
-
-    sourceSets["main"].java.setSrcDirs(moduleSourceDir)
 }
 
+androidComponents {
+    onVariants { variant ->
+        moduleSourceDirs.forEach { directory ->
+            variant.sources.kotlin?.addStaticSourceDirectory(directory)
+        }
+    }
+}
 
-        dependencies { implementation(project(":client-contract")) }
+dependencies { implementation(project(":client-contract")) }
 
 
 

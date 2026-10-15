@@ -2,16 +2,22 @@
     xmlns:tools="http://schemas.android.com/tools">
 
   <uses-permission android:name="android.permission.INTERNET"/>
+  <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
   <application
-      android:label="Mobile"
+      android:icon="@drawable/ic_launcher"
+      android:roundIcon="@drawable/ic_launcher"
+      android:label="@string/app_name"
+      android:theme="@style/Theme.OneTasker"
       android:supportsRtl="true"
       android:usesCleartextTraffic="true">
     <service
-        android:name="androidx.work.impl.background.systemjob.SystemJobService"
-        android:permission="android.permission.BIND_JOB_SERVICE"
-        android:exported="false"
-        tools:replace="android:exported"/>
+        android:name=".notification.MobilingFirebaseMessagingService"
+        android:exported="false">
+      <intent-filter>
+        <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+      </intent-filter>
+    </service>
 
     <activity android:name=".MainActivity" android:exported="true">
       <intent-filter>

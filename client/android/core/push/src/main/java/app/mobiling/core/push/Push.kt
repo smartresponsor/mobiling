@@ -7,11 +7,22 @@ import app.mobiling.client.usecase.system.push.PushRegisterUseCase
  * Legacy-compatible Android entry point bridged to canonical system/push slices.
  */
 class Push(
-    baseUrl: String = "https://httpbin.org",
+    baseUrl: String,
 ) {
     private val pushRegistrationGateway: PushRegistrationGateway = PushRegistrationGateway(baseUrl)
     private val pushRegisterUseCase: PushRegisterUseCase = PushRegisterUseCase(pushRegistrationGateway)
 
-    fun register(token: String, platform: String = "android"): Boolean =
-        pushRegisterUseCase(token = token, platform = platform)
+    fun register(
+        token: String,
+        platform: String = "android",
+        appKey: String,
+        deviceId: String,
+        enabled: Boolean = true,
+    ): Boolean = pushRegisterUseCase(
+        token = token,
+        platform = platform,
+        appKey = appKey,
+        deviceId = deviceId,
+        enabled = enabled,
+    )
 }

@@ -86,6 +86,44 @@
         }
       },
       {
+        "key": "casing_cases",
+        "label": "My cases",
+        "icon": "support",
+        "badge": null,
+        "enabled": true,
+        "visible": true,
+        "status": "active",
+        "disabledReason": null,
+        "requiredComponent": null,
+        "location": "mobile.account.quick",
+        "group": "account",
+        "groupLabel": "Account",
+        "action": null,
+        "route": "support/case",
+        "metadata": {
+          "mobile_route": "support/case"
+        }
+      },
+      {
+        "key": "casing_order_help",
+        "label": "Order help",
+        "icon": "receipt",
+        "badge": null,
+        "enabled": true,
+        "visible": true,
+        "status": "active",
+        "disabledReason": null,
+        "requiredComponent": null,
+        "location": "mobile.account.quick",
+        "group": "account",
+        "groupLabel": "Account",
+        "action": null,
+        "route": "support/order",
+        "metadata": {
+          "mobile_route": "support/order"
+        }
+      },
+      {
         "key": "access_sign_out",
         "label": "Sign Out",
         "icon": "logout",
@@ -142,6 +180,25 @@
         "route": "vendor",
         "metadata": {
           "mobile_route": "vendor"
+        }
+      },
+      {
+        "key": "support",
+        "label": "Support",
+        "icon": "support",
+        "badge": null,
+        "enabled": true,
+        "visible": true,
+        "status": "active",
+        "disabledReason": null,
+        "requiredComponent": null,
+        "location": "mobile.more.drawer",
+        "group": "active",
+        "groupLabel": "Active",
+        "action": null,
+        "route": "support",
+        "metadata": {
+          "mobile_route": "support"
         }
       },
       {

@@ -20,4 +20,8 @@ public struct MessageFeatureBridge: Sendable {
     public func send(request: SendMessageRequest) async throws -> MessageItemPayload {
         try await SendMessageUseCase(gateway: gateway)(request: request)
     }
+
+    public func markRead(threadId: String, messageId: String) async throws {
+        try await gateway.markRead(threadId: threadId, messageId: messageId)
+    }
 }

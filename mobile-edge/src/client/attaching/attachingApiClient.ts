@@ -1,6 +1,7 @@
 import { request as httpRequest } from "http";
 import { request as httpsRequest } from "https";
 import { ENV } from "../../env.js";
+import { resolveUpstreamBaseUrl } from "../../runtime/applicationRuntimeResolver.js";
 
 export interface AttachingApiErrorPayload {
   code: string;
@@ -54,8 +55,8 @@ export class AttachingApiClient {
     return this.request("POST", "/attachment/detach", body, forwardedHeaders);
   }
 
-  attachmentFileUrl(attachmentId: string): string | null {
-    const baseUrl = this.baseUrl.trim();
+  async attachmentFileUrl(attachmentId: string, forwardedHeaders: Record<string, string> = {}): Promise<string | null> {
+    const baseUrl = await resolveUpstreamBaseUrl(forwardedHeaders, this.baseUrl);
 
     if ("" === baseUrl || "" === attachmentId.trim()) {
       return null;
@@ -68,8 +69,8 @@ export class AttachingApiClient {
     }
   }
 
-  attachmentUploadUrl(): string | null {
-    const baseUrl = this.baseUrl.trim();
+  async attachmentUploadUrl(forwardedHeaders: Record<string, string> = {}): Promise<string | null> {
+    const baseUrl = await resolveUpstreamBaseUrl(forwardedHeaders, this.baseUrl);
 
     if ("" === baseUrl) {
       return null;
@@ -83,7 +84,7 @@ export class AttachingApiClient {
   }
 
   private async request(method: string, path: string, body: unknown, forwardedHeaders: Record<string, string>): Promise<AttachingApiResponse> {
-    const baseUrl = this.baseUrl.trim();
+    const baseUrl = await resolveUpstreamBaseUrl(forwardedHeaders, this.baseUrl);
 
     if ("" === baseUrl) {
       return this.unavailable();

@@ -9,6 +9,7 @@ public enum MobileRouteResolver {
         switch route {
         case "dashboard": return .dashboard
         case "more": return .more
+        case "money": return .money
         case "access/sign-in": return .accessSignIn
         case "access/register": return .accessRegister
         case "access/recovery/request": return .accessRecoveryRequest
@@ -16,8 +17,12 @@ public enum MobileRouteResolver {
         case "access/verification": return .accessVerification
         case "access/password": return .accessPassword
         case "access/sign-out": return .accessSignOut
+        case "wallet": return .wallet
+        case "wallet/transaction": return .walletTransaction
+        case "wallet/funding": return .walletFunding
+        case "wallet/withdrawal": return .walletWithdrawal
         case "vendor": return .vendor
-        case "vendor/profile": return .vendorProfile
+        case "vendor/page": return .vendorProfile
         case "vendor/summary": return .vendorSummary
         case "vendor/statement": return .vendorStatement
         case "vendor/payout": return .vendorPayout
@@ -27,11 +32,18 @@ public enum MobileRouteResolver {
         case "catalog/browse": return .catalogBrowse
         case "catalog/search": return .catalogSearch(searchText: query["q"] ?? query["searchText"])
         case "message": return .message
+        case "notification": return .notification
+        case "support": return .support
+        case "support/case": return .supportCases
         case "attachment": return .attachment
         case "cart": return .cart
         case "cart/checkout": return .cartCheckout
-        case "vendor/product": return .vendorProduct
+        case "vendor/retail": return .vendorProduct
+        case "vendor/retail/new": return .vendorProductNew
         case "vendor/order": return .vendorOrder
+        case "vendor/order/new": return .vendorOrderNew
+        case "vendor/project": return .vendorProject
+        case "vendor/project/new": return .vendorProjectNew
         default:
             return resolveSegmentedRoute(segments)
         }
@@ -53,13 +65,41 @@ public enum MobileRouteResolver {
         switch resolve(rawRoute) {
         case .dashboard,
              .more,
+             .money,
+             .wallet,
+             .walletTransaction,
+             .walletFunding,
+             .walletWithdrawal,
+             .walletWithdrawalDetail,
              .vendor,
              .vendorProfile,
              .vendorSummary,
              .vendorStatement,
              .vendorPayout,
              .vendorTransaction,
+             .vendorAttachment,
+             .vendorProduct,
+             .vendorProductNew,
+             .vendorProductDetail,
+             .vendorProductPlacement,
+             .vendorOrder,
+             .vendorOrderNew,
+             .vendorOrderDetail,
+             .vendorOrderShipment,
+             .vendorOrderShipmentDetail,
+             .vendorOrderTax,
+             .vendorOrderTaxDetail,
+             .vendorProject,
+             .vendorProjectNew,
+             .vendorProjectDetail,
+             .message,
+             .notification,
+             .support,
+             .supportCases,
+             .supportCaseDetail,
+             .supportFlow,
              .catalog,
+             .cart,
              .attachment:
             return true
         default:
@@ -68,18 +108,29 @@ public enum MobileRouteResolver {
     }
 
     public static func normalizeRoute(_ rawRoute: String?) -> String {
-        (rawRoute ?? "")
+        let normalized = (rawRoute ?? "")
             .trimmingCharacters(in: .whitespacesAndNewlines)
             .split(separator: "/", omittingEmptySubsequences: true)
             .joined(separator: "/")
+
+        return normalized == "vendor/profile" ? "vendor/page" : normalized
     }
 
     private static func resolveSegmentedRoute(_ segments: [String]) -> MobileRoute? {
+        if segments.count == 3, segments[0] == "wallet", segments[1] == "withdrawal" {
+            return .walletWithdrawalDetail(withdrawalId: segments[2])
+        }
         if segments.count == 3, segments[0] == "catalog", segments[1] == "node" {
             return .catalogNode(catalogNodeId: segments[2])
         }
         if segments.count == 3, segments[0] == "message", segments[1] == "thread" {
             return .messageThread(threadId: segments[2])
+        }
+        if segments.count == 3, segments[0] == "support", segments[1] == "case" {
+            return .supportCaseDetail(caseReference: segments[2])
+        }
+        if segments.first == "support", segments.count > 1 {
+            return .supportFlow(path: segments.joined(separator: "/"))
         }
         if segments.count == 2, segments[0] == "attachment" {
             return .attachmentDetail(attachmentId: segments[1])
@@ -87,7 +138,10 @@ public enum MobileRouteResolver {
         if segments.count == 4, segments[0] == "cart", segments[1] == "checkout", segments[2] == "result" {
             return .cartCheckoutResult(checkoutId: segments[3])
         }
-        if segments.count == 3, segments[0] == "vendor", segments[1] == "product" {
+        if segments.count == 4, segments[0] == "vendor", segments[1] == "retail", segments[3] == "placement" {
+            return .vendorProductPlacement(retailId: segments[2])
+        }
+        if segments.count == 3, segments[0] == "vendor", segments[1] == "retail" {
             return .vendorProductDetail(productId: segments[2])
         }
         if segments.count == 3, segments[0] == "vendor", segments[1] == "order" {
@@ -104,6 +158,9 @@ public enum MobileRouteResolver {
         }
         if segments.count == 5, segments[0] == "vendor", segments[1] == "order", segments[3] == "tax" {
             return .vendorOrderTaxDetail(orderId: segments[2], taxId: segments[4])
+        }
+        if segments.count == 3, segments[0] == "vendor", segments[1] == "project" {
+            return .vendorProjectDetail(projectId: segments[2])
         }
         return nil
     }

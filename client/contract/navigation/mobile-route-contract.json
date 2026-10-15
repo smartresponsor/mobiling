@@ -26,11 +26,15 @@
     "dashboard",
     "more",
     "vendor",
-    "vendor/profile",
+    "vendor/page",
     "vendor/summary",
     "vendor/statement",
     "vendor/payout",
     "vendor/transaction",
+    "vendor/project",
+    "vendor/retail",
+    "message",
+    "notification",
     "attachment"
   ],
   "known_route": [
@@ -115,7 +119,7 @@
       "ios": true
     },
     {
-      "route": "vendor/profile",
+      "route": "vendor/page",
       "family": "vendor",
       "owner": "Vendoring",
       "published_state": "active",
@@ -151,6 +155,40 @@
       "family": "vendor",
       "owner": "Vendoring",
       "published_state": "active",
+      "android": true,
+      "ios": true
+    },
+    {
+      "route": "vendor/retail",
+      "family": "vendor",
+      "owner": "Vendoring",
+      "published_state": "active",
+      "android": true,
+      "ios": true
+    },
+    {
+      "route": "vendor/project",
+      "family": "vendor",
+      "owner": "Vendoring",
+      "published_state": "active",
+      "android": true,
+      "ios": true
+    },
+    {
+      "route": "message",
+      "family": "message",
+      "owner": "Messaging",
+      "published_state": "active_backend_linked",
+      "backend_route": "/message/index",
+      "mobile_shell_route": "message",
+      "android": true,
+      "ios": true
+    },
+    {
+      "route": "notification",
+      "family": "notification",
+      "owner": "Interfacing",
+      "published_state": "active_placeholder",
       "android": true,
       "ios": true
     },
@@ -200,3 +238,7 @@
       "owner": "Cataloging",
       "published_state": "future_screen",
       "android": true,
+      "ios": true
+    }
+  ]
+}

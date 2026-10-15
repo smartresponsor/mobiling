@@ -1,6 +1,7 @@
 import { request as httpRequest } from "http";
 import { request as httpsRequest } from "https";
 import { ENV } from "../../env.js";
+import { ApplicationRuntimeResolver } from "../../runtime/applicationRuntimeResolver.js";
 const NAVIGATING_API_UNAVAILABLE_PAYLOAD = {
     code: "navigating_api_unavailable",
     message: "Navigating API is unavailable from mobile-edge.",
@@ -8,6 +9,7 @@ const NAVIGATING_API_UNAVAILABLE_PAYLOAD = {
 export class NavigatingApiClient {
     baseUrl;
     timeoutMs;
+    runtimeResolver = new ApplicationRuntimeResolver();
     constructor(baseUrl = ENV.NAVIGATING_API_BASE_URL, timeoutMs = ENV.NAVIGATING_API_TIMEOUT_MS) {
         this.baseUrl = baseUrl;
         this.timeoutMs = timeoutMs;
@@ -16,7 +18,10 @@ export class NavigatingApiClient {
         return this.request("GET", "/api/navigation/mobile/shell", forwardedHeaders);
     }
     async request(method, path, forwardedHeaders) {
-        const baseUrl = this.baseUrl.trim();
+        const applicationKey = forwardedHeaders["x-application-key"] || "";
+        const applicationEnvironment = forwardedHeaders["x-application-environment"] || "";
+        const runtime = await this.runtimeResolver.resolve(applicationKey, applicationEnvironment);
+        const baseUrl = (runtime?.effectiveOrigin || this.baseUrl).trim();
         if ("" === baseUrl) {
             return this.unavailable();
         }

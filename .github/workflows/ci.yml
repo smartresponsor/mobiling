@@ -33,7 +33,7 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with: { gradle-version: "8.2" }
       - run: gradle :app:compileDebugKotlin --stacktrace
-  ios-structure:
+  ios:
     runs-on: macos-latest
     defaults: { run: { working-directory: client/ios } }
     steps:
@@ -41,3 +41,7 @@ jobs:
       - run: swift package dump-package
       - run: brew install xcodegen
       - run: xcodegen generate
+      - name: Build OneTasker iOS
+        run: xcodebuild -project Mobiling.xcodeproj -scheme OneTasker -configuration DebugOneTasker -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build
+      - name: Build SmartResponsor iOS
+        run: xcodebuild -project Mobiling.xcodeproj -scheme SmartResponsor -configuration DebugSmartResponsor -destination 'generic/platform=iOS Simulator' CODE_SIGNING_ALLOWED=NO build

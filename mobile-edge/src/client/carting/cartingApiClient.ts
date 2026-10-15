@@ -1,6 +1,7 @@
 import { request as httpRequest } from "http";
 import { request as httpsRequest } from "https";
 import { ENV } from "../../env.js";
+import { resolveUpstreamBaseUrl } from "../../runtime/applicationRuntimeResolver.js";
 
 export interface CartingApiErrorPayload {
   code: string;
@@ -11,6 +12,7 @@ export interface CartingApiErrorPayload {
 export interface CartingApiResponse {
   status: number;
   body: unknown;
+  cartToken?: string;
 }
 
 const CARTING_API_UNAVAILABLE_PAYLOAD: CartingApiErrorPayload = {
@@ -38,7 +40,7 @@ export class CartingApiClient {
   }
 
   private async request(method: string, path: string, body: unknown, forwardedHeaders: Record<string, string>): Promise<CartingApiResponse> {
-    const baseUrl = this.baseUrl.trim();
+    const baseUrl = await resolveUpstreamBaseUrl(forwardedHeaders, this.baseUrl);
 
     if ("" === baseUrl) {
       return this.unavailable();
@@ -82,9 +84,11 @@ export class CartingApiClient {
             }
 
             const text = Buffer.concat(chunks).toString("utf8");
+            const cartTokenHeader = response.headers["x-cart-token"];
             resolve({
               status,
               body: this.parseResponseBody(text),
+              ...(typeof cartTokenHeader === "string" && cartTokenHeader.trim() !== "" ? { cartToken: cartTokenHeader.trim() } : {}),
             });
           });
         },

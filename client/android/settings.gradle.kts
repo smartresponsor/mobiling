@@ -1,13 +1,14 @@
 pluginManagement { repositories { google(); mavenCentral(); gradlePluginPortal() } }
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-    repositories { google(); mavenCentral() }
+    repositories { google(); mavenCentral(); maven("https://jitpack.io") }
 }
 rootProject.name = "Mobiling"
 include(
-    ":app", ":client-contract", ":client-data", ":client-usecase", ":client-navigation", ":client-ui",
+    ":app", ":one-tasker-widget", ":client-contract", ":client-data", ":client-usecase", ":client-navigation", ":client-ui",
     ":core:config", ":core:entitlement", ":core:billing", ":core:analytic", ":core:push", ":core:security",
 )
+project(":one-tasker-widget").projectDir = file("OneTaskerWidget")
 project(":client-contract").projectDir = file("Contract")
 project(":client-data").projectDir = file("Data")
 project(":client-usecase").projectDir = file("UseCase")

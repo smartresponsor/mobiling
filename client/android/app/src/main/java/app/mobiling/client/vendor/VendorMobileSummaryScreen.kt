@@ -56,8 +56,6 @@ fun VendorMobileSummaryScreen(
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        item { Text("Vendor Summary", fontWeight = FontWeight.Bold) }
-
         when {
             errorMessage != null -> item { Text(errorMessage ?: "Vendor summary is temporarily unavailable.") }
             summary == null -> item { Text("Loading vendor summary...") }

@@ -1,0 +1,13 @@
+{
+  "name": "@mobiling/richtext-web",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": { "build": "vite build --base=./" },
+  "dependencies": {
+    "@tiptap/core": "^3.0.9",
+    "@tiptap/extension-link": "^3.0.9",
+    "@tiptap/starter-kit": "^3.0.9"
+  },
+  "devDependencies": { "vite": "^7.0.6" }
+}

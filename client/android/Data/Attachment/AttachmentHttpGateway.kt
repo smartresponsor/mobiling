@@ -7,11 +7,15 @@ import app.mobiling.client.contract.attachment.AttachmentLinkRequest
 import app.mobiling.client.contract.attachment.AttachmentListPayload
 import app.mobiling.client.contract.attachment.AttachmentUploadHandoffPayload
 import app.mobiling.client.contract.attachment.AttachmentUploadHandoffRequest
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
+import java.net.URI
 
 /**
  * Marketing America Corp. Oleksandr Tishchenko
@@ -70,6 +74,50 @@ class AttachmentHttpGateway(
         return uploadHandoffFrom(sendAttachmentRequest(method = "POST", path = "/attachment/upload-handoff", body = body))
     }
 
+    override suspend fun uploadAttachment(
+        request: AttachmentUploadHandoffRequest,
+        fileName: String,
+        mimeType: String,
+        bytes: ByteArray,
+    ): AttachmentItemPayload = withContext(Dispatchers.IO) {
+        require(bytes.isNotEmpty()) { "Attachment upload requires non-empty bytes." }
+        val handoff = uploadHandoff(request)
+        val multipart = MultipartBody.Builder().setType(MultipartBody.FORM)
+            .addFormDataPart("ownerType", request.ownerType)
+            .addFormDataPart("ownerId", request.ownerId)
+            .addFormDataPart("isPrimary", if (request.isPrimary) "1" else "0")
+            .addFormDataPart(handoff.fieldName, fileName, bytes.toRequestBody(mimeType.toMediaType()))
+            .apply {
+                request.context?.takeIf(String::isNotBlank)?.let { addFormDataPart("context", it) }
+                request.slot?.takeIf(String::isNotBlank)?.let { addFormDataPart("slot", it) }
+                request.title?.takeIf(String::isNotBlank)?.let { addFormDataPart("title", it) }
+                request.description?.takeIf(String::isNotBlank)?.let { addFormDataPart("description", it) }
+                request.altText?.takeIf(String::isNotBlank)?.let { addFormDataPart("altText", it) }
+            }
+            .build()
+        val uploadRequest = Request.Builder()
+            .url(handoff.uploadUrl)
+            .header("Accept", "application/json")
+            .post(multipart)
+            .build()
+
+        client.newCall(uploadRequest).execute().use { response ->
+            val responseBody = response.body?.string().orEmpty()
+            if (!response.isSuccessful) {
+                throw IllegalStateException(errorMessage(responseBody, response.code))
+            }
+            val json = if (responseBody.isBlank()) JSONObject() else JSONObject(responseBody)
+            itemFrom(
+                JSONObject()
+                    .put("attachmentId", json.opt("attachmentId") ?: json.opt("id"))
+                    .put("type", json.optString("type", "attachment"))
+                    .put("mimeType", json.optString("mimeType", mimeType))
+                    .put("downloadUrl", json.optString("downloadUrl", ""))
+                    .put("payloadText", responseBody),
+            )
+        }
+    }
+
     private fun listFrom(json: JSONObject): AttachmentListPayload {
         val array = json.optJSONArray("items")
         val items = (0 until (array?.length() ?: 0)).mapNotNull { index ->
@@ -88,8 +136,23 @@ class AttachmentHttpGateway(
     private fun itemFrom(json: JSONObject): AttachmentItemPayload = AttachmentItemPayload(
         attachmentId = json.optString("attachmentId", ""),
         type = json.optString("type", "attachment"),
+        mediaKind = stringOrNull(json, "mediaKind"),
+        documentKind = stringOrNull(json, "documentKind"),
+        originalName = stringOrNull(json, "originalName"),
+        title = stringOrNull(json, "title"),
         mimeType = stringOrNull(json, "mimeType"),
-        downloadUrl = stringOrNull(json, "downloadUrl"),
+        extension = stringOrNull(json, "extension"),
+        size = json.optLong("size", 0L),
+        width = nullableInt(json, "width"),
+        height = nullableInt(json, "height"),
+        durationMs = nullableInt(json, "durationMs"),
+        pageCount = nullableInt(json, "pageCount"),
+        context = stringOrNull(json, "context"),
+        slot = stringOrNull(json, "slot"),
+        isPrimary = json.optBoolean("isPrimary", false),
+        position = json.optInt("position", 0),
+        createdAt = stringOrNull(json, "createdAt"),
+        downloadUrl = normalizeExternalUrl(stringOrNull(json, "downloadUrl")),
         payloadText = json.optString("payloadText", ""),
     )
 
@@ -107,7 +170,7 @@ class AttachmentHttpGateway(
 
     private fun fileHandoffFrom(json: JSONObject): AttachmentFileHandoffPayload = AttachmentFileHandoffPayload(
         attachmentId = json.optString("attachmentId", ""),
-        downloadUrl = json.optString("downloadUrl", ""),
+        downloadUrl = normalizeExternalUrl(json.optString("downloadUrl", "")) ?: "",
         mimeType = stringOrNull(json, "mimeType"),
         fileName = stringOrNull(json, "fileName"),
         handoffMode = json.optString("handoffMode", "external_url"),
@@ -115,14 +178,14 @@ class AttachmentHttpGateway(
     )
 
     private fun uploadHandoffFrom(json: JSONObject): AttachmentUploadHandoffPayload = AttachmentUploadHandoffPayload(
-        uploadUrl = json.optString("uploadUrl", ""),
+        uploadUrl = normalizeExternalUrl(json.optString("uploadUrl", "")) ?: "",
         method = json.optString("method", "POST"),
         fieldName = json.optString("fieldName", "file"),
         handoffMode = json.optString("handoffMode", "multipart_direct"),
         payloadText = json.optString("payloadText", ""),
     )
 
-    private fun sendAttachmentRequest(method: String, path: String, body: JSONObject?): JSONObject {
+    private suspend fun sendAttachmentRequest(method: String, path: String, body: JSONObject?): JSONObject = withContext(Dispatchers.IO) {
         val requestBuilder = Request.Builder()
             .url(normalizedBaseUrl() + path)
             .header("Accept", "application/json")
@@ -140,7 +203,7 @@ class AttachmentHttpGateway(
                 throw IllegalStateException(errorMessage(responseBody, response.code))
             }
 
-            return if (responseBody.isBlank()) JSONObject() else JSONObject(responseBody)
+            if (responseBody.isBlank()) JSONObject() else JSONObject(responseBody)
         }
     }
 
@@ -161,6 +224,30 @@ class AttachmentHttpGateway(
 
     private fun stringOrNull(json: JSONObject, key: String): String? =
         json.optString(key).trim().takeUnless { it.isBlank() || it == "null" }
+
+    private fun nullableInt(json: JSONObject, key: String): Int? =
+        if (!json.has(key) || json.isNull(key)) null else json.optInt(key)
+
+    private fun normalizeExternalUrl(value: String?): String? {
+        if (value.isNullOrBlank()) {
+            return null
+        }
+
+        return try {
+            val externalUri = URI(value)
+            val apiUri = URI(normalizedBaseUrl())
+            val externalHost = externalUri.host?.lowercase()
+            val apiHost = apiUri.host
+
+            if (externalUri.isAbsolute && externalHost in setOf("127.0.0.1", "localhost") && !apiHost.isNullOrBlank() && apiHost.lowercase() !in setOf("127.0.0.1", "localhost")) {
+                URI(externalUri.scheme, externalUri.userInfo, apiHost, externalUri.port, externalUri.path, externalUri.query, externalUri.fragment).toString()
+            } else {
+                value
+            }
+        } catch (_: Exception) {
+            value
+        }
+    }
 
     private fun normalizedBaseUrl(): String = baseUrl.trimEnd('/')
 

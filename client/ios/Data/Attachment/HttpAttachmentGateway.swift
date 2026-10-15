@@ -55,7 +55,22 @@ public struct HttpAttachmentGateway: AttachmentReader, AttachmentWriter {
             AttachmentItemPayload(
                 attachmentId: string(itemObject["attachmentId"]) ?? "attachment-unavailable",
                 type: string(itemObject["type"]),
+                mediaKind: string(itemObject["mediaKind"]),
+                documentKind: string(itemObject["documentKind"]),
+                originalName: string(itemObject["originalName"]),
+                title: string(itemObject["title"]),
                 mimeType: string(itemObject["mimeType"]),
+                extensionName: string(itemObject["extension"]),
+                size: int64(itemObject["size"]) ?? 0,
+                width: int(itemObject["width"]),
+                height: int(itemObject["height"]),
+                durationMs: int(itemObject["durationMs"]),
+                pageCount: int(itemObject["pageCount"]),
+                context: string(itemObject["context"]),
+                slot: string(itemObject["slot"]),
+                isPrimary: itemObject["isPrimary"] as? Bool ?? false,
+                position: int(itemObject["position"]) ?? 0,
+                createdAt: string(itemObject["createdAt"]),
                 downloadUrl: string(itemObject["downloadUrl"]),
                 payloadText: string(itemObject["payloadText"])
             )
@@ -171,6 +186,65 @@ public struct HttpAttachmentGateway: AttachmentReader, AttachmentWriter {
             fieldName: string(object["fieldName"]) ?? "file",
             handoffMode: string(object["handoffMode"]) ?? "multipart_direct",
             payloadText: string(object["payloadText"])
+        )
+    }
+
+    public func uploadAttachment(request: AttachmentUploadHandoffRequest, fileName: String, mimeType: String, data: Data) async throws -> AttachmentItemPayload {
+        guard !data.isEmpty else { throw HttpAttachmentGatewayError.invalidPayload }
+        let handoff = try await uploadHandoff(request: request)
+        guard let url = URL(string: handoff.uploadUrl) else { throw HttpAttachmentGatewayError.invalidUrl }
+        let boundary = "MobilingBoundary-\(UUID().uuidString)"
+        var body = Data()
+        func appendField(_ name: String, _ value: String) {
+            body.append("--\(boundary)\r\nContent-Disposition: form-data; name=\"\(name)\"\r\n\r\n\(value)\r\n".data(using: .utf8)!)
+        }
+        appendField("ownerType", request.ownerType)
+        appendField("ownerId", request.ownerId)
+        appendField("isPrimary", request.isPrimary ? "1" : "0")
+        if let value = request.context { appendField("context", value) }
+        if let value = request.slot { appendField("slot", value) }
+        if let value = request.title { appendField("title", value) }
+        if let value = request.description { appendField("description", value) }
+        if let value = request.altText { appendField("altText", value) }
+        body.append("--\(boundary)\r\nContent-Disposition: form-data; name=\"\(handoff.fieldName)\"; filename=\"\(fileName)\"\r\nContent-Type: \(mimeType)\r\n\r\n".data(using: .utf8)!)
+        body.append(data)
+        body.append("\r\n--\(boundary)--\r\n".data(using: .utf8)!)
+
+        var urlRequest = URLRequest(url: url)
+        urlRequest.httpMethod = "POST"
+        urlRequest.setValue("application/json", forHTTPHeaderField: "Accept")
+        urlRequest.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+        urlRequest.httpBody = body
+        let (responseData, response) = try await session.data(for: urlRequest)
+        guard let httpResponse = response as? HTTPURLResponse else { throw HttpAttachmentGatewayError.invalidResponse }
+        guard (200..<300).contains(httpResponse.statusCode) else {
+            throw HttpAttachmentGatewayError.requestFailed(errorMessage(data: responseData, statusCode: httpResponse.statusCode))
+        }
+        guard let object = try JSONSerialization.jsonObject(with: responseData) as? [String: Any] else {
+            throw HttpAttachmentGatewayError.invalidPayload
+        }
+        let attachmentId = string(object["attachmentId"]) ?? string(object["id"]) ?? "attachment-unavailable"
+        return AttachmentItemPayload(
+            attachmentId: attachmentId,
+            type: string(object["type"]),
+            mediaKind: string(object["mediaKind"]),
+            documentKind: string(object["documentKind"]),
+            originalName: string(object["originalName"]),
+            title: string(object["title"]),
+            mimeType: string(object["mimeType"]) ?? mimeType,
+            extensionName: string(object["extension"]),
+            size: int64(object["size"]) ?? Int64(data.count),
+            width: int(object["width"]),
+            height: int(object["height"]),
+            durationMs: int(object["durationMs"]),
+            pageCount: int(object["pageCount"]),
+            context: string(object["context"]) ?? request.context,
+            slot: string(object["slot"]) ?? request.slot,
+            isPrimary: object["isPrimary"] as? Bool ?? request.isPrimary,
+            position: int(object["position"]) ?? 0,
+            createdAt: string(object["createdAt"]),
+            downloadUrl: string(object["downloadUrl"]),
+            payloadText: String(data: responseData, encoding: .utf8)
         )
     }
 

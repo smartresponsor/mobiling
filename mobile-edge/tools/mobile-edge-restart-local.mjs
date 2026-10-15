@@ -47,7 +47,39 @@ for (const processId of listeningProcessIds(port)) {
 }
 
 const localizingApiBaseUrl = process.env.LOCALIZING_API_BASE_URL || "http://127.0.0.1:8000";
-const startCommand = `$env:LOCALIZING_API_BASE_URL = "${localizingApiBaseUrl}"; Start-Process -FilePath "${process.execPath}" -ArgumentList "dist/app.js" -WorkingDirectory "${root}" -WindowStyle Hidden`;
+const accessingApiBaseUrl = process.env.ACCESSING_API_BASE_URL || "http://127.0.0.1:8000";
+const crudingApiBaseUrl = process.env.CRUDING_API_BASE_URL || "http://127.0.0.1:8000";
+const catalogingApiBaseUrl = process.env.CATALOGING_API_BASE_URL || "http://127.0.0.1:8000";
+
+async function assertAccessingBackendAvailable() {
+  const sessionUrl = `${accessingApiBaseUrl.replace(/\/$/, "")}/api/access/session`;
+
+  try {
+    const response = await fetch(sessionUrl, {
+      redirect: "manual",
+      signal: AbortSignal.timeout(3000),
+    });
+
+    if (response.status >= 300 && response.status < 400) {
+      const location = response.headers.get("location") || "<missing Location header>";
+      throw new Error(`unexpected redirect to ${location}`);
+    }
+
+    if (response.status >= 500 || 404 === response.status) {
+      throw new Error(`unexpected HTTP ${response.status}`);
+    }
+
+    console.log(`Accessing backend preflight passed: ${sessionUrl} (HTTP ${response.status})`);
+  } catch (error) {
+    console.error(
+      `Accessing backend preflight failed for ${sessionUrl}. Start the local Host App on http://127.0.0.1:8000 and ensure /api/access/session is available without an HTTPS redirect. ${error instanceof Error ? error.message : String(error)}`,
+    );
+    process.exit(1);
+  }
+}
+
+await assertAccessingBackendAvailable();
+const startCommand = `$env:LOCALIZING_API_BASE_URL = "${localizingApiBaseUrl}"; $env:ACCESSING_API_BASE_URL = "${accessingApiBaseUrl}"; $env:CRUDING_API_BASE_URL = "${crudingApiBaseUrl}"; $env:CATALOGING_API_BASE_URL = "${catalogingApiBaseUrl}"; Start-Process -FilePath "${process.execPath}" -ArgumentList "dist/app.js" -WorkingDirectory "${root}" -WindowStyle Hidden`;
 const startResult = spawnSync("powershell.exe", ["-NoProfile", "-Command", startCommand], {
   encoding: "utf8",
 });

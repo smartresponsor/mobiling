@@ -5,4 +5,5 @@ public protocol MessageThreadGateway: Sendable {
     func listThreads() async throws -> [MessageThreadSummary]
     func listItems(threadId: String) async throws -> [MessageItemPayload]
     func sendMessage(request: SendMessageRequest) async throws -> MessageItemPayload
+    func markRead(threadId: String, messageId: String) async throws
 }

@@ -3,6 +3,7 @@
 build/
 **/build/
 local.properties
+**/google-services.json
 *.apk
 !dist/Mobiling-debug.apk
 *.aab
@@ -11,3 +12,9 @@ local.properties
 mobile-edge/var/
 .codebase-memory/
 .mobile-cookie.txt
+.console-mcp/
+**/.console-mcp/
+watchdog/
+**/node_modules/
+**/.kotlin/
+tool/.mobile-edge-current.ps1
