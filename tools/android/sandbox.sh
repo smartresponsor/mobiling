@@ -170,25 +170,31 @@ edge() {
 }
 run_app() {
     select_device
-    local reset=false animations=false skip=false task=:app:assembleDebug
+    local reset=false animations=false skip=false brand= task=
     while (($#)); do
         case "$1" in
             --reset) reset=true;; --animations) animations=true;; --skip-build) skip=true;;
-            --task) shift; task=${1:?Gradle task required};; *) die "Unknown run option: $1";;
+            --brand) shift; brand=${1:?Brand required};; *) die "Unknown run option: $1";;
         esac
         shift
     done
+    case "$brand" in
+        oneTasker) task=:app:assembleOneTaskerDebug;;
+        smartResponsor) task=:app:assembleSmartResponsorDebug;;
+        *) die 'Explicit --brand oneTasker|smartResponsor is required';;
+    esac
     if ! $skip; then
         need java
         (cd "$REPO_ROOT/client/android"; ./gradlew "$task" --no-daemon --max-workers=2 '-Dorg.gradle.jvmargs=-Xmx1024m -Dfile.encoding=UTF-8' -Pkotlin.compiler.execution.strategy=in-process "-PmobilingDevEdgeUrl=http://10.0.2.2:$EDGE_PORT")
     fi
     # AGP metadata supplies the actual APK and application ID, including flavors.
-    mapfile -t apk_info < <(python3 - "$REPO_ROOT/client/android/app/build/outputs/apk" <<'PY'
+    mapfile -t apk_info < <(python3 - "$REPO_ROOT/client/android/app/build/outputs/apk" "$brand" <<'PY'
 import pathlib,json,sys
 c=[]
+brand=sys.argv[2]
 for p in pathlib.Path(sys.argv[1]).rglob('output-metadata.json'):
  d=json.loads(p.read_text())
- if d.get('variantName','').lower().endswith('debug'):
+ if d.get('variantName','').lower()==(brand+'Debug').lower():
   for e in d['elements']:
    a=p.parent/e['outputFile']
    if a.exists(): c.append((a,d['applicationId']))
@@ -197,7 +203,12 @@ print(c[0][0]); print(c[0][1])
 PY
 )
     [[ ${#apk_info[@]} == 2 ]] || die 'Unable to select debug APK from AGP output metadata.'
-    local apk=${apk_info[0]} package=${apk_info[1]} activity
+    local apk=${apk_info[0]} package=${apk_info[1]} activity expected_package
+    case "$brand" in
+        oneTasker) expected_package=app.mobiling.client.onetasker;;
+        smartResponsor) expected_package=app.mobiling.client.smartresponsor;;
+    esac
+    [[ $package == "$expected_package" ]] || die "Brand/package mismatch: $brand -> $package (expected $expected_package)"
     adb -s "$SERIAL" install -r "$apk"
     if $reset; then adb -s "$SERIAL" shell pm clear "$package"; fi
     if $animations; then
@@ -249,7 +260,7 @@ smoke() {
     start
     # Build while the emulator is up with constrained Gradle memory/worker count.
     edge start
-    run_app --reset --animations
+    run_app "$@" --reset --animations
     edge_health
     capture welcome
     ui smoke
@@ -273,7 +284,7 @@ case "${1:-help}" in
             code=$(curl -sS --max-time 10 -o /dev/null -w '%{http_code}' "http://127.0.0.1:$EDGE_PORT/$route")
             [[ $code == 2* ]] || die "Upstream /$route returned HTTP $code; configure the development runtime."
         done;;
-    smoke) smoke;;
-    help|-h|--help) echo 'Usage: sandbox.sh {status|setup [--host-packages]|start|stop|restart|recover|diagnose|run [--reset] [--animations] [--skip-build] [--task TASK]|capture [NAME]|tap X Y [NAME]|ui {smoke|open-signin|tap-text TEXT|login}|edge {start|stop|restart|health}|verify-upstream|smoke}';;
+    smoke) shift; smoke "$@";;
+    help|-h|--help) echo 'Usage: sandbox.sh {status|setup [--host-packages]|start|stop|restart|recover|diagnose|run --brand oneTasker|smartResponsor [--reset] [--animations] [--skip-build]|capture [NAME]|tap X Y [NAME]|ui {smoke|open-signin|tap-text TEXT|login}|edge {start|stop|restart|health}|verify-upstream|smoke --brand oneTasker|smartResponsor}';;
     *) die "Unknown command: $1 (use help)";;
 esac

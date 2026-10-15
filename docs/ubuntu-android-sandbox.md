@@ -13,12 +13,12 @@ source "$HOME/.config/mobiling/android-env.sh" # optional for interactive adb/Gr
 
 tools/android/sandbox.sh start
 tools/android/sandbox.sh edge start
-tools/android/sandbox.sh run --reset --animations
+tools/android/sandbox.sh run --brand oneTasker --reset --animations
 tools/android/sandbox.sh edge health
 tools/android/sandbox.sh capture welcome
 tools/android/sandbox.sh ui open-signin
 tools/android/sandbox.sh tap 360 600 example
-tools/android/sandbox.sh smoke                 # resets app data, exercises access UI
+tools/android/sandbox.sh smoke --brand oneTasker # resets selected app data, exercises access UI
 
 tools/android/sandbox.sh stop
 tools/android/sandbox.sh edge stop
@@ -30,7 +30,7 @@ The `Mobiling_Light_API_34` AVD uses API 34 Google APIs x86_64, two virtual CPUs
 
 `start` reuses the named healthy AVD, waits up to 300 seconds for boot completion, package manager and a usable UIAutomator dump, then dismisses the keyguard. `MOBILING_BOOT_TIMEOUT` changes the deadline. Readiness/UI automation retries an observed System UI ANR using the enabled Wait action at its current bounds, up to three dumps; persistent dialogs fail with diagnostics. `restart`/`recover` stop and cold-start the AVD without clearing userdata. Stale lock cleanup is restricted to that stopped AVD. `stop` is safe to repeat. Emulator logs and owned process state live in ignored `.codebase-memory/android`. `diagnose` reports adb, KVM and boot logs. Other devices are never selected implicitly; use `ANDROID_SERIAL` to explicitly target a healthy device for install/capture. Network checks and the existing app URL assume the standard Android Emulator; physical-device networking requires a separate application configuration.
 
-`run` discovers the APK/application ID from AGP metadata and resolves the installed launcher activity. It checks process and foreground state. Use `--skip-build` only for a previously built APK with matching network configuration; `--task :app:assembleDebug` selects the build task. Ambiguous debug outputs fail rather than guessing. `--reset` clears app data; `--animations` disables the device's three animation scales. Restore them with `adb shell settings put global <scale> 1` if desired.
+`run` requires an explicit `--brand oneTasker|smartResponsor`, builds only that flavor, and checks AGP metadata against its expected application ID before installation. It resolves the installed launcher activity. It checks process and foreground state. Use `--skip-build` only for a previously built APK with matching network configuration; The selected flavor determines the Gradle task. Ambiguous or mismatched APK outputs fail rather than guessing. `--reset` clears app data; `--animations` disables the device's three animation scales. Restore them with `adb shell settings put global <scale> 1` if desired.
 
 ## Mobile Edge and upstream services
 
