@@ -20,7 +20,7 @@ export class CartingApiClient {
         return this.request("POST", "/api/cart/item", body, forwardedHeaders);
     }
     prepareCheckoutHandoff(forwardedHeaders = {}) {
-        return this.request("POST", "/api/cart/checkout-handoff", null, forwardedHeaders);
+        return this.request("POST", "/api/cart/checkout/handoff", null, forwardedHeaders);
     }
     async request(method, path, body, forwardedHeaders) {
         const baseUrl = await resolveUpstreamBaseUrl(forwardedHeaders, this.baseUrl);

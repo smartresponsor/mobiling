@@ -31,7 +31,7 @@
     {
       "owner": "Carting",
       "mobileRoute": "POST /cart/checkout-handoff",
-      "upstreamRoute": "POST /api/cart/checkout-handoff",
+      "upstreamRoute": "POST /api/cart/checkout/handoff",
       "status": "declared-in-app"
     },
     {
