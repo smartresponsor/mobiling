@@ -36,7 +36,7 @@ export class CartingApiClient {
   }
 
   prepareCheckoutHandoff(forwardedHeaders: Record<string, string> = {}): Promise<CartingApiResponse> {
-    return this.request("POST", "/api/cart/checkout-handoff", null, forwardedHeaders);
+    return this.request("POST", "/api/cart/checkout/handoff", null, forwardedHeaders);
   }
 
   private async request(method: string, path: string, body: unknown, forwardedHeaders: Record<string, string>): Promise<CartingApiResponse> {
